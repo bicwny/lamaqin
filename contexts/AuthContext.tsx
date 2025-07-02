@@ -49,7 +49,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuthState = async () => {
     try {
       console.log('Checking auth state...');
-      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Auth check timeout')), 10000)
+      );
+      
+      const authPromise = supabase.auth.getSession();
+      
+      const { data: { session }, error } = await Promise.race([authPromise, timeoutPromise]) as any;
 
       if (error) {
         console.error('Auth session error:', error);
