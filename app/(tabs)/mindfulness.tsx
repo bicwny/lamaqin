@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
+<old_str>import React, { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
@@ -8,8 +8,8 @@ import { Colors } from '@/constants/Colors';
 interface MindState {
   id: string;
   date: string;
-  morning_state: 'good' | 'neutral' | 'difficult' | null;
-  evening_state: 'good' | 'neutral' | 'difficult' | null;
+  morning_state?: 'good' | 'bad';
+  evening_state?: 'good' | 'bad';
   gratitude_count: number;
   compassion_practice: boolean;
   notes?: string;
@@ -54,7 +54,7 @@ export default function MindfulnessScreen() {
       setHeartPractices([
         {
           id: '1',
-          name: '感恩修习',
+          name: '感恩练习',
           description: '每日记录三件感恩的事',
           type: 'daily',
           icon: '🙏'
@@ -62,26 +62,18 @@ export default function MindfulnessScreen() {
         {
           id: '2',
           name: '慈悲观修',
-          description: '愿众生离苦得乐',
+          description: '培养对自他的慈悲心',
           type: 'daily',
-          icon: '❤️'
+          icon: '💖'
         },
         {
           id: '3',
-          name: '菩提心培养',
-          description: '发菩提心，利益众生',
+          name: '菩提心训练',
+          description: '菩提心的生起次第',
           type: 'weekly',
-          icon: '💎'
-        },
-        {
-          id: '4',
-          name: '四无量心',
-          description: '慈悲喜舍四种心境',
-          type: 'weekly',
-          icon: '🌟'
+          icon: '🧠'
         }
       ]);
-
     } catch (error) {
       console.error('Error loading mindfulness data:', error);
     } finally {
@@ -89,202 +81,136 @@ export default function MindfulnessScreen() {
     }
   };
 
-  const updateMorningState = (state: 'good' | 'neutral' | 'difficult') => {
-    setTodayState(prev => prev ? { ...prev, morning_state: state } : null);
-  };
-
-  const updateEveningState = (state: 'good' | 'neutral' | 'difficult') => {
-    setTodayState(prev => prev ? { ...prev, evening_state: state } : null);
-  };
-
-  const addGratitude = () => {
-    setTodayState(prev => 
-      prev ? { ...prev, gratitude_count: prev.gratitude_count + 1 } : null
-    );
-  };
-
-  const toggleCompassionPractice = () => {
-    setTodayState(prev => 
-      prev ? { ...prev, compassion_practice: !prev.compassion_practice } : null
-    );
-  };
-
-  const getStateColor = (state: string | null) => {
-    switch (state) {
-      case 'good': return Colors.success;
-      case 'neutral': return Colors.warning;
-      case 'difficult': return Colors.error;
-      default: return Colors.textSecondary;
-    }
-  };
-
-  const getStateText = (state: string | null) => {
-    switch (state) {
-      case 'good': return '良好';
-      case 'neutral': return '平静';
-      case 'difficult': return '困难';
-      default: return '未记录';
+  const recordMindState = (type: 'good' | 'bad') => {
+    // In real app, save to database
+    console.log(`Recording ${type} mind state`);
+    
+    // Update local state for immediate feedback
+    if (todayState) {
+      setTodayState({
+        ...todayState,
+        evening_state: type
+      });
     }
   };
 
   if (loading) {
     return (
       <ThemedView style={styles.container}>
-        <ThemedText>Loading mindfulness data...</ThemedText>
+        <ThemedText>加载中...</ThemedText>
       </ThemedView>
     );
   }
+
+  const goodCount = 8; // Mock data
+  const badCount = 3; // Mock data
+  const goodPercentage = Math.round((goodCount / (goodCount + badCount)) * 100);
 
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <ThemedView style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            💝 心性修养
+            💝 心性观察
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Heart & Mind Cultivation
+            Mindfulness & Heart Cultivation
           </ThemedText>
         </ThemedView>
 
-        {/* Daily Mind State Tracking */}
+        {/* Quick Record */}
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            今日心境记录
+            快速记录心念
           </ThemedText>
           
-          <View style={styles.stateCard}>
-            <View style={styles.stateRow}>
-              <ThemedText style={styles.stateLabel}>晨起状态:</ThemedText>
-              <View style={styles.stateButtons}>
-                {['good', 'neutral', 'difficult'].map((state) => (
-                  <TouchableOpacity
-                    key={state}
-                    style={[
-                      styles.stateButton,
-                      { backgroundColor: todayState?.morning_state === state ? getStateColor(state) : Colors.surface }
-                    ]}
-                    onPress={() => updateMorningState(state as any)}
-                  >
-                    <Text style={[
-                      styles.stateButtonText,
-                      { color: todayState?.morning_state === state ? Colors.surface : Colors.text }
-                    ]}>
-                      {getStateText(state)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.stateRow}>
-              <ThemedText style={styles.stateLabel}>睡前状态:</ThemedText>
-              <View style={styles.stateButtons}>
-                {['good', 'neutral', 'difficult'].map((state) => (
-                  <TouchableOpacity
-                    key={state}
-                    style={[
-                      styles.stateButton,
-                      { backgroundColor: todayState?.evening_state === state ? getStateColor(state) : Colors.surface }
-                    ]}
-                    onPress={() => updateEveningState(state as any)}
-                  >
-                    <Text style={[
-                      styles.stateButtonText,
-                      { color: todayState?.evening_state === state ? Colors.surface : Colors.text }
-                    ]}>
-                      {getStateText(state)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+          <View style={styles.quickButtons}>
+            <TouchableOpacity 
+              style={[styles.mindButton, styles.goodMindButton]}
+              onPress={() => recordMindState('good')}
+            >
+              <Text style={styles.mindButtonText}>🤍 善心</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.mindButton, styles.badMindButton]}
+              onPress={() => recordMindState('bad')}
+            >
+              <Text style={styles.mindButtonText}>🖤 恶心</Text>
+            </TouchableOpacity>
           </View>
         </ThemedView>
 
-        {/* Daily Practice Summary */}
+        {/* Today's Stats */}
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            今日修心
+            今日善恶心统计
           </ThemedText>
           
-          <View style={styles.practiceCard}>
-            <View style={styles.practiceRow}>
-              <ThemedText style={styles.practiceLabel}>🙏 感恩记录:</ThemedText>
-              <View style={styles.countContainer}>
-                <ThemedText style={styles.countText}>{todayState?.gratitude_count || 0} 件</ThemedText>
-                <TouchableOpacity style={styles.addButton} onPress={addGratitude}>
-                  <Text style={styles.addButtonText}>+1</Text>
-                </TouchableOpacity>
-              </View>
+          <View style={styles.statsCard}>
+            <View style={styles.statsRow}>
+              <ThemedText style={styles.statsLabel}>🤍 善心：{goodCount}次</ThemedText>
+              <ThemedText style={styles.statsLabel}>🖤 恶心：{badCount}次</ThemedText>
             </View>
+            <ThemedText style={styles.percentageText}>
+              善心比例：{goodPercentage}% ↗️
+            </ThemedText>
+            
+            <TouchableOpacity style={styles.statsButton}>
+              <Text style={styles.statsButtonText}>统计</Text>
+            </TouchableOpacity>
+          </View>
+        </ThemedView>
 
-            <View style={styles.practiceRow}>
-              <ThemedText style={styles.practiceLabel}>❤️ 慈悲观修:</ThemedText>
-              <TouchableOpacity 
-                style={[
-                  styles.toggleButton,
-                  { backgroundColor: todayState?.compassion_practice ? Colors.success : Colors.textSecondary }
-                ]}
-                onPress={toggleCompassionPractice}
-              >
-                <Text style={styles.toggleButtonText}>
-                  {todayState?.compassion_practice ? '已完成' : '未完成'}
-                </Text>
+        {/* Heart Practices */}
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            心性修持
+          </ThemedText>
+          
+          {heartPractices.map((practice) => (
+            <View key={practice.id} style={styles.practiceCard}>
+              <View style={styles.practiceHeader}>
+                <Text style={styles.practiceIcon}>{practice.icon}</Text>
+                <View style={styles.practiceInfo}>
+                  <ThemedText style={styles.practiceName}>{practice.name}</ThemedText>
+                  <ThemedText style={styles.practiceDesc}>{practice.description}</ThemedText>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.practiceButton}>
+                <Text style={styles.practiceButtonText}>开始修持</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          ))}
         </ThemedView>
 
-        {/* Weekly Progress Chart */}
+        {/* Weekly Visualization */}
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             本周心境趋势
           </ThemedText>
           
-          <View style={styles.chartCard}>
-            <View style={styles.chartContainer}>
-              {weeklyProgress.map((progress, index) => (
-                <View key={index} style={styles.chartBar}>
+          <View style={styles.weeklyChart}>
+            {weeklyProgress.map((percentage, index) => (
+              <View key={index} style={styles.dayColumn}>
+                <View style={styles.barContainer}>
                   <View 
                     style={[
-                      styles.chartFill,
-                      { 
-                        height: `${progress}%`,
-                        backgroundColor: progress >= 70 ? Colors.success : progress >= 50 ? Colors.warning : Colors.error
-                      }
+                      styles.goodBar, 
+                      { height: `${percentage}%` }
                     ]} 
                   />
-                  <ThemedText style={styles.chartLabel}>
-                    {['一', '二', '三', '四', '五', '六', '日'][index]}
-                  </ThemedText>
+                  <View 
+                    style={[
+                      styles.badBar, 
+                      { height: `${100 - percentage}%` }
+                    ]} 
+                  />
                 </View>
-              ))}
-            </View>
-            <ThemedText style={styles.chartDescription}>
-              本周平均心境良好度: {Math.round(weeklyProgress.reduce((a, b) => a + b, 0) / weeklyProgress.length)}%
-            </ThemedText>
-          </View>
-        </ThemedView>
-
-        {/* Heart Cultivation Practices */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            修心法门
-          </ThemedText>
-          
-          <View style={styles.practicesGrid}>
-            {heartPractices.map((practice) => (
-              <TouchableOpacity key={practice.id} style={styles.practiceItem}>
-                <Text style={styles.practiceIcon}>{practice.icon}</Text>
-                <ThemedText style={styles.practiceName}>{practice.name}</ThemedText>
-                <ThemedText style={styles.practiceDescription}>{practice.description}</ThemedText>
-                <View style={[styles.practiceType, { backgroundColor: practice.type === 'daily' ? Colors.mindfulness : Colors.secondary }]}>
-                  <Text style={styles.practiceTypeText}>
-                    {practice.type === 'daily' ? '每日' : '每周'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
+                <ThemedText style={styles.dayLabel}>
+                  {['一', '二', '三', '四', '五', '六', '日'][index]}
+                </ThemedText>
+              </View>
             ))}
           </View>
         </ThemedView>
@@ -327,7 +253,30 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: Colors.text,
   },
-  stateCard: {
+  quickButtons: {
+    flexDirection: 'row',
+    gap: 15,
+    justifyContent: 'center',
+  },
+  mindButton: {
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  goodMindButton: {
+    backgroundColor: Colors.success,
+  },
+  badMindButton: {
+    backgroundColor: Colors.error,
+  },
+  mindButtonText: {
+    color: Colors.surface,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  statsCard: {
     backgroundColor: Colors.surface,
     padding: 20,
     borderRadius: 12,
@@ -337,158 +286,554 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  stateRow: {
-    marginBottom: 15,
-  },
-  stateLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 10,
+  },
+  statsLabel: {
+    fontSize: 16,
     color: Colors.text,
   },
-  stateButtons: {
-    flexDirection: 'row',
-    gap: 8,
+  percentageText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.success,
+    textAlign: 'center',
+    marginBottom: 15,
   },
-  stateButton: {
+  statsButton: {
+    backgroundColor: Colors.mindfulness,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.textSecondary,
+    borderRadius: 6,
+    alignSelf: 'center',
   },
-  stateButtonText: {
-    fontSize: 14,
+  statsButtonText: {
+    color: Colors.surface,
     fontWeight: 'bold',
+    fontSize: 14,
   },
   practiceCard: {
     backgroundColor: Colors.surface,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  practiceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  practiceLabel: {
-    fontSize: 16,
-    color: Colors.text,
-  },
-  countContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  countText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.text,
-  },
-  addButton: {
-    backgroundColor: Colors.mindfulness,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  addButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-  },
-  toggleButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  toggleButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  chartCard: {
-    backgroundColor: Colors.surface,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  chartContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    height: 120,
-    marginBottom: 15,
-    alignItems: 'flex-end',
-  },
-  chartBar: {
-    flex: 1,
-    alignItems: 'center',
-    marginHorizontal: 2,
-  },
-  chartFill: {
-    width: '80%',
-    borderRadius: 2,
-    marginBottom: 5,
-  },
-  chartLabel: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-  chartDescription: {
-    textAlign: 'center',
-    fontSize: 14,
-    color: Colors.textSecondary,
-  },
-  practicesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 15,
-  },
-  practiceItem: {
-    backgroundColor: Colors.surface,
     padding: 15,
     borderRadius: 12,
-    width: '47%',
-    alignItems: 'center',
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.mindfulness,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  practiceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   practiceIcon: {
     fontSize: 24,
-    marginBottom: 8,
+    marginRight: 10,
+  },
+  practiceInfo: {
+    flex: 1,
   },
   practiceName: {
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 5,
     color: Colors.text,
+    marginBottom: 5,
   },
-  practiceDescription: {
-    fontSize: 12,
-    textAlign: 'center',
+  practiceDesc: {
+    fontSize: 14,
     color: Colors.textSecondary,
-    marginBottom: 8,
   },
-  practiceType: {
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+  practiceButton: {
+    backgroundColor: Colors.mindfulness,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
   },
-  practiceTypeText: {
-    fontSize: 10,
+  practiceButtonText: {
     color: Colors.surface,
     fontWeight: 'bold',
+    fontSize: 14,
   },
-});
+  weeklyChart: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 150,
+    alignItems: 'flex-end',
+    backgroundColor: Colors.surface,
+    padding: 15,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dayColumn: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  barContainer: {
+    width: 20,
+    height: 100,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginBottom: 5,
+  },
+  goodBar: {
+    backgroundColor: Colors.success,
+    width: '100%',
+  },
+  badBar: {
+    backgroundColor: Colors.error,
+    width: '100%',
+  },
+  dayLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+});</old_str>
+<new_str>import React, { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { Colors } from '@/constants/Colors';
+
+interface DayStats {
+  good: number;
+  bad: number;
+  date: string;
+}
+
+export default function MindfulnessScreen() {
+  const [todayStats, setTodayStats] = useState<DayStats>({ good: 8, bad: 3, date: new Date().toISOString().split('T')[0] });
+  const [weeklyData, setWeeklyData] = useState<DayStats[]>([]);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [showVisualization, setShowVisualization] = useState(false);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    // Mock weekly data
+    const mockWeekly = [
+      { good: 8, bad: 3, date: '2025-01-27' }, // 今天
+      { good: 7, bad: 2, date: '2025-01-26' }, // 周六
+      { good: 9, bad: 2, date: '2025-01-25' }, // 周五
+      { good: 6, bad: 2, date: '2025-01-24' }, // 周四
+      { good: 6, bad: 3, date: '2025-01-23' }, // 周三
+      { good: 8, bad: 2, date: '2025-01-22' }, // 周二
+      { good: 7, bad: 3, date: '2025-01-21' }, // 周一
+    ];
+    setWeeklyData(mockWeekly);
+  };
+
+  const recordMind = (type: 'good' | 'bad') => {
+    setTodayStats(prev => ({
+      ...prev,
+      [type]: prev[type] + 1
+    }));
+    
+    // Update weekly data
+    setWeeklyData(prev => prev.map(day => 
+      day.date === todayStats.date 
+        ? { ...day, [type]: day[type] + 1 }
+        : day
+    ));
+  };
+
+  const getGoodPercentage = (day: DayStats) => {
+    const total = day.good + day.bad;
+    return total > 0 ? Math.round((day.good / total) * 100) : 0;
+  };
+
+  const getTrendIcon = (current: number, previous: number) => {
+    if (current > previous) return '↗️';
+    if (current < previous) return '↘️';
+    return '';
+  };
+
+  return (
+    <ThemedView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <ThemedView style={styles.header}>
+          <ThemedText type="title" style={styles.title}>
+            👁 观心记录
+          </ThemedText>
+        </ThemedView>
+
+        {/* Quick Record */}
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            快速记录：
+          </ThemedText>
+          
+          <View style={styles.quickButtons}>
+            <TouchableOpacity 
+              style={[styles.mindButton, styles.goodMindButton]}
+              onPress={() => recordMind('good')}
+            >
+              <Text style={styles.mindButtonText}>🤍 善心</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.mindButton, styles.badMindButton]}
+              onPress={() => recordMind('bad')}
+            >
+              <Text style={styles.mindButtonText}>🖤 恶心</Text>
+            </TouchableOpacity>
+          </View>
+        </ThemedView>
+
+        {/* Today's Stats */}
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            今日善恶心统计：
+          </ThemedText>
+          
+          <View style={styles.statsCard}>
+            <View style={styles.statsRow}>
+              <ThemedText style={styles.statsLabel}>🤍 善心：{todayStats.good}次</ThemedText>
+              <ThemedText style={styles.statsLabel}>🖤 恶心：{todayStats.bad}次</ThemedText>
+            </View>
+            
+            <ThemedText style={styles.percentageText}>
+              善心比例：{getGoodPercentage(todayStats)}% {getTrendIcon(getGoodPercentage(todayStats), weeklyData[1] ? getGoodPercentage(weeklyData[1]) : 0)}
+            </ThemedText>
+            
+            <TouchableOpacity 
+              style={styles.statsButton}
+              onPress={() => setShowStatsModal(true)}
+            >
+              <Text style={styles.statsButtonText}>统计</Text>
+            </TouchableOpacity>
+          </View>
+        </ThemedView>
+      </ScrollView>
+
+      {/* Stats Modal */}
+      <Modal visible={showStatsModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ThemedText type="subtitle" style={styles.modalTitle}>
+              👁 观心统计
+            </ThemedText>
+            
+            <ThemedText style={styles.modalSubtitle}>
+              📊 过去7天：（今天在最上面）
+            </ThemedText>
+            
+            <ScrollView style={styles.weeklyList}>
+              {weeklyData.map((day, index) => {
+                const percentage = getGoodPercentage(day);
+                const dayName = index === 0 ? '今天' : ['周六', '周五', '周四', '周三', '周二', '周一'][index - 1];
+                const trendIcon = index < weeklyData.length - 1 ? getTrendIcon(percentage, getGoodPercentage(weeklyData[index + 1])) : '';
+                
+                return (
+                  <View key={day.date} style={styles.weeklyItem}>
+                    <ThemedText style={styles.weeklyText}>
+                      {dayName}：善{percentage}% 恶{100 - percentage}% {trendIcon}
+                    </ThemedText>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowStatsModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>返回</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.modalButton}
+                onPress={() => {
+                  setShowStatsModal(false);
+                  setShowVisualization(true);
+                }}
+              >
+                <Text style={styles.modalButtonText}>visualization</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Visualization Modal */}
+      <Modal visible={showVisualization} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ThemedText type="subtitle" style={styles.modalTitle}>
+              📈 观心趋势可视化
+            </ThemedText>
+            
+            <ThemedText style={styles.modalSubtitle}>
+              📊 过去7天视觉图表：
+            </ThemedText>
+            
+            <ScrollView style={styles.visualizationContainer}>
+              {weeklyData.map((day, index) => {
+                const goodPercentage = getGoodPercentage(day);
+                const dayName = index === 0 ? '今天' : ['周六', '周五', '周四', '周三', '周二', '周一'][index - 1];
+                const goodCount = Math.round((goodPercentage / 100) * 10);
+                const badCount = 10 - goodCount;
+                
+                return (
+                  <View key={day.date} style={styles.visualizationRow}>
+                    <View style={styles.dayLabelContainer}>
+                      <ThemedText style={styles.dayLabelViz}>{dayName}：</ThemedText>
+                    </View>
+                    <View style={styles.heartsContainer}>
+                      {'🤍'.repeat(goodCount)}{'🖤'.repeat(badCount)}
+                    </View>
+                    <ThemedText style={styles.percentageLabel}>
+                      ({goodPercentage}%善心)
+                    </ThemedText>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            
+            <View style={styles.monthlyStats}>
+              <ThemedText style={styles.monthlyTitle}>📈 月度统计：</ThemedText>
+              <ThemedText style={styles.monthlyText}>本月平均善心：75%</ThemedText>
+              <ThemedText style={styles.monthlyText}>连续记录天数：30天 🔥</ThemedText>
+              <ThemedText style={styles.monthlyText}>最佳表现：周五 82%</ThemedText>
+            </View>
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowVisualization(false)}
+              >
+                <Text style={styles.cancelButtonText}>返回</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton}>
+                <Text style={styles.modalButtonText}>本月视图</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    padding: 20,
+    backgroundColor: Colors.mindfulness,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.surface,
+    marginBottom: 5,
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: Colors.text,
+  },
+  quickButtons: {
+    flexDirection: 'row',
+    gap: 15,
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  mindButton: {
+    paddingVertical: 20,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    minWidth: 140,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  goodMindButton: {
+    backgroundColor: Colors.success,
+  },
+  badMindButton: {
+    backgroundColor: Colors.error,
+  },
+  mindButtonText: {
+    color: Colors.surface,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  statsCard: {
+    backgroundColor: Colors.surface,
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  statsLabel: {
+    fontSize: 16,
+    color: Colors.text,
+    fontWeight: 'bold',
+  },
+  percentageText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.success,
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  statsButton: {
+    backgroundColor: Colors.mindfulness,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  statsButtonText: {
+    color: Colors.surface,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: Colors.surface,
+    padding: 20,
+    borderRadius: 12,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 15,
+    fontWeight: 'bold',
+  },
+  weeklyList: {
+    maxHeight: 200,
+    marginBottom: 20,
+  },
+  weeklyItem: {
+    padding: 10,
+    backgroundColor: Colors.background,
+    marginBottom: 5,
+    borderRadius: 6,
+  },
+  weeklyText: {
+    fontSize: 16,
+    color: Colors.text,
+  },
+  visualizationContainer: {
+    maxHeight: 300,
+    marginBottom: 20,
+  },
+  visualizationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingVertical: 5,
+  },
+  dayLabelContainer: {
+    width: 50,
+  },
+  dayLabelViz: {
+    fontSize: 14,
+    color: Colors.text,
+    fontWeight: 'bold',
+  },
+  heartsContainer: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  percentageLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    width: 80,
+  },
+  monthlyStats: {
+    backgroundColor: Colors.background,
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  monthlyTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginBottom: 10,
+  },
+  monthlyText: {
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 5,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  modalButton: {
+    backgroundColor: Colors.mindfulness,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.textSecondary,
+  },
+  modalButtonText: {
+    color: Colors.surface,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  cancelButtonText: {
+    color: Colors.textSecondary,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});</new_str>

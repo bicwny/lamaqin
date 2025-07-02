@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -94,7 +93,7 @@ export default function StudyScreen() {
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             课程列表
           </ThemedText>
-          
+
           {displayCourses.map((course) => (
             <View key={course.id} style={styles.courseCard}>
               <View style={styles.courseHeader}>
@@ -105,13 +104,13 @@ export default function StudyScreen() {
                   <Text style={styles.lessonText}>{course.total_lessons}课</Text>
                 </View>
               </View>
-              
+
               {course.teacher && (
                 <ThemedText style={styles.teacherText}>
                   授课法师: {course.teacher}
                 </ThemedText>
               )}
-              
+
               {course.description && (
                 <ThemedText style={styles.descriptionText}>
                   {course.description}
@@ -153,23 +152,23 @@ export default function StudyScreen() {
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             快速功能
           </ThemedText>
-          
+
           <View style={styles.actionsGrid}>
             <TouchableOpacity style={styles.actionCard}>
               <Text style={styles.actionIcon}>📖</Text>
               <ThemedText style={styles.actionLabel}>今日复习</ThemedText>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.actionCard}>
               <Text style={styles.actionIcon}>📝</Text>
               <ThemedText style={styles.actionLabel}>笔记回顾</ThemedText>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.actionCard}>
               <Text style={styles.actionIcon}>🎯</Text>
               <ThemedText style={styles.actionLabel}>学习计划</ThemedText>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.actionCard}>
               <Text style={styles.actionIcon}>📊</Text>
               <ThemedText style={styles.actionLabel}>学习统计</ThemedText>
