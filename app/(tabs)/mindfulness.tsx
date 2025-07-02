@@ -22,14 +22,22 @@ export default function MindfulnessScreen() {
   }, [user]);
 
   const loadTodayRecords = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log('🔄 Loading mindfulness records for user:', user.id);
+      
       const today = new Date().toISOString().split('T')[0];
       const records = await mindfulnessService.getTodayRecords(user.id, today);
+      
+      console.log('💝 Loaded mindfulness records:', records.length);
       setTodayRecords(records);
     } catch (error) {
-      console.error('Error loading mindfulness records:', error);
+      console.error('❌ Error loading mindfulness records:', error);
+      setTodayRecords([]);
     } finally {
       setLoading(false);
     }

@@ -29,18 +29,29 @@ export default function StudyScreen() {
   }, [user]);
 
   const loadStudyData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log('🔄 Loading study data for user:', user.id);
+      
       const coursesData = await studyService.getCourses();
       const progressData = await studyService.getUserStudyProgress(user.id);
+
+      console.log('📚 Loaded courses:', coursesData.length);
+      console.log('📖 Loaded progress records:', progressData.length);
 
       setCourses(coursesData);
       // Process progress data into organized format
       const organizedProgress = processProgressData(progressData);
       setProgress(organizedProgress);
     } catch (error) {
-      console.error('Error loading study data:', error);
+      console.error('❌ Error loading study data:', error);
+      // Show empty state instead of any fallback
+      setCourses([]);
+      setProgress([]);
     } finally {
       setLoading(false);
     }

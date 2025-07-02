@@ -84,8 +84,8 @@ export default function HomeScreen() {
 
       setPractices(practicesData);
     } catch (error) {
-      console.error('Error loading practices:', error);
-      // Fallback to mock data if database fails
+      console.error('❌ Error loading practices:', error);
+      // Show empty state instead of mock data
       setPractices([]);
     } finally {
       setLoading(false);
