@@ -1,6 +1,22 @@
 
-import { supabase } from './supabase';
+import { supabase, testConnection } from './supabase';
 import { Database } from '@/types/database';
+
+// Re-export testConnection for convenience
+export { testConnection };
+
+// Legacy function exports for backward compatibility
+export async function getUserPracticeProjects(userId: string) {
+  return await practiceService.getUserPracticeProjects(userId);
+}
+
+export async function getTodayRecords(userId: string, date: string) {
+  return await dailyRecordService.getTodayRecords(userId, date);
+}
+
+export async function createDailyRecord(record: Omit<DailyRecord, 'id' | 'created_at'>) {
+  return await dailyRecordService.recordPractice(record);
+}
 
 export type User = Database['public']['Tables']['users']['Row'];
 export type Theme = Database['public']['Tables']['themes']['Row'];
@@ -70,13 +86,12 @@ export const practiceService = {
     return data || [];
   },
 
-  async getUserPracticeProjects(userId: string): Promise<UserPracticeProject[]> {
+  async getUserPracticeProjects(userId: string) {
     const { data, error } = await supabase
       .from('user_practice_projects')
       .select(`
         *,
-        theme:themes(*),
-        practice:practices(*)
+        practices(*)
       `)
       .eq('user_id', userId)
       .order('created_at');

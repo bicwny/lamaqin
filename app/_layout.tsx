@@ -35,9 +35,9 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         ) : (
-          <Stack.Screen name="auth" />
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
         )}
         <Stack.Screen name="+not-found" />
       </Stack>
