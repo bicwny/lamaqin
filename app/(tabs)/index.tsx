@@ -10,6 +10,7 @@ import { Colors } from '@/constants/Colors';
 import { getUserPracticeProjects, getTodayRecords, createDailyRecord } from '@/lib/database';
 import { testConnection } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -53,12 +54,7 @@ export default function HomeScreen() {
       // Use actual authenticated user ID, or skip if not available
       if (!user?.id) {
         console.log('No user ID available, using mock data');
-        setPractices([
-          { name: '念佛', current: 1250, target: 3000, type: 'count', status: 'in_progress' },
-          { name: '拜佛', current: 20, target: 108, type: 'count', status: 'pending' },
-          { name: '诵经', current: 25, target: 30, type: 'time', status: 'in_progress' },
-          { name: '禅修', current: 30, target: 30, type: 'time', status: 'completed' },
-        ]);
+        setPractices([]);
         return;
       }
 
@@ -90,12 +86,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error('Error loading practices:', error);
       // Fallback to mock data if database fails
-      setPractices([
-        { name: '念佛', current: 1250, target: 3000, type: 'count', status: 'in_progress' },
-        { name: '拜佛', current: 20, target: 108, type: 'count', status: 'pending' },
-        { name: '诵经', current: 25, target: 30, type: 'time', status: 'in_progress' },
-        { name: '禅修', current: 30, target: 30, type: 'time', status: 'completed' },
-      ]);
+      setPractices([]);
     } finally {
       setLoading(false);
     }
@@ -151,28 +142,24 @@ export default function HomeScreen() {
   };
 
   const [todayProgress, setTodayProgress] = useState({
-    completedPractices: 3,
-    totalPractices: 6,
-    studyMinutes: 45,
-    meditationMinutes: 25,
-    goodMindCount: 12,
-    badMindCount: 2,
-    streak: 27
+    completedPractices: 0,
+    totalPractices: 0,
+    studyMinutes: 0,
+    meditationMinutes: 0,
+    goodMindCount: 0,
+    badMindCount: 0,
+    streak: 0
   });
 
   const [quickStats, setQuickStats] = useState({
-    totalMantras: 2847,
-    totalStudyHours: 89,
-    totalMeditationHours: 156,
-    favoriteMantra: '六字大明咒'
+    totalMantras: 0,
+    totalStudyHours: 0,
+    totalMeditationHours: 0,
+    favoriteMantra: ''
   });
 
-  const [currentPractices, setCurrentPractices] = useState([
-    { name: '六字大明咒', current: 2847, target: 10000, unit: '次' },
-    { name: '禅修', current: 25, target: 30, unit: '分钟' },
-    { name: '心经', current: 7, target: 21, unit: '次' }
-  ]);
-
+  const [currentPractices, setCurrentPractices] = useState([]);
+  const [userPracticeProjects, setUserPracticeProjects] = useState([]);
 
   return (
     <ThemedView style={styles.container}>
@@ -244,30 +231,30 @@ export default function HomeScreen() {
             📿 进行中的修行
           </ThemedText>
 
-          {currentPractices.map((practice, index) => {
-            const progress = (practice.current / practice.target) * 100;
-            return (
-              <View key={index} style={styles.practiceCard}>
-                <View style={styles.practiceInfo}>
-                  <ThemedText style={styles.practiceName}>{practice.name}</ThemedText>
-                  <ThemedText style={styles.practiceProgress}>
-                    {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
-                  </ThemedText>
-                </View>
-                <View style={styles.practiceProgressBar}>
+          {userPracticeProjects.length > 0 ? userPracticeProjects.map((project, index) => (
+            <View key={project.id} style={styles.practiceCard}>
+              <Text style={styles.practiceTitle}>{project.practices?.name || '未知修行'}</Text>
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
                   <View 
                     style={[
-                      styles.practiceProgressFill, 
-                      { 
-                        width: `${Math.min(progress, 100)}%`,
-                        backgroundColor: Colors.practice 
-                      }
+                      styles.progressFill, 
+                      { width: `${Math.min((project.current_count / project.daily_target) * 100, 100)}%` }
                     ]} 
                   />
                 </View>
+                <Text style={styles.progressText}>
+                  {project.current_count}/{project.daily_target} {project.practices?.unit || ''}
+                </Text>
               </View>
-            );
-          })}
+            </View>
+          )) : (
+            <View style={styles.emptyPracticeState}>
+              <Ionicons name="flower-outline" size={48} color="#9CA3AF" />
+              <Text style={styles.emptyPracticeText}>暂无修行项目</Text>
+              <Text style={styles.emptyPracticeSubtext}>前往"修行"页面添加您的第一个项目</Text>
+            </View>
+          )}
         </ThemedView>
 
         {/* Quick Stats */}
@@ -590,5 +577,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     textAlign: 'right',
+  },
+  connectionButton: {
+    backgroundColor: '#059669',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  connectionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyPracticeState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  emptyPracticeText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  emptyPracticeSubtext: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
 });
