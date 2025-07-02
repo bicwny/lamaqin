@@ -1,96 +1,156 @@
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
-import { getCourses } from '@/lib/database';
-import { Course } from '@/types/database';
+import { useColorScheme } from '@/hooks/useColorScheme';
+
+interface Course {
+  id: string;
+  title: string;
+  teacher: string;
+  currentLesson: number;
+  totalLessons: number;
+  progress: number;
+}
+
+interface DailyStudyStatus {
+  hasStudied: boolean;
+  date: string;
+}
+
+const mockCourses: Course[] = [
+  {
+    id: '1',
+    title: '佛子行',
+    teacher: '索达吉堪布',
+    currentLesson: 0,
+    totalLessons: 48,
+    progress: 0,
+  },
+  {
+    id: '2',
+    title: '修心七要',
+    teacher: '索达吉堪布',
+    currentLesson: 0,
+    totalLessons: 36,
+    progress: 0,
+  },
+  {
+    id: '3',
+    title: '修心七要-圆照',
+    teacher: '圆照堪布',
+    currentLesson: 0,
+    totalLessons: 36,
+    progress: 0,
+  },
+  {
+    id: '4',
+    title: '入菩萨行论',
+    teacher: '索达吉堪布',
+    currentLesson: 0,
+    totalLessons: 201,
+    progress: 0,
+  },
+  {
+    id: '5',
+    title: '前行广释',
+    teacher: '索达吉堪布',
+    currentLesson: 0,
+    totalLessons: 156,
+    progress: 0,
+  },
+];
 
 export default function StudyScreen() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  const colorScheme = useColorScheme();
+  const [courses, setCourses] = useState<Course[]>(mockCourses);
+  const [dailyStatus, setDailyStatus] = useState<DailyStudyStatus>({
+    hasStudied: false,
+    date: new Date().toDateString(),
+  });
 
-  useEffect(() => {
-    loadCourses();
-  }, []);
-
-  const loadCourses = async () => {
-    try {
-      const coursesData = await getCourses();
-      setCourses(coursesData);
-    } catch (error) {
-      console.error('Error loading courses:', error);
-    } finally {
-      setLoading(false);
+  const handleStartStudy = () => {
+    if (!dailyStatus.hasStudied) {
+      setDailyStatus({
+        hasStudied: true,
+        date: new Date().toDateString(),
+      });
+      Alert.alert('开始学习', '开始今日的学习吧！', [{ text: '确定' }]);
+    } else {
+      Alert.alert('今日已学习', '您今天已经完成学习了！', [{ text: '确定' }]);
     }
   };
 
+  const handleCoursePress = (course: Course) => {
+    Alert.alert(
+      course.title,
+      `教师: ${course.teacher}\n课程进度: ${course.currentLesson}/${course.totalLessons}`,
+      [
+        { text: '取消', style: 'cancel' },
+        { 
+          text: '开始学习', 
+          onPress: () => {
+            // Update course progress
+            setCourses(prev => prev.map(c => 
+              c.id === course.id 
+                ? { ...c, currentLesson: Math.min(c.currentLesson + 1, c.totalLessons) }
+                : c
+            ));
+          }
+        },
+      ]
+    );
+  };
+
+  const CourseCard = ({ course }: { course: Course }) => (
+    <TouchableOpacity
+      style={[styles.courseCard, { borderColor: Colors[colorScheme ?? 'light'].border }]}
+      onPress={() => handleCoursePress(course)}
+    >
+      <View style={styles.courseHeader}>
+        <Text style={styles.courseTitle}>《{course.title}》</Text>
+        <Text style={styles.courseTeacher}>{course.teacher}</Text>
+      </View>
+      <Text style={styles.courseProgress}>
+        课程进度: <Text style={styles.progressNumbers}>{course.currentLesson} / {course.totalLessons}</Text>
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
-            📚 闻思学习
-          </ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Buddhist Study & Courses
-          </ThemedText>
-        </ThemedView>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" showsVerticalScrollIndicator={false}>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <ThemedText type="title" style={styles.headerTitle}>闻思</ThemedText>
+        </View>
 
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            今日学习
-          </ThemedText>
-          <View style={styles.quickStudyCard}>
-            <ThemedText style={styles.cardText}>
-              今天还没有学习记录
-            </ThemedText>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.buttonText}>开始学习</Text>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
+        {/* Daily Study Status Card */}
+        <View style={[styles.dailyCard, { backgroundColor: Colors[colorScheme ?? 'light'].cardBackground }]}>
+          <Text style={styles.dailyStatusText}>
+            {dailyStatus.hasStudied ? '今天已完成学习' : '今天还没有学习记录'}
+          </Text>
+          <TouchableOpacity
+            style={[
+              styles.startButton,
+              { backgroundColor: dailyStatus.hasStudied ? '#6B7280' : '#3B82F6' }
+            ]}
+            onPress={handleStartStudy}
+          >
+            <Text style={styles.startButtonText}>
+              {dailyStatus.hasStudied ? '已完成' : '开始学习'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            我的课程
-          </ThemedText>
-          {loading ? (
-            <ThemedText>Loading courses...</ThemedText>
-          ) : (
-            courses.map((course) => (
-              <View key={course.id} style={styles.courseCard}>
-                <ThemedText type="defaultSemiBold" style={styles.courseName}>
-                  {course.name}
-                </ThemedText>
-                <ThemedText style={styles.courseTeacher}>
-                  {course.teacher}
-                </ThemedText>
-                <ThemedText style={styles.courseProgress}>
-                  课程进度: 0 / {course.total_lessons}
-                </ThemedText>
-              </View>
-            ))
-          )}
-        </ThemedView>
-
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            快速操作
-          </ThemedText>
-          <View style={styles.actionGrid}>
-            <TouchableOpacity style={styles.gridButton}>
-              <Text style={styles.gridButtonText}>继续学习</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.gridButton}>
-              <Text style={styles.gridButtonText}>浏览课程</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.gridButton}>
-              <Text style={styles.gridButtonText}>今日听课</Text>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
+        {/* Course List */}
+        <View style={styles.courseList}>
+          {courses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </View>
       </ScrollView>
     </ThemedView>
   );
@@ -99,104 +159,87 @@ export default function StudyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
   },
   header: {
-    padding: 20,
-    backgroundColor: Colors.study,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
   },
-  title: {
+  headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.surface,
-    marginBottom: 5,
   },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.surface,
-    opacity: 0.9,
-  },
-  section: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: Colors.text,
-  },
-  quickStudyCard: {
-    backgroundColor: Colors.surface,
+  dailyCard: {
+    marginHorizontal: 15,
+    marginBottom: 20,
     padding: 20,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  cardText: {
+  dailyStatusText: {
     fontSize: 16,
-    color: Colors.textSecondary,
     marginBottom: 15,
+    color: '#374151',
+    textAlign: 'center',
   },
-  actionButton: {
-    backgroundColor: Colors.study,
-    padding: 12,
+  startButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
   },
-  buttonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
+  startButtonText: {
+    color: 'white',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  courseList: {
+    paddingHorizontal: 15,
+    paddingBottom: 100,
   },
   courseCard: {
-    backgroundColor: Colors.surface,
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.study,
+    backgroundColor: 'white',
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  courseName: {
+  courseHeader: {
+    marginBottom: 8,
+  },
+  courseTitle: {
     fontSize: 18,
-    color: Colors.text,
-    marginBottom: 5,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
   },
   courseTeacher: {
     fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 5,
+    color: '#6B7280',
   },
   courseProgress: {
     fontSize: 14,
-    color: Colors.study,
-    fontWeight: 'bold',
+    color: '#6B7280',
   },
-  actionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  gridButton: {
-    backgroundColor: Colors.surface,
-    padding: 15,
-    borderRadius: 10,
-    flex: 1,
-    minWidth: '30%',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.study,
-  },
-  gridButtonText: {
-    color: Colors.study,
-    fontWeight: 'bold',
-    fontSize: 14,
+  progressNumbers: {
+    color: '#3B82F6',
+    fontWeight: '600',
   },
 });
+</styles>
