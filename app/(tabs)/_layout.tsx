@@ -30,74 +30,48 @@ export default function TabLayout() {
       <Tabs.Screen
         name="study"
         options={{
-          title: '闻思',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
+          title: '📚 闻思',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'book.fill' : 'book'} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="practice"
         options={{
-          title: '修行',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="hands.and.sparkles.fill" color={color} />,
+          title: '📿 修行',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'hands.and.sparkles.fill' : 'hands.and.sparkles'} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="mindfulness"
         options={{
-          title: '心性',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          title: '💝 心性',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'heart.fill' : 'heart'} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
-          title: '统计',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
+          title: '📊 统计',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'chart.bar.fill' : 'chart.bar'} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: '个人',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          title: '👤 个人',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'person.fill' : 'person'} color={color} />
+          ),
         }}
       />
-      <Tabs.Screen
-          name="study"
-          options={{
-            title: '📚 闻思',
-            tabBarIcon: ({ color, focused }) => (
-              <IconSymbol size={28} name={focused ? 'book.fill' : 'book'} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="practice"
-          options={{
-            title: '📿 修行',
-            tabBarIcon: ({ color, focused }) => (
-              <IconSymbol size={28} name={focused ? 'heart.fill' : 'heart'} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="mindfulness"
-          options={{
-            title: '💝 心性',
-            tabBarIcon: ({ color, focused }) => (
-              <IconSymbol size={28} name={focused ? 'brain.head.profile.fill' : 'brain.head.profile'} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="stats"
-          options={{
-            title: '📊 统计',
-            tabBarIcon: ({ color, focused }) => (
-              <IconSymbol size={28} name={focused ? 'chart.bar.fill' : 'chart.bar'} color={color} />
-            ),
-          }}
-        />
       <Tabs.Screen
         name="index"
         options={{
