@@ -76,6 +76,8 @@ export default function TabLayout() {
         name="index"
         options={{
           href: null, // Hide the default index tab
+          tabBarButton: () => null,
+          tabBarVisible: false,
         }}
       />
       <Tabs.Screen
