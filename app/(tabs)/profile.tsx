@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal, Share } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -10,6 +11,8 @@ interface UserProfile {
   practiceYears: number;
   location: string;
   className: string;
+  email: string;
+  registrationDate: string;
 }
 
 interface TodaySummary {
@@ -25,14 +28,21 @@ export default function ProfileScreen() {
 
   const handleSignOut = () => {
     Alert.alert(
-      '退出登录',
-      '确定要退出登录吗？',
+      '⚠️ 确认退出',
+      '您确定要退出登录吗？\n\n退出后将无法自动同步修行数据，建议先进行数据备份。',
       [
         { text: '取消', style: 'cancel' },
         { 
-          text: '退出', 
+          text: '确认退出', 
           style: 'destructive',
-          onPress: signOut 
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (error) {
+              console.error('Logout failed:', error);
+              Alert.alert('退出失败', '退出登录时发生错误，请重试。');
+            }
+          }
         }
       ]
     );
@@ -42,7 +52,9 @@ export default function ProfileScreen() {
     dharmaName: '多吉丹',
     practiceYears: 3,
     location: '纽约',
-    className: '入行班'
+    className: '入行班',
+    email: user?.email || 'dorje@example.com',
+    registrationDate: '2025-01-01'
   });
 
   const [showShareModal, setShowShareModal] = useState(false);
@@ -115,9 +127,25 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
     setShowShareModal(false);
   };
 
+  const handleEditProfile = () => {
+    Alert.alert('功能开发中', '个人资料编辑功能正在开发中');
+  };
+
+  const handleNotificationSettings = () => {
+    Alert.alert('通知设置', '🔔 通知设置功能正在开发中');
+  };
+
+  const handlePracticeGoals = () => {
+    Alert.alert('修行目标', '🎯 修行目标设置功能正在开发中');
+  };
+
+  const handleThemeManagement = () => {
+    Alert.alert('主题管理', '🎯 主题管理功能正在开发中');
+  };
+
   const handleDataExport = () => {
     Alert.alert(
-      '数据导出',
+      '📤 数据导出',
       '选择导出格式',
       [
         { text: '取消', style: 'cancel' },
@@ -129,13 +157,21 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
 
   const handleDataBackup = () => {
     Alert.alert(
-      '数据备份',
+      '🔄 数据备份',
       '将数据备份到云端',
       [
         { text: '取消', style: 'cancel' },
         { text: '确认备份', onPress: () => Alert.alert('成功', '数据已成功备份到云端') }
       ]
     );
+  };
+
+  const handleChangePassword = () => {
+    Alert.alert('修改密码', '🔐 密码修改功能正在开发中');
+  };
+
+  const handleChangeEmail = () => {
+    Alert.alert('更换邮箱', '📧 邮箱更换功能正在开发中');
   };
 
   return (
@@ -155,42 +191,126 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             </View>
             <View style={styles.profileInfo}>
               <ThemedText type="subtitle" style={styles.userName}>
-                {userProfile.dharmaName}
+                {userProfile.dharmaName} 🌟
               </ThemedText>
               <ThemedText style={styles.userDetails}>
                 修行年限：{userProfile.practiceYears}年 | 常住：{userProfile.location} | 班级：{userProfile.className}
               </ThemedText>
+              <ThemedText style={styles.userEmail}>
+                邮箱：{userProfile.email}
+              </ThemedText>
+              <ThemedText style={styles.registrationDate}>
+                注册时间：{userProfile.registrationDate}
+              </ThemedText>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
             <Text style={styles.editButtonText}>编辑资料</Text>
           </TouchableOpacity>
         </ThemedView>
 
-        {/* Function Settings */}
+        {/* Application Settings */}
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            ⚙️ 功能设置：
+            ⚙️ 应用设置
           </ThemedText>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={styles.settingItem} onPress={handleNotificationSettings}>
+            <Text style={styles.settingIcon}>🔔</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>通知设置</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem} onPress={handlePracticeGoals}>
             <Text style={styles.settingIcon}>🎯</Text>
             <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>主题管理</ThemedText>
+              <ThemedText style={styles.settingTitle}>修行目标</ThemedText>
             </View>
-            <Text style={styles.settingAction}>设置</Text>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>🌙</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>夜间模式</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>关闭</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>🌍</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>语言选择</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>简体中文</Text>
           </TouchableOpacity>
         </ThemedView>
 
         {/* Data Management */}
         <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            📊 数据管理
+          </ThemedText>
+
           <TouchableOpacity style={styles.dataButton} onPress={handleDataExport}>
-            <Text style={styles.dataButtonText}>📤 数据导出</Text>
+            <Text style={styles.dataButtonText}>📤 导出数据</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.dataButton} onPress={handleDataBackup}>
-            <Text style={styles.dataButtonText}>🔄 数据备份</Text>
+            <Text style={styles.dataButtonText}>🔄 备份恢复</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.dataButton}>
+            <Text style={styles.dataButtonText}>🗑️ 清除缓存</Text>
+          </TouchableOpacity>
+        </ThemedView>
+
+        {/* Account Security */}
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            🔐 账户安全
+          </ThemedText>
+
+          <TouchableOpacity style={styles.dataButton} onPress={handleChangePassword}>
+            <Text style={styles.dataButtonText}>🔒 修改密码</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.dataButton} onPress={handleChangeEmail}>
+            <Text style={styles.dataButtonText}>📧 更换邮箱</Text>
+          </TouchableOpacity>
+        </ThemedView>
+
+        {/* Feature Management */}
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            🛠️ 功能管理
+          </ThemedText>
+
+          <TouchableOpacity style={styles.settingItem} onPress={handleThemeManagement}>
+            <Text style={styles.settingIcon}>🎯</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>主题管理</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>📚</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>课程管理</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>⏰</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>提醒设置</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
           </TouchableOpacity>
         </ThemedView>
 
@@ -206,6 +326,44 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             </TouchableOpacity>
           </View>
         </ThemedView>
+
+        {/* Help & Support */}
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            ❓ 帮助支持
+          </ThemedText>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>📖</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>使用指南</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>💬</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>意见反馈</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <Text style={styles.settingIcon}>ℹ️</Text>
+            <View style={styles.settingContent}>
+              <ThemedText style={styles.settingTitle}>关于应用</ThemedText>
+            </View>
+            <Text style={styles.settingAction}>></Text>
+          </TouchableOpacity>
+        </ThemedView>
+
+        {/* Sign Out */}
+        <ThemedView style={styles.section}>
+          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+            <Text style={styles.signOutText}>退出登录</Text>
+          </TouchableOpacity>
+        </ThemedView>
       </ScrollView>
 
       {/* Share Modal */}
@@ -213,7 +371,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <ThemedText type="subtitle" style={styles.modalTitle}>
-              📄 修行分享
+              📄 修行分享生成
             </ThemedText>
 
             <ThemedText style={styles.modalSubtitle}>
@@ -221,7 +379,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             </ThemedText>
 
             <View style={styles.sharePreview}>
-              <ThemedText style={styles.sharePreviewLabel}>自动生成：</ThemedText>
+              <ThemedText style={styles.sharePreviewLabel}>🔄 自动生成格式：</ThemedText>
               <ScrollView style={styles.shareTextContainer}>
                 <Text style={styles.shareText}>{generateShareText()}</Text>
               </ScrollView>
@@ -308,6 +466,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  registrationDate: {
+    fontSize: 12,
+    color: Colors.textSecondary,
   },
   editButton: {
     backgroundColor: Colors.profile,
@@ -398,6 +566,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  signOutButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  signOutText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -468,32 +653,6 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: Colors.textSecondary,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  actionButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 12,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  signOutButton: {
-    backgroundColor: '#FF6B6B',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  signOutText: {
-    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
   },

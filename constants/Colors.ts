@@ -1,10 +1,9 @@
-
 /**
  * Buddhist Practice Tracking App Color Scheme
  * Colors inspired by Buddhist symbolism and peaceful design
  */
 
-const tintColorLight = '#D4AF37'; // Golden
+const tintColorLight = '#D4AF37'; // Golden color for Buddhist theme
 const tintColorDark = '#F5F5DC';  // Beige
 
 export const Colors = {
@@ -19,7 +18,7 @@ export const Colors = {
   success: '#228B22',      // Forest green
   warning: '#FF8C00',      // Dark orange
   error: '#DC143C',        // Crimson
-  
+
   // Tab-specific colors
   study: '#4169E1',        // Royal blue - wisdom
   practice: '#D4AF37',     // Golden - practice
@@ -31,9 +30,18 @@ export const Colors = {
     text: '#2F4F4F',
     background: '#F5F5DC',
     tint: tintColorLight,
-    icon: '#8B4513',
+    icon: '#687076',
     tabIconDefault: '#696969',
     tabIconSelected: tintColorLight,
+    surface: '#FFFFFF',
+    primary: '#D4AF37',
+    secondary: '#2F4F4F',
+    textSecondary: '#696969',
+    practice: '#D4AF37',
+    study: '#4682B4',
+    mindfulness: '#FF69B4',
+    stats: '#32CD32',
+    profile: '#D4AF37',
   },
   dark: {
     text: '#F5F5DC',

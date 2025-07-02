@@ -1,30 +1,31 @@
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  Alert, 
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-  ActivityIndicator,
+  ScrollView
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { Colors } from '@/constants/Colors';
 
 export default function RegisterScreen() {
+  const [dharmaName, setDharmaName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [dharmaName, setDharmaName] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert('提示', '请填写所有必填项');
+      Alert.alert('提示', '请填写必填项目');
       return;
     }
 
@@ -34,7 +35,7 @@ export default function RegisterScreen() {
     }
 
     if (password.length < 6) {
-      Alert.alert('提示', '密码长度至少6位');
+      Alert.alert('提示', '密码至少需要6位字符');
       return;
     }
 
@@ -45,7 +46,7 @@ export default function RegisterScreen() {
         password,
         options: {
           data: {
-            dharma_name: dharmaName || null,
+            dharma_name: dharmaName.trim() || null,
           },
         },
       });
@@ -55,7 +56,7 @@ export default function RegisterScreen() {
       } else {
         Alert.alert(
           '注册成功',
-          '请查看您的邮箱，点击验证链接完成注册',
+          '我们已向您的邮箱发送了验证邮件，请查收并验证后登录。',
           [
             {
               text: '确定',
@@ -72,188 +73,177 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>🌸 开始修行</Text>
-            <Text style={styles.subtitle}>注册账户，开启您的修行之旅</Text>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.logo}>🌸</Text>
+          <Text style={styles.title}>开始修行</Text>
+          <Text style={styles.subtitle}>注册账户，开启您的修行之旅</Text>
+        </View>
+
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>👤 法名（可选）</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="如：多吉、白玛等"
+              value={dharmaName}
+              onChangeText={setDharmaName}
+              autoCapitalize="words"
+            />
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>法名（可选）</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="如：多吉、白玛等"
-                value={dharmaName}
-                onChangeText={setDharmaName}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>邮箱地址 *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="请输入您的邮箱"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>密码 *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="至少6位密码"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>确认密码 *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="请再次输入密码"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            <TouchableOpacity 
-              style={[styles.loginButton, loading && styles.buttonDisabled]}
-              onPress={handleRegister}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.loginButtonText}>注册</Text>
-              )}
-            </TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>📧 邮箱地址 *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="请输入您的邮箱"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>已有账户？</Text>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>🔒 密码 *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="至少6位密码"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>🔒 确认密码 *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="请再次输入密码"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color={Colors.surface} />
+            ) : (
+              <Text style={styles.registerButtonText}>注册</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.loginPrompt}>
+            <Text style={styles.loginPromptText}>已有账户？</Text>
             <Link href="/auth/login" asChild>
               <TouchableOpacity>
-                <Text style={styles.registerLink}>立即登录</Text>
+                <Text style={styles.loginLink}>立即登录</Text>
               </TouchableOpacity>
             </Link>
           </View>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5DC',
+    backgroundColor: Colors.background,
   },
-  keyboardView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    padding: 20,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 40,
+  },
+  logo: {
+    fontSize: 48,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#D4AF37',
-    marginBottom: 8,
-    textAlign: 'center',
+    color: Colors.primary,
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#696969',
+    color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
   },
   form: {
-    marginBottom: 32,
+    width: '100%',
   },
-  inputContainer: {
+  inputGroup: {
     marginBottom: 20,
   },
-  label: {
+  inputLabel: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#2F4F4F',
+    color: Colors.text,
     marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  loginButton: {
-    backgroundColor: '#D4AF37',
+    borderColor: '#E0E0E0',
     borderRadius: 12,
-    paddingVertical: 16,
+    padding: 15,
+    fontSize: 16,
+    backgroundColor: Colors.surface,
+    color: Colors.text,
+  },
+  registerButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 15,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 10,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 3,
   },
-  buttonDisabled: {
+  registerButtonDisabled: {
     opacity: 0.6,
   },
-  loginButtonText: {
-    color: '#FFFFFF',
+  registerButtonText: {
+    color: Colors.surface,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
-  footer: {
+  loginPrompt: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 30,
   },
-  footerText: {
+  loginPromptText: {
+    color: Colors.textSecondary,
     fontSize: 16,
-    color: '#696969',
-    marginRight: 8,
+    marginRight: 5,
   },
-  registerLink: {
+  loginLink: {
+    color: Colors.primary,
     fontSize: 16,
-    color: '#D4AF37',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });

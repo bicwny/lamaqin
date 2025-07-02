@@ -9,18 +9,27 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { DebugInfo } from '@/components/DebugInfo';
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
 
+  console.log('RootLayoutNav render - user:', user?.email, 'loading:', loading);
+  console.log('User object:', JSON.stringify(user, null, 2));
+
   if (loading) {
+    console.log('Showing loading screen...');
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <DebugInfo />
       </View>
     );
   }
+
+  console.log('Auth state resolved, user:', user ? 'logged in' : 'not logged in');
+  console.log('About to render Stack with screens');
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

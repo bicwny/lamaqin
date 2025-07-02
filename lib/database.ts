@@ -17,6 +17,27 @@ const getCurrentUserId = async (): Promise<string | null> => {
   return user?.id || null;
 };
 
+// Create user profile after registration
+export const createUserProfile = async (userId: string, email: string, dharmaName?: string) => {
+  const userData = {
+    id: userId,
+    email,
+    dharma_name: dharmaName || null,
+    practice_years: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabase
+    .from('users')
+    .insert(userData)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
 // User operations
 export const createUser = async (userData: Partial<User>) => {
   const { data, error } = await supabase
