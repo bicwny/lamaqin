@@ -219,80 +219,81 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
       
-      // First, test if we can connect to the database at all
-      const { error: connectionError } = await supabase
-        .from('users')
-        .select('count', { count: 'exact', head: true });
-
-      if (connectionError) {
-        console.error('❌ AuthContext: Database connection failed:', connectionError);
-        // Don't throw here - allow user to continue without database sync
-        console.log('⚠️ AuthContext: Continuing without database sync');
+      // Skip database operations if we don't have a valid user ID
+      if (!user.id) {
+        console.log('⚠️ AuthContext: No user ID provided, skipping database sync');
         return;
       }
 
-      const { data: existingUser, error: selectError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+      // Check if user exists with a timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database operation timeout')), 5000)
+      );
 
-      if (selectError && selectError.code !== 'PGRST116') { // PGRST116 is no data found, which is fine
-        console.error('❌ AuthContext: Error checking user existence:', selectError);
-        // Don't throw here - allow user to continue
-        console.log('⚠️ AuthContext: Continuing without database sync');
-        return;
-      }
-
-      if (!existingUser) {
-        console.log('➕ AuthContext: Creating new user in database:', user.email);
-        const { error: insertError } = await supabase
+      const dbOperation = async () => {
+        const { data: existingUser, error: selectError } = await supabase
           .from('users')
-          .insert([{
-            id: user.id,
-            email: user.email,
-            dharma_name: user.user_metadata?.dharma_name || null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }]);
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-        if (insertError) {
-          // Handle duplicate key constraint gracefully
-          if (insertError.code === '23505') {
-            console.log('✅ AuthContext: User already exists (race condition handled)');
+        if (selectError && selectError.code !== 'PGRST116') { // PGRST116 is no data found, which is fine
+          console.error('❌ AuthContext: Error checking user existence:', selectError);
+          return;
+        }
+
+        if (!existingUser) {
+          console.log('➕ AuthContext: Creating new user in database:', user.email);
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert([{
+              id: user.id,
+              email: user.email,
+              dharma_name: user.user_metadata?.dharma_name || null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }]);
+
+          if (insertError) {
+            // Handle duplicate key constraint gracefully
+            if (insertError.code === '23505') {
+              console.log('✅ AuthContext: User already exists (race condition handled)');
+            } else {
+              console.error('❌ AuthContext: Error creating user in database:', insertError);
+            }
           } else {
-            console.error('❌ AuthContext: Error creating user in database:', insertError);
-            // Don't throw - allow user to continue
-            console.log('⚠️ AuthContext: Continuing without database sync');
+            console.log('✅ AuthContext: User created in database:', user.email);
           }
         } else {
-          console.log('✅ AuthContext: User created in database:', user.email);
-        }
-      } else {
-        console.log('✅ AuthContext: User already exists in database:', user.email);
-        
-        // Update user info if dharma_name has changed
-        if (user.user_metadata?.dharma_name && existingUser.dharma_name !== user.user_metadata.dharma_name) {
-          console.log('🔄 AuthContext: Updating user dharma_name');
-          const { error: updateError } = await supabase
-            .from('users')
-            .update({ 
-              dharma_name: user.user_metadata.dharma_name,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', user.id);
-            
-          if (updateError) {
-            console.error('❌ AuthContext: Error updating user:', updateError);
-          } else {
-            console.log('✅ AuthContext: User updated in database');
+          console.log('✅ AuthContext: User already exists in database:', user.email);
+          
+          // Update user info if dharma_name has changed
+          if (user.user_metadata?.dharma_name && existingUser.dharma_name !== user.user_metadata.dharma_name) {
+            console.log('🔄 AuthContext: Updating user dharma_name');
+            const { error: updateError } = await supabase
+              .from('users')
+              .update({ 
+                dharma_name: user.user_metadata.dharma_name,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', user.id);
+              
+            if (updateError) {
+              console.error('❌ AuthContext: Error updating user:', updateError);
+            } else {
+              console.log('✅ AuthContext: User updated in database');
+            }
           }
         }
-      }
+      };
+
+      // Race the database operation against the timeout
+      await Promise.race([dbOperation(), timeoutPromise]);
+      
     } catch (error) {
       console.error('❌ AuthContext: Error ensuring user in database:', error);
-      // Don't throw error - allow user to continue without database sync
       console.log('⚠️ AuthContext: Continuing without database sync due to error');
+      // Don't throw error - allow user to continue without database sync
     }
   };
 
