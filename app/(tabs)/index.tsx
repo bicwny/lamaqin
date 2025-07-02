@@ -89,7 +89,7 @@ export default function HomeScreen() {
     try {
       // Update database if connected
       if (dbConnected && practice.id) {
-        const userId = 'mock-user-id';
+        const userId = '550e8400-e29b-41d4-a716-446655440000';
         const today = new Date().toISOString().split('T')[0];
 
         await createDailyRecord({
@@ -300,6 +300,16 @@ export default function HomeScreen() {
           </ThemedText>
 
           <View style={styles.actionsGrid}>
+            <TouchableOpacity 
+              style={[styles.actionButton, { backgroundColor: dbConnected ? '#4CAF50' : '#F44336' }]}
+              onPress={checkConnection}
+            >
+              <ThemedText style={styles.actionIcon}>🔌</ThemedText>
+              <ThemedText style={[styles.actionText, { color: 'white' }]}>
+                {dbConnected ? '数据库已连接' : '测试数据库'}
+              </ThemedText>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.actionButton}>
               <ThemedText style={styles.actionIcon}>📿</ThemedText>
               <ThemedText style={styles.actionText}>开始持咒</ThemedText>
