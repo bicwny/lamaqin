@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   View, 
@@ -54,16 +53,11 @@ export default function RegisterScreen() {
       if (error) {
         Alert.alert('注册失败', error.message);
       } else {
-        Alert.alert(
-          '注册成功',
-          '我们已向您的邮箱发送了验证邮件，请查收并验证后登录。',
-          [
-            {
-              text: '确定',
-              onPress: () => router.replace('/auth/login'),
-            },
-          ]
-        );
+        // Redirect to email verification page instead of login
+        router.push({
+          pathname: '/auth/email-verification',
+          params: { email }
+        });
       }
     } catch (error) {
       Alert.alert('注册失败', '网络错误，请稍后重试');
