@@ -42,56 +42,56 @@ export default function PracticeScreen() {
     setDailyPractices([
       {
         id: '1',
-        name: '顶礼',
-        current: 391,
-        target: 547,
+        name: '六字大明咒',
+        current: 2847,
+        target: 10000,
         type: 'count',
         status: 'in_progress',
         unit: '次'
       },
       {
         id: '2',
-        name: '百字明',
-        current: 0,
-        target: 273,
+        name: '大悲咒',
+        current: 21,
+        target: 21,
         type: 'count',
-        status: 'pending',
+        status: 'completed',
         unit: '次'
       },
       {
         id: '3',
-        name: '金刚萨埵心咒',
-        current: 0,
-        target: 13334,
-        type: 'count',
-        status: 'pending',
-        unit: '次'
+        name: '禅修',
+        current: 25,
+        target: 30,
+        type: 'time',
+        status: 'in_progress',
+        unit: '分钟'
       },
       {
         id: '4',
-        name: '前行观修',
-        current: 0,
+        name: '金刚经',
+        current: 1,
         target: 1,
-        type: 'meditation',
-        status: 'pending',
-        unit: '座'
+        type: 'count',
+        status: 'completed',
+        unit: '部'
       },
       {
         id: '5',
-        name: '课前念诵',
-        current: 0,
-        target: 1,
+        name: '般若波罗蜜多心经',
+        current: 7,
+        target: 21,
         type: 'count',
-        status: 'pending',
+        status: 'in_progress',
         unit: '次'
       },
       {
         id: '6',
-        name: '三十五佛忏悔文',
-        current: 0,
-        target: 1,
+        name: '念佛',
+        current: 548,
+        target: 1000,
         type: 'count',
-        status: 'pending',
+        status: 'in_progress',
         unit: '次'
       },
     ]);
@@ -99,13 +99,23 @@ export default function PracticeScreen() {
     setThemes([
       {
         id: '1',
-        name: '五加行',
-        progress: 25,
+        name: '日常修持',
+        progress: 78,
+        activeCount: 4,
+        notStartedCount: 1,
+        completedCount: 2,
+        activePractices: ['六字大明咒', '禅修', '心经', '念佛'],
+        notStartedPractices: ['药师咒']
+      },
+      {
+        id: '2',
+        name: '净土修行',
+        progress: 45,
         activeCount: 2,
-        notStartedCount: 3,
-        completedCount: 0,
-        activePractices: ['顶礼', '百字明'],
-        notStartedPractices: ['发心', '供曼达', '上师瑜伽']
+        notStartedCount: 2,
+        completedCount: 1,
+        activePractices: ['念佛', '观音心咒'],
+        notStartedPractices: ['净土文', '往生咒']
       }
     ]);
   };

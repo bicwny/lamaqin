@@ -11,10 +11,8 @@ interface DayStats {
 }
 
 export default function MindfulnessScreen() {
-  const [todayStats, setTodayStats] = useState<DayStats>({ good: 8, bad: 3, date: new Date().toISOString().split('T')[0] });
+  const [todayStats, setTodayStats] = useState<DayStats>({ good: 12, bad: 2, date: new Date().toISOString().split('T')[0] });
   const [weeklyData, setWeeklyData] = useState<DayStats[]>([]);
-  const [showStatsModal, setShowStatsModal] = useState(false);
-  const [showVisualization, setShowVisualization] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -23,13 +21,13 @@ export default function MindfulnessScreen() {
   const loadData = async () => {
     // Mock weekly data
     const mockWeekly = [
-      { good: 8, bad: 3, date: '2025-01-27' }, // 今天
-      { good: 7, bad: 2, date: '2025-01-26' }, // 周六
-      { good: 9, bad: 2, date: '2025-01-25' }, // 周五
-      { good: 6, bad: 2, date: '2025-01-24' }, // 周四
-      { good: 6, bad: 3, date: '2025-01-23' }, // 周三
-      { good: 8, bad: 2, date: '2025-01-22' }, // 周二
-      { good: 7, bad: 3, date: '2025-01-21' }, // 周一
+      { good: 12, bad: 2, date: '2025-01-27' }, // 今天
+      { good: 15, bad: 3, date: '2025-01-26' }, // 周六
+      { good: 18, bad: 2, date: '2025-01-25' }, // 周五
+      { good: 11, bad: 4, date: '2025-01-24' }, // 周四
+      { good: 13, bad: 3, date: '2025-01-23' }, // 周三
+      { good: 16, bad: 1, date: '2025-01-22' }, // 周二
+      { good: 14, bad: 5, date: '2025-01-21' }, // 周一
     ];
     setWeeklyData(mockWeekly);
   };

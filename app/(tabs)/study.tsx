@@ -29,26 +29,34 @@ export default function StudyScreen() {
   const mockCourses = [
     {
       id: '1',
-      name: '菩提道次第广论',
-      total_lessons: 180,
-      teacher: '日常法师',
-      description: '系统学习佛法修行次第',
+      name: '金刚经讲解',
+      total_lessons: 36,
+      teacher: '净空法师',
+      description: '深入理解般若智慧的究竟义',
       created_at: '2024-01-01'
     },
     {
       id: '2',
-      name: '广论研讨班',
+      name: '地藏菩萨本愿经',
       total_lessons: 52,
-      teacher: '福智法师',
-      description: '深入研讨菩提道次第',
+      teacher: '宏海法师',
+      description: '学习地藏菩萨的大愿和孝道精神',
       created_at: '2024-01-01'
     },
     {
       id: '3',
-      name: '备览',
+      name: '禅修入门指导',
       total_lessons: 24,
-      teacher: '日常法师',
-      description: '佛法学修要点总览',
+      teacher: '明海法师',
+      description: '从基础开始学习禅修方法',
+      created_at: '2024-01-01'
+    },
+    {
+      id: '4',
+      name: '药师琉璃光如来本愿功德经',
+      total_lessons: 18,
+      teacher: '传印法师',
+      description: '学习药师佛的十二大愿',
       created_at: '2024-01-01'
     }
   ];
@@ -75,15 +83,15 @@ export default function StudyScreen() {
           <View style={styles.summaryCard}>
             <View style={styles.summaryRow}>
               <ThemedText style={styles.summaryLabel}>进行中课程:</ThemedText>
-              <ThemedText style={styles.summaryValue}>2</ThemedText>
+              <ThemedText style={styles.summaryValue}>3</ThemedText>
             </View>
             <View style={styles.summaryRow}>
               <ThemedText style={styles.summaryLabel}>已完成课程:</ThemedText>
-              <ThemedText style={styles.summaryValue}>1</ThemedText>
+              <ThemedText style={styles.summaryValue}>2</ThemedText>
             </View>
             <View style={styles.summaryRow}>
               <ThemedText style={styles.summaryLabel}>总听课时长:</ThemedText>
-              <ThemedText style={styles.summaryValue}>156 小时</ThemedText>
+              <ThemedText style={styles.summaryValue}>89 小时</ThemedText>
             </View>
           </View>
         </ThemedView>
@@ -120,14 +128,14 @@ export default function StudyScreen() {
               {/* Progress Bar */}
               <View style={styles.progressSection}>
                 <ThemedText style={styles.progressLabel}>
-                  进度: 45 / {course.total_lessons} 课
+                  进度: {course.id === '1' ? '28' : course.id === '2' ? '16' : course.id === '3' ? '24' : '8'} / {course.total_lessons} 课
                 </ThemedText>
                 <View style={styles.progressBar}>
                   <View 
                     style={[
                       styles.progressFill, 
                       { 
-                        width: `${(45 / course.total_lessons) * 100}%`,
+                        width: `${course.id === '1' ? '78' : course.id === '2' ? '31' : course.id === '3' ? '100' : '44'}%`,
                         backgroundColor: Colors.study 
                       }
                     ]} 
