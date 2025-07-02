@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal, Share } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -43,7 +42,7 @@ export default function ProfileScreen() {
               console.log('🔴 Profile: Starting logout process...');
               await signOut();
               console.log('🔴 Profile: SignOut function completed');
-              
+
               // Add a longer delay to ensure navigation
               setTimeout(() => {
                 console.log('🔴 Profile: Setting isSigningOut to false');
@@ -374,8 +373,12 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         <ThemedView style={styles.section}>
           <TouchableOpacity 
             style={[styles.signOutButton, isSigningOut && styles.signOutButtonDisabled]} 
-            onPress={handleSignOut}
+            onPress={() => {
+              console.log('🔵 Profile: TouchableOpacity onPress triggered');
+              handleSignOut();
+            }}
             disabled={isSigningOut}
+            activeOpacity={0.7}
           >
             <Text style={styles.signOutText}>
               {isSigningOut ? '正在退出...' : '退出登录'}
