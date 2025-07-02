@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
@@ -15,7 +14,7 @@ export default function ResetPasswordScreen() {
       Alert.alert('密码不匹配', '两次输入的密码不一致');
       return;
     }
-    
+
     if (password.length < 6) {
       Alert.alert('密码太短', '密码至少需要6位字符');
       return;
@@ -24,7 +23,7 @@ export default function ResetPasswordScreen() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
-      
+
       if (error) {
         Alert.alert('重置失败', error.message);
       } else {
@@ -42,7 +41,7 @@ export default function ResetPasswordScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>🔐 设置新密码</Text>
       <Text style={styles.subtitle}>请输入新的登录密码</Text>
-      
+
       <View style={styles.inputContainer}>
         <Text style={styles.label}>新密码</Text>
         <View style={styles.passwordContainer}>
@@ -62,7 +61,7 @@ export default function ResetPasswordScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      
+
       <View style={styles.inputContainer}>
         <Text style={styles.label}>确认新密码</Text>
         <TextInput
@@ -74,7 +73,7 @@ export default function ResetPasswordScreen() {
           autoCapitalize="none"
         />
       </View>
-      
+
       <TouchableOpacity
         style={[styles.button, (!password || !confirmPassword || loading) && styles.buttonDisabled]}
         onPress={handleUpdatePassword}

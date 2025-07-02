@@ -29,7 +29,7 @@ export default function ForgotPasswordScreen() {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${process.env.EXPO_PUBLIC_APP_DOMAIN || 'exp://localhost:8081'}/auth/reset-password`,
       });
-      
+
       if (error) {
         Alert.alert('发送失败', error.message);
       } else {
@@ -51,7 +51,7 @@ export default function ForgotPasswordScreen() {
       <Text style={styles.subtitle}>
         输入您的邮箱地址，我们将发送密码重置链接
       </Text>
-      
+
       <View style={styles.inputContainer}>
         <Text style={styles.label}>邮箱地址</Text>
         <TextInput
@@ -64,7 +64,7 @@ export default function ForgotPasswordScreen() {
           autoCorrect={false}
         />
       </View>
-      
+
       <TouchableOpacity
         style={[styles.button, (!email || loading) && styles.buttonDisabled]}
         onPress={handleSendResetEmail}

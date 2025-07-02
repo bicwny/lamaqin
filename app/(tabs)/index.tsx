@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ConnectionTest } from '@/components/ConnectionTest';
+import { DebugInfo } from '@/components/DebugInfo';
+import { UserCheck } from '@/components/UserCheck';
+import { PracticeProjectsCheck } from '@/components/PracticeProjectsCheck';
 import { Colors } from '@/constants/Colors';
 import { getUserPracticeProjects, getTodayRecords, createDailyRecord } from '@/lib/database';
 import { testConnection } from '@/lib/supabase';
@@ -15,16 +19,16 @@ export default function HomeScreen() {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadData = async () => {
       await loadTodaysPractices();
       if (isMounted) {
         await checkConnection();
       }
     };
-    
+
     loadData();
-    
+
     return () => {
       isMounted = false;
     };
@@ -34,7 +38,7 @@ export default function HomeScreen() {
     console.log('🔍 Testing Supabase connection...');
     const connected = await testConnection();
     setDbConnected(connected);
-    
+
     if (connected) {
       console.log('✅ Supabase connected successfully!');
     } else {
@@ -45,7 +49,7 @@ export default function HomeScreen() {
   const loadTodaysPractices = async () => {
     try {
       setLoading(true);
-      
+
       // Use actual authenticated user ID, or skip if not available
       if (!user?.id) {
         console.log('No user ID available, using mock data');
@@ -361,6 +365,10 @@ export default function HomeScreen() {
             </ThemedText>
           </View>
         </ThemedView>
+        <ConnectionTest />
+        <DebugInfo />
+        <UserCheck />
+        <PracticeProjectsCheck />
       </ScrollView>
     </ThemedView>
   );
