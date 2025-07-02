@@ -1,19 +1,20 @@
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  Alert, 
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-  ActivityIndicator,
+  ScrollView
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { Colors } from '@/constants/Colors';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('提示', '请输入邮箱和密码');
+      Alert.alert('提示', '请填写邮箱和密码');
       return;
     }
 
@@ -46,62 +47,61 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.title}>🙏 修行追踪</Text>
-            <Text style={styles.subtitle}>欢迎回来，继续您的修行之路</Text>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.logo}>🙏</Text>
+          <Text style={styles.title}>修行追踪</Text>
+          <Text style={styles.subtitle}>欢迎回来，继续您的修行之路</Text>
+        </View>
+
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>📧 邮箱地址</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="请输入您的邮箱"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>邮箱地址</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="请输入您的邮箱"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>密码</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="请输入密码"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            <TouchableOpacity 
-              style={[styles.loginButton, loading && styles.buttonDisabled]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.loginButtonText}>登录</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>忘记密码？</Text>
-            </TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>🔒 密码</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="请输入密码"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>还没有账户？</Text>
+          <TouchableOpacity 
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color={Colors.surface} />
+            ) : (
+              <Text style={styles.loginButtonText}>登录</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>忘记密码？</Text>
+          </TouchableOpacity>
+
+          <View style={styles.registerPrompt}>
+            <Text style={styles.registerPromptText}>还没有账户？</Text>
             <Link href="/auth/register" asChild>
               <TouchableOpacity>
                 <Text style={styles.registerLink}>立即注册</Text>
@@ -109,115 +109,104 @@ export default function LoginScreen() {
             </Link>
           </View>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5DC',
+    backgroundColor: Colors.background,
   },
-  keyboardView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    padding: 20,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 40,
+  },
+  logo: {
+    fontSize: 48,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#D4AF37',
-    marginBottom: 8,
-    textAlign: 'center',
+    color: Colors.primary,
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#696969',
+    color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
   },
   form: {
-    marginBottom: 32,
+    width: '100%',
   },
-  inputContainer: {
+  inputGroup: {
     marginBottom: 20,
   },
-  label: {
+  inputLabel: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#2F4F4F',
+    color: Colors.text,
     marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 16,
+    backgroundColor: Colors.surface,
+    color: Colors.text,
   },
   loginButton: {
-    backgroundColor: '#D4AF37',
+    backgroundColor: Colors.primary,
+    paddingVertical: 15,
     borderRadius: 12,
-    paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 10,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 3,
   },
-  buttonDisabled: {
+  loginButtonDisabled: {
     opacity: 0.6,
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: Colors.surface,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   forgotPassword: {
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 20,
   },
   forgotPasswordText: {
-    color: '#D4AF37',
+    color: Colors.primary,
     fontSize: 16,
   },
-  footer: {
+  registerPrompt: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 30,
   },
-  footerText: {
+  registerPromptText: {
+    color: Colors.textSecondary,
     fontSize: 16,
-    color: '#696969',
-    marginRight: 8,
+    marginRight: 5,
   },
   registerLink: {
+    color: Colors.primary,
     fontSize: 16,
-    color: '#D4AF37',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
