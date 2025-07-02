@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
@@ -11,20 +11,39 @@ export default function HomeScreen() {
   const [dbConnected, setDbConnected] = useState(false);
 
   useEffect(() => {
-    loadTodaysPractices();
-    checkConnection();
+    let isMounted = true;
+    
+    const loadData = async () => {
+      await loadTodaysPractices();
+      if (isMounted) {
+        await checkConnection();
+      }
+    };
+    
+    loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const checkConnection = async () => {
+    console.log('🔍 Testing Supabase connection...');
     const connected = await testConnection();
     setDbConnected(connected);
+    
+    if (connected) {
+      console.log('✅ Supabase connected successfully!');
+    } else {
+      console.log('❌ Supabase connection failed - using mock data');
+    }
   };
 
   const loadTodaysPractices = async () => {
     try {
       setLoading(true);
       // For now, using mock user ID. In real app, get from auth
-      const userId = 'mock-user-id';
+      const userId = '550e8400-e29b-41d4-a716-446655440000';
       const today = new Date().toISOString().split('T')[0];
 
       const [projects, todayRecords] = await Promise.all([
@@ -70,11 +89,11 @@ export default function HomeScreen() {
     try {
       // Update database if connected
       if (dbConnected && practice.id) {
-        const userId = 'mock-user-id';
+        const userId = '550e8400-e29b-41d4-a716-446655440000';
         const today = new Date().toISOString().split('T')[0];
 
         await createDailyRecord({
-          user_id: userId,
+          user_id: '550e8400-e29b-41d4-a716-446655440000',
           practice_project_id: practice.id,
           record_date: today,
           count: newCount
@@ -183,17 +202,17 @@ export default function HomeScreen() {
 
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
-                <Text style={styles.statIcon}>📚</Text>
+                <ThemedText style={styles.statIcon}>📚</ThemedText>
                 <ThemedText style={styles.statText}>{todayProgress.studyMinutes}分钟</ThemedText>
                 <ThemedText style={styles.statLabel}>学习</ThemedText>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statIcon}>🧘</Text>
+                <ThemedText style={styles.statIcon}>🧘</ThemedText>
                 <ThemedText style={styles.statText}>{todayProgress.meditationMinutes}分钟</ThemedText>
                 <ThemedText style={styles.statLabel}>禅修</ThemedText>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statIcon}>👁</Text>
+                <ThemedText style={styles.statIcon}>👁</ThemedText>
                 <ThemedText style={styles.statText}>{Math.round((todayProgress.goodMindCount / (todayProgress.goodMindCount + todayProgress.badMindCount)) * 100)}%</ThemedText>
                 <ThemedText style={styles.statLabel}>善心</ThemedText>
               </View>
@@ -241,7 +260,7 @@ export default function HomeScreen() {
 
           <View style={styles.statsGrid}>
             <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatIcon}>📿</Text>
+              <ThemedText style={styles.quickStatIcon}>📿</ThemedText>
               <ThemedText style={styles.quickStatNumber}>
                 {quickStats.totalMantras.toLocaleString()}
               </ThemedText>
@@ -249,7 +268,7 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatIcon}>📚</Text>
+              <ThemedText style={styles.quickStatIcon}>📚</ThemedText>
               <ThemedText style={styles.quickStatNumber}>
                 {quickStats.totalStudyHours}
               </ThemedText>
@@ -257,7 +276,7 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatIcon}>🧘</Text>
+              <ThemedText style={styles.quickStatIcon}>🧘</ThemedText>
               <ThemedText style={styles.quickStatNumber}>
                 {quickStats.totalMeditationHours}
               </ThemedText>
@@ -265,7 +284,7 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.quickStatCard}>
-              <Text style={styles.quickStatIcon}>⭐</Text>
+              <ThemedText style={styles.quickStatIcon}>⭐</ThemedText>
               <ThemedText style={styles.quickStatNumber}>
                 {todayProgress.streak}
               </ThemedText>
@@ -281,23 +300,33 @@ export default function HomeScreen() {
           </ThemedText>
 
           <View style={styles.actionsGrid}>
+            <TouchableOpacity 
+              style={[styles.actionButton, { backgroundColor: dbConnected ? '#4CAF50' : '#F44336' }]}
+              onPress={checkConnection}
+            >
+              <ThemedText style={styles.actionIcon}>🔌</ThemedText>
+              <ThemedText style={[styles.actionText, { color: 'white' }]}>
+                {dbConnected ? '数据库已连接' : '测试数据库'}
+              </ThemedText>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionIcon}>📿</Text>
+              <ThemedText style={styles.actionIcon}>📿</ThemedText>
               <ThemedText style={styles.actionText}>开始持咒</ThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionIcon}>🧘</Text>
+              <ThemedText style={styles.actionIcon}>🧘</ThemedText>
               <ThemedText style={styles.actionText}>开始禅修</ThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionIcon}>👁</Text>
+              <ThemedText style={styles.actionIcon}>👁</ThemedText>
               <ThemedText style={styles.actionText}>观心记录</ThemedText>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionIcon}>📚</Text>
+              <ThemedText style={styles.actionIcon}>📚</ThemedText>
               <ThemedText style={styles.actionText}>继续学习</ThemedText>
             </TouchableOpacity>
           </View>

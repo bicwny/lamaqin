@@ -34,7 +34,19 @@ export default function PracticeScreen() {
   const [showAddPracticeModal, setShowAddPracticeModal] = useState(false);
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+
+    const loadPracticesSafely = async () => {
+      if (isMounted) {
+        await loadData();
+      }
+    };
+
+    loadPracticesSafely();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const loadData = async () => {

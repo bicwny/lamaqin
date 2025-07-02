@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
@@ -23,7 +23,7 @@ export default function MindfulnessScreen() {
 
   const loadData = async () => {
     try {
-      const userId = 'mock-user-id';
+      const userId = '550e8400-e29b-41d4-a716-446655440000';
       const today = new Date().toISOString().split('T')[0];
 
       // Load today's records
@@ -76,7 +76,7 @@ export default function MindfulnessScreen() {
           text: '确定',
           onPress: async () => {
             try {
-              const userId = 'mock-user-id';
+              const userId = '550e8400-e29b-41d4-a716-446655440000';
               const now = new Date();
               const today = now.toISOString().split('T')[0];
               const currentTime = now.toTimeString().split(' ')[0];

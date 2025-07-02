@@ -31,7 +31,19 @@ export default function ProfileScreen() {
   const [todaySummary, setTodaySummary] = useState<TodaySummary | null>(null);
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+
+    const loadDataSafely = async () => {
+      if (isMounted) {
+        await loadData();
+      }
+    };
+
+    loadDataSafely();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const loadData = async () => {

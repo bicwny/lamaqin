@@ -1,5 +1,5 @@
 
-import { supabase } from './supabase';
+import { supabase, testConnection } from './supabase';
 import { 
   User, 
   Theme, 
@@ -170,3 +170,6 @@ export const getTodayMindfulnessRecords = async (userId: string, date: string) =
   if (error) throw error;
   return data;
 };
+
+// Re-export test function
+export { testConnection };
