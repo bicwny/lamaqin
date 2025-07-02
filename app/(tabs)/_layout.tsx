@@ -26,7 +26,8 @@ export default function TabLayout() {
           },
           default: {},
         }),
-      }}>
+      }}
+      initialRouteName="study">
       <Tabs.Screen
         name="study"
         options={{
