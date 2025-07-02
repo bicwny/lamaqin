@@ -3,6 +3,7 @@ import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Modal, Alert } fr
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
+import { getTodayMindfulnessRecords, createMindfulnessRecord } from '@/utils/supabase';
 
 interface DayStats {
   good: number;
@@ -21,31 +22,98 @@ export default function MindfulnessScreen() {
   }, []);
 
   const loadData = async () => {
-    // Mock weekly data
-    const mockWeekly = [
-      { good: 12, bad: 2, date: '2025-01-27' }, // 今天
-      { good: 15, bad: 3, date: '2025-01-26' }, // 周六
-      { good: 18, bad: 2, date: '2025-01-25' }, // 周五
-      { good: 11, bad: 4, date: '2025-01-24' }, // 周四
-      { good: 13, bad: 3, date: '2025-01-23' }, // 周三
-      { good: 16, bad: 1, date: '2025-01-22' }, // 周二
-      { good: 14, bad: 5, date: '2025-01-21' }, // 周一
-    ];
-    setWeeklyData(mockWeekly);
+    try {
+      const userId = 'mock-user-id';
+      const today = new Date().toISOString().split('T')[0];
+
+      // Load today's records
+      const todayRecords = await getTodayMindfulnessRecords(userId, today);
+      const goodCount = todayRecords.filter(r => r.mind_type === 'good').length;
+      const badCount = todayRecords.filter(r => r.mind_type === 'bad').length;
+
+      setTodayStats({ good: goodCount, bad: badCount, date: today });
+
+      // Load weekly data (you could extend this to query actual historical data)
+      const mockWeeklyData = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const good = i === 0 ? goodCount : Math.floor(Math.random() * 15) + 5;
+        const bad = i === 0 ? badCount : Math.floor(Math.random() * 8) + 1;
+        mockWeeklyData.push({
+          good,
+          bad,
+          date: date.toISOString().split('T')[0]
+        });
+      }
+      setWeeklyData(mockWeeklyData);
+    } catch (error) {
+      console.error('Error loading mindfulness data:', error);
+      // Fallback to mock data
+      const mockWeeklyData = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const good = Math.floor(Math.random() * 15) + 5;
+        const bad = Math.floor(Math.random() * 8) + 1;
+        mockWeeklyData.push({
+          good,
+          bad,
+          date: date.toISOString().split('T')[0]
+        });
+      }
+      setWeeklyData(mockWeeklyData);
+    }
   };
 
   const recordMind = (type: 'good' | 'bad') => {
-    setTodayStats(prev => ({
-      ...prev,
-      [type]: prev[type] + 1
-    }));
+    Alert.alert(
+      type === 'good' ? '记录善心' : '记录恶心',
+      `确定要记录一次${type === 'good' ? '善心' : '恶心'}状态吗？`,
+      [
+        { text: '取消', style: 'cancel' },
+        {
+          text: '确定',
+          onPress: async () => {
+            try {
+              const userId = 'mock-user-id';
+              const now = new Date();
+              const today = now.toISOString().split('T')[0];
+              const currentTime = now.toTimeString().split(' ')[0];
 
-    // Update weekly data
-    setWeeklyData(prev => prev.map(day => 
-      day.date === todayStats.date 
-        ? { ...day, [type]: day[type] + 1 }
-        : day
-    ));
+              // Save to database
+              await createMindfulnessRecord({
+                user_id: userId,
+                record_date: today,
+                record_time: currentTime,
+                mind_type: type
+              });
+
+              // Update local state
+              const newStats = { ...todayStats };
+              if (type === 'good') {
+                newStats.good += 1;
+              } else {
+                newStats.bad += 1;
+              }
+              setTodayStats(newStats);
+
+              // Update weekly data for today
+              const updatedWeekly = weeklyData.map(day => {
+                if (day.date === todayStats.date) {
+                  return { ...day, [type]: day[type] + 1 };
+                }
+                return day;
+              });
+              setWeeklyData(updatedWeekly);
+            } catch (error) {
+              console.error('Error recording mind state:', error);
+              Alert.alert('错误', '记录失败，请重试');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const getGoodPercentage = (day: DayStats) => {

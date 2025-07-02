@@ -1,11 +1,118 @@
-
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, View, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
+import { getUserPracticeProjects, getTodayRecords, createDailyRecord, testConnection } from '@/lib/database';
 
 export default function HomeScreen() {
+  const [practices, setPractices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dbConnected, setDbConnected] = useState(false);
+
+  useEffect(() => {
+    loadTodaysPractices();
+    checkConnection();
+  }, []);
+
+  const checkConnection = async () => {
+    const connected = await testConnection();
+    setDbConnected(connected);
+  };
+
+  const loadTodaysPractices = async () => {
+    try {
+      setLoading(true);
+      // For now, using mock user ID. In real app, get from auth
+      const userId = 'mock-user-id';
+      const today = new Date().toISOString().split('T')[0];
+
+      const [projects, todayRecords] = await Promise.all([
+        getUserPracticeProjects(userId),
+        getTodayRecords(userId, today)
+      ]);
+
+      // Transform database data to match UI format
+      const practicesData = projects.map(project => {
+        const todayRecord = todayRecords.find(r => r.practice_project_id === project.id);
+        const current = todayRecord?.count || 0;
+
+        return {
+          id: project.id,
+          name: project.practices.name,
+          current,
+          target: project.daily_target,
+          type: project.practices.type,
+          status: current >= project.daily_target ? 'completed' : 
+                 current > 0 ? 'in_progress' : 'pending'
+        };
+      });
+
+      setPractices(practicesData);
+    } catch (error) {
+      console.error('Error loading practices:', error);
+      // Fallback to mock data if database fails
+      setPractices([
+        { name: '念佛', current: 1250, target: 3000, type: 'count', status: 'in_progress' },
+        { name: '拜佛', current: 20, target: 108, type: 'count', status: 'pending' },
+        { name: '诵经', current: 25, target: 30, type: 'time', status: 'in_progress' },
+        { name: '禅修', current: 30, target: 30, type: 'time', status: 'completed' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updatePractice = async (index: number, increment: number) => {
+    const practice = practices[index];
+    const newCount = Math.max(0, practice.current + increment);
+
+    try {
+      // Update database if connected
+      if (dbConnected && practice.id) {
+        const userId = 'mock-user-id';
+        const today = new Date().toISOString().split('T')[0];
+
+        await createDailyRecord({
+          user_id: userId,
+          practice_project_id: practice.id,
+          record_date: today,
+          count: newCount
+        });
+      }
+
+      // Update local state
+      const newPractices = [...practices];
+      newPractices[index].current = newCount;
+
+      // Update status based on progress
+      if (newPractices[index].current >= newPractices[index].target) {
+        newPractices[index].status = 'completed';
+      } else if (newPractices[index].current > 0) {
+        newPractices[index].status = 'in_progress';
+      } else {
+        newPractices[index].status = 'pending';
+      }
+
+      setPractices(newPractices);
+    } catch (error) {
+      console.error('Error updating practice:', error);
+      Alert.alert('错误', '更新修行记录失败');
+    }
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 6) return '🌙 夜深了，早点休息';
+    if (hour < 12) return '🌅 早上好，开始今日修行';
+    if (hour < 18) return '☀️ 下午好，精进不懈';
+    return '🌆 晚上好，回顾今日收获';
+  };
+
+  const getCompletionPercentage = () => {
+    return Math.round((todayProgress.completedPractices / todayProgress.totalPractices) * 100);
+  };
+
   const [todayProgress, setTodayProgress] = useState({
     completedPractices: 3,
     totalPractices: 6,
@@ -29,17 +136,6 @@ export default function HomeScreen() {
     { name: '心经', current: 7, target: 21, unit: '次' }
   ]);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 6) return '🌙 夜深了，早点休息';
-    if (hour < 12) return '🌅 早上好，开始今日修行';
-    if (hour < 18) return '☀️ 下午好，精进不懈';
-    return '🌆 晚上好，回顾今日收获';
-  };
-
-  const getCompletionPercentage = () => {
-    return Math.round((todayProgress.completedPractices / todayProgress.totalPractices) * 100);
-  };
 
   return (
     <ThemedView style={styles.container}>
@@ -72,7 +168,7 @@ export default function HomeScreen() {
                 {todayProgress.completedPractices}/{todayProgress.totalPractices}
               </ThemedText>
             </View>
-            
+
             <View style={styles.progressBar}>
               <View 
                 style={[
