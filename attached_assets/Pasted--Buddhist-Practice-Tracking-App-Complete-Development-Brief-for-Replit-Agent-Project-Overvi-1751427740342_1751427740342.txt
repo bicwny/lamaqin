@@ -1,0 +1,697 @@
+# Buddhist Practice Tracking App - Complete Development Brief for Replit Agent
+
+## 📋 Project Overview
+
+### **Application Purpose**
+A comprehensive mobile app for Buddhist practitioners to track practice activities across the complete spiritual path: study, practice, mindfulness cultivation, merit dedication, and selflessness realization.
+
+### **Target Platform**
+- **Framework**: Expo React Native (~53.0.9)
+- **Backend**: Supabase (PostgreSQL + Auth + Storage)  
+- **Development**: Replit environment
+- **Deployment**: Cross-platform (iOS/Android/Web)
+
+---
+
+## 🧭 Navigation Structure
+
+### **5-Tab Bottom Navigation**
+```
+📚 闻思 (study)      - Buddhist study and courses
+📿 修行 (practice)    - Practice recording and themes
+💝 心性 (mindfulness) - Heart/mind cultivation  
+📊 统计 (stats)      - Progress statistics and analytics
+👤 个人 (profile)    - Personal settings and data management
+```
+
+---
+
+## 🗄️ Complete Database Schema
+
+### **Core Tables (12 total)**
+
+```sql
+-- User Management
+users (
+  id UUID PRIMARY KEY,
+  dharma_name VARCHAR(100),
+  email VARCHAR(255) UNIQUE,
+  location VARCHAR(100),
+  practice_years INTEGER,
+  class_name VARCHAR(100),
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+)
+
+-- Practice System
+themes (
+  id UUID PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,        -- '五加行', '金刚萨埵法会', etc.
+  description TEXT,
+  type VARCHAR(50) NOT NULL,         -- 'foundation', 'puja', 'meditation'
+  created_at TIMESTAMP
+)
+
+practices (
+  id UUID PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,        -- '顶礼', '百字明', '前行实修法'
+  type VARCHAR(50) NOT NULL,         -- 'count' or 'time'
+  unit VARCHAR(20) NOT NULL,         -- '次' or '分钟'
+  description TEXT,
+  created_at TIMESTAMP
+)
+
+theme_practices (
+  id UUID PRIMARY KEY,
+  theme_id UUID REFERENCES themes(id),
+  practice_id UUID REFERENCES practices(id),
+  target_count INTEGER NOT NULL,     -- 100000 for 五加行
+  is_required BOOLEAN DEFAULT true,
+  created_at TIMESTAMP
+)
+
+-- Course System
+courses (
+  id UUID PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,        -- '《入菩萨行论》'
+  total_lessons INTEGER NOT NULL,    -- 201
+  teacher VARCHAR(100),              -- '索达吉堪布'
+  description TEXT,
+  created_at TIMESTAMP
+)
+
+course_lessons (
+  id UUID PRIMARY KEY,
+  course_id UUID REFERENCES courses(id),
+  lesson_number INTEGER NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content_summary TEXT,
+  created_at TIMESTAMP
+)
+
+-- User Practice Projects
+user_practice_projects (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  theme_id UUID REFERENCES themes(id),
+  practice_id UUID REFERENCES practices(id),
+  target_count INTEGER NOT NULL,
+  start_date DATE,
+  target_end_date DATE,
+  current_count INTEGER DEFAULT 0,
+  daily_target INTEGER DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'not_started', -- 'not_started', 'active', 'completed'
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+)
+
+-- Recording Systems
+daily_records (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  practice_project_id UUID REFERENCES user_practice_projects(id),
+  record_date DATE NOT NULL,
+  count INTEGER NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP
+)
+
+meditation_records (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  practice_id UUID REFERENCES practices(id),
+  record_date DATE NOT NULL,
+  session_number INTEGER NOT NULL,   -- 第几座 (1-92)
+  duration_minutes INTEGER NOT NULL,
+  session_attempt INTEGER DEFAULT 1, -- 这座的第几次 (1-3+)
+  method VARCHAR(100),
+  created_at TIMESTAMP
+)
+
+study_records (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  course_id UUID REFERENCES courses(id),
+  lesson_id UUID REFERENCES course_lessons(id),
+  study_date DATE NOT NULL,
+  study_count_for_lesson INTEGER DEFAULT 1,
+  created_at TIMESTAMP
+)
+
+mindfulness_records (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  record_date DATE NOT NULL,
+  record_time TIME NOT NULL,
+  mind_type VARCHAR(10) NOT NULL,    -- 'good' or 'bad'
+  description TEXT,
+  created_at TIMESTAMP
+)
+
+one_time_records (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  record_date DATE NOT NULL,
+  practice_type VARCHAR(50) NOT NULL,
+  practice_name VARCHAR(100) NOT NULL,
+  count_or_duration VARCHAR(50) NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP
+)
+
+precept_records (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  precept_type VARCHAR(50) NOT NULL, -- '八关斋戒', '菩萨戒', etc.
+  record_date DATE NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP
+)
+```
+
+---
+
+## 📊 Base Data to Load
+
+### **Themes (5 items)**
+```sql
+INSERT INTO themes (name, description, type) VALUES
+('五加行', '密乘修行的基础，包含五个基础修法，各需完成十万遍', 'foundation'),
+('2025金刚萨埵法会', '2025年金刚萨埵净障法会，净除罪障的殊胜修法', 'puja'),
+('前行实修法', '系统的前行观修训练，共92座修法', 'meditation'),
+('2025莲师法会', '2025年莲师法会，祈请莲师加持的修法', 'puja'),
+('大礼拜专修', '以大礼拜为主的身语意净化修法', 'practice');
+```
+
+### **Practices (17 items)**
+```sql
+-- Count-based practices (计数类 - count + 次)
+INSERT INTO practices (name, type, unit, description) VALUES
+('顶礼', 'count', '次', '身语意三门供养诸佛菩萨'),
+('发心', 'count', '次', '发菩提心，为利众生愿成佛'),
+('百字明', 'count', '次', '金刚萨埵百字明心咒，净除业障'),
+('供曼达', 'count', '次', '供养三千大千世界，积累福德'),
+('上师瑜伽', 'count', '次', '与上师相应，获得加持'),
+('金刚萨埵心咒', 'count', '次', '金刚萨埵六字心咒'),
+('观音心咒', 'count', '次', '六字大明咒'),
+('文殊心咒', 'count', '次', '文殊菩萨心咒'),
+('莲师心咒', 'count', '次', '莲师心咒'),
+('阿弥陀佛', 'count', '次', '南无阿弥陀佛'),
+('课前念诵', 'count', '次', '课前的皈依发心等'),
+('三十五佛忏悔文', 'count', '次', '三十五佛忏悔文'),
+('普贤行愿品', 'count', '次', '普贤菩萨行愿品'),
+('心经', 'count', '次', '般若波罗蜜多心经'),
+('供护法', 'count', '次', '供养护法'),
+('烟施', 'count', '次', '烟施法'),
+
+-- Time-based practices (时间类 - time + 分钟)
+('前行实修法', 'time', '分钟', '92座前行观修，每座至少3次');
+```
+
+### **Courses (6 items)**
+```sql
+INSERT INTO courses (name, total_lessons, teacher, description) VALUES
+('《入菩萨行论》', 201, '索达吉堪布', '寂天菩萨的经典著作，菩萨行的根本指南'),
+('《大圆满前行》', 92, '索达吉堪布', '华智仁波切的前行指导，显密圆融的修行指南'),
+('《前行广释》', 156, '索达吉堪布', '详细解释前行修法的重要论典'),
+('《佛子行》', 48, '索达吉堪布', '无著菩萨的修心要诀'),
+('《修心七要》', 36, '索达吉堪布', '藏传佛教修心的精华教授'),
+('《修心七要-圆照》', 36, '圆照堪布', '藏传佛教修心的精华教授');
+```
+
+### **Theme-Practice Relationships**
+```sql
+-- 五加行: 5个修法各10万次
+-- 金刚萨埵法会: 金刚萨埵心咒40万遍  
+-- 前行实修法: 92座观修
+```
+
+---
+
+## 🎨 Design System
+
+### **Color Scheme**
+```typescript
+const Colors = {
+  primary: '#D4AF37',      // Golden - enlightenment
+  secondary: '#8B4513',    // Brown - earth/stability
+  accent: '#FF6B35',       // Orange - energy/compassion
+  background: '#F5F5DC',   // Beige - peaceful
+  surface: '#FFFFFF',      // White - purity
+  text: '#2F4F4F',         // Dark slate gray
+  textSecondary: '#696969', // Dim gray
+  success: '#228B22',      // Forest green
+  warning: '#FF8C00',      // Dark orange
+  error: '#DC143C',        // Crimson
+  
+  // Tab-specific colors
+  study: '#4169E1',        // Royal blue - wisdom
+  practice: '#D4AF37',     // Golden - practice
+  mindfulness: '#FF69B4',  // Hot pink - heart
+  stats: '#32CD32',        // Lime green - growth/progress
+  profile: '#8A2BE2',      // Blue violet - personal
+};
+```
+
+### **Typography & Icons**
+- **Chinese text support**: Ensure proper font rendering
+- **Buddhist symbols**: Use meaningful icons for each function
+- **Clean layout**: Card-based design with proper shadows and spacing
+
+---
+
+## ⚙️ Core Business Logic
+
+### **Practice Recording System**
+
+#### **1. Four Ways to Add Practices**
+```typescript
+enum AddPracticeMethod {
+  JOIN_THEME = 'join_theme',           // 🎯 加入主题
+  SINGLE_PRACTICE = 'single_practice', // 📿 单独添加修法
+  DAILY_ROUTINE = 'daily_routine',     // 📖 添加每日功课
+  ONE_TIME = 'one_time'                // ⚡ 一次性修行记录
+}
+```
+
+#### **2. Practice Status Flow**
+```typescript
+enum PracticeStatus {
+  NOT_STARTED = 'not_started', // 💤 未启动
+  ACTIVE = 'active',           // 🔄 进行中  
+  COMPLETED = 'completed'      // ✅ 已完成
+}
+// No pause/suspend functionality
+```
+
+#### **3. Recording Methods**
+```typescript
+interface RecordingMethod {
+  complete: boolean;     // [完成] button - completes daily target
+  custom: number;        // [自定义记录] - enter any amount
+}
+```
+
+### **Meditation System (前行实修法)**
+
+#### **92-Session Logic**
+```typescript
+interface MeditationSession {
+  sessionNumber: number;        // 1-92
+  attempts: MeditationAttempt[]; // Multiple attempts per session
+  isComplete: boolean;          // At least 3 attempts completed
+}
+
+interface MeditationAttempt {
+  duration: number;    // minutes
+  method?: string;     // optional meditation method
+  date: Date;
+}
+
+// Validation Rules:
+// - Total duration ≥ 30 minutes OR
+// - Each session ≥ 15 minutes AND at least 2 sessions
+```
+
+### **Study System**
+
+#### **Course Progress Logic**
+```typescript
+interface StudyProgress {
+  courseId: string;
+  currentLesson: number;
+  totalLessons: number;
+  listenCount: Record<number, number>; // lesson -> listen count
+  autoAdvance: boolean; // Auto jump to next lesson after completion
+}
+
+// Features:
+// - Multiple listens per lesson
+// - Dropdown lesson selection
+// - One-click completion recording
+```
+
+### **Mindfulness System**
+
+#### **Simple Good/Bad Heart Recording**
+```typescript
+enum MindType {
+  GOOD = 'good',   // 🤍 善心
+  BAD = 'bad'      // 🖤 恶心
+}
+
+interface MindfulnessStats {
+  daily: { good: number; bad: number };
+  weekly: Array<{ date: Date; goodPercent: number }>;
+  trends: 'improving' | 'declining' | 'stable';
+}
+```
+
+---
+
+## 📱 Screen Structures
+
+### **📚 闻思 (Study) Tab**
+```typescript
+interface StudyScreen {
+  myCourses: CourseProgress[];
+  quickStudyToday: QuickStudyWidget;
+  weeklyStats: StudyStats;
+  actions: ['继续学习', '浏览全部课程', '今日听课'];
+}
+```
+
+### **📿 修行 (Practice) Tab** 
+```typescript
+interface PracticeScreen {
+  todaysPractices: DailyPractice[];
+  myThemes: ThemeProgress[];
+  actions: ['完成', '自定义记录', '添加修法', '生成分享'];
+}
+
+interface DailyPractice {
+  name: string;
+  current: number;
+  target: number;
+  type: 'count' | 'time';
+  status: 'pending' | 'in_progress' | 'completed';
+}
+```
+
+### **💝 心性 (Mindfulness) Tab**
+```typescript
+interface MindfulnessScreen {
+  quickRecord: { good: () => void; bad: () => void };
+  todayStats: { good: number; bad: number; percentage: number };
+  weeklyTrend: MindfulnessStats[];
+  visualization: WeeklyMindChart;
+}
+```
+
+### **📊 统计 (Stats) Tab**
+```typescript
+interface StatsScreen {
+  practiceOverview: PracticeStats;
+  themeProgress: ThemeProgressChart[];
+  studyAnalytics: StudyAnalytics;
+  mindfulnessStats: MindfulnessAnalytics;
+  achievements: Achievement[];
+  timelineView: PracticeTimeline;
+  shareOptions: ShareGenerationOptions;
+}
+
+interface PracticeStats {
+  daily: DailyProgress;
+  weekly: WeeklyProgress;
+  monthly: MonthlyProgress;
+  streaks: PracticeStreaks;
+}
+```
+
+### **👤 个人 (Profile) Tab**
+```typescript
+interface ProfileScreen {
+  userInfo: UserProfile;
+  settings: AppSettings;
+  dataManagement: DataExportOptions;
+  backup: BackupOptions;
+  notifications: NotificationSettings;
+  about: AboutInfo;
+}
+
+interface UserProfile {
+  dharmaName: string;
+  email: string;
+  location: string;
+  practiceYears: number;
+  className: string;
+}
+```
+
+---
+
+## 🔄 Development Phases
+
+### **Phase 1: Core Foundation (2-3 weeks)**
+#### **Priority Features:**
+1. **Navigation & UI Setup**
+   - 5-tab navigation with proper icons
+   - Basic screen layouts with placeholder content
+   - Design system implementation
+
+2. **Authentication System**
+   - Supabase Auth integration
+   - User registration with email verification
+   - Profile setup (dharma name, location, etc.)
+
+3. **Database Setup**
+   - Execute complete SQL schema
+   - Load base data (themes, practices, courses)
+   - Test database connections
+
+4. **Basic Practice Recording**
+   - Simple count-based practice recording
+   - Daily target system
+   - Basic progress display
+
+#### **Success Criteria:**
+- App runs without errors
+- User can register and login
+- Can record simple practices
+- Navigation works smoothly
+
+### **Phase 2: Practice System (2-3 weeks)**
+#### **Priority Features:**
+1. **Theme Management**
+   - Join theme workflow
+   - Gradual practice activation
+   - Theme progress tracking
+
+2. **Meditation System**
+   - 92-session tracking
+   - Multiple session recording
+   - Session completion validation
+
+3. **Recording Methods**
+   - [完成] and [自定义记录] buttons
+   - Progress calculations
+   - Daily target management
+
+#### **Success Criteria:**
+- Complete practice recording system
+- Theme management working
+- Meditation tracking functional
+
+### **Phase 3: Study & Mindfulness (2 weeks)**
+#### **Priority Features:**
+1. **Study System**
+   - Course listening records
+   - Auto-advance to next lesson
+   - Study progress tracking
+
+2. **Mindfulness Recording**
+   - Quick good/bad heart buttons
+   - Daily statistics
+   - Weekly trend visualization
+
+#### **Success Criteria:**
+- Study recording functional
+- Mindfulness tracking working
+- Basic statistics display
+
+### **Phase 4: Statistics & Profile (1-2 weeks)**
+#### **Priority Features:**
+1. **Statistics & Analytics**
+   - Comprehensive progress reports
+   - Visual charts and trends
+   - Achievement system
+   - Practice timeline visualization
+
+2. **Profile & Data Management**
+   - User profile management
+   - Data export capabilities
+   - Backup and restore functionality
+   - App settings and preferences
+
+3. **Sharing System**
+   - Auto-generated daily summaries
+   - Practice sharing templates
+   - Merit dedication features
+
+4. **Polish & Optimization**
+   - Offline functionality
+   - Performance optimization
+   - Bug fixes and UX improvements
+
+#### **Success Criteria:**
+- Complete app functionality
+- Smooth user experience
+- Ready for app store release
+
+---
+
+## 🛠️ Technical Implementation Notes
+
+### **Required Dependencies**
+```json
+{
+  "@supabase/supabase-js": "^2.39.0",
+  "@react-navigation/native": "^6.1.9",
+  "@react-navigation/bottom-tabs": "^6.5.11",
+  "react-native-async-storage": "^1.19.5",
+  "expo-notifications": "~0.25.0",
+  "react-native-reanimated": "~3.6.0"
+}
+```
+
+### **File Structure**
+```
+app/
+├── (tabs)/
+│   ├── _layout.tsx          # Tab navigation
+│   ├── study.tsx            # 📚 闻思
+│   ├── practice.tsx         # 📿 修行
+│   ├── mindfulness.tsx      # 💝 心性
+│   ├── stats.tsx            # 📊 统计
+│   └── profile.tsx          # 👤 个人
+├── auth/
+│   ├── login.tsx
+│   └── register.tsx
+└── modals/
+    ├── add-practice.tsx
+    ├── record-meditation.tsx
+    └── custom-record.tsx
+
+components/
+├── PracticeCard.tsx
+├── ThemeProgress.tsx
+├── StatChart.tsx
+├── MindfulnessWidget.tsx
+└── QuickRecord.tsx
+
+lib/
+├── supabase.ts              # Database client
+├── database.ts              # CRUD operations
+├── storage.ts               # Offline storage
+└── notifications.ts         # Push notifications
+
+types/
+└── database.ts              # TypeScript interfaces
+
+constants/
+├── Colors.ts
+├── Practices.ts
+└── Courses.ts
+```
+
+### **Key Implementation Points**
+
+1. **Supabase Configuration**
+   ```typescript
+   const supabase = createClient(
+     process.env.EXPO_PUBLIC_SUPABASE_URL!,
+     process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+   );
+   ```
+
+2. **Practice Recording Logic**
+   ```typescript
+   const recordPractice = async (practiceId: string, count: number) => {
+     // Update user_practice_projects.current_count
+     // Insert daily_records entry
+     // Check for completion status
+     // Update statistics
+   };
+   ```
+
+3. **Meditation Session Validation**
+   ```typescript
+   const validateMeditationSession = (attempts: MeditationAttempt[]) => {
+     const totalDuration = attempts.reduce((sum, a) => sum + a.duration, 0);
+     const validSessions = attempts.filter(a => a.duration >= 15);
+     
+     return totalDuration >= 30 || (validSessions.length >= 2);
+   };
+   ```
+
+---
+
+## 🎯 Success Metrics
+
+### **Technical Metrics**
+- App startup time < 3 seconds
+- Database query response < 500ms
+- Offline functionality coverage > 80%
+- Crash rate < 1%
+
+### **User Experience Metrics**
+- 7-day retention rate > 60%
+- Daily practice recording rate > 80%
+- Average session duration > 5 minutes
+- User satisfaction score > 4.5/5
+
+### **Business Metrics**
+- Theme completion rate > 30%
+- Daily active users growth > 20%
+- Practice streak maintenance > 30 days
+- Sharing feature usage > 50%
+
+---
+
+## 🔧 Environment Setup Instructions
+
+### **1. Supabase Setup**
+1. Create new Supabase project
+2. Execute the complete SQL schema provided above
+3. Configure Row Level Security (RLS) policies
+4. Set up email authentication
+5. Get project URL and anon key for environment variables
+
+### **2. Replit Configuration**
+1. Create new Replit with Expo React Native template
+2. Install additional dependencies listed above
+3. Set environment variables:
+   ```
+   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   ```
+4. Configure TypeScript path aliases in tsconfig.json
+
+### **3. Development Workflow**
+1. Start with Phase 1 core features
+2. Test each feature thoroughly before moving to next
+3. Use Expo development build for testing
+4. Regular database backups during development
+
+---
+
+## 📞 Support & Debugging
+
+### **Common Issues & Solutions**
+1. **Database Connection**: Verify Supabase credentials and RLS policies
+2. **Navigation Issues**: Check Expo Router configuration
+3. **TypeScript Errors**: Ensure proper type definitions
+4. **Build Failures**: Verify all dependencies are compatible with Expo 53
+
+### **Testing Strategy**
+1. **Unit Tests**: Core business logic functions
+2. **Integration Tests**: Database operations
+3. **E2E Tests**: Complete user workflows
+4. **Performance Tests**: Load and stress testing
+
+---
+
+## 🏁 Final Notes
+
+This comprehensive brief contains everything needed to build the Buddhist Practice Tracking App. The Replit Agent should follow the phases sequentially, implementing each feature completely before moving to the next.
+
+The app balances traditional Buddhist practice tracking with modern digital UX, providing a meaningful tool for spiritual development while maintaining technical excellence.
+
+**Key Success Factors:**
+1. **Gradual Implementation**: Build features incrementally
+2. **User-Centric Design**: Prioritize ease of use over complexity  
+3. **Data Integrity**: Ensure accurate practice tracking
+4. **Cultural Sensitivity**: Respect Buddhist traditions and terminology
+5. **Technical Excellence**: Maintain high code quality and performance
+
+Start with Phase 1 and confirm each step before proceeding. The foundation must be solid before building advanced features.
