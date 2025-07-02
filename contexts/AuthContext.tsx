@@ -135,21 +135,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Signing out user...');
       
-      // Clear user state immediately for instant UI response
-      setUser(null);
-      setLoading(false);
-      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error('Sign out error:', error);
-        // Don't throw error since we already cleared the UI state
       }
+      
+      // Clear user state after successful logout
+      setUser(null);
+      setLoading(false);
       
       console.log('User signed out successfully');
     } catch (error) {
       console.error('Sign out error:', error);
-      // User state is already cleared, so logout will work in UI
+      // Clear user state even if there's an error to ensure UI logout
+      setUser(null);
+      setLoading(false);
     }
   };
 
