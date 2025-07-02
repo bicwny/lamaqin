@@ -1,23 +1,21 @@
-
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { ConnectionTest } from './ConnectionTest';
 
 export function DebugInfo() {
-  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+  const hasSupabaseUrl = !!process.env.EXPO_PUBLIC_SUPABASE_URL;
+  const hasSupabaseKey = !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Debug Info</Text>
-      <Text style={styles.text}>
-        Supabase URL: {supabaseUrl ? 'Set' : 'Missing'}
+      <Text style={styles.title}>🔧 Debug Info</Text>
+      <Text style={styles.info}>
+        Supabase URL: {hasSupabaseUrl ? '✅ Set' : '❌ Missing'}
       </Text>
-      <Text style={styles.text}>
-        Supabase Key: {supabaseKey ? 'Set' : 'Missing'}
+      <Text style={styles.info}>
+        Supabase Key: {hasSupabaseKey ? '✅ Set' : '❌ Missing'}
       </Text>
-      <Text style={styles.text}>
-        Environment: {__DEV__ ? 'Development' : 'Production'}
-      </Text>
+      <ConnectionTest />
     </View>
   );
 }

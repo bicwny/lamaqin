@@ -31,45 +31,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         console.log('🔄 Auth state changed:', event, session?.user?.email);
 
+        // Handle sign out
         if (event === 'SIGNED_OUT') {
           console.log('🚪 User signed out - clearing state');
           setUser(null);
           setLoading(false);
-          // Clear any cached data
-          await AsyncStorage.removeItem('@auth_token');
-          await AsyncStorage.removeItem('@user_session');
+          try {
+            await AsyncStorage.removeItem('@auth_token');
+            await AsyncStorage.removeItem('@user_session');
+          } catch (error) {
+            console.error('Error clearing storage:', error);
+          }
           return;
         }
 
-        if (session?.user && session.user.email_confirmed_at) {
-          console.log('✅ Found verified session for:', session.user.email);
-
-          try {
-            // Create user in database if doesn't exist
-            await ensureUserInDatabase(session.user);
-
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-              dharma_name: session.user.user_metadata?.dharma_name,
-            });
-            console.log('✅ User state set successfully');
-          } catch (error) {
-            console.error('❌ Failed to ensure user in database:', error);
-            // Still set user if database sync fails
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-              dharma_name: session.user.user_metadata?.dharma_name,
-            });
+        // Handle successful authentication
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (session?.user && session.user.email_confirmed_at) {
+            console.log('✅ Found verified session for:', session.user.email);
+            
+            try {
+              await ensureUserInDatabase(session.user);
+              setUser({
+                id: session.user.id,
+                email: session.user.email!,
+                dharma_name: session.user.user_metadata?.dharma_name,
+              });
+              console.log('✅ User state set successfully');
+            } catch (error) {
+              console.error('❌ Database sync failed:', error);
+              // Still set user even if database sync fails
+              setUser({
+                id: session.user.id,
+                email: session.user.email!,
+                dharma_name: session.user.user_metadata?.dharma_name,
+              });
+            }
+          } else if (session?.user && !session.user.email_confirmed_at) {
+            console.log('⏳ User exists but email not verified');
+            setUser(null);
+          } else {
+            console.log('ℹ️ No valid session');
+            setUser(null);
           }
-        } else if (session?.user && !session.user.email_confirmed_at) {
-          console.log('⏳ User exists but email not verified');
-          setUser(null); // Don't set user until email is verified
-        } else {
-          console.log('❌ No session found');
-          setUser(null);
         }
+        
         setLoading(false);
       }
     );
@@ -79,39 +85,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthState = async () => {
     try {
-      console.log('Checking auth state...');
+      console.log('🔍 Checking auth state...');
+      setLoading(true);
 
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Auth check timeout')), 10000)
-      );
-
-      const authPromise = supabase.auth.getSession();
-
-      const { data: { session }, error } = await Promise.race([authPromise, timeoutPromise]) as any;
+      const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
-        console.error('Auth session error:', error);
+        console.error('❌ Auth session error:', error);
+        setUser(null);
         setLoading(false);
         return;
       }
 
-      if (session?.user) {
-        console.log('Found existing session for:', session.user.email);
+      if (session?.user && session.user.email_confirmed_at) {
+        console.log('✅ Found verified session for:', session.user.email);
 
-        // Create user in database if doesn't exist
-        await ensureUserInDatabase(session.user);
+        try {
+          // Create user in database if doesn't exist
+          await ensureUserInDatabase(session.user);
 
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-          dharma_name: session.user.user_metadata?.dharma_name,
-        });
+          setUser({
+            id: session.user.id,
+            email: session.user.email!,
+            dharma_name: session.user.user_metadata?.dharma_name,
+          });
+          console.log('✅ User state set successfully');
+        } catch (dbError) {
+          console.error('❌ Database sync failed, but continuing:', dbError);
+          // Still set user even if database sync fails
+          setUser({
+            id: session.user.id,
+            email: session.user.email!,
+            dharma_name: session.user.user_metadata?.dharma_name,
+          });
+        }
+      } else if (session?.user && !session.user.email_confirmed_at) {
+        console.log('⏳ User exists but email not verified');
+        setUser(null);
       } else {
-        console.log('No existing session found');
+        console.log('ℹ️ No existing session found');
+        setUser(null);
       }
     } catch (error) {
-      console.error('Auth check error:', error);
+      console.error('❌ Auth check error:', error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
