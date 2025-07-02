@@ -1,0 +1,51 @@
+Running application "main" with appParams:
+ 
+Object {rootTag: "#root", hydrate: undefined}
+ 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+"shadow*" style props are deprecated. Use "boxShadow".
+RootLayoutNav render - user: undefined loading: true
+User object: null
+Showing loading screen...
+Checking auth state...
+RootLayoutNav render - user: undefined loading: true
+User object: null
+Showing loading screen...
+Auth state changed: SIGNED_IN patriziolin@gmail.com
+RootLayoutNav render - user: patriziolin@gmail.com loading: false
+User object: {
+  "id": "cd3b8ae2-df3f-442f-996f-9c12a10aff19",
+  "email": "patriziolin@gmail.com",
+  "dharma_name": "多吉丹"
+}
+Auth state resolved, user: logged in
+About to render Stack with screens
+props.pointerEvents is deprecated. Use style.pointerEvents
+Error loading practices: 
+TypeError {}
+
+at t.value (https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
+🔍 Testing Supabase connection...
+(0 , _database.testConnection) is not a function
+Found existing session for: patriziolin@gmail.com
+RootLayoutNav render - user: patriziolin@gmail.com loading: false
+User object: {
+  "id": "cd3b8ae2-df3f-442f-996f-9c12a10aff19",
+  "email": "patriziolin@gmail.com",
+  "dharma_name": "多吉丹"
+}
+Auth state resolved, user: logged in
+About to render Stack with screens
+Auth state changed: INITIAL_SESSION patriziolin@gmail.com
+RootLayoutNav render - user: patriziolin@gmail.com loading: false
+User object: {
+  "id": "cd3b8ae2-df3f-442f-996f-9c12a10aff19",
+  "email": "patriziolin@gmail.com",
+  "dharma_name": "多吉丹"
+}
+Auth state resolved, user: logged in
+About to render Stack with screens
