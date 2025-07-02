@@ -29,10 +29,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('🔄 Auth state changed:', event, session?.user?.email);
 
         if (event === 'SIGNED_OUT') {
-          console.log('User signed out - clearing state');
+          console.log('🚪 User signed out - clearing state');
           setUser(null);
           setLoading(false);
           // Clear any cached data
@@ -41,19 +41,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        if (session?.user) {
-          console.log('Found existing session for:', session.user.email);
+        if (session?.user && session.user.email_confirmed_at) {
+          console.log('✅ Found verified session for:', session.user.email);
 
-          // Create user in database if doesn't exist
-          await ensureUserInDatabase(session.user);
+          try {
+            // Create user in database if doesn't exist
+            await ensureUserInDatabase(session.user);
 
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            dharma_name: session.user.user_metadata?.dharma_name,
-          });
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              dharma_name: session.user.user_metadata?.dharma_name,
+            });
+            console.log('✅ User state set successfully');
+          } catch (error) {
+            console.error('❌ Failed to ensure user in database:', error);
+            // Still set user if database sync fails
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              dharma_name: session.user.user_metadata?.dharma_name,
+            });
+          }
+        } else if (session?.user && !session.user.email_confirmed_at) {
+          console.log('⏳ User exists but email not verified');
+          setUser(null); // Don't set user until email is verified
         } else {
-          console.log('No existing session found');
+          console.log('❌ No session found');
+          setUser(null);
         }
         setLoading(false);
       }
@@ -225,10 +240,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: user.id,
             email: user.email,
             dharma_name: user.user_metadata?.dharma_name || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           }]);
 
         if (insertError) {
-          console.error('❌ AuthContext: Error creating user in database:', insertError);
+          // Handle duplicate key constraint gracefully
+          if (insertError.code === '23505') {
+            console.log('✅ AuthContext: User already exists (race condition handled)');
+          } else {
+            console.error('❌ AuthContext: Error creating user in database:', insertError);
+            throw insertError;
+          }
         } else {
           console.log('✅ AuthContext: User created in database:', user.email);
         }
@@ -255,6 +278,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('❌ AuthContext: Error ensuring user in database:', error);
+      throw error;
     }
   };
 
