@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
-            
+
             // Create user in database if doesn't exist (non-blocking)
             await ensureUserInDatabase(session.user);
             setUser({
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(null);
           }
         }
-        
+
         setLoading(false);
       }
     );
@@ -218,7 +218,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const ensureUserInDatabase = async (user: any) => {
     try {
       console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
-      
+
       // Skip database operations if we don't have a valid user ID
       if (!user.id) {
         console.log('⚠️ AuthContext: No user ID provided, skipping database sync');
@@ -266,7 +266,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } else {
           console.log('✅ AuthContext: User already exists in database:', user.email);
-          
+
           // Update user info if dharma_name has changed
           if (user.user_metadata?.dharma_name && existingUser.dharma_name !== user.user_metadata.dharma_name) {
             console.log('🔄 AuthContext: Updating user dharma_name');
@@ -277,7 +277,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 updated_at: new Date().toISOString()
               })
               .eq('id', user.id);
-              
+
             if (updateError) {
               console.error('❌ AuthContext: Error updating user:', updateError);
             } else {
@@ -289,9 +289,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Race the database operation against the timeout
       await Promise.race([dbOperation(), timeoutPromise]);
-      
+
     } catch (error) {
-      console.error('❌ AuthContext: Error ensuring user in database:', error);
+      console.error('❌ AuthContext: Error ensuring user in database:', error?.message || error);
       console.log('⚠️ AuthContext: Continuing without database sync due to error');
       // Don't throw error - allow user to continue without database sync
     }
