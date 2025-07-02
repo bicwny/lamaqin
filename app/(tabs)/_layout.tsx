@@ -79,7 +79,7 @@ export default function TabLayout() {
               <IconSymbol size={28} name={focused ? 'heart.fill' : 'heart'} color={color} />
             ),
           }}
-        /></Tabs.Screen>
+        />
         <Tabs.Screen
           name="mindfulness"
           options={{
