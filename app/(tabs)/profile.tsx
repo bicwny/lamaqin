@@ -3,6 +3,7 @@ import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal, Sha
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserProfile {
   dharmaName: string;
@@ -20,6 +21,23 @@ interface TodaySummary {
 }
 
 export default function ProfileScreen() {
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = () => {
+    Alert.alert(
+      '退出登录',
+      '确定要退出登录吗？',
+      [
+        { text: '取消', style: 'cancel' },
+        { 
+          text: '退出', 
+          style: 'destructive',
+          onPress: signOut 
+        }
+      ]
+    );
+  };
+
   const [userProfile, setUserProfile] = useState<UserProfile>({
     dharmaName: '多吉丹',
     practiceYears: 3,
@@ -450,6 +468,32 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: Colors.textSecondary,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  actionButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: Colors.surface,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  signOutButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  signOutText: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
   },

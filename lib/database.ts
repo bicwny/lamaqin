@@ -1,4 +1,3 @@
-
 import { supabase, testConnection } from './supabase';
 import { 
   User, 
@@ -12,6 +11,12 @@ import {
   MindfulnessRecord 
 } from '@/types/database';
 
+// Get current user ID
+const getCurrentUserId = async (): Promise<string | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id || null;
+};
+
 // User operations
 export const createUser = async (userData: Partial<User>) => {
   const { data, error } = await supabase
@@ -19,7 +24,7 @@ export const createUser = async (userData: Partial<User>) => {
     .insert(userData)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -30,7 +35,7 @@ export const getUser = async (userId: string) => {
     .select('*')
     .eq('id', userId)
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -41,7 +46,7 @@ export const getThemes = async () => {
     .from('themes')
     .select('*')
     .order('created_at');
-  
+
   if (error) throw error;
   return data;
 };
@@ -52,7 +57,7 @@ export const getPractices = async () => {
     .from('practices')
     .select('*')
     .order('name');
-  
+
   if (error) throw error;
   return data;
 };
@@ -63,7 +68,7 @@ export const getCourses = async () => {
     .from('courses')
     .select('*')
     .order('name');
-  
+
   if (error) throw error;
   return data;
 };
@@ -79,7 +84,7 @@ export const getUserPracticeProjects = async (userId: string) => {
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
   return data;
 };
@@ -90,7 +95,7 @@ export const createPracticeProject = async (projectData: Partial<UserPracticePro
     .insert(projectData)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -102,7 +107,7 @@ export const createDailyRecord = async (recordData: Partial<DailyRecord>) => {
     .insert(recordData)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -119,7 +124,7 @@ export const getTodayRecords = async (userId: string, date: string) => {
     `)
     .eq('user_id', userId)
     .eq('record_date', date);
-  
+
   if (error) throw error;
   return data;
 };
@@ -131,7 +136,7 @@ export const createMeditationRecord = async (recordData: Partial<MeditationRecor
     .insert(recordData)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -143,7 +148,7 @@ export const createStudyRecord = async (recordData: Partial<StudyRecord>) => {
     .insert(recordData)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -155,7 +160,7 @@ export const createMindfulnessRecord = async (recordData: Partial<MindfulnessRec
     .insert(recordData)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data;
 };
@@ -166,7 +171,7 @@ export const getTodayMindfulnessRecords = async (userId: string, date: string) =
     .select('*')
     .eq('user_id', userId)
     .eq('record_date', date);
-  
+
   if (error) throw error;
   return data;
 };
