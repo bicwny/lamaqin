@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal, Share } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -27,36 +26,39 @@ export default function ProfileScreen() {
   const { user, signOut } = useAuth();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleSignOut = () => {
-    Alert.alert(
-      '⚠️ 确认退出',
-      '您确定要退出登录吗？\n\n退出后将无法自动同步修行数据，建议先进行数据备份。',
-      [
-        { text: '取消', style: 'cancel' },
-        { 
-          text: '确认退出', 
-          style: 'destructive',
-          onPress: async () => {
-            setIsSigningOut(true);
-            try {
-              console.log('Starting logout process...');
-              await signOut();
-              console.log('Logout completed');
-              
-              // Small delay to ensure state changes are processed
-              setTimeout(() => {
-                setIsSigningOut(false);
-              }, 100);
-            } catch (error) {
-              console.error('Logout failed:', error);
-              Alert.alert('退出失败', '退出登录时发生错误，请重试。');
-              setIsSigningOut(false);
-            }
-          }
-        }
-      ]
-    );
+    console.log('🔵 Profile: handleSignOut function called');
+    console.log('🔵 Profile: About to show logout modal');
+    setShowLogoutModal(true);
+    console.log('🔵 Profile: Logout modal state set to true');
+  };
+
+  const confirmLogout = async () => {
+    console.log('🔵 Profile: User confirmed logout');
+    setShowLogoutModal(false);
+    setIsSigningOut(true);
+    try {
+      console.log('🔴 Profile: Starting logout process...');
+      await signOut();
+      console.log('🔴 Profile: SignOut function completed');
+
+      // Add a longer delay to ensure navigation
+      setTimeout(() => {
+        console.log('🔴 Profile: Setting isSigningOut to false');
+        setIsSigningOut(false);
+      }, 500);
+    } catch (error) {
+      console.error('🔴 Profile: Logout failed:', error);
+      Alert.alert('退出失败', '退出登录时发生错误，请重试。');
+      setIsSigningOut(false);
+    }
+  };
+
+  const cancelLogout = () => {
+    console.log('🔵 Profile: User cancelled logout');
+    setShowLogoutModal(false);
   };
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -373,8 +375,12 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         <ThemedView style={styles.section}>
           <TouchableOpacity 
             style={[styles.signOutButton, isSigningOut && styles.signOutButtonDisabled]} 
-            onPress={handleSignOut}
+            onPress={() => {
+              console.log('🔵 Profile: TouchableOpacity onPress triggered');
+              handleSignOut();
+            }}
             disabled={isSigningOut}
+            activeOpacity={0.7}
           >
             <Text style={styles.signOutText}>
               {isSigningOut ? '正在退出...' : '退出登录'}
@@ -414,6 +420,36 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
                 onPress={handleShare}
               >
                 <Text style={styles.modalButtonText}>复制分享</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Logout Confirmation Modal */}
+      <Modal visible={showLogoutModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, styles.logoutModalContent]}>
+            <Text style={styles.logoutModalIcon}>⚠️</Text>
+            <ThemedText type="subtitle" style={styles.logoutModalTitle}>
+              确认退出
+            </ThemedText>
+            <ThemedText style={styles.logoutModalMessage}>
+              您确定要退出登录吗？{'\n\n'}退出后将无法自动同步修行数据，建议先进行数据备份。
+            </ThemedText>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={cancelLogout}
+              >
+                <Text style={styles.cancelButtonText}>取消</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.logoutConfirmButton]}
+                onPress={confirmLogout}
+              >
+                <Text style={styles.logoutConfirmButtonText}>确认退出</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -674,6 +710,37 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: Colors.textSecondary,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  logoutModalContent: {
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+  logoutModalIcon: {
+    fontSize: 48,
+    marginBottom: 15,
+  },
+  logoutModalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  logoutModalMessage: {
+    fontSize: 16,
+    color: Colors.text,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 25,
+    paddingHorizontal: 10,
+  },
+  logoutConfirmButton: {
+    backgroundColor: '#FF6B6B',
+  },
+  logoutConfirmButtonText: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
   },

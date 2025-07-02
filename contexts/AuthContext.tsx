@@ -144,31 +144,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log('Signing out user...');
+      console.log('🚪 AuthContext: signOut function called');
+      console.log('🚪 Current user before logout:', user?.email);
       
-      // Clear local storage first to ensure immediate logout
+      // Set loading to true to prevent any intermediate state issues
+      setLoading(true);
+      
+      // Clear local storage first
+      console.log('🧹 AuthContext: Clearing local storage...');
       await AsyncStorage.removeItem('@auth_token');
       await AsyncStorage.removeItem('@user_session');
+      console.log('✅ AuthContext: Local storage cleared');
       
-      // Force clear user state immediately before Supabase call
-      setUser(null);
-      setLoading(false);
-      
+      // Call Supabase signOut first
+      console.log('🔐 AuthContext: Calling Supabase signOut...');
       const { error } = await supabase.auth.signOut({
-        scope: 'global' // Sign out from all sessions
+        scope: 'global'
       });
       
       if (error) {
-        console.error('Sign out error:', error);
-        // Don't throw here, state is already cleared
+        console.error('❌ AuthContext: Supabase sign out error:', error);
+        // Still clear local state even if Supabase fails
+      } else {
+        console.log('✅ AuthContext: Supabase signOut completed successfully');
       }
       
-      console.log('User signed out successfully');
-    } catch (error) {
-      console.error('Sign out error:', error);
-      // Clear user state even if there's an error to ensure UI logout
+      // Force clear user state
+      console.log('🔄 AuthContext: Clearing user state...');
       setUser(null);
       setLoading(false);
+      console.log('✅ AuthContext: User state cleared');
+      
+      console.log('🎉 AuthContext: Logout process completed - user should be redirected to login');
+    } catch (error) {
+      console.error('❌ AuthContext: Logout error:', error);
+      // Ensure user state is cleared regardless
+      console.log('🛡️ AuthContext: Force clearing user state due to error');
+      setUser(null);
+      setLoading(false);
+      throw error; // Re-throw so the UI can handle it
     }
   };
 
