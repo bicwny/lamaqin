@@ -40,14 +40,15 @@ export default function ProfileScreen() {
           onPress: async () => {
             setIsSigningOut(true);
             try {
-              console.log('Starting logout process...');
+              console.log('🔴 Profile: Starting logout process...');
               await signOut();
-              console.log('Logout completed');
+              console.log('🔴 Profile: SignOut function completed');
               
-              // Small delay to ensure state changes are processed
+              // Add a longer delay to ensure navigation
               setTimeout(() => {
+                console.log('🔴 Profile: Setting isSigningOut to false');
                 setIsSigningOut(false);
-              }, 100);
+              }, 500);
             } catch (error) {
               console.error('Logout failed:', error);
               Alert.alert('退出失败', '退出登录时发生错误，请重试。');

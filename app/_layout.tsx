@@ -15,11 +15,11 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
 
-  console.log('RootLayoutNav render - user:', user?.email, 'loading:', loading);
-  console.log('User object:', JSON.stringify(user, null, 2));
+  console.log('🔍 RootLayoutNav render - user:', user?.email, 'loading:', loading);
+  console.log('📋 User object:', JSON.stringify(user, null, 2));
 
   if (loading) {
-    console.log('Showing loading screen...');
+    console.log('⏳ Showing loading screen...');
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -28,8 +28,9 @@ function RootLayoutNav() {
     );
   }
 
-  console.log('Auth state resolved, user:', user ? 'logged in' : 'not logged in');
-  console.log('About to render Stack with screens');
+  console.log('✅ Auth state resolved, user:', user ? 'logged in' : 'not logged in');
+  console.log('📱 About to render Stack with screens');
+  console.log('🎯 Will show:', user ? '(tabs) screen' : 'auth screen');
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

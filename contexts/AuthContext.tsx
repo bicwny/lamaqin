@@ -144,29 +144,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log('Signing out user...');
+      console.log('🚪 Starting logout process...');
       
-      // Clear local storage first to ensure immediate logout
+      // Clear local storage first
       await AsyncStorage.removeItem('@auth_token');
       await AsyncStorage.removeItem('@user_session');
+      console.log('✅ Local storage cleared');
       
-      // Force clear user state immediately before Supabase call
+      // Force clear user state immediately
+      console.log('🔄 Clearing user state...');
       setUser(null);
       setLoading(false);
       
+      // Call Supabase signOut
+      console.log('🔐 Calling Supabase signOut...');
       const { error } = await supabase.auth.signOut({
-        scope: 'global' // Sign out from all sessions
+        scope: 'global'
       });
       
       if (error) {
-        console.error('Sign out error:', error);
-        // Don't throw here, state is already cleared
+        console.error('❌ Supabase sign out error:', error);
+      } else {
+        console.log('✅ Supabase signOut completed');
       }
       
-      console.log('User signed out successfully');
+      // Force a small delay to ensure state propagation
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      console.log('🎉 Logout process completed - user should be redirected to login');
     } catch (error) {
-      console.error('Sign out error:', error);
-      // Clear user state even if there's an error to ensure UI logout
+      console.error('❌ Logout error:', error);
+      // Ensure user state is cleared regardless
       setUser(null);
       setLoading(false);
     }
