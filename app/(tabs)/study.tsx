@@ -11,7 +11,19 @@ export default function StudyScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadCourses();
+    let isMounted = true;
+    
+    const loadCoursesSafely = async () => {
+      if (isMounted) {
+        await loadCourses();
+      }
+    };
+    
+    loadCoursesSafely();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const loadCourses = async () => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
@@ -11,8 +11,20 @@ export default function HomeScreen() {
   const [dbConnected, setDbConnected] = useState(false);
 
   useEffect(() => {
-    loadTodaysPractices();
-    checkConnection();
+    let isMounted = true;
+    
+    const loadData = async () => {
+      await loadTodaysPractices();
+      if (isMounted) {
+        await checkConnection();
+      }
+    };
+    
+    loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const checkConnection = async () => {
