@@ -36,7 +36,7 @@ export default function HomeScreen() {
     try {
       setLoading(true);
       // For now, using mock user ID. In real app, get from auth
-      const userId = 'mock-user-id';
+      const userId = '550e8400-e29b-41d4-a716-446655440000';
       const today = new Date().toISOString().split('T')[0];
 
       const [projects, todayRecords] = await Promise.all([
