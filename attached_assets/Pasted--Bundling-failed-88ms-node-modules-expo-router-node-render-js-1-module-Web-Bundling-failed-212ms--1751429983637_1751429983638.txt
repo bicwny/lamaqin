@@ -1,0 +1,82 @@
+λ Bundling failed 88ms node_modules/expo-router/node/render.js (1 module)
+Web Bundling failed 212ms node_modules/expo-router/entry.js (1 module)
+
+Metro error: SyntaxError: /home/runner/workspace/app/(tabs)/practice.tsx: Unexpected token, expected "}" (9:4)
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+
+Call Stack
+  <unknown> (app/(tabs)/practice.tsx:9:5)
+Web Bundling failed 345ms node_modules/expo-router/entry.js (1 module)
+ ERROR  SyntaxError: /home/runner/workspace/app/(tabs)/practice.tsx: Unexpected token, expected "}" (9:4)
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+Web Bundled 621ms node_modules/expo-router/_error.js (232 modules)
+λ Bundling failed 1456ms node_modules/expo-router/node/render.js (1 module)
+
+Metro error: SyntaxError: /home/runner/workspace/app/(tabs)/practice.tsx: Unexpected token, expected "}" (9:4)
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+
+Call Stack
+  <unknown> (app/(tabs)/practice.tsx:9:5)
+Web Bundling failed 1576ms node_modules/expo-router/entry.js (1 module)
+Web Bundled 231ms node_modules/expo-router/_error.js (1 module)
+Web Bundling failed 1153ms node_modules/expo-router/entry.js (1 module)
+λ Bundling failed 1173ms node_modules/expo-router/node/render.js (1 module)
+
+Metro error: SyntaxError: /home/runner/workspace/app/(tabs)/practice.tsx: Unexpected token, expected "}" (9:4)
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+
+   7 |
+   8 | interface PracticeProject {
+>  9 |   id: string;
+     |     ^
+  10 |   practice_id: string;
+  11 |   target_count: number;
+  12 |   current_count: number;
+
+Call Stack
+  <unknown> (app/(tabs)/practice.tsx:9:5)
+Web Bundled 14ms node_modules/expo-router/_error.js (1 module)
