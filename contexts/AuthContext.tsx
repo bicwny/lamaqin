@@ -30,6 +30,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
+        
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out - clearing state');
+          setUser(null);
+          setLoading(false);
+          // Clear any cached data
+          await AsyncStorage.removeItem('@auth_token');
+          await AsyncStorage.removeItem('@user_session');
+          return;
+        }
+        
         if (session?.user) {
           setUser({
             id: session.user.id,
@@ -135,13 +146,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Signing out user...');
       
-      const { error } = await supabase.auth.signOut();
+      // Clear local storage first to ensure immediate logout
+      await AsyncStorage.removeItem('@auth_token');
+      await AsyncStorage.removeItem('@user_session');
+      
+      const { error } = await supabase.auth.signOut({
+        scope: 'global' // Sign out from all sessions
+      });
       
       if (error) {
         console.error('Sign out error:', error);
+        // Don't throw here, still want to clear local state
       }
       
-      // Clear user state after successful logout
+      // Force clear user state immediately
       setUser(null);
       setLoading(false);
       

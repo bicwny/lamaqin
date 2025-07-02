@@ -26,6 +26,8 @@ interface TodaySummary {
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
 
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
   const handleSignOut = () => {
     Alert.alert(
       '⚠️ 确认退出',
@@ -36,11 +38,16 @@ export default function ProfileScreen() {
           text: '确认退出', 
           style: 'destructive',
           onPress: async () => {
+            setIsSigningOut(true);
             try {
+              console.log('Starting logout process...');
               await signOut();
+              console.log('Logout completed');
             } catch (error) {
               console.error('Logout failed:', error);
               Alert.alert('退出失败', '退出登录时发生错误，请重试。');
+            } finally {
+              setIsSigningOut(false);
             }
           }
         }
@@ -360,8 +367,14 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
 
         {/* Sign Out */}
         <ThemedView style={styles.section}>
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Text style={styles.signOutText}>退出登录</Text>
+          <TouchableOpacity 
+            style={[styles.signOutButton, isSigningOut && styles.signOutButtonDisabled]} 
+            onPress={handleSignOut}
+            disabled={isSigningOut}
+          >
+            <Text style={styles.signOutText}>
+              {isSigningOut ? '正在退出...' : '退出登录'}
+            </Text>
           </TouchableOpacity>
         </ThemedView>
       </ScrollView>
@@ -577,6 +590,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  signOutButtonDisabled: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.6,
   },
   signOutText: {
     color: '#FFFFFF',
