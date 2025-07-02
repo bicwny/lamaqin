@@ -28,15 +28,25 @@ export default function ProfileScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = () => {
+    console.log('🔵 Profile: handleSignOut function called');
+    console.log('🔵 Profile: About to show Alert dialog');
+    
     Alert.alert(
       '⚠️ 确认退出',
       '您确定要退出登录吗？\n\n退出后将无法自动同步修行数据，建议先进行数据备份。',
       [
-        { text: '取消', style: 'cancel' },
+        { 
+          text: '取消', 
+          style: 'cancel',
+          onPress: () => {
+            console.log('🔵 Profile: User cancelled logout');
+          }
+        },
         { 
           text: '确认退出', 
           style: 'destructive',
           onPress: async () => {
+            console.log('🔵 Profile: User confirmed logout');
             setIsSigningOut(true);
             try {
               console.log('🔴 Profile: Starting logout process...');
@@ -49,7 +59,7 @@ export default function ProfileScreen() {
                 setIsSigningOut(false);
               }, 500);
             } catch (error) {
-              console.error('Logout failed:', error);
+              console.error('🔴 Profile: Logout failed:', error);
               Alert.alert('退出失败', '退出登录时发生错误，请重试。');
               setIsSigningOut(false);
             }
@@ -57,6 +67,8 @@ export default function ProfileScreen() {
         }
       ]
     );
+    
+    console.log('🔵 Profile: Alert.alert called');
   };
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
