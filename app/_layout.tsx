@@ -1,7 +1,6 @@
-
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -14,9 +13,17 @@ import { DebugInfo } from '@/components/DebugInfo';
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
+  const router = useRouter();
 
   console.log('🔍 RootLayoutNav render - user:', user?.email, 'loading:', loading);
   console.log('📋 User object:', JSON.stringify(user, null, 2));
+
+  useEffect(() => {
+    if (!loading && user) {
+      console.log('🚀 Navigating to study tab after login...');
+      router.replace('(tabs)/study');
+    }
+  }, [user, loading]);
 
   if (loading) {
     console.log('⏳ Showing loading screen...');
@@ -36,18 +43,18 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen 
-            name="(tabs)" 
-            options={{ headerShown: false }} 
+          <Stack.Screen
+            name="(tabs)"
+            options={{ headerShown: false }}
             key="authenticated"
           />
         ) : (
-          <Stack.Screen 
-            name="auth" 
-            options={{ 
+          <Stack.Screen
+            name="auth"
+            options={{
               headerShown: false,
               animationTypeForReplace: 'pop'
-            }} 
+            }}
             key="unauthenticated"
           />
         )}
