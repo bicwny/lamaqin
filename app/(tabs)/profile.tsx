@@ -43,10 +43,14 @@ export default function ProfileScreen() {
               console.log('Starting logout process...');
               await signOut();
               console.log('Logout completed');
+              
+              // Small delay to ensure state changes are processed
+              setTimeout(() => {
+                setIsSigningOut(false);
+              }, 100);
             } catch (error) {
               console.error('Logout failed:', error);
               Alert.alert('退出失败', '退出登录时发生错误，请重试。');
-            } finally {
               setIsSigningOut(false);
             }
           }

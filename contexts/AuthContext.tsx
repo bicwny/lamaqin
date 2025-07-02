@@ -150,18 +150,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await AsyncStorage.removeItem('@auth_token');
       await AsyncStorage.removeItem('@user_session');
       
+      // Force clear user state immediately before Supabase call
+      setUser(null);
+      setLoading(false);
+      
       const { error } = await supabase.auth.signOut({
         scope: 'global' // Sign out from all sessions
       });
       
       if (error) {
         console.error('Sign out error:', error);
-        // Don't throw here, still want to clear local state
+        // Don't throw here, state is already cleared
       }
-      
-      // Force clear user state immediately
-      setUser(null);
-      setLoading(false);
       
       console.log('User signed out successfully');
     } catch (error) {
