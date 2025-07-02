@@ -1,7 +1,4 @@
-` tags.
 
-```xml
-<replit_final_file>
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
