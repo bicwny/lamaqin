@@ -50,23 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
             
-            try {
-              await ensureUserInDatabase(session.user);
-              setUser({
-                id: session.user.id,
-                email: session.user.email!,
-                dharma_name: session.user.user_metadata?.dharma_name,
-              });
-              console.log('✅ User state set successfully');
-            } catch (error) {
-              console.error('❌ Database sync failed:', error);
-              // Still set user even if database sync fails
-              setUser({
-                id: session.user.id,
-                email: session.user.email!,
-                dharma_name: session.user.user_metadata?.dharma_name,
-              });
-            }
+            // Create user in database if doesn't exist (non-blocking)
+            await ensureUserInDatabase(session.user);
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              dharma_name: session.user.user_metadata?.dharma_name,
+            });
+            console.log('✅ User state set successfully');
           } else if (session?.user && !session.user.email_confirmed_at) {
             console.log('⏳ User exists but email not verified');
             setUser(null);
@@ -100,25 +91,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user && session.user.email_confirmed_at) {
         console.log('✅ Found verified session for:', session.user.email);
 
-        try {
-          // Create user in database if doesn't exist
-          await ensureUserInDatabase(session.user);
+        // Create user in database if doesn't exist (non-blocking)
+        await ensureUserInDatabase(session.user);
 
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            dharma_name: session.user.user_metadata?.dharma_name,
-          });
-          console.log('✅ User state set successfully');
-        } catch (dbError) {
-          console.error('❌ Database sync failed, but continuing:', dbError);
-          // Still set user even if database sync fails
-          setUser({
-            id: session.user.id,
-            email: session.user.email!,
-            dharma_name: session.user.user_metadata?.dharma_name,
-          });
-        }
+        setUser({
+          id: session.user.id,
+          email: session.user.email!,
+          dharma_name: session.user.user_metadata?.dharma_name,
+        });
+        console.log('✅ User state set successfully');
       } else if (session?.user && !session.user.email_confirmed_at) {
         console.log('⏳ User exists but email not verified');
         setUser(null);
@@ -238,6 +219,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
       
+      // First, test if we can connect to the database at all
+      const { error: connectionError } = await supabase
+        .from('users')
+        .select('count', { count: 'exact', head: true });
+
+      if (connectionError) {
+        console.error('❌ AuthContext: Database connection failed:', connectionError);
+        // Don't throw here - allow user to continue without database sync
+        console.log('⚠️ AuthContext: Continuing without database sync');
+        return;
+      }
+
       const { data: existingUser, error: selectError } = await supabase
         .from('users')
         .select('*')
@@ -246,6 +239,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (selectError && selectError.code !== 'PGRST116') { // PGRST116 is no data found, which is fine
         console.error('❌ AuthContext: Error checking user existence:', selectError);
+        // Don't throw here - allow user to continue
+        console.log('⚠️ AuthContext: Continuing without database sync');
         return;
       }
 
@@ -267,7 +262,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log('✅ AuthContext: User already exists (race condition handled)');
           } else {
             console.error('❌ AuthContext: Error creating user in database:', insertError);
-            throw insertError;
+            // Don't throw - allow user to continue
+            console.log('⚠️ AuthContext: Continuing without database sync');
           }
         } else {
           console.log('✅ AuthContext: User created in database:', user.email);
@@ -295,7 +291,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('❌ AuthContext: Error ensuring user in database:', error);
-      throw error;
+      // Don't throw error - allow user to continue without database sync
+      console.log('⚠️ AuthContext: Continuing without database sync due to error');
     }
   };
 
