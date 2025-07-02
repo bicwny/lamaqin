@@ -13,6 +13,8 @@ interface DayStats {
 export default function MindfulnessScreen() {
   const [todayStats, setTodayStats] = useState<DayStats>({ good: 12, bad: 2, date: new Date().toISOString().split('T')[0] });
   const [weeklyData, setWeeklyData] = useState<DayStats[]>([]);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [showVisualization, setShowVisualization] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -189,7 +191,7 @@ export default function MindfulnessScreen() {
                       <ThemedText style={styles.dayLabelViz}>{dayName}：</ThemedText>
                     </View>
                     <View style={styles.heartsContainer}>
-                      {'🤍'.repeat(goodCount)}{'🖤'.repeat(badCount)}
+                      <Text style={styles.heartEmojis}>{'🤍'.repeat(goodCount)}{'🖤'.repeat(badCount)}</Text>
                     </View>
                     <ThemedText style={styles.percentageLabel}>
                       ({goodPercentage}%善心)
@@ -386,7 +388,11 @@ const styles = StyleSheet.create({
   percentageLabel: {
     fontSize: 12,
     color: Colors.textSecondary,
-    width: 80,
+    marginLeft: 10,
+  },
+  heartEmojis: {
+    fontSize: 16,
+    lineHeight: 20,
   },
   monthlyStats: {
     backgroundColor: Colors.background,
