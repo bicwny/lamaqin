@@ -204,6 +204,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const ensureUserInDatabase = async (user: any) => {
     try {
+      console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
+      
       const { data: existingUser, error: selectError } = await supabase
         .from('users')
         .select('*')
@@ -211,29 +213,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (selectError && selectError.code !== 'PGRST116') { // PGRST116 is no data found, which is fine
-        console.error('Error checking user existence:', selectError);
+        console.error('❌ AuthContext: Error checking user existence:', selectError);
         return;
       }
 
       if (!existingUser) {
+        console.log('➕ AuthContext: Creating new user in database:', user.email);
         const { error: insertError } = await supabase
           .from('users')
           .insert([{
             id: user.id,
             email: user.email,
-            // You can add more fields here based on user.user_metadata or other sources
+            dharma_name: user.user_metadata?.dharma_name || null,
           }]);
 
         if (insertError) {
-          console.error('Error creating user in database:', insertError);
+          console.error('❌ AuthContext: Error creating user in database:', insertError);
         } else {
-          console.log('User created in database:', user.email);
+          console.log('✅ AuthContext: User created in database:', user.email);
         }
       } else {
-        console.log('User already exists in database:', user.email);
+        console.log('✅ AuthContext: User already exists in database:', user.email);
+        
+        // Update user info if dharma_name has changed
+        if (user.user_metadata?.dharma_name && existingUser.dharma_name !== user.user_metadata.dharma_name) {
+          console.log('🔄 AuthContext: Updating user dharma_name');
+          const { error: updateError } = await supabase
+            .from('users')
+            .update({ 
+              dharma_name: user.user_metadata.dharma_name,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+            
+          if (updateError) {
+            console.error('❌ AuthContext: Error updating user:', updateError);
+          } else {
+            console.log('✅ AuthContext: User updated in database');
+          }
+        }
       }
     } catch (error) {
-      console.error('Error ensuring user in database:', error);
+      console.error('❌ AuthContext: Error ensuring user in database:', error);
     }
   };
 
