@@ -1,0 +1,50 @@
+Error: ENOENT: no such file or directory, open '/home/runner/workspace/<anonymous>'
+    at Object.readFileSync (node:fs:448:20)
+    at getCodeFrame (/home/runner/workspace/node_modules/metro/src/Server.js:960:18)
+    at Server._symbolicate (/home/runner/workspace/node_modules/metro/src/Server.js:1042:22)
+    at Server._processRequest (/home/runner/workspace/node_modules/metro/src/Server.js:423:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/runner/workspace/<anonymous>'
+}
+Error: ENOENT: no such file or directory, open '/home/runner/workspace/<anonymous>'
+    at Object.readFileSync (node:fs:448:20)
+    at getCodeFrame (/home/runner/workspace/node_modules/metro/src/Server.js:960:18)
+    at Server._symbolicate (/home/runner/workspace/node_modules/metro/src/Server.js:1042:22)
+    at Server._processRequest (/home/runner/workspace/node_modules/metro/src/Server.js:423:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/runner/workspace/<anonymous>'
+}
+Error: ENOENT: no such file or directory, open '/home/runner/workspace/<anonymous>'
+    at Object.readFileSync (node:fs:448:20)
+    at getCodeFrame (/home/runner/workspace/node_modules/metro/src/Server.js:960:18)
+    at Server._symbolicate (/home/runner/workspace/node_modules/metro/src/Server.js:1042:22)
+    at Server._processRequest (/home/runner/workspace/node_modules/metro/src/Server.js:423:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/runner/workspace/<anonymous>'
+}
+Error: ENOENT: no such file or directory, open '/home/runner/workspace/<anonymous>'
+    at Object.readFileSync (node:fs:448:20)
+    at getCodeFrame (/home/runner/workspace/node_modules/metro/src/Server.js:960:18)
+    at Server._symbolicate (/home/runner/workspace/node_modules/metro/src/Server.js:1042:22)
+    at Server._processRequest (/home/runner/workspace/node_modules/metro/src/Server.js:423:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/runner/workspace/<anonymous>'
+}
+Error: ENOENT: no such file or directory, open '/home/runner/workspace/<anonymous>'
+    at Object.readFileSync (node:fs:448:20)
+    at getCodeFrame (/home/runner/workspace/node_modules/metro/src/Server.js:960:18)
+    at Server._symbolicate (/home/runner/workspace/node_modules/metro/src/Server.js:1042:22)
+    at Server._processRequest (/home/runner/workspace/node_modules/metro/src/Server.js:423:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/runner/workspace/<anonymous>'
+}
