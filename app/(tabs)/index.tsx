@@ -5,6 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ConnectionTest } from '@/components/ConnectionTest';
 import { DebugInfo } from '@/components/DebugInfo';
 import { UserCheck } from '@/components/UserCheck';
+import { PracticeProjectsCheck } from '@/components/PracticeProjectsCheck';
 import { Colors } from '@/constants/Colors';
 import { getUserPracticeProjects, getTodayRecords, createDailyRecord } from '@/lib/database';
 import { testConnection } from '@/lib/supabase';
@@ -367,6 +368,7 @@ export default function HomeScreen() {
         <ConnectionTest />
         <DebugInfo />
         <UserCheck />
+        <PracticeProjectsCheck />
       </ScrollView>
     </ThemedView>
   );
