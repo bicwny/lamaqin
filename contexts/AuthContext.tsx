@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { createUserProfile } from '@/lib/database';
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +29,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Try to create user profile if it doesn't exist
+          try {
+            const dharmaName = session.user.user_metadata?.dharma_name;
+            await createUserProfile(session.user.id, session.user.email!, dharmaName);
+          } catch (error) {
+            // Profile might already exist, ignore error
+            console.log('User profile already exists or creation failed:', error);
+          }
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
