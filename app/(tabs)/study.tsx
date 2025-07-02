@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Course {
   id: string;
@@ -27,18 +29,29 @@ export default function StudyScreen() {
   }, [user]);
 
   const loadStudyData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log('🔄 Loading study data for user:', user.id);
+      
       const coursesData = await studyService.getCourses();
       const progressData = await studyService.getUserStudyProgress(user.id);
+
+      console.log('📚 Loaded courses:', coursesData.length);
+      console.log('📖 Loaded progress records:', progressData.length);
 
       setCourses(coursesData);
       // Process progress data into organized format
       const organizedProgress = processProgressData(progressData);
       setProgress(organizedProgress);
     } catch (error) {
-      console.error('Error loading study data:', error);
+      console.error('❌ Error loading study data:', error);
+      // Show empty state instead of any fallback
+      setCourses([]);
+      setProgress([]);
     } finally {
       setLoading(false);
     }
@@ -96,12 +109,64 @@ export default function StudyScreen() {
     return progress.find(p => p.courseId === courseId);
   };
 
+  const handleBrowseCourses = () => {
+    // TODO: Navigate to course list
+    console.log('Browse courses pressed');
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>📚 闻思学习</Text>
         <Text>加载中...</Text>
       </View>
+    );
+  }
+
+  if (courses.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>📚 闻思学习</Text>
+            <Text style={styles.subtitle}>系统学习佛法课程</Text>
+          </View>
+
+          <View style={styles.emptyState}>
+            <View style={styles.iconContainer}>
+              <Ionicons name="book-outline" size={80} color="#9CA3AF" />
+            </View>
+
+            <Text style={styles.emptyTitle}>开始闻思学习</Text>
+            <Text style={styles.emptyDescription}>
+              选择课程开始系统学习，追踪学习进度
+            </Text>
+
+            <TouchableOpacity style={styles.browseButton} onPress={handleBrowseCourses}>
+              <Ionicons name="library-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.browseButtonText}>浏览课程</Text>
+            </TouchableOpacity>
+
+            <View style={styles.courseContainer}>
+              <Text style={styles.courseTitle}>推荐课程：</Text>
+              <View style={styles.courses}>
+                <View style={styles.courseItem}>
+                  <Text style={styles.courseName}>《入菩萨行论》</Text>
+                  <Text style={styles.courseInfo}>索达吉堪布 • 201课</Text>
+                </View>
+                <View style={styles.courseItem}>
+                  <Text style={styles.courseName}>《大圆满前行》</Text>
+                  <Text style={styles.courseInfo}>索达吉堪布 • 92课</Text>
+                </View>
+                <View style={styles.courseItem}>
+                  <Text style={styles.courseName}>《净土教言》</Text>
+                  <Text style={styles.courseInfo}>索达吉堪布 • 45课</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -167,13 +232,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  header: {
+    padding: 20,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
   },
   courseCard: {
     backgroundColor: '#fff',
@@ -240,5 +320,74 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     backgroundColor: '#007AFF',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    minHeight: 500,
+  },
+  iconContainer: {
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+    maxWidth: 280,
+  },
+  browseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    marginBottom: 40,
+  },
+  browseButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  courseContainer: {
+    alignItems: 'center',
+  },
+  courseTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 16,
+  },
+  courses: {
+    alignItems: 'stretch',
+  },
+  courseItem: {
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    minWidth: 250,
+  },
+  courseName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 4,
+  },
+  courseInfo: {
+    fontSize: 14,
+    color: '#6B7280',
   },
 });

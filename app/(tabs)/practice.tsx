@@ -36,12 +36,20 @@ export default function PracticeScreen() {
   }, [user]);
 
   const loadPracticeData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log('🔄 Loading practice data for user:', user.id);
+      
       const projects = await practiceService.getUserPracticeProjects(user.id);
       const today = new Date().toISOString().split('T')[0];
       const records = await dailyRecordService.getTodayRecords(user.id, today);
+
+      console.log('📋 Loaded practice projects:', projects.length);
+      console.log('📅 Loaded today records:', records.length);
 
       setPracticeProjects(projects);
 
@@ -54,7 +62,10 @@ export default function PracticeScreen() {
       setTodayRecords(recordsMap);
 
     } catch (error) {
-      console.error('Error loading practice data:', error);
+      console.error('❌ Error loading practice data:', error);
+      // Don't set any fallback data - show empty state instead
+      setPracticeProjects([]);
+      setTodayRecords({});
     } finally {
       setLoading(false);
     }
