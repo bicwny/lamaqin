@@ -14,13 +14,18 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
 
+  console.log('RootLayoutNav render - user:', user?.email, 'loading:', loading);
+
   if (loading) {
+    console.log('Showing loading screen...');
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
+
+  console.log('Auth state resolved, user:', user ? 'logged in' : 'not logged in');
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
