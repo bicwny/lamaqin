@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { practiceService } from '@/lib/database';
@@ -20,7 +19,7 @@ export function PracticeProjectsCheck() {
   const checkProjects = async () => {
     try {
       console.log('🔍 Checking practice projects for user:', user?.email);
-      
+
       // Get user's practice projects
       const userProjects = await practiceService.getUserPracticeProjects(user!.id);
       console.log('📋 User practice projects:', userProjects);
@@ -59,7 +58,7 @@ export function PracticeProjectsCheck() {
     <View style={styles.container}>
       <Text style={styles.title}>📋 Practice Projects Debug</Text>
       <Text style={styles.subtitle}>User: {user.email}</Text>
-      
+
       <Text style={styles.sectionTitle}>User's Practice Projects ({projects.length}):</Text>
       {projects.length === 0 ? (
         <Text style={styles.error}>❌ No practice projects found for this user</Text>
@@ -77,7 +76,7 @@ export function PracticeProjectsCheck() {
           • {practice.name} ({practice.type})
         </Text>
       ))}
-      
+
       {error && <Text style={styles.error}>Error: {error}</Text>}
     </View>
   );

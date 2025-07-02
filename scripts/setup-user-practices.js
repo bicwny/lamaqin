@@ -69,8 +69,7 @@ async function setupUserPractices() {
         .insert({
           user_id: USER_ID,
           practice_id: practice.id,
-          daily_target: projectConfig.daily_target,
-          is_active: true
+          daily_target: projectConfig.daily_target
         })
         .select()
         .single();
@@ -94,8 +93,7 @@ async function setupUserPractices() {
           unit
         )
       `)
-      .eq('user_id', USER_ID)
-      .eq('is_active', true);
+      .eq('user_id', USER_ID);
     
     if (verifyError) {
       console.error('❌ Error verifying setup:', verifyError);

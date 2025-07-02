@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -29,11 +28,23 @@ export default function EmailVerificationScreen() {
 
   // Countdown timer for resend button
   useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
+    const timer = setInterval(() => {
+      if (countdown > 0) {
+        setCountdown(countdown - 1);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [countdown]);
+
+  useEffect(() => {
+    // Auto-check verification status every 5 seconds
+    const verificationCheck = setInterval(() => {
+      checkVerificationStatus();
+    }, 5000);
+
+    return () => clearInterval(verificationCheck);
+  }, []);
 
   const handleResendVerification = async () => {
     if (!email) {
@@ -47,7 +58,7 @@ export default function EmailVerificationScreen() {
         type: 'signup',
         email: email,
       });
-      
+
       if (error) {
         Alert.alert('发送失败', error.message);
       } else {
@@ -64,7 +75,7 @@ export default function EmailVerificationScreen() {
     setCheckingStatus(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session?.user?.email_confirmed_at) {
         router.replace('/(tabs)');
       } else {
@@ -82,7 +93,7 @@ export default function EmailVerificationScreen() {
       <Text style={styles.subtitle}>
         我们已向 {email} 发送验证邮件
       </Text>
-      
+
       <View style={styles.steps}>
         <Text style={styles.stepTitle}>📝 验证步骤：</Text>
         <Text style={styles.step}>1. 检查邮箱(包括垃圾邮件文件夹)</Text>
@@ -99,7 +110,7 @@ export default function EmailVerificationScreen() {
           {countdown > 0 ? `重新发送验证邮件 (${countdown}s)` : "重新发送验证邮件"}
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity 
         style={[styles.button, styles.outlineButton]}
         onPress={checkVerificationStatus}
