@@ -35,7 +35,14 @@ export default function ProfileScreen() {
         { 
           text: '确认退出', 
           style: 'destructive',
-          onPress: signOut 
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (error) {
+              console.error('Logout failed:', error);
+              Alert.alert('退出失败', '退出登录时发生错误，请重试。');
+            }
+          }
         }
       ]
     );
