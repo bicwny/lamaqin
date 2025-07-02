@@ -1,6 +1,9 @@
 
-import { supabase } from './supabase';
+import { supabase, testConnection } from './supabase';
 import { Database } from '@/types/database';
+
+// Re-export testConnection for convenience
+export { testConnection };
 
 export type User = Database['public']['Tables']['users']['Row'];
 export type Theme = Database['public']['Tables']['themes']['Row'];

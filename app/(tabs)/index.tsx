@@ -3,7 +3,8 @@ import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'rea
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
-import { getUserPracticeProjects, getTodayRecords, createDailyRecord, testConnection } from '@/lib/database';
+import { getUserPracticeProjects, getTodayRecords, createDailyRecord } from '@/lib/database';
+import { testConnection } from '@/lib/supabase';
 
 export default function HomeScreen() {
   const [practices, setPractices] = useState([]);
