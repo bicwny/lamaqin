@@ -1,509 +1,338 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
-import { getTodayMindfulnessRecords, createMindfulnessRecord } from '@/utils/supabase';
 
-interface DayStats {
-  good: number;
-  bad: number;
-  date: string;
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { useAuth } from '@/contexts/AuthContext';
+import { mindfulnessService } from '@/lib/database';
+
+interface MindfulnessRecord {
+  id: string;
+  record_time: string;
+  mind_type: 'good' | 'bad';
+  description?: string;
 }
 
 export default function MindfulnessScreen() {
-  const [todayStats, setTodayStats] = useState<DayStats>({ good: 12, bad: 2, date: new Date().toISOString().split('T')[0] });
-  const [weeklyData, setWeeklyData] = useState<DayStats[]>([]);
-  const [showStatsModal, setShowStatsModal] = useState(false);
-  const [showVisualization, setShowVisualization] = useState(false);
+  const { user } = useAuth();
+  const [todayRecords, setTodayRecords] = useState<MindfulnessRecord[]>([]);
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadTodayRecords();
+  }, [user]);
 
-  const loadData = async () => {
+  const loadTodayRecords = async () => {
+    if (!user) return;
+
     try {
-      const userId = '550e8400-e29b-41d4-a716-446655440000';
       const today = new Date().toISOString().split('T')[0];
-
-      // Load today's records
-      const todayRecords = await getTodayMindfulnessRecords(userId, today);
-      const goodCount = todayRecords.filter(r => r.mind_type === 'good').length;
-      const badCount = todayRecords.filter(r => r.mind_type === 'bad').length;
-
-      setTodayStats({ good: goodCount, bad: badCount, date: today });
-
-      // Load weekly data (you could extend this to query actual historical data)
-      const mockWeeklyData = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const good = i === 0 ? goodCount : Math.floor(Math.random() * 15) + 5;
-        const bad = i === 0 ? badCount : Math.floor(Math.random() * 8) + 1;
-        mockWeeklyData.push({
-          good,
-          bad,
-          date: date.toISOString().split('T')[0]
-        });
-      }
-      setWeeklyData(mockWeeklyData);
+      const records = await mindfulnessService.getTodayRecords(user.id, today);
+      setTodayRecords(records);
     } catch (error) {
-      console.error('Error loading mindfulness data:', error);
-      // Fallback to mock data
-      const mockWeeklyData = [];
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const good = Math.floor(Math.random() * 15) + 5;
-        const bad = Math.floor(Math.random() * 8) + 1;
-        mockWeeklyData.push({
-          good,
-          bad,
-          date: date.toISOString().split('T')[0]
-        });
-      }
-      setWeeklyData(mockWeeklyData);
+      console.error('Error loading mindfulness records:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const recordMind = (type: 'good' | 'bad') => {
-    Alert.alert(
-      type === 'good' ? '记录善心' : '记录恶心',
-      `确定要记录一次${type === 'good' ? '善心' : '恶心'}状态吗？`,
-      [
-        { text: '取消', style: 'cancel' },
-        {
-          text: '确定',
-          onPress: async () => {
-            try {
-              const userId = '550e8400-e29b-41d4-a716-446655440000';
-              const now = new Date();
-              const today = now.toISOString().split('T')[0];
-              const currentTime = now.toTimeString().split(' ')[0];
+  const recordMindfulness = async (mindType: 'good' | 'bad') => {
+    if (!user) return;
 
-              // Save to database
-              await createMindfulnessRecord({
-                user_id: userId,
-                record_date: today,
-                record_time: currentTime,
-                mind_type: type
-              });
+    try {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const currentTime = now.toTimeString().split(' ')[0];
 
-              // Update local state
-              const newStats = { ...todayStats };
-              if (type === 'good') {
-                newStats.good += 1;
-              } else {
-                newStats.bad += 1;
-              }
-              setTodayStats(newStats);
+      await mindfulnessService.recordMindfulness({
+        user_id: user.id,
+        record_date: today,
+        record_time: currentTime,
+        mind_type: mindType,
+        description: description.trim() || undefined
+      });
 
-              // Update weekly data for today
-              const updatedWeekly = weeklyData.map(day => {
-                if (day.date === todayStats.date) {
-                  return { ...day, [type]: day[type] + 1 };
-                }
-                return day;
-              });
-              setWeeklyData(updatedWeekly);
-            } catch (error) {
-              console.error('Error recording mind state:', error);
-              Alert.alert('错误', '记录失败，请重试');
-            }
-          }
-        }
-      ]
+      Alert.alert('成功', '心性记录已保存');
+      setDescription('');
+      loadTodayRecords(); // Refresh data
+
+    } catch (error) {
+      console.error('Error recording mindfulness:', error);
+      Alert.alert('错误', '保存失败，请重试');
+    }
+  };
+
+  const getTodayStats = () => {
+    const good = todayRecords.filter(r => r.mind_type === 'good').length;
+    const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
+    const total = good + bad;
+    const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
+
+    return { good, bad, total, goodPercent };
+  };
+
+  const formatTime = (timeString: string) => {
+    return timeString.substring(0, 5); // HH:MM
+  };
+
+  const stats = getTodayStats();
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>💝 心性观察</Text>
+        <Text>加载中...</Text>
+      </View>
     );
-  };
-
-  const getGoodPercentage = (day: DayStats) => {
-    const total = day.good + day.bad;
-    return total > 0 ? Math.round((day.good / total) * 100) : 0;
-  };
-
-  const getTrendIcon = (current: number, previous: number) => {
-    if (current > previous) return '↗️';
-    if (current < previous) return '↘️';
-    return '';
-  };
+  }
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
-            👁 观心记录
-          </ThemedText>
-        </ThemedView>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>💝 心性观察</Text>
 
-        {/* Quick Record */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            快速记录：
-          </ThemedText>
-
-          <View style={styles.quickButtons}>
-            <TouchableOpacity 
-              style={[styles.mindButton, styles.goodMindButton]}
-              onPress={() => recordMind('good')}
-            >
-              <Text style={styles.mindButtonText}>🤍 善心</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.mindButton, styles.badMindButton]}
-              onPress={() => recordMind('bad')}
-            >
-              <Text style={styles.mindButtonText}>🖤 恶心</Text>
-            </TouchableOpacity>
+      <View style={styles.statsCard}>
+        <Text style={styles.statsTitle}>今日统计</Text>
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{stats.good}</Text>
+            <Text style={styles.statLabel}>善心</Text>
           </View>
-        </ThemedView>
-
-        {/* Today's Stats */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            今日善恶心统计：
-          </ThemedText>
-
-          <View style={styles.statsCard}>
-            <View style={styles.statsRow}>
-              <ThemedText style={styles.statsLabel}>🤍 善心：{todayStats.good}次</ThemedText>
-              <ThemedText style={styles.statsLabel}>🖤 恶心：{todayStats.bad}次</ThemedText>
-            </View>
-
-            <ThemedText style={styles.percentageText}>
-              善心比例：{getGoodPercentage(todayStats)}% {getTrendIcon(getGoodPercentage(todayStats), weeklyData[1] ? getGoodPercentage(weeklyData[1]) : 0)}
-            </ThemedText>
-
-            <TouchableOpacity 
-              style={styles.statsButton}
-              onPress={() => setShowStatsModal(true)}
-            >
-              <Text style={styles.statsButtonText}>统计</Text>
-            </TouchableOpacity>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{stats.bad}</Text>
+            <Text style={styles.statLabel}>恶心</Text>
           </View>
-        </ThemedView>
-      </ScrollView>
-
-      {/* Stats Modal */}
-      <Modal visible={showStatsModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ThemedText type="subtitle" style={styles.modalTitle}>
-              👁 观心统计
-            </ThemedText>
-
-            <ThemedText style={styles.modalSubtitle}>
-              📊 过去7天：（今天在最上面）
-            </ThemedText>
-
-            <ScrollView style={styles.weeklyList}>
-              {weeklyData.map((day, index) => {
-                const percentage = getGoodPercentage(day);
-                const dayName = index === 0 ? '今天' : ['周六', '周五', '周四', '周三', '周二', '周一'][index - 1];
-                const trendIcon = index < weeklyData.length - 1 ? getTrendIcon(percentage, getGoodPercentage(weeklyData[index + 1])) : '';
-
-                return (
-                  <View key={day.date} style={styles.weeklyItem}>
-                    <ThemedText style={styles.weeklyText}>
-                      {dayName}：善{percentage}% 恶{100 - percentage}% {trendIcon}
-                    </ThemedText>
-                  </View>
-                );
-              })}
-            </ScrollView>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowStatsModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>返回</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.modalButton}
-                onPress={() => {
-                  setShowStatsModal(false);
-                  setShowVisualization(true);
-                }}
-              >
-                <Text style={styles.modalButtonText}>visualization</Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{stats.goodPercent}%</Text>
+            <Text style={styles.statLabel}>善心比例</Text>
           </View>
         </View>
-      </Modal>
 
-      {/* Visualization Modal */}
-      <Modal visible={showVisualization} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ThemedText type="subtitle" style={styles.modalTitle}>
-              📈 观心趋势可视化
-            </ThemedText>
-
-            <ThemedText style={styles.modalSubtitle}>
-              📊 过去7天视觉图表：
-            </ThemedText>
-
-            <ScrollView style={styles.visualizationContainer}>
-              {weeklyData.map((day, index) => {
-                const goodPercentage = getGoodPercentage(day);
-                const dayName = index === 0 ? '今天' : ['周六', '周五', '周四', '周三', '周二', '周一'][index - 1];
-                const goodCount = Math.round((goodPercentage / 100) * 10);
-                const badCount = 10 - goodCount;
-
-                return (
-                  <View key={day.date} style={styles.visualizationRow}>
-                    <View style={styles.dayLabelContainer}>
-                      <ThemedText style={styles.dayLabelViz}>{dayName}：</ThemedText>
-                    </View>
-                    <View style={styles.heartsContainer}>
-                      <Text style={styles.heartEmojis}>{'🤍'.repeat(goodCount)}{'🖤'.repeat(badCount)}</Text>
-                    </View>
-                    <ThemedText style={styles.percentageLabel}>
-                      ({goodPercentage}%善心)
-                    </ThemedText>
-                  </View>
-                );
-              })}
-            </ScrollView>
-
-            <View style={styles.monthlyStats}>
-              <ThemedText style={styles.monthlyTitle}>📈 月度统计：</ThemedText>
-              <ThemedText style={styles.monthlyText}>本月平均善心：75%</ThemedText>
-              <ThemedText style={styles.monthlyText}>连续记录天数：30天 🔥</ThemedText>
-              <ThemedText style={styles.monthlyText}>最佳表现：周五 82%</ThemedText>
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowVisualization(false)}
-              >
-                <Text style={styles.cancelButtonText}>返回</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>本月视图</Text>
-              </TouchableOpacity>
-            </View>
+        {stats.total > 0 && (
+          <View style={styles.progressBar}>
+            <View 
+              style={[
+                styles.goodFill, 
+                { width: `${stats.goodPercent}%` }
+              ]} 
+            />
           </View>
+        )}
+      </View>
+
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>记录当前心性</Text>
+
+        <TextInput
+          style={styles.descriptionInput}
+          placeholder="描述当前的心境或想法（可选）"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          numberOfLines={3}
+        />
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity 
+            style={[styles.recordButton, styles.goodButton]}
+            onPress={() => recordMindfulness('good')}
+          >
+            <Text style={styles.buttonText}>😊 善心</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.recordButton, styles.badButton]}
+            onPress={() => recordMindfulness('bad')}
+          >
+            <Text style={styles.buttonText}>😔 恶心</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </ThemedView>
+      </View>
+
+      <View style={styles.historyCard}>
+        <Text style={styles.historyTitle}>今日记录</Text>
+
+        {todayRecords.length === 0 ? (
+          <Text style={styles.emptyText}>今天还没有记录</Text>
+        ) : (
+          todayRecords
+            .sort((a, b) => b.record_time.localeCompare(a.record_time))
+            .map((record, index) => (
+              <View key={index} style={styles.recordItem}>
+                <View style={styles.recordHeader}>
+                  <Text style={styles.recordTime}>
+                    {formatTime(record.record_time)}
+                  </Text>
+                  <Text style={[
+                    styles.recordType,
+                    record.mind_type === 'good' ? styles.goodType : styles.badType
+                  ]}>
+                    {record.mind_type === 'good' ? '😊 善心' : '😔 恶心'}
+                  </Text>
+                </View>
+                {record.description && (
+                  <Text style={styles.recordDescription}>
+                    {record.description}
+                  </Text>
+                )}
+              </View>
+            ))
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: Colors.mindfulness,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    backgroundColor: '#f5f5f5',
+    padding: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.surface,
-    marginBottom: 5,
-  },
-  section: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: Colors.text,
-  },
-  quickButtons: {
-    flexDirection: 'row',
-    gap: 15,
-    justifyContent: 'center',
     marginBottom: 20,
-  },
-  mindButton: {
-    paddingVertical: 20,
-    paddingHorizontal: 40,
-    borderRadius: 25,
-    minWidth: 140,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  goodMindButton: {
-    backgroundColor: Colors.success,
-  },
-  badMindButton: {
-    backgroundColor: Colors.error,
-  },
-  mindButtonText: {
-    color: Colors.surface,
-    fontSize: 20,
-    fontWeight: 'bold',
+    textAlign: 'center',
   },
   statsCard: {
-    backgroundColor: Colors.surface,
-    padding: 20,
+    backgroundColor: '#fff',
     borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  statsLabel: {
-    fontSize: 16,
-    color: Colors.text,
-    fontWeight: 'bold',
-  },
-  percentageText: {
+  statsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.success,
+    marginBottom: 12,
     textAlign: 'center',
-    marginBottom: 15,
   },
-  statsButton: {
-    backgroundColor: Colors.mindfulness,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center',
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 12,
   },
-  statsButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+  statItem: {
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: Colors.surface,
-    padding: 20,
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007AFF',
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: '#FFE5E5',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  goodFill: {
+    height: '100%',
+    backgroundColor: '#34C759',
+  },
+  recordCard: {
+    backgroundColor: '#fff',
     borderRadius: 12,
-    width: '90%',
-    maxHeight: '80%',
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  modalTitle: {
-    fontSize: 20,
+  recordTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 15,
+    marginBottom: 12,
     textAlign: 'center',
   },
-  modalSubtitle: {
-    fontSize: 16,
-    color: Colors.text,
-    marginBottom: 15,
-    fontWeight: 'bold',
-  },
-  weeklyList: {
-    maxHeight: 200,
-    marginBottom: 20,
-  },
-  weeklyItem: {
-    padding: 10,
-    backgroundColor: Colors.background,
-    marginBottom: 5,
-    borderRadius: 6,
-  },
-  weeklyText: {
-    fontSize: 16,
-    color: Colors.text,
-  },
-  visualizationContainer: {
-    maxHeight: 300,
-    marginBottom: 20,
-  },
-  visualizationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    paddingVertical: 5,
-  },
-  dayLabelContainer: {
-    width: 50,
-  },
-  dayLabelViz: {
-    fontSize: 14,
-    color: Colors.text,
-    fontWeight: 'bold',
-  },
-  heartsContainer: {
-    flex: 1,
-    marginHorizontal: 10,
-  },
-  percentageLabel: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginLeft: 10,
-  },
-  heartEmojis: {
-    fontSize: 16,
-    lineHeight: 20,
-  },
-  monthlyStats: {
-    backgroundColor: Colors.background,
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  monthlyTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 10,
-  },
-  monthlyText: {
-    fontSize: 14,
-    color: Colors.text,
-    marginBottom: 5,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  modalButton: {
-    backgroundColor: Colors.mindfulness,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    flex: 1,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: 'transparent',
+  descriptionInput: {
     borderWidth: 1,
-    borderColor: Colors.textSecondary,
-  },
-  modalButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
     fontSize: 16,
+    textAlignVertical: 'top',
   },
-  cancelButtonText: {
-    color: Colors.textSecondary,
-    fontWeight: 'bold',
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  recordButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  goodButton: {
+    backgroundColor: '#34C759',
+  },
+  badButton: {
+    backgroundColor: '#FF3B30',
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  historyCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  historyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#666',
+    fontStyle: 'italic',
+  },
+  recordItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    paddingVertical: 8,
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  recordTime: {
+    fontSize: 14,
+    color: '#666',
+  },
+  recordType: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  goodType: {
+    color: '#34C759',
+  },
+  badType: {
+    color: '#FF3B30',
+  },
+  recordDescription: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 4,
+    fontStyle: 'italic',
   },
 });

@@ -1,434 +1,212 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { useAuth } from '@/contexts/AuthContext';
+import { practiceService, dailyRecordService } from '@/lib/database';
 
-interface DailyPractice {
+interface Practice {
   id: string;
   name: string;
-  current: number;
-  target: number;
-  type: 'count' | 'time' | 'meditation';
-  status: 'pending' | 'in_progress' | 'completed';
-  unit: string;
+  type: 'count' | 'time';
+  unit: '次' | '分钟';
 }
 
-interface Theme {
+interface UserPracticeProject {
   id: string;
-  name: string;
-  progress: number;
-  activeCount: number;
-  notStartedCount: number;
-  completedCount: number;
-  activePractices: string[];
-  notStartedPractices: string[];
+  practice_id: string;
+  target_count: number;
+  current_count: number;
+  daily_target: number;
+  practice?: Practice;
+}
+
+interface DailyRecord {
+  practice_project_id: string;
+  count: number;
 }
 
 export default function PracticeScreen() {
-  const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
-  const [themes, setThemes] = useState<Theme[]>([]);
-  const [showCustomModal, setShowCustomModal] = useState(false);
-  const [selectedPractice, setSelectedPractice] = useState<DailyPractice | null>(null);
-  const [customCount, setCustomCount] = useState('');
-  const [showAddPracticeModal, setShowAddPracticeModal] = useState(false);
+  const { user } = useAuth();
+  const [practiceProjects, setPracticeProjects] = useState<UserPracticeProject[]>([]);
+  const [todayRecords, setTodayRecords] = useState<Record<string, number>>({});
+  const [inputValues, setInputValues] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    loadPracticeData();
+  }, [user]);
 
-    const loadPracticesSafely = async () => {
-      if (isMounted) {
-        await loadData();
-      }
-    };
+  const loadPracticeData = async () => {
+    if (!user) return;
 
-    loadPracticesSafely();
+    try {
+      const projects = await practiceService.getUserPracticeProjects(user.id);
+      const today = new Date().toISOString().split('T')[0];
+      const records = await dailyRecordService.getTodayRecords(user.id, today);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      setPracticeProjects(projects);
 
-  const loadData = async () => {
-    // Mock data for demonstration
-    setDailyPractices([
-      {
-        id: '1',
-        name: '六字大明咒',
-        current: 2847,
-        target: 10000,
-        type: 'count',
-        status: 'in_progress',
-        unit: '次'
-      },
-      {
-        id: '2',
-        name: '大悲咒',
-        current: 21,
-        target: 21,
-        type: 'count',
-        status: 'completed',
-        unit: '次'
-      },
-      {
-        id: '3',
-        name: '禅修',
-        current: 25,
-        target: 30,
-        type: 'time',
-        status: 'in_progress',
-        unit: '分钟'
-      },
-      {
-        id: '4',
-        name: '金刚经',
-        current: 1,
-        target: 1,
-        type: 'count',
-        status: 'completed',
-        unit: '部'
-      },
-      {
-        id: '5',
-        name: '般若波罗蜜多心经',
-        current: 7,
-        target: 21,
-        type: 'count',
-        status: 'in_progress',
-        unit: '次'
-      },
-      {
-        id: '6',
-        name: '念佛',
-        current: 548,
-        target: 1000,
-        type: 'count',
-        status: 'in_progress',
-        unit: '次'
-      },
-    ]);
+      // Organize today's records by practice project
+      const recordsMap: Record<string, number> = {};
+      records.forEach(record => {
+        recordsMap[record.practice_project_id] = 
+          (recordsMap[record.practice_project_id] || 0) + record.count;
+      });
+      setTodayRecords(recordsMap);
 
-    setThemes([
-      {
-        id: '1',
-        name: '日常修持',
-        progress: 78,
-        activeCount: 4,
-        notStartedCount: 1,
-        completedCount: 2,
-        activePractices: ['六字大明咒', '禅修', '心经', '念佛'],
-        notStartedPractices: ['药师咒']
-      },
-      {
-        id: '2',
-        name: '净土修行',
-        progress: 45,
-        activeCount: 2,
-        notStartedCount: 2,
-        completedCount: 1,
-        activePractices: ['念佛', '观音心咒'],
-        notStartedPractices: ['净土文', '往生咒']
-      }
-    ]);
-  };
-
-  const handleComplete = (practice: DailyPractice) => {
-    const remaining = practice.target - practice.current;
-    Alert.alert(
-      `完成 ${practice.name}`,
-      `今日目标: ${practice.target}${practice.unit}\n当前进度: ${practice.current}${practice.unit}\n剩余: ${remaining}${practice.unit}`,
-      [
-        { text: '取消', style: 'cancel' },
-        { text: '确认完成', onPress: () => recordPractice(practice.id, remaining) }
-      ]
-    );
-  };
-
-  const handleCustomRecord = (practice: DailyPractice) => {
-    setSelectedPractice(practice);
-    setCustomCount('');
-    setShowCustomModal(true);
-  };
-
-  const recordPractice = (practiceId: string, count: number) => {
-    setDailyPractices(prev => prev.map(p => {
-      if (p.id === practiceId) {
-        const newCurrent = p.current + count;
-        const newStatus = newCurrent >= p.target ? 'completed' : 'in_progress';
-        return { ...p, current: newCurrent, status: newStatus };
-      }
-      return p;
-    }));
-
-    Alert.alert('记录成功', `已记录 ${count} ${selectedPractice?.unit || '次'}`);
-  };
-
-  const handleCustomSubmit = () => {
-    if (selectedPractice && customCount) {
-      const count = parseInt(customCount);
-      if (count > 0) {
-        recordPractice(selectedPractice.id, count);
-        setShowCustomModal(false);
-      }
+    } catch (error) {
+      console.error('Error loading practice data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const renderPracticeCard = (practice: DailyPractice) => {
-    const progress = (practice.current / practice.target) * 100;
-    const isCompleted = practice.status === 'completed';
-    const remaining = practice.target - practice.current;
+  const recordPractice = async (projectId: string, count: number) => {
+    if (!user || count <= 0) return;
 
-    return (
-      <View key={practice.id} style={styles.practiceCard}>
-        <View style={styles.practiceHeader}>
-          <ThemedText style={styles.practiceName}>
-            {practice.name}: {practice.current}/{practice.target} {isCompleted ? '✅' : practice.status === 'in_progress' ? '⏳' : '☐'}
-          </ThemedText>
-        </View>
+    try {
+      const today = new Date().toISOString().split('T')[0];
 
-        {practice.status !== 'pending' && (
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { 
-                  width: `${Math.min(progress, 100)}%`,
-                  backgroundColor: isCompleted ? Colors.success : Colors.practice
-                }
-              ]} 
-            />
-          </View>
-        )}
+      await dailyRecordService.recordPractice({
+        user_id: user.id,
+        practice_project_id: projectId,
+        record_date: today,
+        count: count,
+        notes: ''
+      });
 
-        <View style={styles.actionRow}>
-          {practice.type === 'meditation' ? (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.secondaryButton]}
-              onPress={() => handleCustomRecord(practice)}
-            >
-              <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>自定义记录</Text>
-            </TouchableOpacity>
-          ) : (
-            <>
-              <TouchableOpacity 
-                style={[styles.actionButton, isCompleted && styles.completedButton]}
-                onPress={() => handleComplete(practice)}
-                disabled={isCompleted}
-              >
-                <Text style={styles.actionButtonText}>完成</Text>
-              </TouchableOpacity>
+      Alert.alert('成功', '修行记录已保存');
+      loadPracticeData(); // Refresh data
+      setInputValues(prev => ({ ...prev, [projectId]: '' }));
 
-              <TouchableOpacity 
-                style={[styles.actionButton, styles.secondaryButton]}
-                onPress={() => handleCustomRecord(practice)}
-              >
-                <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>自定义记录</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-      </View>
-    );
+    } catch (error) {
+      console.error('Error recording practice:', error);
+      Alert.alert('错误', '保存失败，请重试');
+    }
   };
 
+  const quickAdd = (projectId: string, amount: number) => {
+    const currentToday = todayRecords[projectId] || 0;
+    recordPractice(projectId, amount);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>📿 修行功课</Text>
+        <Text>加载中...</Text>
+      </View>
+    );
+  }
+
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
-            📿 修行记录
-          </ThemedText>
-        </ThemedView>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>📿 修行功课</Text>
 
-        {/* Today's Practice */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            📖 今日功课：
-          </ThemedText>
+      {practiceProjects.map(project => {
+        const todayCount = todayRecords[project.id] || 0;
+        const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
+        const isCompleted = todayCount >= project.daily_target;
 
-          {dailyPractices.map(renderPracticeCard)}
+        return (
+          <View key={project.id} style={styles.practiceCard}>
+            <View style={styles.practiceHeader}>
+              <Text style={styles.practiceName}>
+                {project.practice?.name || '修行项目'}
+              </Text>
+              <Text style={[styles.status, isCompleted && styles.completed]}>
+                {isCompleted ? '✅ 已完成' : '⏳ 进行中'}
+              </Text>
+            </View>
 
-          <View style={styles.actionsRow}>
-            <TouchableOpacity 
-              style={styles.primaryActionButton}
-              onPress={() => setShowAddPracticeModal(true)}
-            >
-              <Text style={styles.primaryActionText}>添加修法</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.primaryActionButton, styles.secondaryActionButton]}>
-              <Text style={[styles.primaryActionText, styles.secondaryActionText]}>生成分享</Text>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
+            <View style={styles.progressInfo}>
+              <Text style={styles.progressText}>
+                今日: {todayCount} / {project.daily_target} {project.practice?.unit}
+              </Text>
+              <Text style={styles.totalProgress}>
+                总计: {project.current_count} / {project.target_count} {project.practice?.unit}
+              </Text>
+            </View>
 
-        {/* Theme Progress */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🎯 我的主题：
-          </ThemedText>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: `${progressPercent}%` },
+                  isCompleted && styles.completedFill
+                ]} 
+              />
+            </View>
 
-          {themes.map(theme => (
-            <View key={theme.id} style={styles.themeCard}>
-              <ThemedText type="defaultSemiBold" style={styles.themeName}>
-                📿 {theme.name} ({theme.progress}%)
-              </ThemedText>
-              <ThemedText style={styles.themeStatus}>
-                进行中：{theme.activePractices.join('、')}
-              </ThemedText>
-              <ThemedText style={styles.themeStatus}>
-                未启动：{theme.notStartedPractices.join('、')}
-              </ThemedText>
-              <TouchableOpacity style={styles.themeButton}>
-                <Text style={styles.themeButtonText}>管理主题</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.countInput}
+                placeholder="数量"
+                value={inputValues[project.id] || ''}
+                onChangeText={(text) => setInputValues(prev => ({ ...prev, [project.id]: text }))}
+                keyboardType="numeric"
+              />
+              <TouchableOpacity 
+                style={styles.recordButton}
+                onPress={() => {
+                  const count = parseInt(inputValues[project.id] || '0');
+                  if (count > 0) recordPractice(project.id, count);
+                }}
+              >
+                <Text style={styles.buttonText}>记录</Text>
               </TouchableOpacity>
             </View>
-          ))}
-        </ThemedView>
-      </ScrollView>
 
-      {/* Custom Record Modal */}
-      <Modal visible={showCustomModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ThemedText type="subtitle" style={styles.modalTitle}>
-              🙏 {selectedPractice?.name} - 自定义记录
-            </ThemedText>
-
-            <ThemedText style={styles.modalInfo}>
-              当前进度：{selectedPractice?.current}{selectedPractice?.unit}
-            </ThemedText>
-            <ThemedText style={styles.modalInfo}>
-              今日目标：{selectedPractice?.target}{selectedPractice?.unit}
-            </ThemedText>
-            <ThemedText style={styles.modalInfo}>
-              剩余：{selectedPractice ? selectedPractice.target - selectedPractice.current : 0}{selectedPractice?.unit}
-            </ThemedText>
-
-            <ThemedText style={styles.inputLabel}>
-              📊 输入完成数量：
-            </ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={customCount}
-              onChangeText={setCustomCount}
-              placeholder="输入数量"
-              keyboardType="numeric"
-            />
-            <Text style={styles.unitText}>{selectedPractice?.unit}</Text>
-
-            <View style={styles.modalActions}>
+            <View style={styles.quickButtons}>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowCustomModal(false)}
+                style={styles.quickButton}
+                onPress={() => quickAdd(project.id, 1)}
               >
-                <Text style={styles.cancelButtonText}>取消</Text>
+                <Text style={styles.quickButtonText}>+1</Text>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={styles.modalButton}
-                onPress={handleCustomSubmit}
+                style={styles.quickButton}
+                onPress={() => quickAdd(project.id, 10)}
               >
-                <Text style={styles.modalButtonText}>确认</Text>
+                <Text style={styles.quickButtonText}>+10</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.quickButton}
+                onPress={() => quickAdd(project.id, 100)}
+              >
+                <Text style={styles.quickButtonText}>+100</Text>
               </TouchableOpacity>
             </View>
           </View>
+        );
+      })}
+
+      {practiceProjects.length === 0 && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>还没有设置修行功课</Text>
+          <Text style={styles.emptySubtext}>请先添加修行项目</Text>
         </View>
-      </Modal>
-
-      {/* Add Practice Modal */}
-      <Modal visible={showAddPracticeModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ThemedText type="subtitle" style={styles.modalTitle}>
-              ➕ 添加修法
-            </ThemedText>
-
-            <ThemedText style={styles.modalSubtitle}>选择添加方式：</ThemedText>
-
-            <TouchableOpacity style={styles.addMethodCard}>
-              <Text style={styles.addMethodIcon}>🎯</Text>
-              <View style={styles.addMethodContent}>
-                <ThemedText style={styles.addMethodTitle}>加入主题</ThemedText>
-                <ThemedText style={styles.addMethodDesc}>选择预设的修行主题</ThemedText>
-                <Text style={styles.addMethodAction}>浏览主题</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.addMethodCard}>
-              <Text style={styles.addMethodIcon}>📿</Text>
-              <View style={styles.addMethodContent}>
-                <ThemedText style={styles.addMethodTitle}>单独添加修法</ThemedText>
-                <ThemedText style={styles.addMethodDesc}>独立添加一个修法项目</ThemedText>
-                <Text style={styles.addMethodAction}>选择修法</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.addMethodCard}>
-              <Text style={styles.addMethodIcon}>📖</Text>
-              <View style={styles.addMethodContent}>
-                <ThemedText style={styles.addMethodTitle}>添加每日功课</ThemedText>
-                <ThemedText style={styles.addMethodDesc}>添加固定的每日功课</ThemedText>
-                <Text style={styles.addMethodAction}>选择功课</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.addMethodCard}>
-              <Text style={styles.addMethodIcon}>⚡</Text>
-              <View style={styles.addMethodContent}>
-                <ThemedText style={styles.addMethodTitle}>一次性修行记录</ThemedText>
-                <ThemedText style={styles.addMethodDesc}>记录临时的修行活动</ThemedText>
-                <Text style={styles.addMethodAction}>快速记录</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.modalButton, styles.cancelButton, { marginTop: 20 }]}
-              onPress={() => setShowAddPracticeModal(false)}
-            >
-              <Text style={styles.cancelButtonText}>取消</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </ThemedView>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: Colors.practice,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    backgroundColor: '#f5f5f5',
+    padding: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.surface,
-    marginBottom: 5,
-  },
-  section: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: Colors.text,
+    marginBottom: 20,
+    textAlign: 'center',
   },
   practiceCard: {
-    backgroundColor: Colors.surface,
-    padding: 15,
+    backgroundColor: '#fff',
     borderRadius: 12,
-    marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.practice,
+    padding: 16,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -436,221 +214,98 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   practiceHeader: {
-    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   practiceName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.text,
+  },
+  status: {
+    fontSize: 14,
+    color: '#FF9500',
+    fontWeight: '500',
+  },
+  completed: {
+    color: '#34C759',
+  },
+  progressInfo: {
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  totalProgress: {
+    fontSize: 14,
+    color: '#666',
   },
   progressBar: {
-    height: 6,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 3,
-    marginBottom: 10,
+    height: 8,
+    backgroundColor: '#E5E5E7',
+    borderRadius: 4,
     overflow: 'hidden',
+    marginBottom: 12,
   },
   progressFill: {
     height: '100%',
-    borderRadius: 3,
+    backgroundColor: '#007AFF',
   },
-  actionRow: {
+  completedFill: {
+    backgroundColor: '#34C759',
+  },
+  inputRow: {
     flexDirection: 'row',
-    gap: 10,
-  },
-  actionButton: {
-    backgroundColor: Colors.practice,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    flex: 1,
-    alignItems: 'center',
-  },
-  completedButton: {
-    backgroundColor: Colors.success,
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.practice,
-  },
-  actionButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-  secondaryButtonText: {
-    color: Colors.practice,
-  },
-  themeCard: {
-    backgroundColor: Colors.surface,
-    padding: 20,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: Colors.practice,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  themeName: {
-    fontSize: 18,
-    color: Colors.text,
+    gap: 8,
     marginBottom: 8,
   },
-  themeStatus: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 5,
-  },
-  themeButton: {
-    backgroundColor: Colors.practice,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-  },
-  themeButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: 15,
-    marginTop: 15,
-  },
-  primaryActionButton: {
-    backgroundColor: Colors.practice,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+  countInput: {
     flex: 1,
-    alignItems: 'center',
-  },
-  secondaryActionButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: Colors.practice,
-  },
-  primaryActionText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  secondaryActionText: {
-    color: Colors.practice,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: Colors.surface,
-    padding: 20,
-    borderRadius: 12,
-    width: '90%',
-    maxHeight: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  modalSubtitle: {
-    fontSize: 16,
-    color: Colors.text,
-    marginBottom: 15,
-  },
-  modalInfo: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 5,
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: Colors.text,
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  textInput: {
     borderWidth: 1,
-    borderColor: Colors.practice,
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: Colors.background,
   },
-  unitText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginTop: 5,
-    marginBottom: 20,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  modalButton: {
-    backgroundColor: Colors.practice,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+  recordButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
     borderRadius: 8,
-    flex: 1,
+    minWidth: 80,
     alignItems: 'center',
   },
-  cancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.textSecondary,
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
-  modalButtonText: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  cancelButtonText: {
-    color: Colors.textSecondary,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  addMethodCard: {
-    backgroundColor: Colors.background,
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: Colors.practice,
+  quickButtons: {
     flexDirection: 'row',
+    gap: 8,
+  },
+  quickButton: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+    padding: 8,
+    borderRadius: 6,
     alignItems: 'center',
   },
-  addMethodIcon: {
-    fontSize: 24,
-    marginRight: 15,
+  quickButtonText: {
+    color: '#007AFF',
+    fontWeight: '500',
   },
-  addMethodContent: {
-    flex: 1,
+  emptyState: {
+    alignItems: 'center',
+    marginTop: 40,
   },
-  addMethodTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 5,
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 8,
   },
-  addMethodDesc: {
+  emptySubtext: {
     fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 5,
-  },
-  addMethodAction: {
-    fontSize: 14,
-    color: Colors.practice,
-    fontWeight: 'bold',
+    color: '#999',
   },
 });
