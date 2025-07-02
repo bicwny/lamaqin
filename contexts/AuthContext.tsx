@@ -147,19 +147,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🚪 AuthContext: signOut function called');
       console.log('🚪 Current user before logout:', user?.email);
       
+      // Set loading to true to prevent any intermediate state issues
+      setLoading(true);
+      
       // Clear local storage first
       console.log('🧹 AuthContext: Clearing local storage...');
       await AsyncStorage.removeItem('@auth_token');
       await AsyncStorage.removeItem('@user_session');
       console.log('✅ AuthContext: Local storage cleared');
       
-      // Force clear user state immediately
-      console.log('🔄 AuthContext: Clearing user state...');
-      setUser(null);
-      setLoading(false);
-      console.log('✅ AuthContext: User state cleared');
-      
-      // Call Supabase signOut
+      // Call Supabase signOut first
       console.log('🔐 AuthContext: Calling Supabase signOut...');
       const { error } = await supabase.auth.signOut({
         scope: 'global'
@@ -167,14 +164,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) {
         console.error('❌ AuthContext: Supabase sign out error:', error);
-        throw error;
+        // Still clear local state even if Supabase fails
       } else {
         console.log('✅ AuthContext: Supabase signOut completed successfully');
       }
       
-      // Force a small delay to ensure state propagation
-      console.log('⏳ AuthContext: Waiting for state propagation...');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Force clear user state
+      console.log('🔄 AuthContext: Clearing user state...');
+      setUser(null);
+      setLoading(false);
+      console.log('✅ AuthContext: User state cleared');
       
       console.log('🎉 AuthContext: Logout process completed - user should be redirected to login');
     } catch (error) {
