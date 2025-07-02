@@ -5,8 +5,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { getUserPracticeProjects, getTodayRecords, createDailyRecord } from '@/lib/database';
 import { testConnection } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomeScreen() {
+  const { user } = useAuth();
   const [practices, setPractices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dbConnected, setDbConnected] = useState(false);
@@ -43,8 +45,20 @@ export default function HomeScreen() {
   const loadTodaysPractices = async () => {
     try {
       setLoading(true);
-      // For now, using mock user ID. In real app, get from auth
-      const userId = '550e8400-e29b-41d4-a716-446655440000';
+      
+      // Use actual authenticated user ID, or skip if not available
+      if (!user?.id) {
+        console.log('No user ID available, using mock data');
+        setPractices([
+          { name: '念佛', current: 1250, target: 3000, type: 'count', status: 'in_progress' },
+          { name: '拜佛', current: 20, target: 108, type: 'count', status: 'pending' },
+          { name: '诵经', current: 25, target: 30, type: 'time', status: 'in_progress' },
+          { name: '禅修', current: 30, target: 30, type: 'time', status: 'completed' },
+        ]);
+        return;
+      }
+
+      const userId = user.id;
       const today = new Date().toISOString().split('T')[0];
 
       const [projects, todayRecords] = await Promise.all([
@@ -88,13 +102,12 @@ export default function HomeScreen() {
     const newCount = Math.max(0, practice.current + increment);
 
     try {
-      // Update database if connected
-      if (dbConnected && practice.id) {
-        const userId = '550e8400-e29b-41d4-a716-446655440000';
+      // Update database if connected and user is available
+      if (dbConnected && practice.id && user?.id) {
         const today = new Date().toISOString().split('T')[0];
 
         await createDailyRecord({
-          user_id: '550e8400-e29b-41d4-a716-446655440000',
+          user_id: user.id,
           practice_project_id: practice.id,
           record_date: today,
           count: newCount
