@@ -48,62 +48,7 @@ export function DebugInfo() {
     </View>
   );
 }
-```
 
-```
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { supabase } from '@/lib/supabase';
-
-export function DebugInfo() {
-  const [practices, setPractices] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadPractices = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('practices')
-        .select('*')
-        .limit(20);
-
-      if (error) throw error;
-
-      console.log('📋 All available practices:', data);
-      setPractices(data || []);
-    } catch (error) {
-      console.error('Error loading practices:', error);
-      setPractices([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>调试信息</Text>
-
-      <TouchableOpacity style={styles.button} onPress={loadPractices}>
-        <Text style={styles.buttonText}>
-          {loading ? '加载中...' : '加载修行项目'}
-        </Text>
-      </TouchableOpacity>
-
-      <Text style={styles.subtitle}>可用修行项目 ({practices.length}): </Text>
-      {practices.map((practice: any, index) => (
-        <View key={practice.id} style={styles.practiceItem}>
-          <Text style={styles.practiceName}>{practice.name}</Text>
-          <Text style={styles.practiceDetails}>
-            类型: {practice.type} | 单位: {practice.unit}
-          </Text>
-        </View>
-      ))}
-    </View>
-  );
-}
-```
-
-```
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -147,9 +92,7 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
 });
-```
 
-```
 export function ConnectionTest() {
   const [isConnected, setIsConnected] = useState(false);
 
@@ -181,10 +124,8 @@ export function ConnectionTest() {
     </View>
   );
 }
-```
 
-```
-const styles = StyleSheet.create({
+const styles2 = StyleSheet.create({
   container: {
     padding: 20,
     backgroundColor: '#f0f0f0',
@@ -201,24 +142,19 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-```
-
-```
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 
 export function Welcome() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>欢迎!</Text>
-      <Text style={styles.subtitle}>
+    <View style={styles3.container}>
+      <Text style={styles3.title}>欢迎!</Text>
+      <Text style={styles3.subtitle}>
         请选择你的修行项目
       </Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles3 = StyleSheet.create({
   container: {
     padding: 20,
   },
@@ -231,21 +167,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-```
-
-```
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 
 export function SectionHeader({ title }) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+    <View style={styles4.container}>
+      <Text style={styles4.title}>{title}</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles4 = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: '#e2e8f0',
