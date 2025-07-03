@@ -1,4 +1,3 @@
-
 -- Complete RLS fix for meditation_topics table
 -- Run this entire script in your Supabase SQL Editor
 
@@ -8,6 +7,9 @@ DROP POLICY IF EXISTS "Allow service role to insert meditation topics" ON public
 DROP POLICY IF EXISTS "Allow service role to update meditation topics" ON public.meditation_topics;
 DROP POLICY IF EXISTS "Allow service role to delete meditation topics" ON public.meditation_topics;
 DROP POLICY IF EXISTS "Allow anon access to meditation topics" ON public.meditation_topics;
+DROP POLICY IF EXISTS "Allow public read access to meditation topics" ON public.meditation_topics;
+DROP POLICY IF EXISTS "Allow authenticated insert to meditation topics" ON public.meditation_topics;
+DROP POLICY IF EXISTS "Allow service role full access to meditation topics" ON public.meditation_topics;
 
 -- Step 2: Temporarily disable RLS to allow service role access
 ALTER TABLE public.meditation_topics DISABLE ROW LEVEL SECURITY;
@@ -132,24 +134,52 @@ BEGIN
     RAISE NOTICE 'Successfully inserted 92 meditation topics!';
 END $$;
 
--- Step 4: Re-enable RLS and create proper policies
+-- Step 4: Re-enable RLS
 ALTER TABLE public.meditation_topics ENABLE ROW LEVEL SECURITY;
 
--- Step 5: Create simple, permissive policies that will work
-CREATE POLICY "Allow public read access to meditation topics" ON public.meditation_topics
+-- Step 5: Create comprehensive policies that work for all access patterns
+
+-- Allow anyone to read meditation topics (no restrictions)
+CREATE POLICY "meditation_topics_select_policy" ON public.meditation_topics
 FOR SELECT
 USING (true);
 
-CREATE POLICY "Allow authenticated insert to meditation topics" ON public.meditation_topics
+-- Allow authenticated users to insert meditation topics
+CREATE POLICY "meditation_topics_insert_policy" ON public.meditation_topics
 FOR INSERT
-TO authenticated
+TO authenticated, anon
 WITH CHECK (true);
 
-CREATE POLICY "Allow service role full access to meditation topics" ON public.meditation_topics
+-- Allow authenticated users to update meditation topics
+CREATE POLICY "meditation_topics_update_policy" ON public.meditation_topics
+FOR UPDATE
+TO authenticated, anon
+USING (true)
+WITH CHECK (true);
+
+-- Allow authenticated users to delete meditation topics
+CREATE POLICY "meditation_topics_delete_policy" ON public.meditation_topics
+FOR DELETE
+TO authenticated, anon
+USING (true);
+
+-- Allow service role full access (override for admin operations)
+CREATE POLICY "meditation_topics_service_role_policy" ON public.meditation_topics
 FOR ALL
 TO service_role
 USING (true)
 WITH CHECK (true);
 
--- Step 6: Verify the data was inserted
-SELECT COUNT(*) as total_topics FROM meditation_topics;
+-- Step 6: Grant necessary permissions to roles
+GRANT ALL ON public.meditation_topics TO authenticated;
+GRANT ALL ON public.meditation_topics TO anon;
+GRANT ALL ON public.meditation_topics TO service_role;
+
+-- Step 7: Final verification
+SELECT 
+    COUNT(*) as total_topics,
+    MIN(topic_number) as min_topic,
+    MAX(topic_number) as max_topic
+FROM meditation_topics;
+
+RAISE NOTICE 'RLS policies updated successfully!';

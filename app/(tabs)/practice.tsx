@@ -649,7 +649,7 @@ export default function PracticeScreen() {
                       </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    <TouchableOpacity 
                       style={[styles.actionButton, styles.customButton]}
                       onPress={() => handleCustomRecord(project)}
                     >
@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    textAlign: 'center',
+    textAlign:
     fontSize: 16,
     color: '#666',
     marginTop: 10,
