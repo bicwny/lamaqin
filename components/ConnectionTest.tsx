@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { supabase } from '@/lib/supabase';
@@ -14,7 +13,7 @@ export function ConnectionTest() {
   const testConnection = async () => {
     try {
       console.log('🔗 Testing Supabase connection...');
-      
+
       // Check if environment variables are set
       if (!process.env.EXPO_PUBLIC_SUPABASE_URL || !process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
         throw new Error('Missing Supabase environment variables');

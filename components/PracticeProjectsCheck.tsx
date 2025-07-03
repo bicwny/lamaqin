@@ -1,123 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { practiceService } from '@/lib/database';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 export function PracticeProjectsCheck() {
   const { user } = useAuth();
-  const [projects, setProjects] = useState<any[]>([]);
-  const [practices, setPractices] = useState<any[]>([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (user?.id) {
-      checkProjects();
-    }
+    loadProjects();
   }, [user]);
 
-  const checkProjects = async () => {
+  const loadProjects = async () => {
+    if (!user?.email) {
+      setLoading(false);
+      return;
+    }
+
     try {
-      console.log('🔍 Checking practice projects for user:', user?.email);
+      console.log('🔍 Checking practice projects for user:', user.email);
 
-      // Get user's practice projects
-      const userProjects = await practiceService.getUserPracticeProjects(user!.id);
-      console.log('📋 User practice projects:', userProjects);
-      setProjects(userProjects);
+      const { data, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          *,
+          practices (
+            id,
+            name,
+            type,
+            unit,
+            description
+          )
+        `)
+        .eq('user_id', user.id);
 
-      // Get all available practices
-      const allPractices = await practiceService.getAllPractices();
-      console.log('📋 All available practices:', allPractices);
-      setPractices(allPractices);
+      if (error) throw error;
 
-    } catch (err: any) {
-      console.error('❌ Error checking practice projects:', err);
-      setError(err.message);
+      console.log('📋 User practice projects:', data);
+      setProjects(data || []);
+    } catch (error) {
+      console.error('Error loading practice projects:', error);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.error}>No user logged in</Text>
-      </View>
-    );
-  }
-
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.testing}>🔍 Checking practice projects...</Text>
+        <Text>加载修行项目中...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📋 Practice Projects Debug</Text>
-      <Text style={styles.subtitle}>User: {user.email}</Text>
+      <Text style={styles.title}>用户修行项目 ({projects.length})</Text>
 
-      <Text style={styles.sectionTitle}>User's Practice Projects ({projects.length}):</Text>
-      {projects.length === 0 ? (
-        <Text style={styles.error}>❌ No practice projects found for this user</Text>
-      ) : (
-        projects.map((project, index) => (
-          <Text key={index} style={styles.item}>
-            ✅ {project.practices?.name || 'Unknown'} - Target: {project.daily_target}
+      <TouchableOpacity style={styles.refreshButton} onPress={loadProjects}>
+        <Text style={styles.refreshButtonText}>刷新</Text>
+      </TouchableOpacity>
+
+      {projects.map((project, index) => (
+        <View key={project.id} style={styles.projectItem}>
+          <Text style={styles.projectName}>
+            {project.practices?.name || '未知修行'}
           </Text>
-        ))
-      )}
-
-      <Text style={styles.sectionTitle}>Available Practices ({practices.length}):</Text>
-      {practices.slice(0, 5).map((practice, index) => (
-        <Text key={index} style={styles.item}>
-          • {practice.name} ({practice.type})
-        </Text>
+          <Text style={styles.projectDetails}>
+            目标: {project.current_count}/{project.target_count} {project.practices?.unit}
+          </Text>
+          <Text style={styles.projectDetails}>
+            每日目标: {project.daily_target} {project.practices?.unit}
+          </Text>
+          <Text style={styles.projectStatus}>状态: {project.status}</Text>
+        </View>
       ))}
 
-      {error && <Text style={styles.error}>Error: {error}</Text>}
+      {projects.length === 0 && (
+        <Text style={styles.emptyText}>暂无修行项目</Text>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    margin: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 14,
-    marginBottom: 10,
-    color: '#666',
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  item: {
-    fontSize: 12,
-    marginLeft: 10,
-    marginBottom: 2,
-  },
-  testing: {
-    color: '#ff9800',
-    fontSize: 14,
-  },
-  error: {
-    color: '#f44336',
-    fontSize: 14,
-  },
-});
