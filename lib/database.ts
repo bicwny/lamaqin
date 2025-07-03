@@ -283,53 +283,76 @@ export const studyService = {
   },
 
   async getUserCourses(userId: string) {
-    const { data, error } = await supabase
-      .from('user_courses')
-      .select(`
-        *,
-        courses!inner(*)
-      `)
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .order('joined_date');
-    
-    if (error) throw error;
-    
-    // Transform the data to match expected structure
-    return data?.map(userCourse => ({
-      ...userCourse,
-      course: userCourse.courses
-    })) || [];
+    try {
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select(`
+          *,
+          courses!inner(*)
+        `)
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('joined_date');
+      
+      if (error) {
+        console.error('❌ Error getting user courses:', error);
+        // Return empty array if table doesn't exist
+        if (error.code === 'PGRST116' || error.message.includes('does not exist')) {
+          return [];
+        }
+        throw error;
+      }
+      
+      // Transform the data to match expected structure
+      return data?.map(userCourse => ({
+        ...userCourse,
+        course: userCourse.courses
+      })) || [];
+    } catch (err) {
+      console.error('❌ getUserCourses failed:', err);
+      return [];
+    }
   },
 
   async joinCourse(userId: string, courseId: string) {
-    // First insert the user course record
-    const { data: userCourseData, error: insertError } = await supabase
-      .from('user_courses')
-      .insert({
-        user_id: userId,
-        course_id: courseId,
-        status: 'active',
-        joined_date: new Date().toISOString().split('T')[0]
-      })
-      .select()
-      .single();
-    
-    if (insertError) throw insertError;
-    
-    // Then fetch the course data separately
-    const { data: courseData, error: courseError } = await supabase
-      .from('courses')
-      .select('*')
-      .eq('id', courseId)
-      .single();
-    
-    if (courseError) throw courseError;
-    
-    return {
-      ...userCourseData,
-      course: courseData
-    };
+    try {
+      // First insert the user course record
+      const { data: userCourseData, error: insertError } = await supabase
+        .from('user_courses')
+        .insert({
+          user_id: userId,
+          course_id: courseId,
+          status: 'active',
+          joined_date: new Date().toISOString().split('T')[0]
+        })
+        .select()
+        .single();
+      
+      if (insertError) {
+        console.error('❌ Error inserting user course:', insertError);
+        throw insertError;
+      }
+      
+      // Then fetch the course data separately
+      const { data: courseData, error: courseError } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('id', courseId)
+        .single();
+      
+      if (courseError) {
+        console.error('❌ Error fetching course data:', courseError);
+        throw courseError;
+      }
+      
+      return {
+        ...userCourseData,
+        course: courseData
+      };
+    } catch (err) {
+      console.error('❌ joinCourse failed:', err);
+      throw err;
+    }
   },
 
   async calculateProgress(userId: string, courseId: string) {
