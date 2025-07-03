@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    textAlign:
+    textAlign: 'center',
     fontSize: 16,
     color: '#666',
     marginTop: 10,
