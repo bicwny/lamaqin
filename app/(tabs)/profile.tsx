@@ -32,7 +32,7 @@ export default function ProfileScreen() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const goBackToIndex = () => {
-    router.push('/(tabs)/index');
+    router.push('/(tabs)/study');
   };
 
   const handleSignOut = () => {
