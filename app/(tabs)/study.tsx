@@ -380,7 +380,8 @@ export default function StudyScreen() {
                   style={styles.continueButton}
                   onPress={(e) => {
                     e.stopPropagation();
-                    recordStudy(userCourse.course_id, currentLesson);
+                    setSelectedCourse(userCourse);
+                    setViewMode('courseDetail');
                   }}
                 >
                   <Text style={styles.continueButtonText}>继续学习</Text>
