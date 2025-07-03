@@ -287,18 +287,24 @@ export const studyService = {
       .from('user_courses')
       .select(`
         *,
-        course:courses(*)
+        courses!inner(*)
       `)
       .eq('user_id', userId)
       .eq('status', 'active')
       .order('joined_date');
     
     if (error) throw error;
-    return data || [];
+    
+    // Transform the data to match expected structure
+    return data?.map(userCourse => ({
+      ...userCourse,
+      course: userCourse.courses
+    })) || [];
   },
 
   async joinCourse(userId: string, courseId: string) {
-    const { data, error } = await supabase
+    // First insert the user course record
+    const { data: userCourseData, error: insertError } = await supabase
       .from('user_courses')
       .insert({
         user_id: userId,
@@ -306,14 +312,24 @@ export const studyService = {
         status: 'active',
         joined_date: new Date().toISOString().split('T')[0]
       })
-      .select(`
-        *,
-        course:courses(*)
-      `)
+      .select()
       .single();
     
-    if (error) throw error;
-    return data;
+    if (insertError) throw insertError;
+    
+    // Then fetch the course data separately
+    const { data: courseData, error: courseError } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('id', courseId)
+      .single();
+    
+    if (courseError) throw courseError;
+    
+    return {
+      ...userCourseData,
+      course: courseData
+    };
   },
 
   async calculateProgress(userId: string, courseId: string) {
