@@ -74,6 +74,52 @@ export default function PracticeScreen() {
     loadPracticeData();
   }, [user]);
 
+  const getCurrentPeriodMeditationDetails = async (projectId: string, practiceId: string, targetPeriod: 'daily' | 'weekly') => {
+    if (!user?.id) return [];
+
+    try {
+      const today = new Date();
+      let startDate: string;
+      let endDate: string;
+
+      if (targetPeriod === 'weekly') {
+        // Get current week (Monday to Sunday)
+        const dayOfWeek = today.getDay();
+        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Handle Sunday (0)
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + mondayOffset);
+        
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        
+        startDate = monday.toISOString().split('T')[0];
+        endDate = sunday.toISOString().split('T')[0];
+      } else {
+        // Daily: just today
+        startDate = today.toISOString().split('T')[0];
+        endDate = startDate;
+      }
+
+      // Get meditation records for current period with ≥15 minutes
+      const { data, error } = await supabase
+        .from('meditation_records')
+        .select('duration_minutes, session_number, method, record_date, created_at')
+        .eq('user_id', user.id)
+        .eq('practice_id', practiceId)
+        .gte('record_date', startDate)
+        .lte('record_date', endDate)
+        .gte('duration_minutes', 15) // Only valid sessions (≥15 minutes)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      console.error('Error getting meditation details:', error);
+      return [];
+    }
+  };
+
   const loadPracticeData = async () => {
     if (!user?.id) return;
 
@@ -686,28 +732,22 @@ export default function PracticeScreen() {
                 } else {
                   // Time type: calculate total duration and current period progress
                   if (project.target_period === 'weekly') {
-                    const startDate = new Date(project.start_date || new Date());
-                    const endDate = new Date(project.target_end_date || new Date());
-                    const totalWeeks = Math.ceil((endDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
-
-                    // Get current week's progress (approximation - would need actual DB query for accuracy)
-                    const currentWeekSessions = todayCount; // This should be weekly count from DB query
+                    // For weekly meditation practices
+                    const currentWeekSessions = todayCount; // This represents valid sessions count for the week
 
                     return {
-                      primaryText: `${project.practices.name}(周)：${totalWeeks}周`,
-                      secondaryText: `(本周：${currentWeekSessions}/${dailyTarget})`,
-                      progressText: `本周进度: ${currentWeekSessions} / ${dailyTarget} 座`
+                      primaryText: `${project.practices.name}`,
+                      secondaryText: `(本周目标：${dailyTarget}座)`,
+                      progressText: `本周进度: ${currentWeekSessions} / ${dailyTarget} 座 (≥15分钟/座)`
                     };
                   } else {
-                    // Daily time type
-                    const startDate = new Date(project.start_date || new Date());
-                    const endDate = new Date(project.target_end_date || new Date());
-                    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+                    // Daily meditation practices
+                    const currentDaySessions = todayCount; // This represents valid sessions count for today
 
                     return {
-                      primaryText: `${project.practices.name}(日)：${totalDays}天`,
-                      secondaryText: `(今天：${todayCount}/${dailyTarget}座)`,
-                      progressText: `今日进度: ${todayCount} / ${dailyTarget} 座`
+                      primaryText: `${project.practices.name}`,
+                      secondaryText: `(每日目标：${dailyTarget}座)`,
+                      progressText: `今日进度: ${currentDaySessions} / ${dailyTarget} 座 (≥15分钟/座)`
                     };
                   }
                 }
@@ -780,6 +820,36 @@ export default function PracticeScreen() {
                     ) : (
                       <View style={styles.timeBasedActions}>
                         <Text style={styles.timeBasedHint}>点击下方按钮记录观修</Text>
+                        {/* Show current period meditation details */}
+                        <TouchableOpacity
+                          style={styles.sessionDetailsButton}
+                          onPress={async () => {
+                            const details = await getCurrentPeriodMeditationDetails(
+                              project.id, 
+                              project.practice_id, 
+                              project.target_period || 'daily'
+                            );
+                            
+                            if (details.length > 0) {
+                              const sessionList = details.map((session, index) => 
+                                `第${index + 1}座: ${session.duration_minutes}分钟`
+                              ).join('\n');
+                              
+                              Alert.alert(
+                                `${project.target_period === 'weekly' ? '本周' : '今日'}观修详情`,
+                                `有效座数: ${details.length}座\n\n${sessionList}`,
+                                [{ text: '确定', style: 'default' }]
+                              );
+                            } else {
+                              Alert.alert(
+                                '提示',
+                                `${project.target_period === 'weekly' ? '本周' : '今日'}暂无有效观修记录\n\n(单座需≥15分钟才计入有效座数)`
+                              );
+                            }
+                          }}
+                        >
+                          <Text style={styles.sessionDetailsText}>查看详情</Text>
+                        </TouchableOpacity>
                       </View>
                     )}
 
@@ -1684,6 +1754,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     fontStyle: 'italic',
+    marginBottom: 8,
+  },
+  sessionDetailsButton: {
+    backgroundColor: '#f0f8ff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#e0e8ff',
+  },
+  sessionDetailsText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '500',
   },
   customCountInput: {
     backgroundColor: '#fff',
