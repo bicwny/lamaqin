@@ -115,85 +115,13 @@ export default function PracticeScreen() {
     }
   };
 
-  const loadMeditationTopics = async (practiceId: string) => {
-    try {
-      console.log('🧘 Loading meditation topics for practice:', practiceId);
-      const { data, error } = await supabase
-        .from('meditation_topics')
-        .select('topic_number, title, description')
-        .eq('practice_id', practiceId)
-        .order('topic_number', { ascending: true });
-
-      if (error) throw error;
-
-      console.log('📚 Loaded meditation topics from database:', data?.length || 0);
-
-      // Prioritize database data
-      if (data && data.length > 0) {
-        setMeditationTopics(data);
-        
-        // Initialize the first session with the first topic if method is empty
-        if (meditationSessions.length > 0 && !meditationSessions[0].method) {
-          const firstTopic = data[0];
-          setMeditationSessions([{
-            duration: meditationSessions[0].duration,
-            method: firstTopic.title,
-            sessionNumber: firstTopic.topic_number
-          }]);
-        }
-        return;
-      }
-
-      // Fallback: Check if this is a meditation practice and create default topics
-      if (selectedProjectForRecord?.practices.name?.includes('前行') || 
-          selectedProjectForRecord?.practices.name?.includes('观修') ||
-          selectedProjectForRecord?.practices.name?.includes('禅修')) {
-
-        console.log('🔄 Creating default meditation topics for 前行观修');
-        // For meditation practices, create numbered topics
-        const defaultTopics = [];
-        for (let i = 1; i <= 92; i++) {
-          defaultTopics.push({
-            topic_number: i,
-            title: `第${i}座观修`,
-            description: `前行实修法第${i}座的观修内容，深入修持佛法要义`
-          });
-        }
-        setMeditationTopics(defaultTopics);
-      } else {
-        // For other time-based practices, create a simple numbered list
-        console.log('🔄 Creating default topics for other practices');
-        const defaultTopics = [];
-        for (let i = 1; i <= 30; i++) {
-          defaultTopics.push({
-            topic_number: i,
-            title: `第${i}座修行`,
-            description: `${selectedProjectForRecord?.practices.name}第${i}座的修行内容`
-          });
-        }
-        setMeditationTopics(defaultTopics);
-      }
-    } catch (error) {
-      console.error('Error loading meditation topics:', error);
-      // Ultimate fallback
-      const defaultTopics = [];
-      for (let i = 1; i <= 30; i++) {
-        defaultTopics.push({
-          topic_number: i,
-          title: `第${i}座修行`,
-          description: `修行第${i}座的相关内容`
-        });
-      }
-      setMeditationTopics(defaultTopics);
-    }
-  };
+  
 
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
   const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
-  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string, sessionNumber: number}[]>([{duration: '', method: '', sessionNumber: 1}]);
+  const [meditationDuration, setMeditationDuration] = useState('');
   const [recordingMeditation, setRecordingMeditation] = useState(false);
-  const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
 
   const handleRecordPractice = async (projectId: string, amount: number) => {
     if (!user?.id) return;
@@ -214,39 +142,18 @@ export default function PracticeScreen() {
     
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
-      setSelectedProjectForRecord(project); // Set the correct state for meditation
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
-      await loadMeditationTopics(project.practice_id);
+      setSelectedProjectForRecord(project);
+      setMeditationDuration('');
       setShowMeditationModal(true);
     } else {
       // For count-based practices, show the custom count modal
-      setSelectedProjectForCount(project); // Set the correct state for count
+      setSelectedProjectForCount(project);
       setShowCountModal(true);
-      setCustomCount(''); // Reset the custom count
+      setCustomCount('');
     }
   };
 
-  const addMeditationSession = () => {
-    const nextSessionNumber = Math.max(...meditationSessions.map(s => s.sessionNumber), 0) + 1;
-    setMeditationSessions([...meditationSessions, {duration: '', method: '', sessionNumber: nextSessionNumber}]);
-  };
-
-  const removeMeditationSession = (index: number) => {
-    if (meditationSessions.length > 1) {
-      const newSessions = meditationSessions.filter((_, i) => i !== index);
-      setMeditationSessions(newSessions);
-    }
-  };
-
-  const updateMeditationSession = (index: number, field: 'duration' | 'method' | 'sessionNumber', value: string | number) => {
-    const newSessions = [...meditationSessions];
-    if (field === 'sessionNumber') {
-      newSessions[index][field] = value as number;
-    } else {
-      newSessions[index][field] = value as string;
-    }
-    setMeditationSessions(newSessions);
-  };
+  
 
   const validateMeditationSession = (duration: number): boolean => {
     // Core business rule: minimum 15 minutes to count as valid session
@@ -257,7 +164,7 @@ export default function PracticeScreen() {
     console.log('🔄 Starting meditation record save...');
     console.log('📋 User ID:', user?.id);
     console.log('📋 Selected project:', selectedProjectForRecord?.id);
-    console.log('📋 Meditation sessions:', meditationSessions);
+    console.log('📋 Duration:', meditationDuration);
 
     if (!user?.id || !selectedProjectForRecord) {
       console.log('❌ Missing user or project');
@@ -265,99 +172,63 @@ export default function PracticeScreen() {
       return;
     }
 
-    // Validate sessions
-    const validSessions = meditationSessions.filter(session => {
-      const duration = parseInt(session.duration);
-      const hasValidDuration = !isNaN(duration) && duration > 0;
-      const hasValidMethod = session.method && session.method.trim().length > 0;
-      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${hasValidDuration && hasValidMethod}`);
-      return hasValidDuration && hasValidMethod;
-    });
-
-    console.log('📋 Valid sessions count:', validSessions.length);
-
-    if (validSessions.length === 0) {
-      Alert.alert('提示', '请至少添加一次有效的观修记录\n\n请确保：\n• 时长大于0分钟\n• 观修方法不为空');
+    const duration = parseInt(meditationDuration);
+    if (isNaN(duration) || duration <= 0) {
+      Alert.alert('提示', '请输入有效的观修时长（大于0分钟）');
       return;
     }
 
     setRecordingMeditation(true);
     try {
       const today = new Date().toISOString().split('T')[0];
-      let validSessionCount = 0;
-      let totalMinutes = 0;
+      const isValidSession = validateMeditationSession(duration);
 
-      console.log('🔄 Saving meditation sessions...');
+      console.log('🔄 Saving meditation record...');
       
-      // Save each meditation session to meditation_records table
-      for (let i = 0; i < validSessions.length; i++) {
-        const session = validSessions[i];
-        const duration = parseInt(session.duration);
-        totalMinutes += duration;
-
-        console.log(`🔄 Saving session ${i + 1}:`, {
+      // Save meditation record
+      const { data: meditationData, error: meditationError } = await supabase
+        .from('meditation_records')
+        .insert({
           user_id: user.id,
           practice_id: selectedProjectForRecord.practice_id,
           record_date: today,
-          session_number: session.sessionNumber,
+          session_number: 1, // Auto-assigned, not user-controlled
           duration_minutes: duration,
-          method: session.method
-        });
+          method: selectedProjectForRecord.practices.name || '观修'
+        })
+        .select();
 
-        // Save to meditation_records with the user-selected session number
-        const { data: meditationData, error: meditationError } = await supabase
-          .from('meditation_records')
-          .insert({
-            user_id: user.id,
-            practice_id: selectedProjectForRecord.practice_id,
-            record_date: today,
-            session_number: session.sessionNumber,
-            duration_minutes: duration,
-            method: session.method
-          })
-          .select();
-
-        if (meditationError) {
-          console.error('❌ Error saving meditation record:', meditationError);
-          throw meditationError;
-        }
-
-        console.log('✅ Meditation record saved:', meditationData);
-
-        // Check if this session counts as a valid "座"
-        if (validateMeditationSession(duration)) {
-          validSessionCount++;
-        }
+      if (meditationError) {
+        console.error('❌ Error saving meditation record:', meditationError);
+        throw meditationError;
       }
 
-      console.log('🔄 Updating project progress...');
-      
-      // Update project progress with valid session count (not total minutes)
-      if (validSessionCount > 0) {
+      console.log('✅ Meditation record saved:', meditationData);
+
+      // Update project progress if it's a valid session (≥15 minutes)
+      if (isValidSession) {
         await dailyRecordService.recordPractice(
           user.id, 
           selectedProjectForRecord.id, 
-          validSessionCount, 
+          1, // Count as 1 valid session
           today
         );
-        console.log('✅ Project progress updated with', validSessionCount, 'valid sessions');
+        console.log('✅ Project progress updated with 1 valid session');
       }
 
       // Reload practice data to reflect the changes
-      console.log('🔄 Reloading practice data...');
       await loadPracticeData();
 
       console.log('✅ Meditation record save completed successfully');
 
       Alert.alert(
         '记录成功', 
-        `本次观修:\n总时长: ${totalMinutes} 分钟\n有效座数: ${validSessionCount} 座\n\n(单座需≥15分钟才计入有效座数)`
+        `本次观修: ${duration} 分钟\n${isValidSession ? '✅ 计入有效座数' : '⚠️ 时长不足15分钟，不计入有效座数'}`
       );
 
       setShowMeditationModal(false);
       setSelectedProjectForRecord(null);
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
-      setMeditationTopics([]);
+      setMeditationDuration('');
     } catch (error) {
       console.error('❌ Error saving meditation:', error);
       Alert.alert('错误', `保存观修记录失败\n\n错误信息: ${error.message || '未知错误'}`);
@@ -938,143 +809,61 @@ export default function PracticeScreen() {
         onRequestClose={() => setShowMeditationModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <ScrollView contentContainerStyle={styles.modalScrollContent}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                🧘 记录"{selectedProjectForRecord?.practices.name}"观修
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              🧘 记录"{selectedProjectForRecord?.practices.name}"观修
+            </Text>
+            <Text style={styles.modalSubtitle}>
+              请输入本次观修的时长（单座≥15分钟才计入有效座数）
+            </Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+              <TextInput
+                style={styles.meditationDurationInput}
+                value={meditationDuration}
+                onChangeText={setMeditationDuration}
+                keyboardType="numeric"
+                placeholder="如：30"
+                autoFocus={true}
+              />
+            </View>
+
+            {meditationDuration && parseInt(meditationDuration) > 0 && (
+              <Text style={[
+                styles.sessionValidation,
+                validateMeditationSession(parseInt(meditationDuration)) 
+                  ? styles.validSession 
+                  : styles.invalidSession
+              ]}>
+                {validateMeditationSession(parseInt(meditationDuration))
+                  ? '✅ 有效座（≥15分钟）'
+                  : '⚠️ 时长不足15分钟，不计入有效座数'
+                }
               </Text>
-              <Text style={styles.modalSubtitle}>
-                请记录您的观修座次（单座≥15分钟才计入有效座数）
-              </Text>
+            )}
 
-              {meditationSessions.map((session, index) => (
-                <View key={index} style={styles.sessionContainer}>
-                  <View style={styles.sessionHeader}>
-                    <Text style={styles.sessionTitle}>第 {index + 1} 座</Text>
-                    {meditationSessions.length > 1 && (
-                      <TouchableOpacity
-                        style={styles.removeSessionButton}
-                        onPress={() => removeMeditationSession(index)}
-                      >
-                        <Text style={styles.removeSessionText}>✕</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-
-                  <View style={styles.sessionInputs}>
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>选择观修内容</Text>
-                      {meditationTopics.length > 0 ? (
-                        <Picker
-                          selectedValue={session.sessionNumber}
-                          onValueChange={(value) => {
-                            console.log('🔄 Picker value changed to:', value);
-                            updateMeditationSession(index, 'sessionNumber', value);
-                            const selectedTopic = meditationTopics.find(t => t.topic_number === value);
-                            console.log('🔄 Selected topic:', selectedTopic);
-                            if (selectedTopic) {
-                              updateMeditationSession(index, 'method', selectedTopic.title);
-                            }
-                          }}
-                          style={styles.topicPicker}
-                        >
-                          {meditationTopics.map((topic) => (
-                            <Picker.Item 
-                              key={topic.topic_number} 
-                              label={`${topic.topic_number} - ${topic.title}`} 
-                              value={topic.topic_number} 
-                            />
-                          ))}
-                        </Picker>
-                      ) : (
-                        <TextInput
-                          style={styles.sessionInput}
-                          value={session.sessionNumber.toString()}
-                          onChangeText={(value) => updateMeditationSession(index, 'sessionNumber', parseInt(value) || 1)}
-                          keyboardType="numeric"
-                          placeholder="座数编号"
-                        />
-                      )}
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-                      <TextInput
-                        style={styles.sessionInput}
-                        value={session.duration}
-                        onChangeText={(value) => updateMeditationSession(index, 'duration', value)}
-                        keyboardType="numeric"
-                        placeholder="如：30"
-                      />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>观修方法/备注</Text>
-                      <TextInput
-                        style={styles.sessionInput}
-                        value={session.method}
-                        onChangeText={(value) => updateMeditationSession(index, 'method', value)}
-                        placeholder="观修方法或备注"
-                        multiline={true}
-                        numberOfLines={2}
-                      />
-                    </View>
-
-                    {meditationTopics.length > 0 && (
-                      <View style={styles.topicDescription}>
-                        <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
-                        <Text style={styles.topicDescriptionText}>
-                          {meditationTopics.find(t => t.topic_number === session.sessionNumber)?.description || ''}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {session.duration && parseInt(session.duration) > 0 && (
-                    <Text style={[
-                      styles.sessionValidation,
-                      validateMeditationSession(parseInt(session.duration)) 
-                        ? styles.validSession 
-                        : styles.invalidSession
-                    ]}>
-                      {validateMeditationSession(parseInt(session.duration))
-                        ? '✅ 有效座（≥15分钟）'
-                        : '⚠️ 时长不足15分钟，不计入有效座数'
-                      }
-                    </Text>
-                  )}
-                </View>
-              ))}
-
-              <TouchableOpacity
-                style={styles.addSessionButton}
-                onPress={addMeditationSession}
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={styles.cancelButton}
+                onPress={() => setShowMeditationModal(false)}
               >
-                <Text style={styles.addSessionText}>+ 添加更多座次</Text>
+                <Text style={styles.cancelButtonText}>取消</Text>
               </TouchableOpacity>
 
-              <View style={styles.modalActions}>
-                <TouchableOpacity 
-                  style={styles.cancelButton}
-                  onPress={() => setShowMeditationModal(false)}
-                >
-                  <Text style={styles.cancelButtonText}>取消</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.confirmButton, recordingMeditation && styles.confirmButtonDisabled]}
-                  onPress={handleSaveMeditationRecord}
-                  disabled={recordingMeditation}
-                >
-                  {recordingMeditation ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.confirmButtonText}>保存记录</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity 
+                style={[styles.confirmButton, recordingMeditation && styles.confirmButtonDisabled]}
+                onPress={handleSaveMeditationRecord}
+                disabled={recordingMeditation}
+              >
+                {recordingMeditation ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.confirmButtonText}>保存记录</Text>
+                )}
+              </TouchableOpacity>
             </View>
-          </ScrollView>
+          </View>
         </View>
       </Modal>
 
@@ -1694,6 +1483,18 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 16,
     color: '#333',
+    marginBottom: 16,
+  },
+  meditationDurationInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 18,
+    color: '#333',
+    textAlign: 'center',
     marginBottom: 16,
   },
 });
