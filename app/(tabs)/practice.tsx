@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { practiceService, dailyRecordService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
@@ -43,6 +44,7 @@ interface Practice {
 
 export default function PracticeScreen() {
   const { user } = useAuth();
+  const router = useRouter();
   const [practiceProjects, setPracticeProjects] = useState<PracticeProject[]>([]);
   const [todayRecords, setTodayRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -834,7 +836,7 @@ export default function PracticeScreen() {
                         {/* Show current period meditation details */}
                         <TouchableOpacity
                           style={styles.sessionDetailsButton}
-                          onPress={async () => {
+                          onPress={() => {
                             console.log('🔍 查看详情按钮被点击');
                             console.log('📋 Project info:', {
                               id: project.id,
@@ -843,41 +845,16 @@ export default function PracticeScreen() {
                               name: project.practices.name
                             });
                             
-                            try {
-                              const details = await getCurrentPeriodMeditationDetails(
-                                project.id, 
-                                project.practice_id, 
-                                project.target_period || 'daily'
-                              );
-                              
-                              console.log('📊 Retrieved details:', details);
-                              
-                              if (details.length > 0) {
-                                const sessionList = details.map((session, index) => 
-                                  `第${index + 1}座: ${session.duration_minutes}分钟`
-                                ).join('\n');
-                                
-                                console.log('📝 Session list:', sessionList);
-                                
-                                Alert.alert(
-                                  `${project.target_period === 'weekly' ? '本周' : '今日'}观修详情`,
-                                  `有效座数: ${details.length}座\n\n${sessionList}`,
-                                  [{ text: '确定', style: 'default' }]
-                                );
-                              } else {
-                                console.log('ℹ️ No meditation records found');
-                                Alert.alert(
-                                  '提示',
-                                  `${project.target_period === 'weekly' ? '本周' : '今日'}暂无观修记录`
-                                );
+                            // Navigate to meditation history page
+                            router.push({
+                              pathname: '/meditation-history',
+                              params: {
+                                projectId: project.id,
+                                practiceId: project.practice_id,
+                                practiceName: project.practices.name,
+                                targetPeriod: project.target_period || 'daily'
                               }
-                            } catch (error) {
-                              console.error('❌ Error in details button:', error);
-                              Alert.alert(
-                                '错误',
-                                '获取观修详情时出错，请稍后重试'
-                              );
-                            }
+                            });
                           }}
                         >
                           <Text style={styles.sessionDetailsText}>查看详情</Text>
