@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -10,6 +11,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '@/contexts/AuthContext';
 import { practiceService, dailyRecordService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
@@ -20,6 +22,7 @@ interface PracticeProject {
   target_count: number;
   current_count: number;
   daily_target: number;
+  target_period?: 'daily' | 'weekly';
   practices: {
     id: string;
     name: string;
@@ -43,15 +46,21 @@ export default function PracticeScreen() {
   const [todayRecords, setTodayRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [customAmount, setCustomAmount] = useState('');
 
-  // New states for individual practice selection
+  // Practice selection states
   const [showPracticeListModal, setShowPracticeListModal] = useState(false);
   const [showGoalSettingModal, setShowGoalSettingModal] = useState(false);
   const [availablePractices, setAvailablePractices] = useState<Practice[]>([]);
   const [selectedPractice, setSelectedPractice] = useState<Practice | null>(null);
-  const [targetAmount, setTargetAmount] = useState('');
   const [addingPractice, setAddingPractice] = useState(false);
+
+  // Goal setting form states
+  const [totalTarget, setTotalTarget] = useState('');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [duration, setDuration] = useState('100');
+  const [customDuration, setCustomDuration] = useState('');
+  const [frequency, setFrequency] = useState<'daily' | 'weekly'>('weekly');
+  const [sessionsPerPeriod, setSessionsPerPeriod] = useState('');
 
   useEffect(() => {
     loadPracticeData();
@@ -96,10 +105,7 @@ export default function PracticeScreen() {
     try {
       const today = new Date().toISOString().split('T')[0];
       await dailyRecordService.recordPractice(user.id, projectId, amount, today);
-
-      // Reload data to reflect changes
       await loadPracticeData();
-
       Alert.alert('成功', `已记录 ${amount} 次修行`);
     } catch (error) {
       console.error('Error recording practice:', error);
@@ -116,18 +122,103 @@ export default function PracticeScreen() {
   const handlePracticeSelected = (practice: Practice) => {
     setSelectedPractice(practice);
     setShowPracticeListModal(false);
+    
+    // Reset form states
+    setTotalTarget('');
+    setSessionsPerPeriod('');
+    setDuration('100');
+    setCustomDuration('');
+    setFrequency('weekly');
+    
     setShowGoalSettingModal(true);
   };
 
+  const calculateProjectParams = () => {
+    if (!selectedPractice) return null;
+
+    const start = new Date(startDate);
+    let durationDays: number;
+
+    if (duration === 'custom') {
+      durationDays = parseInt(customDuration) || 100;
+    } else {
+      durationDays = parseInt(duration);
+    }
+
+    const endDate = new Date(start);
+    endDate.setDate(start.getDate() + durationDays);
+
+    if (selectedPractice.type === 'count') {
+      const total = parseInt(totalTarget);
+      const dailyTarget = Math.ceil(total / durationDays);
+      
+      return {
+        target_count: total,
+        daily_target: dailyTarget,
+        start_date: startDate,
+        target_end_date: endDate.toISOString().split('T')[0],
+        target_period: 'daily'
+      };
+    } else {
+      // time type
+      const sessions = parseInt(sessionsPerPeriod);
+      let totalPeriods: number;
+      
+      if (frequency === 'daily') {
+        totalPeriods = durationDays;
+      } else {
+        totalPeriods = Math.ceil(durationDays / 7);
+      }
+      
+      const totalTargetSessions = sessions * totalPeriods;
+      
+      return {
+        target_count: totalTargetSessions,
+        daily_target: sessions,
+        start_date: startDate,
+        target_end_date: endDate.toISOString().split('T')[0],
+        target_period: frequency
+      };
+    }
+  };
+
   const handleAddIndividualPractice = async () => {
-    if (!user?.id || !selectedPractice || !targetAmount) {
-      Alert.alert('提示', '请填写完整信息');
+    if (!user?.id || !selectedPractice) {
+      Alert.alert('提示', '请选择修法');
       return;
     }
 
-    const target = parseInt(targetAmount);
-    if (isNaN(target) || target <= 0) {
-      Alert.alert('提示', '请输入有效的目标数量');
+    // Validate based on practice type
+    if (selectedPractice.type === 'count') {
+      if (!totalTarget) {
+        Alert.alert('提示', '请输入目标数量');
+        return;
+      }
+      const target = parseInt(totalTarget);
+      if (isNaN(target) || target <= 0) {
+        Alert.alert('提示', '请输入有效的目标数量');
+        return;
+      }
+    } else {
+      if (!sessionsPerPeriod) {
+        Alert.alert('提示', '请输入每期座数');
+        return;
+      }
+      const sessions = parseInt(sessionsPerPeriod);
+      if (isNaN(sessions) || sessions <= 0) {
+        Alert.alert('提示', '请输入有效的座数');
+        return;
+      }
+    }
+
+    if (duration === 'custom' && !customDuration) {
+      Alert.alert('提示', '请输入自定义持续时间');
+      return;
+    }
+
+    const projectParams = calculateProjectParams();
+    if (!projectParams) {
+      Alert.alert('错误', '计算参数失败');
       return;
     }
 
@@ -136,15 +227,19 @@ export default function PracticeScreen() {
       await practiceService.createUserPracticeProject(
         user.id,
         selectedPractice.id,
-        target,
-        Math.ceil(target / 365) // Default daily target (1 year completion)
+        projectParams.target_count,
+        projectParams.daily_target,
+        projectParams.start_date,
+        projectParams.target_end_date,
+        projectParams.target_period
       );
 
       Alert.alert('成功', `已添加${selectedPractice.name}到修行计划`);
 
       // Reset state and reload data
       setSelectedPractice(null);
-      setTargetAmount('');
+      setTotalTarget('');
+      setSessionsPerPeriod('');
       setShowGoalSettingModal(false);
       await loadPracticeData();
     } catch (error) {
@@ -153,6 +248,97 @@ export default function PracticeScreen() {
     } finally {
       setAddingPractice(false);
     }
+  };
+
+  const renderGoalSettingForm = () => {
+    if (!selectedPractice) return null;
+
+    return (
+      <View>
+        <Text style={styles.modalTitle}>
+          🎯 设置"{selectedPractice.name}"的目标
+        </Text>
+
+        {selectedPractice.type === 'count' ? (
+          // Count type form
+          <View>
+            <Text style={styles.modalSubtitle}>您的修行总目标是多少？</Text>
+            <View style={styles.goalInputContainer}>
+              <TextInput
+                style={styles.goalInput}
+                value={totalTarget}
+                onChangeText={setTotalTarget}
+                keyboardType="numeric"
+                placeholder="请输入总数"
+              />
+              <Text style={styles.goalUnit}>{selectedPractice.unit}</Text>
+            </View>
+          </View>
+        ) : (
+          // Time type form
+          <View>
+            <Text style={styles.modalSubtitle}>您的修行频率是？</Text>
+            <View style={styles.frequencyContainer}>
+              <Picker
+                selectedValue={frequency}
+                onValueChange={setFrequency}
+                style={styles.frequencyPicker}
+              >
+                <Picker.Item label="每天" value="daily" />
+                <Picker.Item label="每周" value="weekly" />
+              </Picker>
+              <Text style={styles.frequencyLabel}>完成</Text>
+              <TextInput
+                style={styles.sessionsInput}
+                value={sessionsPerPeriod}
+                onChangeText={setSessionsPerPeriod}
+                keyboardType="numeric"
+                placeholder="座数"
+              />
+              <Text style={styles.frequencyLabel}>座</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Duration section for both types */}
+        <View style={styles.durationSection}>
+          <Text style={styles.durationLabel}>您计划在多长时间内完成？</Text>
+          
+          <View style={styles.dateContainer}>
+            <Text style={styles.dateLabel}>开始时间：</Text>
+            <Text style={styles.dateValue}>{startDate}</Text>
+          </View>
+
+          <View style={styles.durationContainer}>
+            <Text style={styles.durationLabel}>持续时间：</Text>
+            <Picker
+              selectedValue={duration}
+              onValueChange={setDuration}
+              style={styles.durationPicker}
+            >
+              <Picker.Item label="30天" value="30" />
+              <Picker.Item label="60天" value="60" />
+              <Picker.Item label="100天" value="100" />
+              <Picker.Item label="365天" value="365" />
+              <Picker.Item label="自定义" value="custom" />
+            </Picker>
+          </View>
+
+          {duration === 'custom' && (
+            <View style={styles.customDurationContainer}>
+              <TextInput
+                style={styles.customDurationInput}
+                value={customDuration}
+                onChangeText={setCustomDuration}
+                keyboardType="numeric"
+                placeholder="输入天数"
+              />
+              <Text style={styles.customDurationLabel}>天</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    );
   };
 
   const handleOpenAddModal = () => {
@@ -190,12 +376,9 @@ export default function PracticeScreen() {
 
             {practiceProjects.map(project => {
               const todayCount = todayRecords[project.id] || 0;
-              const progressPercent =
-                Math.min(
-                  (todayCount / project.practices.daily_target) * 100,
-                  100
-                );
-              const isCompleted = todayCount >= project.practices.daily_target;
+              const dailyTarget = project.daily_target;
+              const progressPercent = Math.min((todayCount / dailyTarget) * 100, 100);
+              const isCompleted = todayCount >= dailyTarget;
 
               return (
                 <View key={project.id} style={styles.practiceCard}>
@@ -214,9 +397,14 @@ export default function PracticeScreen() {
                       {project.practices.unit}
                     </Text>
                     <Text style={styles.dailyProgress}>
-                      今日: {todayCount} / {project.practices.daily_target}{' '}
+                      今日: {todayCount} / {dailyTarget}{' '}
                       {project.practices.unit}
                     </Text>
+                    {project.target_period && (
+                      <Text style={styles.targetPeriod}>
+                        ({project.target_period === 'daily' ? '每日目标' : '每周目标'}: {dailyTarget} {project.practices.unit})
+                      </Text>
+                    )}
                   </View>
 
                   <View style={styles.progressBar}>
@@ -233,10 +421,7 @@ export default function PracticeScreen() {
                     <TouchableOpacity
                       style={[styles.actionButton, styles.completeButton]}
                       onPress={() =>
-                        handleRecordPractice(
-                          project.id,
-                          project.practices.daily_target - todayCount
-                        )
+                        handleRecordPractice(project.id, dailyTarget - todayCount)
                       }
                       disabled={isCompleted}
                     >
@@ -268,110 +453,102 @@ export default function PracticeScreen() {
       )}
 
       {/* Add Practice Modal */}
-        <Modal
-          visible={showAddModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowAddModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>➕ 添加修法</Text>
-              <Text style={styles.modalSubtitle}>选择添加方式：</Text>
+      <Modal
+        visible={showAddModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAddModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>➕ 添加修法</Text>
+            <Text style={styles.modalSubtitle}>选择添加方式：</Text>
 
-              <TouchableOpacity style={styles.addOption}>
-                <Text style={styles.addOptionIcon}>🎯</Text>
-                <View style={styles.addOptionContent}>
-                  <Text style={styles.addOptionTitle}>加入主题</Text>
-                  <Text style={styles.addOptionDesc}>选择预设的修行主题</Text>
-                </View>
-                <TouchableOpacity style={styles.addOptionButton}>
-                  <Text style={styles.addOptionButtonText}>浏览主题</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.addOption}>
-                <Text style={styles.addOptionIcon}>📿</Text>
-                <View style={styles.addOptionContent}>
-                  <Text style={styles.addOptionTitle}>单项修法</Text>
-                  <Text style={styles.addOptionDesc}>添加单独的修行项目</Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.addOptionButton}
-                  onPress={handleSelectIndividualPractice}
-                >
-                  <Text style={styles.addOptionButtonText}>选择修法</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.cancelButton}
-                onPress={() => setShowAddModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>取消</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Practice List Modal */}
-        <Modal
-          visible={showPracticeListModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowPracticeListModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>📿 选择修法</Text>
-              <Text style={styles.modalSubtitle}>请选择您要添加的修法项目：</Text>
-
-              <ScrollView style={styles.practiceList}>
-                {availablePractices.map((practice) => (
-                  <TouchableOpacity
-                    key={practice.id}
-                    style={styles.practiceItem}
-                    onPress={() => handlePracticeSelected(practice)}
-                  >
-                    <Text style={styles.practiceItemName}>{practice.name}</Text>
-                    <Text style={styles.practiceItemUnit}>({practice.unit})</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-
-              <TouchableOpacity 
-                style={styles.cancelButton}
-                onPress={() => setShowPracticeListModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>取消</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Goal Setting Modal */}
-        <Modal
-          visible={showGoalSettingModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowGoalSettingModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>🎯 设置"{selectedPractice?.name}"的目标</Text>
-              <Text style={styles.modalSubtitle}>请输入您的修行总目标数量：</Text>
-
-              <View style={styles.goalInputContainer}>
-                <Text style={styles.goalLabel}>目标数量：</Text>
-                <TextInput
-                  style={styles.goalInput}
-                  value={targetAmount}
-                  onChangeText={setTargetAmount}
-                  keyboardType="numeric"
-                  placeholder="请输入目标数量"
-                />
-                <Text style={styles.goalUnit}>{selectedPractice?.unit}</Text>
+            <TouchableOpacity style={styles.addOption}>
+              <Text style={styles.addOptionIcon}>🎯</Text>
+              <View style={styles.addOptionContent}>
+                <Text style={styles.addOptionTitle}>加入主题</Text>
+                <Text style={styles.addOptionDesc}>选择预设的修行主题</Text>
               </View>
+              <TouchableOpacity style={styles.addOptionButton}>
+                <Text style={styles.addOptionButtonText}>浏览主题</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.addOption}>
+              <Text style={styles.addOptionIcon}>📿</Text>
+              <View style={styles.addOptionContent}>
+                <Text style={styles.addOptionTitle}>单项修法</Text>
+                <Text style={styles.addOptionDesc}>添加单独的修行项目</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.addOptionButton}
+                onPress={handleSelectIndividualPractice}
+              >
+                <Text style={styles.addOptionButtonText}>选择修法</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.cancelButton}
+              onPress={() => setShowAddModal(false)}
+            >
+              <Text style={styles.cancelButtonText}>取消</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Practice List Modal */}
+      <Modal
+        visible={showPracticeListModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowPracticeListModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>📿 选择修法</Text>
+            <Text style={styles.modalSubtitle}>请选择您要添加的修法项目：</Text>
+
+            <ScrollView style={styles.practiceList}>
+              {availablePractices.map((practice) => (
+                <TouchableOpacity
+                  key={practice.id}
+                  style={styles.practiceItem}
+                  onPress={() => handlePracticeSelected(practice)}
+                >
+                  <View style={styles.practiceItemContent}>
+                    <Text style={styles.practiceItemName}>{practice.name}</Text>
+                    <Text style={styles.practiceItemDetails}>
+                      {practice.type === 'count' ? '计数类' : '计时类'} • {practice.unit}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity 
+              style={styles.cancelButton}
+              onPress={() => setShowPracticeListModal(false)}
+            >
+              <Text style={styles.cancelButtonText}>取消</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Goal Setting Modal */}
+      <Modal
+        visible={showGoalSettingModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowGoalSettingModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ScrollView contentContainerStyle={styles.modalScrollContent}>
+            <View style={styles.modalContent}>
+              {renderGoalSettingForm()}
 
               <View style={styles.modalActions}>
                 <TouchableOpacity 
@@ -394,8 +571,9 @@ export default function PracticeScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </Modal>
+          </ScrollView>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -502,6 +680,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  targetPeriod: {
+    fontSize: 12,
+    color: '#999',
+    fontStyle: 'italic',
+  },
   progressBar: {
     height: 8,
     backgroundColor: '#E5E5E7',
@@ -552,6 +735,11 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalScrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -633,9 +821,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   practiceItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#f8f9fa',
@@ -644,12 +829,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e9ecef',
   },
+  practiceItemContent: {
+    flex: 1,
+  },
   practiceItemName: {
     fontSize: 16,
     fontWeight: '500',
     color: '#333',
+    marginBottom: 4,
   },
-  practiceItemUnit: {
+  practiceItemDetails: {
     fontSize: 14,
     color: '#666',
   },
@@ -664,12 +853,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e9ecef',
   },
-  goalLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginRight: 8,
-  },
   goalInput: {
     flex: 1,
     fontSize: 16,
@@ -682,6 +865,98 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   goalUnit: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+  },
+  frequencyContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+  },
+  frequencyPicker: {
+    flex: 1,
+    height: 40,
+  },
+  frequencyLabel: {
+    fontSize: 16,
+    color: '#333',
+    marginHorizontal: 8,
+  },
+  sessionsInput: {
+    width: 60,
+    fontSize: 16,
+    color: '#333',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    textAlign: 'center',
+  },
+  durationSection: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+  },
+  durationLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 10,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  dateLabel: {
+    fontSize: 16,
+    color: '#333',
+    marginRight: 8,
+  },
+  dateValue: {
+    fontSize: 16,
+    color: '#666',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  durationPicker: {
+    flex: 1,
+    height: 40,
+  },
+  customDurationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  customDurationInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  customDurationLabel: {
     fontSize: 16,
     color: '#666',
     marginLeft: 8,

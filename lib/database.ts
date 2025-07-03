@@ -178,25 +178,33 @@ export const practiceService = {
     return data || [];
   },
 
-  async createUserPracticeProject(userId: string, practiceId: string, targetCount: number, dailyTarget: number) {
+  async createUserPracticeProject(
+    userId: string,
+    practiceId: string,
+    targetCount: number,
+    dailyTarget: number,
+    startDate?: string,
+    targetEndDate?: string,
+    targetPeriod?: 'daily' | 'weekly',
+    themeId?: string
+  ) {
     const { data, error } = await supabase
       .from('user_practice_projects')
       .insert({
         user_id: userId,
         practice_id: practiceId,
+        theme_id: themeId || null,
         target_count: targetCount,
         daily_target: dailyTarget,
-        current_count: 0,
+        start_date: startDate || new Date().toISOString().split('T')[0],
+        target_end_date: targetEndDate || null,
+        target_period: targetPeriod || 'daily',
         status: 'active'
       })
       .select()
       .single();
 
-    if (error) {
-      console.error('Error creating user practice project:', error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 
