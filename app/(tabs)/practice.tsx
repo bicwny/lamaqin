@@ -78,6 +78,8 @@ export default function PracticeScreen() {
     if (!user?.id) return [];
 
     try {
+      console.log('🔍 Getting meditation details for:', { projectId, practiceId, targetPeriod, userId: user.id });
+      
       const today = new Date();
       let startDate: string;
       let endDate: string;
@@ -94,10 +96,14 @@ export default function PracticeScreen() {
         
         startDate = monday.toISOString().split('T')[0];
         endDate = sunday.toISOString().split('T')[0];
+        
+        console.log('📅 Weekly period:', { startDate, endDate });
       } else {
         // Daily: just today
         startDate = today.toISOString().split('T')[0];
         endDate = startDate;
+        
+        console.log('📅 Daily period:', { startDate, endDate });
       }
 
       // Get all meditation records for current period (no duration limit)
@@ -110,11 +116,17 @@ export default function PracticeScreen() {
         .lte('record_date', endDate)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error querying meditation records:', error);
+        throw error;
+      }
+
+      console.log('📊 Found meditation records:', data?.length || 0);
+      console.log('📋 Records details:', data);
 
       return data || [];
     } catch (error) {
-      console.error('Error getting meditation details:', error);
+      console.error('❌ Error getting meditation details:', error);
       return [];
     }
   };
@@ -823,26 +835,47 @@ export default function PracticeScreen() {
                         <TouchableOpacity
                           style={styles.sessionDetailsButton}
                           onPress={async () => {
-                            const details = await getCurrentPeriodMeditationDetails(
-                              project.id, 
-                              project.practice_id, 
-                              project.target_period || 'daily'
-                            );
+                            console.log('🔍 查看详情按钮被点击');
+                            console.log('📋 Project info:', {
+                              id: project.id,
+                              practice_id: project.practice_id,
+                              target_period: project.target_period,
+                              name: project.practices.name
+                            });
                             
-                            if (details.length > 0) {
-                              const sessionList = details.map((session, index) => 
-                                `第${index + 1}座: ${session.duration_minutes}分钟`
-                              ).join('\n');
-                              
-                              Alert.alert(
-                                `${project.target_period === 'weekly' ? '本周' : '今日'}观修详情`,
-                                `有效座数: ${details.length}座\n\n${sessionList}`,
-                                [{ text: '确定', style: 'default' }]
+                            try {
+                              const details = await getCurrentPeriodMeditationDetails(
+                                project.id, 
+                                project.practice_id, 
+                                project.target_period || 'daily'
                               );
-                            } else {
+                              
+                              console.log('📊 Retrieved details:', details);
+                              
+                              if (details.length > 0) {
+                                const sessionList = details.map((session, index) => 
+                                  `第${index + 1}座: ${session.duration_minutes}分钟`
+                                ).join('\n');
+                                
+                                console.log('📝 Session list:', sessionList);
+                                
+                                Alert.alert(
+                                  `${project.target_period === 'weekly' ? '本周' : '今日'}观修详情`,
+                                  `有效座数: ${details.length}座\n\n${sessionList}`,
+                                  [{ text: '确定', style: 'default' }]
+                                );
+                              } else {
+                                console.log('ℹ️ No meditation records found');
+                                Alert.alert(
+                                  '提示',
+                                  `${project.target_period === 'weekly' ? '本周' : '今日'}暂无观修记录`
+                                );
+                              }
+                            } catch (error) {
+                              console.error('❌ Error in details button:', error);
                               Alert.alert(
-                                '提示',
-                                `${project.target_period === 'weekly' ? '本周' : '今日'}暂无观修记录`
+                                '错误',
+                                '获取观修详情时出错，请稍后重试'
                               );
                             }
                           }}
