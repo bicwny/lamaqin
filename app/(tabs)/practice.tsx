@@ -185,6 +185,7 @@ export default function PracticeScreen() {
             method: firstTopic.title,
             sessionNumber: firstTopic.topic_number
           }]);
+          console.log('🔄 Initialized first session with topic:', firstTopic.title);
         }
         return;
       }
@@ -293,9 +294,11 @@ export default function PracticeScreen() {
     setMeditationSessions(newSessions);
   };
 
-  const validateMeditationSession = (duration: number): boolean => {
-    // New simplified rule: every recorded session counts as valid
-    return duration > 0;
+  const validateMeditationSession = (session: {duration: string, method: string}): boolean => {
+    const duration = parseInt(session.duration);
+    const hasValidDuration = !isNaN(duration) && duration > 0;
+    const hasValidMethod = session.method && session.method.trim().length > 0;
+    return hasValidDuration && hasValidMethod;
   };
 
   const handleSaveMeditationRecord = async () => {
@@ -312,11 +315,10 @@ export default function PracticeScreen() {
 
     // Validate sessions
     const validSessions = meditationSessions.filter(session => {
+      const isValid = validateMeditationSession(session);
       const duration = parseInt(session.duration);
-      const hasValidDuration = !isNaN(duration) && duration > 0;
-      const hasValidMethod = session.method && session.method.trim().length > 0;
-      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${hasValidDuration && hasValidMethod}`);
-      return hasValidDuration && hasValidMethod;
+      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${isValid}`);
+      return isValid;
     });
 
     console.log('📋 Valid sessions count:', validSessions.length);
@@ -1041,6 +1043,7 @@ export default function PracticeScreen() {
                             console.log('🔄 Selected topic:', selectedTopic);
                             if (selectedTopic) {
                               updateMeditationSession(index, 'method', selectedTopic.title);
+                              console.log('🔄 Method updated to:', selectedTopic.title);
                             }
                           }}
                           style={styles.topicPicker}
@@ -1100,9 +1103,12 @@ export default function PracticeScreen() {
                   {session.duration && parseInt(session.duration) > 0 && (
                     <Text style={[
                       styles.sessionValidation,
-                      styles.validSession
+                      validateMeditationSession(session) ? styles.validSession : styles.invalidSession
                     ]}>
-                      ✅ 有效座（{parseInt(session.duration)}分钟）
+                      {validateMeditationSession(session) ? 
+                        `✅ 有效座（${parseInt(session.duration)}分钟）` : 
+                        `⚠️ 需要完善信息（${parseInt(session.duration)}分钟）`
+                      }
                     </Text>
                   )}
                 </View>
