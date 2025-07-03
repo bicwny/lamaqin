@@ -131,6 +131,16 @@ export default function PracticeScreen() {
       // Prioritize database data
       if (data && data.length > 0) {
         setMeditationTopics(data);
+        
+        // Initialize the first session with the first topic if method is empty
+        if (meditationSessions.length > 0 && !meditationSessions[0].method) {
+          const firstTopic = data[0];
+          setMeditationSessions([{
+            duration: meditationSessions[0].duration,
+            method: firstTopic.title,
+            sessionNumber: firstTopic.topic_number
+          }]);
+        }
         return;
       }
 
@@ -200,15 +210,17 @@ export default function PracticeScreen() {
   };
 
   const handleCustomRecord = async (project: PracticeProject) => {
-    setSelectedProjectForCount(project);
-
+    console.log('🔄 handleCustomRecord called with project:', project.id, project.practices.name);
+    
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
+      setSelectedProjectForRecord(project); // Set the correct state for meditation
       setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
       await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
       // For count-based practices, show the custom count modal
+      setSelectedProjectForCount(project); // Set the correct state for count
       setShowCountModal(true);
       setCustomCount(''); // Reset the custom count
     }
@@ -242,16 +254,30 @@ export default function PracticeScreen() {
   };
 
   const handleSaveMeditationRecord = async () => {
-    if (!user?.id || !selectedProjectForRecord) return;
+    console.log('🔄 Starting meditation record save...');
+    console.log('📋 User ID:', user?.id);
+    console.log('📋 Selected project:', selectedProjectForRecord?.id);
+    console.log('📋 Meditation sessions:', meditationSessions);
+
+    if (!user?.id || !selectedProjectForRecord) {
+      console.log('❌ Missing user or project');
+      Alert.alert('错误', '用户信息或项目信息缺失');
+      return;
+    }
 
     // Validate sessions
     const validSessions = meditationSessions.filter(session => {
       const duration = parseInt(session.duration);
-      return !isNaN(duration) && duration > 0 && session.method.trim();
+      const hasValidDuration = !isNaN(duration) && duration > 0;
+      const hasValidMethod = session.method && session.method.trim().length > 0;
+      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${hasValidDuration && hasValidMethod}`);
+      return hasValidDuration && hasValidMethod;
     });
 
+    console.log('📋 Valid sessions count:', validSessions.length);
+
     if (validSessions.length === 0) {
-      Alert.alert('提示', '请至少添加一次有效的观修记录');
+      Alert.alert('提示', '请至少添加一次有效的观修记录\n\n请确保：\n• 时长大于0分钟\n• 观修方法不为空');
       return;
     }
 
@@ -261,14 +287,25 @@ export default function PracticeScreen() {
       let validSessionCount = 0;
       let totalMinutes = 0;
 
+      console.log('🔄 Saving meditation sessions...');
+      
       // Save each meditation session to meditation_records table
       for (let i = 0; i < validSessions.length; i++) {
         const session = validSessions[i];
         const duration = parseInt(session.duration);
         totalMinutes += duration;
 
+        console.log(`🔄 Saving session ${i + 1}:`, {
+          user_id: user.id,
+          practice_id: selectedProjectForRecord.practice_id,
+          record_date: today,
+          session_number: session.sessionNumber,
+          duration_minutes: duration,
+          method: session.method
+        });
+
         // Save to meditation_records with the user-selected session number
-        const { error: meditationError } = await supabase
+        const { data: meditationData, error: meditationError } = await supabase
           .from('meditation_records')
           .insert({
             user_id: user.id,
@@ -277,12 +314,15 @@ export default function PracticeScreen() {
             session_number: session.sessionNumber,
             duration_minutes: duration,
             method: session.method
-          });
+          })
+          .select();
 
         if (meditationError) {
-          console.error('Error saving meditation record:', meditationError);
+          console.error('❌ Error saving meditation record:', meditationError);
           throw meditationError;
         }
+
+        console.log('✅ Meditation record saved:', meditationData);
 
         // Check if this session counts as a valid "座"
         if (validateMeditationSession(duration)) {
@@ -290,6 +330,8 @@ export default function PracticeScreen() {
         }
       }
 
+      console.log('🔄 Updating project progress...');
+      
       // Update project progress with valid session count (not total minutes)
       if (validSessionCount > 0) {
         await dailyRecordService.recordPractice(
@@ -298,10 +340,14 @@ export default function PracticeScreen() {
           validSessionCount, 
           today
         );
+        console.log('✅ Project progress updated with', validSessionCount, 'valid sessions');
       }
 
       // Reload practice data to reflect the changes
+      console.log('🔄 Reloading practice data...');
       await loadPracticeData();
+
+      console.log('✅ Meditation record save completed successfully');
 
       Alert.alert(
         '记录成功', 
@@ -313,8 +359,8 @@ export default function PracticeScreen() {
       setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
       setMeditationTopics([]);
     } catch (error) {
-      console.error('Error saving meditation:', error);
-      Alert.alert('错误', '保存观修记录失败');
+      console.error('❌ Error saving meditation:', error);
+      Alert.alert('错误', `保存观修记录失败\n\n错误信息: ${error.message || '未知错误'}`);
     } finally {
       setRecordingMeditation(false);
     }
@@ -922,8 +968,10 @@ export default function PracticeScreen() {
                         <Picker
                           selectedValue={session.sessionNumber}
                           onValueChange={(value) => {
+                            console.log('🔄 Picker value changed to:', value);
                             updateMeditationSession(index, 'sessionNumber', value);
                             const selectedTopic = meditationTopics.find(t => t.topic_number === value);
+                            console.log('🔄 Selected topic:', selectedTopic);
                             if (selectedTopic) {
                               updateMeditationSession(index, 'method', selectedTopic.title);
                             }
