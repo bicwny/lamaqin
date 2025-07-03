@@ -602,6 +602,45 @@ export default function PracticeScreen() {
               const progressPercent = Math.min((todayCount / dailyTarget) * 100, 100);
               const isCompleted = todayCount >= dailyTarget;
 
+              // Calculate display values based on practice type and target_period
+              const getDisplayInfo = () => {
+                if (project.practices.type === 'count') {
+                  // Count type: show current/target count
+                  return {
+                    primaryText: `${project.current_count}/${project.target_count}`,
+                    secondaryText: `(每日目标: ${dailyTarget}${project.practices.unit})`,
+                    progressText: `今日: ${todayCount} / ${dailyTarget} ${project.practices.unit}`
+                  };
+                } else {
+                  // Time type: calculate total duration and current period progress
+                  if (project.target_period === 'weekly') {
+                    const startDate = new Date(project.start_date || new Date());
+                    const endDate = new Date(project.target_end_date || new Date());
+                    const totalWeeks = Math.ceil((endDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+                    
+                    // For weekly: show week progress (would need database query for accurate count)
+                    return {
+                      primaryText: `${totalWeeks}周`,
+                      secondaryText: `(本周：${todayCount}/${dailyTarget})`,
+                      progressText: `本周进度`
+                    };
+                  } else {
+                    // Daily time type
+                    const startDate = new Date(project.start_date || new Date());
+                    const endDate = new Date(project.target_end_date || new Date());
+                    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+                    
+                    return {
+                      primaryText: `${totalDays}天`,
+                      secondaryText: `(今天：${todayCount}座)`,
+                      progressText: `今日进度`
+                    };
+                  }
+                }
+              };
+
+              const displayInfo = getDisplayInfo();
+
               return (
                 <View key={project.id} style={styles.practiceCard}>
                   <View style={styles.practiceHeader}>
@@ -615,14 +654,13 @@ export default function PracticeScreen() {
 
                   <View style={styles.progressInfo}>
                     <Text style={styles.progressText}>
-                      {project.current_count} / {project.target_count} {project.practices.unit}
+                      {displayInfo.primaryText}
                     </Text>
                     <Text style={styles.dailyProgress}>
-                      今日: {todayCount} / {dailyTarget} {project.practices.unit}
+                      {displayInfo.progressText}: {todayCount} / {dailyTarget} {project.practices.unit}
                     </Text>
-
                     <Text style={styles.targetPeriod}>
-                      ({project.target_period === 'daily' ? '每日目标' : '每周目标'}: {dailyTarget} {project.practices.unit})
+                      {displayInfo.secondaryText}
                     </Text>
                   </View>
 
@@ -637,23 +675,31 @@ export default function PracticeScreen() {
                   </View>
 
                   <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.completeButton]}
-                      onPress={() =>
-                        handleRecordPractice(project.id, dailyTarget - todayCount)
-                      }
-                      disabled={isCompleted}
-                    >
-                      <Text style={styles.actionButtonText}>
-                        {isCompleted ? '已完成' : '完成'}
-                      </Text>
-                    </TouchableOpacity>
+                    {project.practices.type === 'count' ? (
+                      <TouchableOpacity
+                        style={[styles.actionButton, styles.completeButton]}
+                        onPress={() =>
+                          handleRecordPractice(project.id, dailyTarget - todayCount)
+                        }
+                        disabled={isCompleted}
+                      >
+                        <Text style={styles.actionButtonText}>
+                          {isCompleted ? '已完成' : '完成'}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={styles.timeBasedActions}>
+                        <Text style={styles.timeBasedHint}>点击下方按钮记录观修</Text>
+                      </View>
+                    )}
 
                     <TouchableOpacity 
                       style={[styles.actionButton, styles.customButton]}
                       onPress={() => handleCustomRecord(project)}
                     >
-                      <Text style={styles.actionButtonText}>自定义记录</Text>
+                      <Text style={styles.actionButtonText}>
+                        {project.practices.type === 'time' ? '记录观修' : '自定义记录'}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -1454,5 +1500,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#6c757d',
     lineHeight: 18,
+  },
+  timeBasedActions: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timeBasedHint: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
   },
 });
