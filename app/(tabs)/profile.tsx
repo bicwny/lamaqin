@@ -4,6 +4,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 interface UserProfile {
   dharmaName: string;
@@ -24,9 +26,14 @@ interface TodaySummary {
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
+  const router = useRouter();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const goBackToIndex = () => {
+    router.push('/(tabs)/index');
+  };
 
   const handleSignOut = () => {
     console.log('🔵 Profile: handleSignOut function called');
@@ -191,9 +198,18 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <ThemedView style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
-            👤 个人中心
-          </ThemedText>
+          <View style={styles.headerContent}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={goBackToIndex}
+            >
+              <Ionicons name="arrow-back" size={24} color={Colors.surface} />
+            </TouchableOpacity>
+            <ThemedText type="title" style={styles.title}>
+              👤 个人中心
+            </ThemedText>
+            <View style={styles.spacer} />
+          </View>
         </ThemedView>
 
         {/* User Profile */}
@@ -473,11 +489,23 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backButton: {
+    padding: 5,
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: Colors.surface,
-    marginBottom: 5,
+    flex: 1,
+    textAlign: 'center',
+  },
+  spacer: {
+    width: 34, // Same width as back button to center the title
   },
   section: {
     padding: 20,
