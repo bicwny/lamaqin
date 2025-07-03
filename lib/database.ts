@@ -268,8 +268,46 @@ export const studyService = {
     if (error) throw error;
 
     // Update progress after recording
-    await this.updateCourseProgress(record.user_id, record.course_id);
+    await this.calculateProgress(record.user_id, record.course_id);
 
+    return data;
+  },
+
+  async getCourseLessons(courseId: string) {
+    const { data, error } = await supabase
+      .from('course_lessons')
+      .select('*')
+      .eq('course_id', courseId)
+      .order('lesson_number');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async updateCourseStatus(userId: string, courseId: string, status: 'active' | 'paused' | 'completed') {
+    const { data, error } = await supabase
+      .from('user_courses')
+      .update({ 
+        status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async quitCourse(userId: string, courseId: string) {
+    const { data, error } = await supabase
+      .from('user_courses')
+      .delete()
+      .eq('user_id', userId)
+      .eq('course_id', courseId);
+
+    if (error) throw error;
     return data;
   },
 
