@@ -240,8 +240,6 @@ export const dailyRecordService = {
     return data || [];
   },
 
-  async recordPractice(record: Omit<DailyRecord, 'id' | 'created_at'>): Promise<DailyRecord>;
-  async recordPractice(userId: string, projectId: string, amount: number, date: string): Promise<void>;
   async recordPractice(
     arg1: Omit<DailyRecord, 'id' | 'created_at'> | string,
     arg2?: string,
@@ -279,7 +277,7 @@ export const dailyRecordService = {
         .eq('user_id', userId)
         .eq('practice_project_id', projectId)
         .eq('record_date', date)
-        .single();
+        .maybeSingle();
 
       if (existingRecordError) throw existingRecordError;
 
