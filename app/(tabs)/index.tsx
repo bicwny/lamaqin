@@ -11,12 +11,18 @@ import { getUserPracticeProjects, getTodayRecords, createDailyRecord } from '@/l
 import { testConnection } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const router = useRouter();
   const [practices, setPractices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dbConnected, setDbConnected] = useState(false);
+
+  const navigateToProfile = () => {
+    router.push('/(tabs)/profile');
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -166,15 +172,25 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Header */}
         <ThemedView style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
-            🏠 修行主页
-          </ThemedText>
-          <ThemedText style={styles.greeting}>
-            {getGreeting()}
-          </ThemedText>
-          <ThemedText style={styles.userName}>
-            善缘居士 · 修行第{todayProgress.streak}天 🔥
-          </ThemedText>
+          <View style={styles.headerContent}>
+            <View style={styles.headerLeft}>
+              <ThemedText type="title" style={styles.title}>
+                🏠 修行主页
+              </ThemedText>
+              <ThemedText style={styles.greeting}>
+                {getGreeting()}
+              </ThemedText>
+              <ThemedText style={styles.userName}>
+                善缘居士 · 修行第{todayProgress.streak}天 🔥
+              </ThemedText>
+            </View>
+            <TouchableOpacity 
+              style={styles.profileIcon}
+              onPress={navigateToProfile}
+            >
+              <Ionicons name="person-circle-outline" size={32} color={Colors.surface} />
+            </TouchableOpacity>
+          </View>
         </ThemedView>
 
         {/* Today's Progress */}
@@ -374,6 +390,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1,
+  },
+  profileIcon: {
+    padding: 5,
+    marginLeft: 10,
   },
   title: {
     fontSize: 28,
