@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -74,6 +73,7 @@ export default function PracticeScreen() {
       console.log('🔄 Loading practice data for user:', user.id);
 
       const projects = await practiceService.getUserPracticeProjects(user.id);
+      console.log('📋 User practice projects:', projects); // Log the projects data
       console.log('📋 Loaded practice projects:', projects.length);
       setPracticeProjects(projects);
 
@@ -122,7 +122,7 @@ export default function PracticeScreen() {
 
   const handleCustomRecord = (project: PracticeProject) => {
     setSelectedProjectForRecord(project);
-    
+
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
       setMeditationSessions([{duration: '', method: ''}]);
@@ -232,8 +232,9 @@ export default function PracticeScreen() {
         );
       }
 
+      // Reload practice data to reflect the changes
       await loadPracticeData();
-      
+
       Alert.alert(
         '记录成功', 
         `本次观修:\n总时长: ${totalMinutes} 分钟\n有效座数: ${validSessionCount} 座\n\n(单座需≥15分钟才计入有效座数)`
@@ -259,14 +260,14 @@ export default function PracticeScreen() {
   const handlePracticeSelected = (practice: Practice) => {
     setSelectedPractice(practice);
     setShowPracticeListModal(false);
-    
+
     // Reset form states
     setTotalTarget('');
     setSessionsPerPeriod('');
     setDuration('100');
     setCustomDuration('');
     setFrequency('weekly');
-    
+
     setShowGoalSettingModal(true);
   };
 
@@ -288,7 +289,7 @@ export default function PracticeScreen() {
     if (selectedPractice.type === 'count') {
       const total = parseInt(totalTarget);
       const dailyTarget = Math.ceil(total / durationDays);
-      
+
       return {
         target_count: total,
         daily_target: dailyTarget,
@@ -300,15 +301,15 @@ export default function PracticeScreen() {
       // time type
       const sessions = parseInt(sessionsPerPeriod);
       let totalPeriods: number;
-      
+
       if (frequency === 'daily') {
         totalPeriods = durationDays;
       } else {
         totalPeriods = Math.ceil(durationDays / 7);
       }
-      
+
       const totalTargetSessions = sessions * totalPeriods;
-      
+
       return {
         target_count: totalTargetSessions,
         daily_target: sessions,
@@ -440,7 +441,7 @@ export default function PracticeScreen() {
         {/* Duration section for both types */}
         <View style={styles.durationSection}>
           <Text style={styles.durationLabel}>您计划在多长时间内完成？</Text>
-          
+
           <View style={styles.dateContainer}>
             <Text style={styles.dateLabel}>开始时间：</Text>
             <Text style={styles.dateValue}>{startDate}</Text>
@@ -537,11 +538,10 @@ export default function PracticeScreen() {
                       今日: {todayCount} / {dailyTarget}{' '}
                       {project.practices.unit}
                     </Text>
-                    {project.target_period && (
-                      <Text style={styles.targetPeriod}>
-                        ({project.target_period === 'daily' ? '每日目标' : '每周目标'}: {dailyTarget} {project.practices.unit})
-                      </Text>
-                    )}
+                    
+                    <Text style={styles.targetPeriod}>
+                      ({project.target_period === 'daily' ? '每日目标' : '每周目标'}: {dailyTarget} {project.practices.unit})
+                    </Text>
                   </View>
 
                   <View style={styles.progressBar}>
