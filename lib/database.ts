@@ -91,9 +91,9 @@ export const practiceService = {
   async joinTheme(userId: string, themeId: string): Promise<UserPracticeProject[]> {
     // Get all practices in the theme
     const themePractices = await this.getThemePractices(themeId);
-    
+
     const createdProjects = [];
-    
+
     for (const themePractice of themePractices) {
       // Check if user already has this practice
       const { data: existingProject } = await supabase
@@ -144,23 +144,59 @@ export const practiceService = {
       .from('user_practice_projects')
       .select(`
         *,
-        practices(*)
+        practices(
+          id,
+          name,
+          type,
+          unit,
+          description
+        )
       `)
       .eq('user_id', userId)
-      .order('created_at');
+      .eq('status', 'active');
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching user practice projects:', error);
+      throw error;
+    }
+
+    console.log('📋 User practice projects:', data);
     return data || [];
   },
 
-  async createPracticeProject(project: Omit<UserPracticeProject, 'id' | 'created_at' | 'updated_at'>): Promise<UserPracticeProject> {
+  async getAllPractices() {
+    const { data, error } = await supabase
+      .from('practices')
+      .select('id, name, type, unit, description')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching practices:', error);
+      throw error;
+    }
+
+    return data || [];
+  },
+
+  async createUserPracticeProject(userId: string, practiceId: string, targetCount: number, dailyTarget: number) {
     const { data, error } = await supabase
       .from('user_practice_projects')
-      .insert(project)
+      .insert({
+        user_id: userId,
+        practice_id: practiceId,
+        target_count: targetCount,
+        daily_target: dailyTarget,
+        current_count: 0,
+        status: 'active'
+      })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error creating user practice project:', error);
+      throw error;
+    }
+
     return data;
   },
 
