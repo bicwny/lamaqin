@@ -133,6 +133,15 @@ export interface PreceptRecord {
   created_at: string;
 }
 
+export interface MeditationTopic {
+  id: string;
+  practice_id: string;
+  topic_number: number;
+  title: string;
+  description?: string;
+  created_at: string;
+}
+
 // Enums
 export enum AddPracticeMethod {
   JOIN_THEME = 'join_theme',

@@ -64,6 +64,12 @@ export default function PracticeScreen() {
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('weekly');
   const [sessionsPerPeriod, setSessionsPerPeriod] = useState('');
 
+  // Count recording states
+  const [showCountModal, setShowCountModal] = useState(false);
+  const [selectedProjectForCount, setSelectedProjectForCount] = useState<PracticeProject | null>(null);
+  const [customCount, setCustomCount] = useState('');
+  const [recordingCount, setRecordingCount] = useState(false);
+
   useEffect(() => {
     loadPracticeData();
   }, [user]);
@@ -194,7 +200,7 @@ export default function PracticeScreen() {
   };
 
   const handleCustomRecord = async (project: PracticeProject) => {
-    setSelectedProjectForRecord(project);
+    setSelectedProjectForCount(project);
 
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
@@ -202,26 +208,9 @@ export default function PracticeScreen() {
       await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
-      // For count-based practices, show simple input
-      Alert.prompt(
-        '自定义记录',
-        `请输入完成的${project.practices.unit}数量：`,
-        [
-          { text: '取消', style: 'cancel' },
-          { 
-            text: '确认', 
-            onPress: (value) => {
-              const amount = parseInt(value || '0');
-              if (amount > 0) {
-                handleRecordPractice(project.id, amount);
-              }
-            }
-          }
-        ],
-        'plain-text',
-        '',
-        'numeric'
-      );
+      // For count-based practices, show the custom count modal
+      setShowCountModal(true);
+      setCustomCount(''); // Reset the custom count
     }
   };
 
@@ -558,7 +547,7 @@ export default function PracticeScreen() {
           {duration === 'custom' && (
             <View style={styles.customDurationContainer}>
               <Text style={styles.customDurationLabel}>选择结束方式：</Text>
-              
+
               <View style={styles.endDateOption}>
                 <Text style={styles.endDateLabel}>结束日期：</Text>
                 <TextInput
@@ -568,9 +557,9 @@ export default function PracticeScreen() {
                   placeholder="2025-07-03"
                 />
               </View>
-              
+
               <Text style={styles.orText}>或</Text>
-              
+
               <View style={styles.durationOption}>
                 <TextInput
                   style={styles.customDurationInput}
@@ -590,6 +579,18 @@ export default function PracticeScreen() {
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
+  };
+
+  const handleCustomCountRecorded = async () => {
+    if (!user?.id || !selectedProjectForCount) return;
+
+    const amount = parseInt(customCount || '0');
+    if (amount > 0) {
+      setShowCountModal(false);
+      await handleRecordPractice(selectedProjectForCount.id, amount);
+    } else {
+      Alert.alert('提示', '请输入有效的数量');
+    }
   };
 
   return (
@@ -642,10 +643,10 @@ export default function PracticeScreen() {
                     const startDate = new Date(project.start_date || new Date());
                     const endDate = new Date(project.target_end_date || new Date());
                     const totalWeeks = Math.ceil((endDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
-                    
+
                     // Get current week's progress (approximation - would need actual DB query for accuracy)
                     const currentWeekSessions = todayCount; // This should be weekly count from DB query
-                    
+
                     return {
                       primaryText: `${project.practices.name}(周)：${totalWeeks}周`,
                       secondaryText: `(本周：${currentWeekSessions}/${dailyTarget})`,
@@ -656,7 +657,7 @@ export default function PracticeScreen() {
                     const startDate = new Date(project.start_date || new Date());
                     const endDate = new Date(project.target_end_date || new Date());
                     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
-                    
+
                     return {
                       primaryText: `${project.practices.name}(日)：${totalDays}天`,
                       secondaryText: `(今天：${todayCount}/${dailyTarget}座)`,
@@ -1026,6 +1027,51 @@ export default function PracticeScreen() {
               </View>
             </View>
           </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Custom Count Modal */}
+      <Modal
+        visible={showCountModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowCountModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>自定义记录</Text>
+            <Text style={styles.modalSubtitle}>
+              请输入完成的{selectedProjectForCount?.practices.unit}数量：
+            </Text>
+            <TextInput
+              style={styles.customCountInput}
+              value={customCount}
+              onChangeText={setCustomCount}
+              keyboardType="numeric"
+              placeholder="请输入数量"
+            />
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowCountModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>取消</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.confirmButton, recordingCount && styles.confirmButtonDisabled]}
+                onPress={handleCustomCountRecorded}
+                disabled={recordingCount}
+              >
+                {recordingCount ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.confirmButtonText}>确认</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </Modal>
     </ScrollView>
@@ -1590,5 +1636,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     fontStyle: 'italic',
+  },
+  customCountInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 16,
   },
 });

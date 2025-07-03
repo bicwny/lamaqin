@@ -364,6 +364,30 @@ export const meditationService = {
   }
 };
 
+// Meditation Topics
+export const meditationTopicsService = {
+  async getMeditationTopics(practiceId: string) {
+    const { data, error } = await supabase
+      .from('meditation_topics')
+      .select('*')
+      .eq('practice_id', practiceId)
+      .order('topic_number', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getAllMeditationTopics() {
+    const { data, error } = await supabase
+      .from('meditation_topics')
+      .select('*')
+      .order('topic_number', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+};
+
 // Study Records
 export const studyService = {
   async getCourses() {
