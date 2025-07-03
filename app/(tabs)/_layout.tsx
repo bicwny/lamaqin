@@ -26,7 +26,16 @@ export default function TabLayout() {
           default: {},
         }),
       }}
-      initialRouteName="study">
+      initialRouteName="index">
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: '🏠 首页',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="study"
         options={{
@@ -37,20 +46,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="practice"
-        options={{
-          title: '📿 修行',
-          tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'hands.and.sparkles.fill' : 'hands.and.sparkles'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="mindfulness"
         options={{
           title: '💝 心性',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'heart.fill' : 'heart'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="practice"
+        options={{
+          title: '📿 修行',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'hands.and.sparkles.fill' : 'hands.and.sparkles'} color={color} />
           ),
         }}
       />
