@@ -107,11 +107,44 @@ export default function PracticeScreen() {
     }
   };
 
+  const loadMeditationTopics = async (practiceId: string) => {
+    try {
+      console.log('🧘 Loading meditation topics for practice:', practiceId);
+      const { data, error } = await supabase
+        .from('meditation_topics')
+        .select('topic_number, title, description')
+        .eq('practice_id', practiceId)
+        .order('topic_number', { ascending: true });
+
+      if (error) throw error;
+
+      console.log('📚 Loaded meditation topics:', data?.length || 0);
+      setMeditationTopics(data || []);
+    } catch (error) {
+      console.error('Error loading meditation topics:', error);
+      // If no topics found, create a default list for 前行观修
+      if (selectedProjectForRecord?.practices.name?.includes('前行') || selectedProjectForRecord?.practices.name?.includes('观修')) {
+        const defaultTopics = [];
+        for (let i = 1; i <= 92; i++) {
+          defaultTopics.push({
+            topic_number: i,
+            title: `第${i}座观修`,
+            description: `前行实修法第${i}座的观修内容`
+          });
+        }
+        setMeditationTopics(defaultTopics);
+      } else {
+        setMeditationTopics([]);
+      }
+    }
+  };
+
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
   const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
-  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string}[]>([{duration: '', method: ''}]);
+  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string, sessionNumber: number}[]>([{duration: '', method: '', sessionNumber: 1}]);
   const [recordingMeditation, setRecordingMeditation] = useState(false);
+  const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
 
   const handleRecordPractice = async (projectId: string, amount: number) => {
     if (!user?.id) return;
@@ -127,12 +160,13 @@ export default function PracticeScreen() {
     }
   };
 
-  const handleCustomRecord = (project: PracticeProject) => {
+  const handleCustomRecord = async (project: PracticeProject) => {
     setSelectedProjectForRecord(project);
 
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
-      setMeditationSessions([{duration: '', method: ''}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
       // For count-based practices, show simple input
@@ -159,7 +193,8 @@ export default function PracticeScreen() {
   };
 
   const addMeditationSession = () => {
-    setMeditationSessions([...meditationSessions, {duration: '', method: ''}]);
+    const nextSessionNumber = Math.max(...meditationSessions.map(s => s.sessionNumber), 0) + 1;
+    setMeditationSessions([...meditationSessions, {duration: '', method: '', sessionNumber: nextSessionNumber}]);
   };
 
   const removeMeditationSession = (index: number) => {
@@ -169,9 +204,13 @@ export default function PracticeScreen() {
     }
   };
 
-  const updateMeditationSession = (index: number, field: 'duration' | 'method', value: string) => {
+  const updateMeditationSession = (index: number, field: 'duration' | 'method' | 'sessionNumber', value: string | number) => {
     const newSessions = [...meditationSessions];
-    newSessions[index][field] = value;
+    if (field === 'sessionNumber') {
+      newSessions[index][field] = value as number;
+    } else {
+      newSessions[index][field] = value as string;
+    }
     setMeditationSessions(newSessions);
   };
 
@@ -206,14 +245,14 @@ export default function PracticeScreen() {
         const duration = parseInt(session.duration);
         totalMinutes += duration;
 
-        // Save to meditation_records - don't expect a return value
+        // Save to meditation_records with the user-selected session number
         const { error: meditationError } = await supabase
           .from('meditation_records')
           .insert({
             user_id: user.id,
             practice_id: selectedProjectForRecord.practice_id,
             record_date: today,
-            session_number: i + 1,
+            session_number: session.sessionNumber,
             duration_minutes: duration,
             method: session.method
           });
@@ -249,7 +288,8 @@ export default function PracticeScreen() {
 
       setShowMeditationModal(false);
       setSelectedProjectForRecord(null);
-      setMeditationSessions([{duration: '', method: ''}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      setMeditationTopics([]);
     } catch (error) {
       console.error('Error saving meditation:', error);
       Alert.alert('错误', '保存观修记录失败');
@@ -750,6 +790,39 @@ export default function PracticeScreen() {
 
                   <View style={styles.sessionInputs}>
                     <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>选择观修内容</Text>
+                      {meditationTopics.length > 0 ? (
+                        <Picker
+                          selectedValue={session.sessionNumber}
+                          onValueChange={(value) => {
+                            updateMeditationSession(index, 'sessionNumber', value);
+                            const selectedTopic = meditationTopics.find(t => t.topic_number === value);
+                            if (selectedTopic) {
+                              updateMeditationSession(index, 'method', selectedTopic.title);
+                            }
+                          }}
+                          style={styles.topicPicker}
+                        >
+                          {meditationTopics.map((topic) => (
+                            <Picker.Item 
+                              key={topic.topic_number} 
+                              label={`${topic.topic_number} - ${topic.title}`} 
+                              value={topic.topic_number} 
+                            />
+                          ))}
+                        </Picker>
+                      ) : (
+                        <TextInput
+                          style={styles.sessionInput}
+                          value={session.sessionNumber.toString()}
+                          onChangeText={(value) => updateMeditationSession(index, 'sessionNumber', parseInt(value) || 1)}
+                          keyboardType="numeric"
+                          placeholder="座数编号"
+                        />
+                      )}
+                    </View>
+
+                    <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>观修时长（分钟）</Text>
                       <TextInput
                         style={styles.sessionInput}
@@ -761,14 +834,25 @@ export default function PracticeScreen() {
                     </View>
 
                     <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>观修方法</Text>
+                      <Text style={styles.inputLabel}>观修方法/备注</Text>
                       <TextInput
                         style={styles.sessionInput}
                         value={session.method}
                         onChangeText={(value) => updateMeditationSession(index, 'method', value)}
-                        placeholder="如：金刚萨埵观修"
+                        placeholder="观修方法或备注"
+                        multiline={true}
+                        numberOfLines={2}
                       />
                     </View>
+
+                    {meditationTopics.length > 0 && (
+                      <View style={styles.topicDescription}>
+                        <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
+                        <Text style={styles.topicDescriptionText}>
+                          {meditationTopics.find(t => t.topic_number === session.sessionNumber)?.description || ''}
+                        </Text>
+                      </View>
+                    )}
                   </View>
 
                   {session.duration && parseInt(session.duration) > 0 && (
@@ -1307,5 +1391,31 @@ const styles = StyleSheet.create({
     color: '#6c757d',
     fontSize: 16,
     fontWeight: '500',
+  },
+  topicPicker: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    height: 40,
+  },
+  topicDescription: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 6,
+    padding: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  topicDescriptionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#495057',
+    marginBottom: 4,
+  },
+  topicDescriptionText: {
+    fontSize: 13,
+    color: '#6c757d',
+    lineHeight: 18,
   },
 });
