@@ -283,33 +283,70 @@ export const studyService = {
   },
 
   async getUserCourses(userId: string) {
-    // Since we don't have user_courses table yet, we'll get unique courses from study_records
     const { data, error } = await supabase
-      .from('study_records')
+      .from('user_courses')
       .select(`
-        course_id,
-        courses(*)
+        *,
+        course:courses(*)
       `)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .order('joined_date');
     
     if (error) throw error;
+    return data || [];
+  },
+
+  async joinCourse(userId: string, courseId: string) {
+    const { data, error } = await supabase
+      .from('user_courses')
+      .insert({
+        user_id: userId,
+        course_id: courseId,
+        status: 'active',
+        joined_date: new Date().toISOString().split('T')[0]
+      })
+      .select(`
+        *,
+        course:courses(*)
+      `)
+      .single();
     
-    // Get unique courses
-    const uniqueCourses = data?.reduce((acc, record) => {
-      if (!acc.find(c => c.course_id === record.course_id)) {
-        acc.push({
-          id: `user-course-${record.course_id}`,
-          user_id: userId,
-          course_id: record.course_id,
-          status: 'active',
-          joined_date: new Date().toISOString(),
-          course: record.courses
-        });
-      }
-      return acc;
-    }, [] as any[]) || [];
-    
-    return uniqueCourses;
+    if (error) throw error;
+    return data;
+  },
+
+  async calculateProgress(userId: string, courseId: string) {
+    // Get total lessons for the course
+    const { data: course } = await supabase
+      .from('courses')
+      .select('total_lessons')
+      .eq('id', courseId)
+      .single();
+
+    if (!course) return 0;
+
+    // Get unique lessons studied by user
+    const { data: studiedLessons } = await supabase
+      .from('study_records')
+      .select('lesson_id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId);
+
+    const uniqueLessons = new Set(studiedLessons?.map(r => r.lesson_id) || []);
+    const progress = (uniqueLessons.size / course.total_lessons) * 100;
+
+    // Update progress in user_courses
+    await supabase
+      .from('user_courses')
+      .update({
+        progress_percentage: Math.round(progress * 100) / 100,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .eq('course_id', courseId);
+
+    return progress;
   }
 };
 
