@@ -15,9 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { practiceService, dailyRecordService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { ConnectionTest } from '@/components/ConnectionTest';
-import { PracticeProjectsCheck } from '@/components/PracticeProjectsCheck';
-import { MeditationTopicsTest } from '@/components/MeditationTopicsTest';
+
 
 interface PracticeProject {
   id: string;
@@ -597,9 +595,6 @@ export default function PracticeScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>📿 修行记录</Text>
-      <ConnectionTest />
-      <PracticeProjectsCheck />
-      <MeditationTopicsTest />
 
       {loading ? (
         <View style={styles.loadingContainer}>
