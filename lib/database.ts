@@ -240,21 +240,91 @@ export const dailyRecordService = {
     return data || [];
   },
 
-  async recordPractice(record: Omit<DailyRecord, 'id' | 'created_at'>): Promise<DailyRecord> {
-    const { data, error } = await supabase
-      .from('daily_records')
-      .insert(record)
-      .select()
-      .single();
+  async recordPractice(record: Omit<DailyRecord, 'id' | 'created_at'>): Promise<DailyRecord>;
+  async recordPractice(userId: string, projectId: string, amount: number, date: string): Promise<void>;
+  async recordPractice(
+    arg1: Omit<DailyRecord, 'id' | 'created_at'> | string,
+    arg2?: string,
+    arg3?: number,
+    arg4?: string
+  ): Promise<DailyRecord | void> {
+    if (typeof arg1 === 'object') {
+      // Case 1: Called with a DailyRecord object
+      const record = arg1;
+      const { data, error } = await supabase
+        .from('daily_records')
+        .insert(record)
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    // Update practice project progress
-    await practiceService.updatePracticeProject(record.practice_project_id, {
-      current_count: data.count // This should be cumulative - need to handle properly
-    });
+      // Update practice project progress
+      await practiceService.updatePracticeProject(record.practice_project_id, {
+        current_count: data.count // This should be cumulative - need to handle properly
+      });
 
-    return data;
+      return data;
+    } else {
+      // Case 2: Called with individual parameters
+      const userId = arg1;
+      const projectId = arg2 as string;
+      const amount = arg3 as number;
+      const date = arg4 as string;
+
+      // First check if a record already exists for this date
+      const { data: existingRecord, error: existingRecordError } = await supabase
+        .from('daily_records')
+        .select('id, count')
+        .eq('user_id', userId)
+        .eq('practice_project_id', projectId)
+        .eq('record_date', date)
+        .single();
+
+      if (existingRecordError) throw existingRecordError;
+
+      if (existingRecord) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('daily_records')
+          .update({ count: existingRecord.count + amount })
+          .eq('id', existingRecord.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('daily_records')
+          .insert({
+            user_id: userId,
+            practice_project_id: projectId,
+            record_date: date,
+            count: amount
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      // Update project's current_count
+      const { data: project, error: projectError } = await supabase
+        .from('user_practice_projects')
+        .select('current_count')
+        .eq('id', projectId)
+        .single();
+
+      if (projectError) throw projectError;
+
+      if (project) {
+        const { error: updateError } = await supabase
+          .from('user_practice_projects')
+          .update({ current_count: project.current_count + amount })
+          .eq('id', projectId);
+
+        if (updateError) throw updateError;
+      }
+    }
+
+    return undefined;
   }
 };
 

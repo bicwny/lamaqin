@@ -199,7 +199,7 @@ export default function PracticeScreen() {
         const duration = parseInt(session.duration);
         totalMinutes += duration;
 
-        // Save to meditation_records
+        // Save to meditation_records - don't expect a return value
         const { error: meditationError } = await supabase
           .from('meditation_records')
           .insert({
@@ -213,6 +213,7 @@ export default function PracticeScreen() {
 
         if (meditationError) {
           console.error('Error saving meditation record:', meditationError);
+          throw meditationError;
         }
 
         // Check if this session counts as a valid "座"
