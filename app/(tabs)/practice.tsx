@@ -100,7 +100,7 @@ export default function PracticeScreen() {
         endDate = startDate;
       }
 
-      // Get meditation records for current period with ≥15 minutes
+      // Get all meditation records for current period (no duration limit)
       const { data, error } = await supabase
         .from('meditation_records')
         .select('duration_minutes, session_number, method, record_date, created_at')
@@ -108,7 +108,6 @@ export default function PracticeScreen() {
         .eq('practice_id', practiceId)
         .gte('record_date', startDate)
         .lte('record_date', endDate)
-        .gte('duration_minutes', 15) // Only valid sessions (≥15 minutes)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -295,8 +294,8 @@ export default function PracticeScreen() {
   };
 
   const validateMeditationSession = (duration: number): boolean => {
-    // Core business rule: minimum 15 minutes to count as valid session
-    return duration >= 15;
+    // New simplified rule: every recorded session counts as valid
+    return duration > 0;
   };
 
   const handleSaveMeditationRecord = async () => {
@@ -370,10 +369,8 @@ export default function PracticeScreen() {
 
         console.log('✅ Meditation record saved:', meditationData);
 
-        // Check if this session counts as a valid "座"
-        if (validateMeditationSession(duration)) {
-          validSessionCount++;
-        }
+        // Every valid session now counts as one "座" (simplified rule)
+        validSessionCount++;
       }
 
       console.log('🔄 Updating project progress...');
@@ -397,7 +394,7 @@ export default function PracticeScreen() {
 
       Alert.alert(
         '记录成功', 
-        `本次观修:\n总时长: ${totalMinutes} 分钟\n有效座数: ${validSessionCount} 座\n\n(单座需≥15分钟才计入有效座数)`
+        `本次观修:\n总时长: ${totalMinutes} 分钟\n完成座数: ${validSessionCount} 座`
       );
 
       setShowMeditationModal(false);
@@ -738,7 +735,7 @@ export default function PracticeScreen() {
                     return {
                       primaryText: `${project.practices.name}`,
                       secondaryText: `(本周目标：${dailyTarget}座)`,
-                      progressText: `本周进度: ${currentWeekSessions} / ${dailyTarget} 座 (≥15分钟/座)`
+                      progressText: `本周进度: ${currentWeekSessions} / ${dailyTarget} 座`
                     };
                   } else {
                     // Daily meditation practices
@@ -747,7 +744,7 @@ export default function PracticeScreen() {
                     return {
                       primaryText: `${project.practices.name}`,
                       secondaryText: `(每日目标：${dailyTarget}座)`,
-                      progressText: `今日进度: ${currentDaySessions} / ${dailyTarget} 座 (≥15分钟/座)`
+                      progressText: `今日进度: ${currentDaySessions} / ${dailyTarget} 座`
                     };
                   }
                 }
@@ -843,7 +840,7 @@ export default function PracticeScreen() {
                             } else {
                               Alert.alert(
                                 '提示',
-                                `${project.target_period === 'weekly' ? '本周' : '今日'}暂无有效观修记录\n\n(单座需≥15分钟才计入有效座数)`
+                                `${project.target_period === 'weekly' ? '本周' : '今日'}暂无观修记录`
                               );
                             }
                           }}
@@ -1014,7 +1011,7 @@ export default function PracticeScreen() {
                 🧘 记录"{selectedProjectForRecord?.practices.name}"观修
               </Text>
               <Text style={styles.modalSubtitle}>
-                请记录您的观修座次（单座≥15分钟才计入有效座数）
+                请记录您的观修座次
               </Text>
 
               {meditationSessions.map((session, index) => (
@@ -1103,14 +1100,9 @@ export default function PracticeScreen() {
                   {session.duration && parseInt(session.duration) > 0 && (
                     <Text style={[
                       styles.sessionValidation,
-                      validateMeditationSession(parseInt(session.duration)) 
-                        ? styles.validSession 
-                        : styles.invalidSession
+                      styles.validSession
                     ]}>
-                      {validateMeditationSession(parseInt(session.duration))
-                        ? '✅ 有效座（≥15分钟）'
-                        : '⚠️ 时长不足15分钟，不计入有效座数'
-                      }
+                      ✅ 有效座（{parseInt(session.duration)}分钟）
                     </Text>
                   )}
                 </View>
