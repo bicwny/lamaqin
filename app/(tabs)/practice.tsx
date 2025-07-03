@@ -14,6 +14,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '@/contexts/AuthContext';
 import { practiceService, dailyRecordService } from '@/lib/database';
+import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 
 interface PracticeProject {
@@ -99,6 +100,12 @@ export default function PracticeScreen() {
     }
   };
 
+  // Meditation recording states
+  const [showMeditationModal, setShowMeditationModal] = useState(false);
+  const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
+  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string}[]>([{duration: '', method: ''}]);
+  const [recordingMeditation, setRecordingMeditation] = useState(false);
+
   const handleRecordPractice = async (projectId: string, amount: number) => {
     if (!user?.id) return;
 
@@ -110,6 +117,136 @@ export default function PracticeScreen() {
     } catch (error) {
       console.error('Error recording practice:', error);
       Alert.alert('错误', '记录修行失败');
+    }
+  };
+
+  const handleCustomRecord = (project: PracticeProject) => {
+    setSelectedProjectForRecord(project);
+    
+    if (project.practices.type === 'time') {
+      // For meditation/time-based practices, show meditation recording modal
+      setMeditationSessions([{duration: '', method: ''}]);
+      setShowMeditationModal(true);
+    } else {
+      // For count-based practices, show simple input
+      Alert.prompt(
+        '自定义记录',
+        `请输入完成的${project.practices.unit}数量：`,
+        [
+          { text: '取消', style: 'cancel' },
+          { 
+            text: '确认', 
+            onPress: (value) => {
+              const amount = parseInt(value || '0');
+              if (amount > 0) {
+                handleRecordPractice(project.id, amount);
+              }
+            }
+          }
+        ],
+        'plain-text',
+        '',
+        'numeric'
+      );
+    }
+  };
+
+  const addMeditationSession = () => {
+    setMeditationSessions([...meditationSessions, {duration: '', method: ''}]);
+  };
+
+  const removeMeditationSession = (index: number) => {
+    if (meditationSessions.length > 1) {
+      const newSessions = meditationSessions.filter((_, i) => i !== index);
+      setMeditationSessions(newSessions);
+    }
+  };
+
+  const updateMeditationSession = (index: number, field: 'duration' | 'method', value: string) => {
+    const newSessions = [...meditationSessions];
+    newSessions[index][field] = value;
+    setMeditationSessions(newSessions);
+  };
+
+  const validateMeditationSession = (duration: number): boolean => {
+    // Core business rule: minimum 15 minutes to count as valid session
+    return duration >= 15;
+  };
+
+  const handleSaveMeditationRecord = async () => {
+    if (!user?.id || !selectedProjectForRecord) return;
+
+    // Validate sessions
+    const validSessions = meditationSessions.filter(session => {
+      const duration = parseInt(session.duration);
+      return !isNaN(duration) && duration > 0 && session.method.trim();
+    });
+
+    if (validSessions.length === 0) {
+      Alert.alert('提示', '请至少添加一次有效的观修记录');
+      return;
+    }
+
+    setRecordingMeditation(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      let validSessionCount = 0;
+      let totalMinutes = 0;
+
+      // Save each meditation session to meditation_records table
+      for (let i = 0; i < validSessions.length; i++) {
+        const session = validSessions[i];
+        const duration = parseInt(session.duration);
+        totalMinutes += duration;
+
+        // Save to meditation_records - don't expect a return value
+        const { error: meditationError } = await supabase
+          .from('meditation_records')
+          .insert({
+            user_id: user.id,
+            practice_id: selectedProjectForRecord.practice_id,
+            record_date: today,
+            session_number: i + 1,
+            duration_minutes: duration,
+            method: session.method
+          });
+
+        if (meditationError) {
+          console.error('Error saving meditation record:', meditationError);
+          throw meditationError;
+        }
+
+        // Check if this session counts as a valid "座"
+        if (validateMeditationSession(duration)) {
+          validSessionCount++;
+        }
+      }
+
+      // Update project progress with valid session count (not total minutes)
+      if (validSessionCount > 0) {
+        await dailyRecordService.recordPractice(
+          user.id, 
+          selectedProjectForRecord.id, 
+          validSessionCount, 
+          today
+        );
+      }
+
+      await loadPracticeData();
+      
+      Alert.alert(
+        '记录成功', 
+        `本次观修:\n总时长: ${totalMinutes} 分钟\n有效座数: ${validSessionCount} 座\n\n(单座需≥15分钟才计入有效座数)`
+      );
+
+      setShowMeditationModal(false);
+      setSelectedProjectForRecord(null);
+      setMeditationSessions([{duration: '', method: ''}]);
+    } catch (error) {
+      console.error('Error saving meditation:', error);
+      Alert.alert('错误', '保存观修记录失败');
+    } finally {
+      setRecordingMeditation(false);
     }
   };
 
@@ -432,7 +569,7 @@ export default function PracticeScreen() {
 
                     <TouchableOpacity
                       style={[styles.actionButton, styles.customButton]}
-                      onPress={() => {}}
+                      onPress={() => handleCustomRecord(project)}
                     >
                       <Text style={styles.actionButtonText}>自定义记录</Text>
                     </TouchableOpacity>
@@ -567,6 +704,108 @@ export default function PracticeScreen() {
                     <ActivityIndicator color="#fff" />
                   ) : (
                     <Text style={styles.confirmButtonText}>确认添加项目</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Meditation Recording Modal */}
+      <Modal
+        visible={showMeditationModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowMeditationModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <ScrollView contentContainerStyle={styles.modalScrollContent}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>
+                🧘 记录"{selectedProjectForRecord?.practices.name}"观修
+              </Text>
+              <Text style={styles.modalSubtitle}>
+                请记录您的观修座次（单座≥15分钟才计入有效座数）
+              </Text>
+
+              {meditationSessions.map((session, index) => (
+                <View key={index} style={styles.sessionContainer}>
+                  <View style={styles.sessionHeader}>
+                    <Text style={styles.sessionTitle}>第 {index + 1} 座</Text>
+                    {meditationSessions.length > 1 && (
+                      <TouchableOpacity
+                        style={styles.removeSessionButton}
+                        onPress={() => removeMeditationSession(index)}
+                      >
+                        <Text style={styles.removeSessionText}>✕</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
+                  <View style={styles.sessionInputs}>
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+                      <TextInput
+                        style={styles.sessionInput}
+                        value={session.duration}
+                        onChangeText={(value) => updateMeditationSession(index, 'duration', value)}
+                        keyboardType="numeric"
+                        placeholder="如：30"
+                      />
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>观修方法</Text>
+                      <TextInput
+                        style={styles.sessionInput}
+                        value={session.method}
+                        onChangeText={(value) => updateMeditationSession(index, 'method', value)}
+                        placeholder="如：金刚萨埵观修"
+                      />
+                    </View>
+                  </View>
+
+                  {session.duration && parseInt(session.duration) > 0 && (
+                    <Text style={[
+                      styles.sessionValidation,
+                      validateMeditationSession(parseInt(session.duration)) 
+                        ? styles.validSession 
+                        : styles.invalidSession
+                    ]}>
+                      {validateMeditationSession(parseInt(session.duration))
+                        ? '✅ 有效座（≥15分钟）'
+                        : '⚠️ 时长不足15分钟，不计入有效座数'
+                      }
+                    </Text>
+                  )}
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={styles.addSessionButton}
+                onPress={addMeditationSession}
+              >
+                <Text style={styles.addSessionText}>+ 添加更多座次</Text>
+              </TouchableOpacity>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity 
+                  style={styles.cancelButton}
+                  onPress={() => setShowMeditationModal(false)}
+                >
+                  <Text style={styles.cancelButtonText}>取消</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.confirmButton, recordingMeditation && styles.confirmButtonDisabled]}
+                  onPress={handleSaveMeditationRecord}
+                  disabled={recordingMeditation}
+                >
+                  {recordingMeditation ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.confirmButtonText}>保存记录</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -977,5 +1216,91 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  sessionContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  sessionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sessionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  removeSessionButton: {
+    backgroundColor: '#dc3545',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeSessionText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  sessionInputs: {
+    gap: 12,
+  },
+  inputGroup: {
+    gap: 6,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  sessionInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: '#333',
+  },
+  sessionValidation: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  validSession: {
+    backgroundColor: '#d4edda',
+    color: '#155724',
+  },
+  invalidSession: {
+    backgroundColor: '#f8d7da',
+    color: '#721c24',
+  },
+  addSessionButton: {
+    backgroundColor: '#e9ecef',
+    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderStyle: 'dashed',
+  },
+  addSessionText: {
+    color: '#6c757d',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
