@@ -28,20 +28,20 @@ export default function TabLayout() {
       }}
       initialRouteName="index">
       <Tabs.Screen
+        name="index"
+        options={{
+          title: '🏠 首页',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="study"
         options={{
           title: '📚 闻思',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'book.fill' : 'book'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="practice"
-        options={{
-          title: '📿 修行',
-          tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'hands.and.sparkles.fill' : 'hands.and.sparkles'} color={color} />
           ),
         }}
       />
@@ -55,20 +55,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="practice"
+        options={{
+          title: '📿 修行',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'hands.and.sparkles.fill' : 'hands.and.sparkles'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="stats"
         options={{
           title: '📊 统计',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'chart.bar.fill' : 'chart.bar'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: '🏠 首页',
-          tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
           ),
         }}
       />
