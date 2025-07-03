@@ -15,6 +15,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { practiceService, dailyRecordService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { ConnectionTest } from '@/components/ConnectionTest';
+import { PracticeProjectsCheck } from '@/components/PracticeProjectsCheck';
+import { MeditationTopicsTest } from '@/components/MeditationTopicsTest';
 
 interface PracticeProject {
   id: string;
@@ -80,13 +83,13 @@ export default function PracticeScreen() {
       const today = new Date().toISOString().split('T')[0];
       const records = await dailyRecordService.getTodayRecords(user.id, today);
       console.log('📅 Loaded today records:', records.length);
-      
+
       // Convert records array to object for easier access
       const recordsMap = records.reduce((acc, record) => {
         acc[record.practice_project_id] = record.count;
         return acc;
       }, {});
-      
+
       setTodayRecords(recordsMap);
     } catch (error) {
       console.error('Error loading practice data:', error);
@@ -119,7 +122,7 @@ export default function PracticeScreen() {
       if (error) throw error;
 
       console.log('📚 Loaded meditation topics from database:', data?.length || 0);
-      
+
       // Prioritize database data
       if (data && data.length > 0) {
         setMeditationTopics(data);
@@ -130,7 +133,7 @@ export default function PracticeScreen() {
       if (selectedProjectForRecord?.practices.name?.includes('前行') || 
           selectedProjectForRecord?.practices.name?.includes('观修') ||
           selectedProjectForRecord?.practices.name?.includes('禅修')) {
-        
+
         console.log('🔄 Creating default meditation topics for 前行观修');
         // For meditation practices, create numbered topics
         const defaultTopics = [];
@@ -564,6 +567,9 @@ export default function PracticeScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>📿 修行记录</Text>
+      <ConnectionTest />
+      <PracticeProjectsCheck />
+      <MeditationTopicsTest />
 
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -614,7 +620,7 @@ export default function PracticeScreen() {
                     <Text style={styles.dailyProgress}>
                       今日: {todayCount} / {dailyTarget} {project.practices.unit}
                     </Text>
-                    
+
                     <Text style={styles.targetPeriod}>
                       ({project.target_period === 'daily' ? '每日目标' : '每周目标'}: {dailyTarget} {project.practices.unit})
                     </Text>
