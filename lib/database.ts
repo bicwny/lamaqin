@@ -238,39 +238,53 @@ export const studyService = {
     study_date: string;
     study_count_for_lesson: number;
   }) {
-    // First, get or create the actual lesson record
-    const { data: lesson, error: lessonError } = await supabase
-      .from('course_lessons')
-      .select('id')
-      .eq('course_id', record.course_id)
-      .eq('lesson_number', record.lesson_number)
-      .single();
+    try {
+      // First, get the lesson record - handle potential duplicates by taking the first one
+      const { data: lessons, error: lessonError } = await supabase
+        .from('course_lessons')
+        .select('id')
+        .eq('course_id', record.course_id)
+        .eq('lesson_number', record.lesson_number)
+        .limit(1);
 
-    if (lessonError) {
-      console.error('❌ Error finding lesson:', lessonError);
-      throw lessonError;
+      if (lessonError) {
+        console.error('❌ Error finding lesson:', lessonError);
+        throw lessonError;
+      }
+
+      if (!lessons || lessons.length === 0) {
+        throw new Error(`Lesson ${record.lesson_number} not found for course ${record.course_id}`);
+      }
+
+      const lesson = lessons[0]; // Take the first lesson if there are duplicates
+
+      const studyRecord = {
+        user_id: record.user_id,
+        course_id: record.course_id,
+        lesson_id: lesson.id,
+        study_date: record.study_date,
+        study_count_for_lesson: record.study_count_for_lesson
+      };
+
+      const { data, error } = await supabase
+        .from('study_records')
+        .insert(studyRecord)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Error inserting study record:', error);
+        throw error;
+      }
+
+      // Update progress after recording
+      await this.calculateProgress(record.user_id, record.course_id);
+
+      return data;
+    } catch (err) {
+      console.error('❌ recordStudy failed:', err);
+      throw err;
     }
-
-    const studyRecord = {
-      user_id: record.user_id,
-      course_id: record.course_id,
-      lesson_id: lesson.id,
-      study_date: record.study_date,
-      study_count_for_lesson: record.study_count_for_lesson
-    };
-
-    const { data, error } = await supabase
-      .from('study_records')
-      .insert(studyRecord)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Update progress after recording
-    await this.calculateProgress(record.user_id, record.course_id);
-
-    return data;
   },
 
   async getCourseLessons(courseId: string) {
