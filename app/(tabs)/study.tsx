@@ -38,6 +38,7 @@ export default function StudyScreen() {
   const [progress, setProgress] = useState<StudyProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const [joiningCourse, setJoiningCourse] = useState<string | null>(null);
 
   useEffect(() => {
     loadStudyData();
@@ -78,28 +79,15 @@ export default function StudyScreen() {
   };
 
   const getUserCourses = async (userId: string): Promise<UserCourse[]> => {
-    // Since we don't have user_courses table yet, we'll simulate it
-    // by checking if user has any study records for courses
-    const studyRecords = await studyService.getUserStudyProgress(userId);
-    const courseIds = [...new Set(studyRecords.map(r => r.course_id))];
-    
-    const courses = await studyService.getCourses();
-    const userCourses: UserCourse[] = courseIds.map(courseId => {
-      const course = courses.find(c => c.id === courseId);
-      if (course) {
-        return {
-          id: `user-course-${courseId}`,
-          user_id: userId,
-          course_id: courseId,
-          status: 'active' as const,
-          joined_date: new Date().toISOString(),
-          course: course
-        };
-      }
-      return null;
-    }).filter(Boolean) as UserCourse[];
-
-    return userCourses;
+    try {
+      // 使用真正的user_courses表
+      const userCourses = await studyService.getUserCourses(userId);
+      return userCourses;
+    } catch (error) {
+      console.error('❌ Error getting user courses:', error);
+      // 如果user_courses表还没有数据，返回空数组
+      return [];
+    }
   };
 
   const processProgressData = (studyRecords: any[], userCourses: UserCourse[]) => {
@@ -175,14 +163,34 @@ export default function StudyScreen() {
     if (!user) return;
 
     try {
-      // For now, we'll simulate joining by recording first lesson
-      await recordStudy(courseId, 1);
+      console.log('🔄 加入课程:', courseId);
+      setJoiningCourse(courseId); // 设置加载状态
+      
+      // 真正的加入课程逻辑
+      const userCourse = await studyService.joinCourse(user.id, courseId);
+      
+      // 即时更新本地状态
+      setUserCourses(prev => [...prev, userCourse]);
+      
+      // 初始化进度数据
+      const newProgress: StudyProgress = {
+        courseId: courseId,
+        currentLesson: 1,
+        listenCount: {},
+        totalLessonsStudied: 0,
+        progressPercentage: 0
+      };
+      setProgress(prev => [...prev, newProgress]);
+      
       Alert.alert('成功', '课程已加入，开始学习吧！');
       setShowCourseModal(false);
-      loadStudyData();
+      
+      console.log('✅ 课程加入成功');
     } catch (error) {
-      console.error('Error joining course:', error);
+      console.error('❌ Error joining course:', error);
       Alert.alert('错误', '加入课程失败，请重试');
+    } finally {
+      setJoiningCourse(null); // 清除加载状态
     }
   };
 
@@ -287,10 +295,18 @@ export default function StudyScreen() {
                     )}
                   </View>
                   <TouchableOpacity
-                    style={styles.joinButton}
+                    style={[
+                      styles.joinButton,
+                      joiningCourse === item.id && styles.joinButtonLoading
+                    ]}
                     onPress={() => joinCourse(item.id)}
+                    disabled={joiningCourse === item.id}
                   >
-                    <Text style={styles.joinButtonText}>加入学习</Text>
+                    {joiningCourse === item.id ? (
+                      <Text style={styles.joinButtonText}>加入中...</Text>
+                    ) : (
+                      <Text style={styles.joinButtonText}>加入学习</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               )}
@@ -631,6 +647,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
+  },
+  joinButtonLoading: {
+    backgroundColor: '#9CA3AF',
   },
   joinButtonText: {
     color: '#fff',
