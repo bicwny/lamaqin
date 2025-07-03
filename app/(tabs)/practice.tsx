@@ -318,28 +318,6 @@ export default function PracticeScreen() {
                       <Text style={styles.actionButtonText}>自定义记录</Text>
                     </TouchableOpacity>
                   </View>
-
-                  {/* Quick add buttons */}
-                  <View style={styles.quickButtons}>
-                    <TouchableOpacity 
-                      style={styles.quickButton}
-                      onPress={() => quickAdd(project.id, 1)}
-                    >
-                      <Text style={styles.quickButtonText}>+1</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={styles.quickButton}
-                      onPress={() => quickAdd(project.id, 10)}
-                    >
-                      <Text style={styles.quickButtonText}>+10</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={styles.quickButton}
-                      onPress={() => quickAdd(project.id, 100)}
-                    >
-                      <Text style={styles.quickButtonText}>+100</Text>
-                    </TouchableOpacity>
-                  </View>
                 </View>
               );
             })}
