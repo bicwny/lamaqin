@@ -107,11 +107,156 @@ export default function PracticeScreen() {
     }
   };
 
+  const loadMeditationTopics = async (practiceId: string) => {
+    try {
+      console.log('🧘 Loading meditation topics for practice:', practiceId);
+      const { data, error } = await supabase
+        .from('meditation_topics')
+        .select('topic_number, title, description')
+        .eq('practice_id', practiceId)
+        .order('topic_number', { ascending: true });
+
+      if (error) throw error;
+
+      console.log('📚 Loaded meditation topics:', data?.length || 0);
+      
+      // If we have topics from database, use them
+      if (data && data.length > 0) {
+        setMeditationTopics(data);
+      } else {
+        // If no topics found, create a comprehensive list for 前行观修
+        if (selectedProjectForRecord?.practices.name?.includes('前行') || 
+            selectedProjectForRecord?.practices.name?.includes('观修') ||
+            selectedProjectForRecord?.practices.name?.includes('禅修')) {
+          const comprehensiveTopics = [
+            { topic_number: 1, title: '观修暇满难得人身', description: '思维暇满人身的珍贵与难得，培养珍惜的心' },
+            { topic_number: 2, title: '思维寿命无常', description: '观修生命的无常性，培养精进修行的紧迫感' },
+            { topic_number: 3, title: '观修轮回过患', description: '思维三界轮回的痛苦本质，生起出离心' },
+            { topic_number: 4, title: '观修因果业力', description: '思维善恶业果的必然性，谨慎取舍' },
+            { topic_number: 5, title: '修习皈依三宝', description: '以至诚心皈依佛法僧三宝' },
+            { topic_number: 6, title: '发菩提心', description: '为利益一切众生而发起成佛的心愿' },
+            { topic_number: 7, title: '观修四无量心', description: '修习慈悲喜舍四无量心' },
+            { topic_number: 8, title: '金刚萨埵净化法', description: '通过金刚萨埵法门净化业障' },
+            { topic_number: 9, title: '供养曼达拉', description: '以虚供实的方式积累福德资粮' },
+            { topic_number: 10, title: '上师瑜伽', description: '与上师相应，获得加持传承' },
+            { topic_number: 11, title: '观修三宝功德', description: '思维佛法僧三宝的殊胜功德' },
+            { topic_number: 12, title: '观修六道轮回', description: '详细观想六道众生的痛苦状况' },
+            { topic_number: 13, title: '观修死亡无常', description: '思维死亡的必然性和不定性' },
+            { topic_number: 14, title: '观修中阴境界', description: '了解中阴期间的各种境界' },
+            { topic_number: 15, title: '观修因果不虚', description: '深入理解因果律的精确性' },
+            { topic_number: 16, title: '观修布施功德', description: '思维布施的殊胜功德利益' },
+            { topic_number: 17, title: '观修持戒功德', description: '思维持戒的清净功德' },
+            { topic_number: 18, title: '观修忍辱功德', description: '思维忍辱的殊胜利益' },
+            { topic_number: 19, title: '观修精进功德', description: '思维精进修行的重要性' },
+            { topic_number: 20, title: '观修禅定功德', description: '思维禅定的殊胜境界' },
+            { topic_number: 21, title: '观修智慧功德', description: '思维般若智慧的殊胜' },
+            { topic_number: 22, title: '观修慈心', description: '修习对一切众生的慈爱心' },
+            { topic_number: 23, title: '观修悲心', description: '修习对众生痛苦的悲悯心' },
+            { topic_number: 24, title: '观修喜心', description: '修习随喜他人功德的喜心' },
+            { topic_number: 25, title: '观修舍心', description: '修习平等无偏的舍心' },
+            { topic_number: 26, title: '观修空性见', description: '初步了解空性的道理' },
+            { topic_number: 27, title: '观修缘起性空', description: '理解缘起与空性的关系' },
+            { topic_number: 28, title: '观修十二因缘', description: '思维十二因缘的流转过程' },
+            { topic_number: 29, title: '观修四谛法门', description: '深入理解苦集灭道四谛' },
+            { topic_number: 30, title: '观修八正道', description: '修习八正道的具体内容' },
+            { topic_number: 31, title: '观修六度万行', description: '修习六波罗蜜的具体行持' },
+            { topic_number: 32, title: '观修四摄法门', description: '修习度化众生的四摄方法' },
+            { topic_number: 33, title: '观修三十七道品', description: '修习三十七菩提分法' },
+            { topic_number: 34, title: '观修念佛法门', description: '专心念佛求生净土' },
+            { topic_number: 35, title: '观修净土庄严', description: '观想极乐世界的庄严' },
+            { topic_number: 36, title: '观修阿弥陀佛', description: '专心观想阿弥陀佛' },
+            { topic_number: 37, title: '观修观音菩萨', description: '修习观音菩萨的慈悲' },
+            { topic_number: 38, title: '观修文殊菩萨', description: '修习文殊菩萨的智慧' },
+            { topic_number: 39, title: '观修普贤菩萨', description: '修习普贤菩萨的大愿' },
+            { topic_number: 40, title: '观修地藏菩萨', description: '修习地藏菩萨的愿力' },
+            { topic_number: 41, title: '观修弥勒菩萨', description: '修习弥勒菩萨的慈心' },
+            { topic_number: 42, title: '观修药师佛', description: '修习药师佛的治病功德' },
+            { topic_number: 43, title: '观修释迦牟尼佛', description: '修习本师释迦牟尼佛' },
+            { topic_number: 44, title: '观修三身佛', description: '理解法身报身化身的意义' },
+            { topic_number: 45, title: '观修佛陀十力', description: '思维佛陀的十种力量' },
+            { topic_number: 46, title: '观修佛陀十八不共法', description: '思维佛陀的十八种不共功德' },
+            { topic_number: 47, title: '观修三十二相', description: '观想佛陀的三十二相' },
+            { topic_number: 48, title: '观修八十种好', description: '观想佛陀的八十种好' },
+            { topic_number: 49, title: '观修佛陀教法', description: '思维佛陀教法的殊胜' },
+            { topic_number: 50, title: '观修僧伽功德', description: '思维僧伽的清净功德' },
+            { topic_number: 51, title: '观修戒定慧三学', description: '修习戒定慧三无漏学' },
+            { topic_number: 52, title: '观修闻思修三慧', description: '修习闻思修三种智慧' },
+            { topic_number: 53, title: '观修信愿行三资粮', description: '修习信愿行三种资粮' },
+            { topic_number: 54, title: '观修福德智慧二资粮', description: '积累福德智慧二种资粮' },
+            { topic_number: 55, title: '观修止观双运', description: '修习止观双运的方法' },
+            { topic_number: 56, title: '观修定慧等持', description: '修习定慧平等的境界' },
+            { topic_number: 57, title: '观修方便般若', description: '修习方便与般若的结合' },
+            { topic_number: 58, title: '观修悲智双运', description: '修习悲心与智慧的结合' },
+            { topic_number: 59, title: '观修自他平等', description: '修习自他平等的菩提心' },
+            { topic_number: 60, title: '观修自他相换', description: '修习自他相换的修法' },
+            { topic_number: 61, title: '观修知母念恩', description: '思维一切众生的母亲恩德' },
+            { topic_number: 62, title: '观修报恩心', description: '发起报答众生恩德的心' },
+            { topic_number: 63, title: '观修慈母有情', description: '观想一切众生如慈母般' },
+            { topic_number: 64, title: '观修爱他胜自', description: '修习爱他胜过爱自己' },
+            { topic_number: 65, title: '观修菩提心利益', description: '思维菩提心的殊胜利益' },
+            { topic_number: 66, title: '观修菩萨行', description: '修习菩萨六度万行' },
+            { topic_number: 67, title: '观修菩萨戒', description: '受持菩萨戒的功德' },
+            { topic_number: 68, title: '观修三聚净戒', description: '修习三聚净戒的内容' },
+            { topic_number: 69, title: '观修四弘誓愿', description: '发起四弘誓愿的大心' },
+            { topic_number: 70, title: '观修十大愿王', description: '修习普贤十大愿王' },
+            { topic_number: 71, title: '观修回向功德', description: '修习回向的殊胜功德' },
+            { topic_number: 72, title: '观修随喜功德', description: '修习随喜他人的功德' },
+            { topic_number: 73, title: '观修赞叹功德', description: '修习赞叹三宝的功德' },
+            { topic_number: 74, title: '观修供养功德', description: '修习供养三宝的功德' },
+            { topic_number: 75, title: '观修礼拜功德', description: '修习礼拜三宝的功德' },
+            { topic_number: 76, title: '观修忏悔功德', description: '修习忏悔业障的功德' },
+            { topic_number: 77, title: '观修持咒功德', description: '修习持咒的殊胜功德' },
+            { topic_number: 78, title: '观修念珠功德', description: '修习使用念珠的功德' },
+            { topic_number: 79, title: '观修经行功德', description: '修习经行的殊胜功德' },
+            { topic_number: 80, title: '观修打坐功德', description: '修习打坐的殊胜功德' },
+            { topic_number: 81, title: '观修读经功德', description: '修习读经的殊胜功德' },
+            { topic_number: 82, title: '观修抄经功德', description: '修习抄经的殊胜功德' },
+            { topic_number: 83, title: '观修放生功德', description: '修习放生的殊胜功德' },
+            { topic_number: 84, title: '观修护生功德', description: '修习护生的殊胜功德' },
+            { topic_number: 85, title: '观修吃素功德', description: '修习吃素的殊胜功德' },
+            { topic_number: 86, title: '观修节欲功德', description: '修习节制欲望的功德' },
+            { topic_number: 87, title: '观修少欲知足', description: '修习少欲知足的功德' },
+            { topic_number: 88, title: '观修清心寡欲', description: '修习清心寡欲的功德' },
+            { topic_number: 89, title: '观修离欲清净', description: '修习远离欲望的清净' },
+            { topic_number: 90, title: '观修解脱道', description: '修习解脱道的殊胜' },
+            { topic_number: 91, title: '观修菩提道', description: '修习菩提道的殊胜' },
+            { topic_number: 92, title: '观修成佛道', description: '修习成佛道的究竟目标' }
+          ];
+          setMeditationTopics(comprehensiveTopics);
+        } else {
+          // For other time-based practices, create a simple numbered list
+          const defaultTopics = [];
+          for (let i = 1; i <= 30; i++) {
+            defaultTopics.push({
+              topic_number: i,
+              title: `第${i}座修行`,
+              description: `${selectedProjectForRecord?.practices.name}第${i}座的修行内容`
+            });
+          }
+          setMeditationTopics(defaultTopics);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading meditation topics:', error);
+      // Fallback to creating default topics
+      const defaultTopics = [];
+      for (let i = 1; i <= 30; i++) {
+        defaultTopics.push({
+          topic_number: i,
+          title: `第${i}座修行`,
+          description: `修行第${i}座的相关内容`
+        });
+      }
+      setMeditationTopics(defaultTopics);
+    }
+  };
+
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
   const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
-  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string}[]>([{duration: '', method: ''}]);
+  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string, sessionNumber: number}[]>([{duration: '', method: '', sessionNumber: 1}]);
   const [recordingMeditation, setRecordingMeditation] = useState(false);
+  const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
 
   const handleRecordPractice = async (projectId: string, amount: number) => {
     if (!user?.id) return;
@@ -127,12 +272,13 @@ export default function PracticeScreen() {
     }
   };
 
-  const handleCustomRecord = (project: PracticeProject) => {
+  const handleCustomRecord = async (project: PracticeProject) => {
     setSelectedProjectForRecord(project);
 
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
-      setMeditationSessions([{duration: '', method: ''}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
       // For count-based practices, show simple input
@@ -159,7 +305,8 @@ export default function PracticeScreen() {
   };
 
   const addMeditationSession = () => {
-    setMeditationSessions([...meditationSessions, {duration: '', method: ''}]);
+    const nextSessionNumber = Math.max(...meditationSessions.map(s => s.sessionNumber), 0) + 1;
+    setMeditationSessions([...meditationSessions, {duration: '', method: '', sessionNumber: nextSessionNumber}]);
   };
 
   const removeMeditationSession = (index: number) => {
@@ -169,9 +316,13 @@ export default function PracticeScreen() {
     }
   };
 
-  const updateMeditationSession = (index: number, field: 'duration' | 'method', value: string) => {
+  const updateMeditationSession = (index: number, field: 'duration' | 'method' | 'sessionNumber', value: string | number) => {
     const newSessions = [...meditationSessions];
-    newSessions[index][field] = value;
+    if (field === 'sessionNumber') {
+      newSessions[index][field] = value as number;
+    } else {
+      newSessions[index][field] = value as string;
+    }
     setMeditationSessions(newSessions);
   };
 
@@ -206,14 +357,14 @@ export default function PracticeScreen() {
         const duration = parseInt(session.duration);
         totalMinutes += duration;
 
-        // Save to meditation_records - don't expect a return value
+        // Save to meditation_records with the user-selected session number
         const { error: meditationError } = await supabase
           .from('meditation_records')
           .insert({
             user_id: user.id,
             practice_id: selectedProjectForRecord.practice_id,
             record_date: today,
-            session_number: i + 1,
+            session_number: session.sessionNumber,
             duration_minutes: duration,
             method: session.method
           });
@@ -249,7 +400,8 @@ export default function PracticeScreen() {
 
       setShowMeditationModal(false);
       setSelectedProjectForRecord(null);
-      setMeditationSessions([{duration: '', method: ''}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      setMeditationTopics([]);
     } catch (error) {
       console.error('Error saving meditation:', error);
       Alert.alert('错误', '保存观修记录失败');
@@ -750,6 +902,39 @@ export default function PracticeScreen() {
 
                   <View style={styles.sessionInputs}>
                     <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>选择观修内容</Text>
+                      {meditationTopics.length > 0 ? (
+                        <Picker
+                          selectedValue={session.sessionNumber}
+                          onValueChange={(value) => {
+                            updateMeditationSession(index, 'sessionNumber', value);
+                            const selectedTopic = meditationTopics.find(t => t.topic_number === value);
+                            if (selectedTopic) {
+                              updateMeditationSession(index, 'method', selectedTopic.title);
+                            }
+                          }}
+                          style={styles.topicPicker}
+                        >
+                          {meditationTopics.map((topic) => (
+                            <Picker.Item 
+                              key={topic.topic_number} 
+                              label={`${topic.topic_number} - ${topic.title}`} 
+                              value={topic.topic_number} 
+                            />
+                          ))}
+                        </Picker>
+                      ) : (
+                        <TextInput
+                          style={styles.sessionInput}
+                          value={session.sessionNumber.toString()}
+                          onChangeText={(value) => updateMeditationSession(index, 'sessionNumber', parseInt(value) || 1)}
+                          keyboardType="numeric"
+                          placeholder="座数编号"
+                        />
+                      )}
+                    </View>
+
+                    <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>观修时长（分钟）</Text>
                       <TextInput
                         style={styles.sessionInput}
@@ -761,14 +946,25 @@ export default function PracticeScreen() {
                     </View>
 
                     <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>观修方法</Text>
+                      <Text style={styles.inputLabel}>观修方法/备注</Text>
                       <TextInput
                         style={styles.sessionInput}
                         value={session.method}
                         onChangeText={(value) => updateMeditationSession(index, 'method', value)}
-                        placeholder="如：金刚萨埵观修"
+                        placeholder="观修方法或备注"
+                        multiline={true}
+                        numberOfLines={2}
                       />
                     </View>
+
+                    {meditationTopics.length > 0 && (
+                      <View style={styles.topicDescription}>
+                        <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
+                        <Text style={styles.topicDescriptionText}>
+                          {meditationTopics.find(t => t.topic_number === session.sessionNumber)?.description || ''}
+                        </Text>
+                      </View>
+                    )}
                   </View>
 
                   {session.duration && parseInt(session.duration) > 0 && (
@@ -1307,5 +1503,31 @@ const styles = StyleSheet.create({
     color: '#6c757d',
     fontSize: 16,
     fontWeight: '500',
+  },
+  topicPicker: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    height: 40,
+  },
+  topicDescription: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 6,
+    padding: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  topicDescriptionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#495057',
+    marginBottom: 4,
+  },
+  topicDescriptionText: {
+    fontSize: 13,
+    color: '#6c757d',
+    lineHeight: 18,
   },
 });
