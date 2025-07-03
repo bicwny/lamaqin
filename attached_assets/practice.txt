@@ -266,3 +266,83 @@
 3.  **更新总账 (Updating Project):**
     * 将上述查询得到的总“座”数，`UPDATE` 到 `user_practice_projects` 表中对应项目的 `current_count` 字段。
     * `UPDATE user_practice_projects SET current_count = [查询到的总座数] WHERE id = 'project_id';`
+
+    20250703 092100 更新观修的database
+好的，这是一个非常关键的问题，涉及到应用核心内容的存储方式。
+
+根据您当前的数据库设计，我们可以分析出其中的逻辑和潜在的优化点。
+
+### **目前的存储方式（基于现有数据库）**
+
+在您当前提供的数据库结构中，并没有一个专门的表来存储这92个观修方法的具体内容（比如每一座的标题和详细描述）。
+
+目前，系统是通过 `meditation_records` 这张表来**记录用户完成了哪一座**：
+
+  * **`meditation_records.session_number` (座数编号):** 这个整数字段是核心。当一个用户完成了第24座观修，应用就会在这张表里插入一条记录，并将 `session_number` 设为 `24`。
+
+**这种做法的局限性：**
+
+  * **信息缺失：** 应用本身并不知道 `session_number: 24` 对应的具体观修法门是什么（比如，它的标题是“思维轮回过患”）。这个“映射关系”可能被硬编码（Hardcode）在前端代码里，但这非常不利于维护和扩展。
+  * **UI体验受限：** 用户在选择观修项目时，可能只能看到一个数字列表（1到92），而看不到每一座的具体名称，体验不佳。
+
+-----
+
+### **推荐的存储方式（建议的优化方案）**
+
+为了让应用功能更完整、体验更好，我强烈建议**增加一张新表**来专门存储这92个方法的详细内容。这才是规范的做法。
+
+我为您设计这张表，可以命名为 `meditation_topics` (观修主题表)。
+
+#### **建议新增的表：`meditation_topics`**
+
+这张表将作为这92个观修方法的“字典”或“目录”。
+
+```sql
+CREATE TABLE public.meditation_topics (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    -- 关联到 practices 表，说明这些主题属于哪个大的修行项目
+    -- 例如，这92个主题都属于“前行实修法”这个 practice
+    practice_id uuid REFERENCES public.practices(id),
+    -- 主题/座的编号 (1 到 92)
+    topic_number integer NOT NULL,
+    -- 主题/座的标题，例如：'观修暇满难得'
+    title character varying NOT NULL,
+    -- 对这个主题的详细描述或观修要点
+    description text,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT meditation_topics_pkey PRIMARY KEY (id)
+);
+```
+
+-----
+
+### **采用新方案后的工作流程**
+
+一旦增加了 `meditation_topics` 这张表，整个流程将变得非常清晰和强大：
+
+1.  **数据预置：**
+
+      * 在数据库初始化时，就在 `meditation_topics` 表里预先插入这92条记录，每一条都包含它的编号、标题和描述。
+
+2.  **界面呈现 (`1.3 观修记录` 弹窗):**
+
+      * 当用户点击 `[自定义记录]` 来记录观修时，弹窗中的“选择观修”不再是一个简单的数字输入框。
+      * 它会变成一个**下拉列表 (Dropdown)**。
+      * **前端逻辑：** 从 `meditation_topics` 表中查询所有记录 (`SELECT topic_number, title FROM meditation_topics ORDER BY topic_number;`)，然后将它们填充到这个下拉列表中。
+      * **用户看到的是：**
+          * `[ 1 - 观修暇满难得 ]`
+          * `[ 2 - 思维寿命无常 ]`
+          * ...
+          * `[ 24 - 思维轮回过患 ]`
+
+3.  **数据记录：**
+
+      * 用户从下拉列表中选择一项，比如“第24座”。
+      * 当用户保存时，应用将 `session_number` (`24`) 和对应的 `meditation_topic_id`（可选）存入 `meditation_records` 表。
+
+### **总结**
+
+  * **现状：** 目前的设计只能记录用户修了**第几座**（一个数字）。
+  * **建议：** **增加一个 `meditation_topics` 表**来存储每一座的**详细内容**（标题、描述）。
+
+通过增加这张表，您的应用就能从一个只能记录数字的工具，**升级为一个能展示丰富内容的、真正的修行指南**，极大地提升了应用的核心价值和用户体验。
