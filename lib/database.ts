@@ -233,14 +233,83 @@ export const studyService = {
   },
 
   async recordStudy(record: Omit<StudyRecord, 'id' | 'created_at'>): Promise<StudyRecord> {
+    // First, try to find or create the lesson
+    let lessonId = record.lesson_id;
+    
+    // If it's a simple format like "courseId-lesson-number", try to find the actual lesson
+    if (lessonId.includes('-lesson-')) {
+      const [courseId, , lessonNumber] = lessonId.split('-');
+      
+      // Try to find the actual lesson in course_lessons table
+      const { data: existingLesson } = await supabase
+        .from('course_lessons')
+        .select('id')
+        .eq('course_id', courseId)
+        .eq('lesson_number', parseInt(lessonNumber))
+        .single();
+      
+      if (existingLesson) {
+        lessonId = existingLesson.id;
+      } else {
+        // Create a new lesson record if it doesn't exist
+        const { data: newLesson } = await supabase
+          .from('course_lessons')
+          .insert({
+            course_id: courseId,
+            lesson_number: parseInt(lessonNumber),
+            title: `第${lessonNumber}课`,
+            content_summary: ''
+          })
+          .select('id')
+          .single();
+        
+        if (newLesson) {
+          lessonId = newLesson.id;
+        }
+      }
+    }
+
     const { data, error } = await supabase
       .from('study_records')
-      .insert(record)
+      .insert({
+        ...record,
+        lesson_id: lessonId
+      })
       .select()
       .single();
     
     if (error) throw error;
     return data;
+  },
+
+  async getUserCourses(userId: string) {
+    // Since we don't have user_courses table yet, we'll get unique courses from study_records
+    const { data, error } = await supabase
+      .from('study_records')
+      .select(`
+        course_id,
+        courses(*)
+      `)
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    // Get unique courses
+    const uniqueCourses = data?.reduce((acc, record) => {
+      if (!acc.find(c => c.course_id === record.course_id)) {
+        acc.push({
+          id: `user-course-${record.course_id}`,
+          user_id: userId,
+          course_id: record.course_id,
+          status: 'active',
+          joined_date: new Date().toISOString(),
+          course: record.courses
+        });
+      }
+      return acc;
+    }, [] as any[]) || [];
+    
+    return uniqueCourses;
   }
 };
 

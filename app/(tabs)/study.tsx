@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,19 +11,33 @@ interface Course {
   name: string;
   total_lessons: number;
   teacher?: string;
+  description?: string;
+}
+
+interface UserCourse {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: 'active' | 'completed' | 'paused';
+  joined_date: string;
+  course: Course;
 }
 
 interface StudyProgress {
   courseId: string;
   currentLesson: number;
   listenCount: Record<number, number>;
+  totalLessonsStudied: number;
+  progressPercentage: number;
 }
 
 export default function StudyScreen() {
   const { user } = useAuth();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [progress, setProgress] = useState<StudyProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCourseModal, setShowCourseModal] = useState(false);
 
   useEffect(() => {
     loadStudyData();
@@ -37,45 +52,94 @@ export default function StudyScreen() {
     try {
       console.log('🔄 Loading study data for user:', user.id);
       
-      const coursesData = await studyService.getCourses();
+      // Load user's courses
+      const userCoursesData = await getUserCourses(user.id);
+      setUserCourses(userCoursesData);
+      
+      // Load all available courses
+      const allCoursesData = await studyService.getCourses();
+      setAllCourses(allCoursesData);
+      
+      // Load progress data
       const progressData = await studyService.getUserStudyProgress(user.id);
-
-      console.log('📚 Loaded courses:', coursesData.length);
-      console.log('📖 Loaded progress records:', progressData.length);
-
-      setCourses(coursesData);
-      // Process progress data into organized format
-      const organizedProgress = processProgressData(progressData);
+      const organizedProgress = processProgressData(progressData, userCoursesData);
       setProgress(organizedProgress);
+
+      console.log('📚 Loaded user courses:', userCoursesData.length);
+      console.log('📖 Loaded progress records:', progressData.length);
     } catch (error) {
       console.error('❌ Error loading study data:', error);
-      // Show empty state instead of any fallback
-      setCourses([]);
+      setUserCourses([]);
+      setAllCourses([]);
       setProgress([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const processProgressData = (studyRecords: any[]) => {
-    const progressMap: Record<string, StudyProgress> = {};
-
-    studyRecords.forEach(record => {
-      const courseId = record.course_id;
-      if (!progressMap[courseId]) {
-        progressMap[courseId] = {
-          courseId,
-          currentLesson: 1,
-          listenCount: {}
+  const getUserCourses = async (userId: string): Promise<UserCourse[]> => {
+    // Since we don't have user_courses table yet, we'll simulate it
+    // by checking if user has any study records for courses
+    const studyRecords = await studyService.getUserStudyProgress(userId);
+    const courseIds = [...new Set(studyRecords.map(r => r.course_id))];
+    
+    const courses = await studyService.getCourses();
+    const userCourses: UserCourse[] = courseIds.map(courseId => {
+      const course = courses.find(c => c.id === courseId);
+      if (course) {
+        return {
+          id: `user-course-${courseId}`,
+          user_id: userId,
+          course_id: courseId,
+          status: 'active' as const,
+          joined_date: new Date().toISOString(),
+          course: course
         };
       }
+      return null;
+    }).filter(Boolean) as UserCourse[];
 
-      const lessonNum = record.lesson?.lesson_number || 1;
-      progressMap[courseId].listenCount[lessonNum] = 
-        (progressMap[courseId].listenCount[lessonNum] || 0) + 1;
+    return userCourses;
+  };
 
-      if (lessonNum >= progressMap[courseId].currentLesson) {
-        progressMap[courseId].currentLesson = lessonNum;
+  const processProgressData = (studyRecords: any[], userCourses: UserCourse[]) => {
+    const progressMap: Record<string, StudyProgress> = {};
+
+    // Initialize progress for all user courses
+    userCourses.forEach(userCourse => {
+      const courseId = userCourse.course_id;
+      progressMap[courseId] = {
+        courseId,
+        currentLesson: 1,
+        listenCount: {},
+        totalLessonsStudied: 0,
+        progressPercentage: 0
+      };
+    });
+
+    // Process study records
+    studyRecords.forEach(record => {
+      const courseId = record.course_id;
+      if (progressMap[courseId]) {
+        const lessonNum = record.lesson?.lesson_number || 1;
+        
+        // Track listen count for each lesson
+        progressMap[courseId].listenCount[lessonNum] = 
+          (progressMap[courseId].listenCount[lessonNum] || 0) + 1;
+
+        // Update current lesson (latest lesson studied)
+        if (lessonNum > progressMap[courseId].currentLesson) {
+          progressMap[courseId].currentLesson = lessonNum;
+        }
+      }
+    });
+
+    // Calculate progress statistics
+    Object.values(progressMap).forEach(progress => {
+      const userCourse = userCourses.find(uc => uc.course_id === progress.courseId);
+      if (userCourse) {
+        progress.totalLessonsStudied = Object.keys(progress.listenCount).length;
+        progress.progressPercentage = (progress.totalLessonsStudied / userCourse.course.total_lessons) * 100;
       }
     });
 
@@ -86,13 +150,15 @@ export default function StudyScreen() {
     if (!user) return;
 
     try {
-      // Find the lesson ID (simplified for now)
       const today = new Date().toISOString().split('T')[0];
+
+      // Create a proper lesson record or use existing one
+      const lessonId = `${courseId}-lesson-${lessonNumber}`;
 
       await studyService.recordStudy({
         user_id: user.id,
         course_id: courseId,
-        lesson_id: `lesson-${courseId}-${lessonNumber}`, // Simplified
+        lesson_id: lessonId,
         study_date: today,
         study_count_for_lesson: 1
       });
@@ -105,25 +171,52 @@ export default function StudyScreen() {
     }
   };
 
+  const joinCourse = async (courseId: string) => {
+    if (!user) return;
+
+    try {
+      // For now, we'll simulate joining by recording first lesson
+      await recordStudy(courseId, 1);
+      Alert.alert('成功', '课程已加入，开始学习吧！');
+      setShowCourseModal(false);
+      loadStudyData();
+    } catch (error) {
+      console.error('Error joining course:', error);
+      Alert.alert('错误', '加入课程失败，请重试');
+    }
+  };
+
   const getCourseProgress = (courseId: string) => {
     return progress.find(p => p.courseId === courseId);
   };
 
-  const handleBrowseCourses = () => {
-    // TODO: Navigate to course list
-    console.log('Browse courses pressed');
+  const handleManageCourses = () => {
+    setShowCourseModal(true);
   };
+
+  const handleContinueStudy = (courseId: string) => {
+    const courseProgress = getCourseProgress(courseId);
+    const currentLesson = courseProgress?.currentLesson || 1;
+    recordStudy(courseId, currentLesson);
+  };
+
+  const availableCourses = allCourses.filter(course => 
+    !userCourses.some(uc => uc.course_id === course.id)
+  );
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>📚 闻思学习</Text>
-        <Text>加载中...</Text>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.title}>📚 闻思学习</Text>
+          <Text style={styles.loadingText}>加载中...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
-  if (courses.length === 0) {
+  // Zero State: No courses added yet
+  if (userCourses.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -137,94 +230,186 @@ export default function StudyScreen() {
               <Ionicons name="book-outline" size={80} color="#9CA3AF" />
             </View>
 
-            <Text style={styles.emptyTitle}>开始闻思学习</Text>
+            <Text style={styles.emptyTitle}>还没有课程，开始学习吧</Text>
             <Text style={styles.emptyDescription}>
-              选择课程开始系统学习，追踪学习进度
+              选择您感兴趣的课程，开始系统的闻思学习
             </Text>
 
-            <TouchableOpacity style={styles.browseButton} onPress={handleBrowseCourses}>
-              <Ionicons name="library-outline" size={24} color="#FFFFFF" />
-              <Text style={styles.browseButtonText}>浏览课程</Text>
+            <TouchableOpacity style={styles.browseButton} onPress={handleManageCourses}>
+              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.browseButtonText}>管理课程</Text>
             </TouchableOpacity>
 
             <View style={styles.courseContainer}>
               <Text style={styles.courseTitle}>推荐课程：</Text>
               <View style={styles.courses}>
-                <View style={styles.courseItem}>
-                  <Text style={styles.courseName}>《入菩萨行论》</Text>
-                  <Text style={styles.courseInfo}>索达吉堪布 • 201课</Text>
-                </View>
-                <View style={styles.courseItem}>
-                  <Text style={styles.courseName}>《大圆满前行》</Text>
-                  <Text style={styles.courseInfo}>索达吉堪布 • 92课</Text>
-                </View>
-                <View style={styles.courseItem}>
-                  <Text style={styles.courseName}>《净土教言》</Text>
-                  <Text style={styles.courseInfo}>索达吉堪布 • 45课</Text>
-                </View>
+                {allCourses.slice(0, 3).map(course => (
+                  <View key={course.id} style={styles.courseItem}>
+                    <Text style={styles.courseName}>{course.name}</Text>
+                    <Text style={styles.courseInfo}>
+                      {course.teacher} • {course.total_lessons}课
+                    </Text>
+                  </View>
+                ))}
               </View>
             </View>
           </View>
         </ScrollView>
+
+        {/* Course Management Modal */}
+        <Modal
+          visible={showCourseModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          <SafeAreaView style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>可加入课程</Text>
+              <TouchableOpacity onPress={() => setShowCourseModal(false)}>
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              data={availableCourses}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.courseModalItem}>
+                  <View style={styles.courseModalInfo}>
+                    <Text style={styles.courseModalName}>{item.name}</Text>
+                    <Text style={styles.courseModalDetails}>
+                      {item.teacher} • {item.total_lessons}课
+                    </Text>
+                    {item.description && (
+                      <Text style={styles.courseModalDescription}>
+                        {item.description}
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    style={styles.joinButton}
+                    onPress={() => joinCourse(item.id)}
+                  >
+                    <Text style={styles.joinButtonText}>加入学习</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          </SafeAreaView>
+        </Modal>
       </SafeAreaView>
     );
   }
 
+  // Active State: User has courses
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>📚 闻思学习</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.header}>
+          <Text style={styles.title}>📚 闻思学习</Text>
+          <TouchableOpacity onPress={handleManageCourses}>
+            <Ionicons name="add-circle-outline" size={24} color="#007AFF" />
+          </TouchableOpacity>
+        </View>
 
-      {courses.map(course => {
-        const courseProgress = getCourseProgress(course.id);
-        const currentLesson = courseProgress?.currentLesson || 1;
-        const listenCount = courseProgress?.listenCount[currentLesson] || 0;
+        {userCourses.map(userCourse => {
+          const courseProgress = getCourseProgress(userCourse.course_id);
+          const currentLesson = courseProgress?.currentLesson || 1;
+          const listenCount = courseProgress?.listenCount[currentLesson] || 0;
+          const progressPercentage = courseProgress?.progressPercentage || 0;
 
-        return (
-          <View key={course.id} style={styles.courseCard}>
-            <Text style={styles.courseName}>{course.name}</Text>
-            {course.teacher && (
-              <Text style={styles.teacher}>授课: {course.teacher}</Text>
-            )}
-
-            <View style={styles.progressInfo}>
-              <Text style={styles.progressText}>
-                当前课程: 第 {currentLesson} 课 / 共 {course.total_lessons} 课
-              </Text>
-              <Text style={styles.listenCount}>
-                今日听闻次数: {listenCount}
-              </Text>
-            </View>
-
-            <View style={styles.buttonRow}>
-              <TouchableOpacity 
-                style={styles.studyButton}
-                onPress={() => recordStudy(course.id, currentLesson)}
-              >
-                <Text style={styles.buttonText}>记录闻思 +1</Text>
-              </TouchableOpacity>
-
-              {currentLesson < course.total_lessons && (
-                <TouchableOpacity 
-                  style={styles.nextButton}
-                  onPress={() => recordStudy(course.id, currentLesson + 1)}
-                >
-                  <Text style={styles.buttonText}>下一课</Text>
-                </TouchableOpacity>
+          return (
+            <View key={userCourse.id} style={styles.courseCard}>
+              <Text style={styles.courseName}>{userCourse.course.name}</Text>
+              {userCourse.course.teacher && (
+                <Text style={styles.teacher}>授课: {userCourse.course.teacher}</Text>
               )}
-            </View>
 
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { width: `${(currentLesson / course.total_lessons) * 100}%` }
-                ]} 
-              />
+              <View style={styles.progressInfo}>
+                <Text style={styles.progressText}>
+                  当前课程: 第 {currentLesson} 课 / 共 {userCourse.course.total_lessons} 课
+                </Text>
+                <Text style={styles.progressText}>
+                  完成进度: {progressPercentage.toFixed(1)}%
+                </Text>
+                <Text style={styles.listenCount}>
+                  本课听闻次数: {listenCount}
+                </Text>
+              </View>
+
+              <View style={styles.buttonRow}>
+                <TouchableOpacity 
+                  style={styles.studyButton}
+                  onPress={() => handleContinueStudy(userCourse.course_id)}
+                >
+                  <Text style={styles.buttonText}>记录闻思 +1</Text>
+                </TouchableOpacity>
+
+                {currentLesson < userCourse.course.total_lessons && (
+                  <TouchableOpacity 
+                    style={styles.nextButton}
+                    onPress={() => recordStudy(userCourse.course_id, currentLesson + 1)}
+                  >
+                    <Text style={styles.buttonText}>下一课</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={styles.progressBar}>
+                <View 
+                  style={[
+                    styles.progressFill, 
+                    { width: `${progressPercentage}%` }
+                  ]} 
+                />
+              </View>
             </View>
+          );
+        })}
+      </ScrollView>
+
+      {/* Course Management Modal */}
+      <Modal
+        visible={showCourseModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>可加入课程</Text>
+            <TouchableOpacity onPress={() => setShowCourseModal(false)}>
+              <Ionicons name="close" size={24} color="#666" />
+            </TouchableOpacity>
           </View>
-        );
-      })}
-    </ScrollView>
+          
+          <FlatList
+            data={availableCourses}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.courseModalItem}>
+                <View style={styles.courseModalInfo}>
+                  <Text style={styles.courseModalName}>{item.name}</Text>
+                  <Text style={styles.courseModalDetails}>
+                    {item.teacher} • {item.total_lessons}课
+                  </Text>
+                  {item.description && (
+                    <Text style={styles.courseModalDescription}>
+                      {item.description}
+                    </Text>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={styles.joinButton}
+                  onPress={() => joinCourse(item.id)}
+                >
+                  <Text style={styles.joinButtonText}>加入学习</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        </SafeAreaView>
+      </Modal>
+    </SafeAreaView>
   );
 }
 
@@ -239,27 +424,41 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 10,
+  },
   header: {
     padding: 20,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
+    marginTop: 4,
   },
   courseCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -380,14 +579,62 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     minWidth: 250,
   },
-  courseName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 4,
-  },
   courseInfo: {
     fontSize: 14,
     color: '#6B7280',
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  courseModalItem: {
+    flexDirection: 'row',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    alignItems: 'center',
+  },
+  courseModalInfo: {
+    flex: 1,
+    marginRight: 16,
+  },
+  courseModalName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  courseModalDetails: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  courseModalDescription: {
+    fontSize: 12,
+    color: '#888',
+    lineHeight: 16,
+  },
+  joinButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  joinButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
