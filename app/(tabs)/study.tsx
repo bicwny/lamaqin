@@ -140,13 +140,10 @@ export default function StudyScreen() {
     try {
       const today = new Date().toISOString().split('T')[0];
 
-      // Create a proper lesson record or use existing one
-      const lessonId = `${courseId}-lesson-${lessonNumber}`;
-
       await studyService.recordStudy({
         user_id: user.id,
         course_id: courseId,
-        lesson_id: lessonId,
+        lesson_number: lessonNumber,
         study_date: today,
         study_count_for_lesson: 1
       });
