@@ -75,6 +75,60 @@ export const practiceService = {
     return data || [];
   },
 
+  async getThemePractices(themeId: string) {
+    const { data, error } = await supabase
+      .from('theme_practices')
+      .select(`
+        *,
+        practice:practices(*)
+      `)
+      .eq('theme_id', themeId);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async joinTheme(userId: string, themeId: string): Promise<UserPracticeProject[]> {
+    // Get all practices in the theme
+    const themePractices = await this.getThemePractices(themeId);
+    
+    const createdProjects = [];
+    
+    for (const themePractice of themePractices) {
+      // Check if user already has this practice
+      const { data: existingProject } = await supabase
+        .from('user_practice_projects')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('practice_id', themePractice.practice_id)
+        .single();
+
+      if (!existingProject) {
+        const { data: newProject, error } = await supabase
+          .from('user_practice_projects')
+          .insert({
+            user_id: userId,
+            theme_id: themeId,
+            practice_id: themePractice.practice_id,
+            target_count: themePractice.target_count,
+            daily_target: Math.ceil(themePractice.target_count / 365), // Default daily target
+            status: 'not_started'
+          })
+          .select(`
+            *,
+            practices(*)
+          `)
+          .single();
+
+        if (!error && newProject) {
+          createdProjects.push(newProject);
+        }
+      }
+    }
+
+    return createdProjects;
+  },
+
   async getAllPractices(): Promise<Practice[]> {
     const { data, error } = await supabase
       .from('practices')
