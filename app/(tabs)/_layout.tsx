@@ -26,7 +26,7 @@ export default function TabLayout() {
           default: {},
         }),
       }}
-      initialRouteName="study">
+      initialRouteName="index">
       <Tabs.Screen
         name="study"
         options={{

@@ -36,7 +36,7 @@ export default function LoginScreen() {
       if (error) {
         Alert.alert('登录失败', error.message);
       } else {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/index');
       }
     } catch (error) {
       Alert.alert('登录失败', '网络错误，请稍后重试');
