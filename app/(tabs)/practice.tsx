@@ -62,6 +62,7 @@ export default function PracticeScreen() {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [duration, setDuration] = useState('100');
   const [customDuration, setCustomDuration] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('weekly');
   const [sessionsPerPeriod, setSessionsPerPeriod] = useState('');
 
@@ -347,6 +348,7 @@ export default function PracticeScreen() {
     setSessionsPerPeriod('');
     setDuration('100');
     setCustomDuration('');
+    setEndDate('');
     setFrequency('weekly');
 
     setShowGoalSettingModal(true);
@@ -356,16 +358,28 @@ export default function PracticeScreen() {
     if (!selectedPractice) return null;
 
     const start = new Date(startDate);
+    let targetEndDate: string;
     let durationDays: number;
 
     if (duration === 'custom') {
-      durationDays = parseInt(customDuration) || 100;
+      if (endDate) {
+        // Use user-provided end date
+        targetEndDate = endDate;
+        const end = new Date(endDate);
+        durationDays = Math.ceil((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+      } else {
+        // Fallback to custom duration in days
+        durationDays = parseInt(customDuration) || 100;
+        const end = new Date(start);
+        end.setDate(start.getDate() + durationDays);
+        targetEndDate = end.toISOString().split('T')[0];
+      }
     } else {
       durationDays = parseInt(duration);
+      const end = new Date(start);
+      end.setDate(start.getDate() + durationDays);
+      targetEndDate = end.toISOString().split('T')[0];
     }
-
-    const endDate = new Date(start);
-    endDate.setDate(start.getDate() + durationDays);
 
     if (selectedPractice.type === 'count') {
       const total = parseInt(totalTarget);
@@ -375,7 +389,7 @@ export default function PracticeScreen() {
         target_count: total,
         daily_target: dailyTarget,
         start_date: startDate,
-        target_end_date: endDate.toISOString().split('T')[0],
+        target_end_date: targetEndDate,
         target_period: 'daily'
       };
     } else {
@@ -395,7 +409,7 @@ export default function PracticeScreen() {
         target_count: totalTargetSessions,
         daily_target: sessions,
         start_date: startDate,
-        target_end_date: endDate.toISOString().split('T')[0],
+        target_end_date: targetEndDate,
         target_period: frequency
       };
     }
@@ -430,8 +444,8 @@ export default function PracticeScreen() {
       }
     }
 
-    if (duration === 'custom' && !customDuration) {
-      Alert.alert('提示', '请输入自定义持续时间');
+    if (duration === 'custom' && !endDate && !customDuration) {
+      Alert.alert('提示', '请输入结束日期或自定义持续时间');
       return;
     }
 
@@ -545,14 +559,30 @@ export default function PracticeScreen() {
 
           {duration === 'custom' && (
             <View style={styles.customDurationContainer}>
-              <TextInput
-                style={styles.customDurationInput}
-                value={customDuration}
-                onChangeText={setCustomDuration}
-                keyboardType="numeric"
-                placeholder="输入天数"
-              />
-              <Text style={styles.customDurationLabel}>天</Text>
+              <Text style={styles.customDurationLabel}>选择结束方式：</Text>
+              
+              <View style={styles.endDateOption}>
+                <Text style={styles.endDateLabel}>结束日期：</Text>
+                <TextInput
+                  style={styles.endDateInput}
+                  value={endDate}
+                  onChangeText={setEndDate}
+                  placeholder="2025-07-03"
+                />
+              </View>
+              
+              <Text style={styles.orText}>或</Text>
+              
+              <View style={styles.durationOption}>
+                <TextInput
+                  style={styles.customDurationInput}
+                  value={customDuration}
+                  onChangeText={setCustomDuration}
+                  keyboardType="numeric"
+                  placeholder="输入天数"
+                />
+                <Text style={styles.customDurationLabel}>天</Text>
+              </View>
             </View>
           )}
         </View>
@@ -1370,9 +1400,12 @@ const styles = StyleSheet.create({
     height: 40,
   },
   customDurationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginTop: 10,
+    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   customDurationInput: {
     flex: 1,
@@ -1386,9 +1419,43 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   customDurationLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#495057',
+    marginBottom: 8,
+  },
+  endDateOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  endDateLabel: {
     fontSize: 16,
-    color: '#666',
-    marginLeft: 8,
+    color: '#333',
+    marginRight: 8,
+    minWidth: 80,
+  },
+  endDateInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  orText: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+    marginVertical: 8,
+    fontStyle: 'italic',
+  },
+  durationOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   confirmButton: {
     backgroundColor: Colors.primary,
