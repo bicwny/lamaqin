@@ -74,6 +74,51 @@ export default function PracticeScreen() {
     loadPracticeData();
   }, [user]);
 
+  const getCurrentPeriodMeditationDetails = async (projectId: string, practiceId: string, targetPeriod: 'daily' | 'weekly') => {
+    if (!user?.id) return [];
+
+    try {
+      const today = new Date();
+      let startDate: string;
+      let endDate: string;
+
+      if (targetPeriod === 'weekly') {
+        // Get current week (Monday to Sunday)
+        const dayOfWeek = today.getDay();
+        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Handle Sunday (0)
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + mondayOffset);
+        
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        
+        startDate = monday.toISOString().split('T')[0];
+        endDate = sunday.toISOString().split('T')[0];
+      } else {
+        // Daily: just today
+        startDate = today.toISOString().split('T')[0];
+        endDate = startDate;
+      }
+
+      // Get all meditation records for current period (no duration limit)
+      const { data, error } = await supabase
+        .from('meditation_records')
+        .select('duration_minutes, session_number, method, record_date, created_at')
+        .eq('user_id', user.id)
+        .eq('practice_id', practiceId)
+        .gte('record_date', startDate)
+        .lte('record_date', endDate)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      console.error('Error getting meditation details:', error);
+      return [];
+    }
+  };
+
   const loadPracticeData = async () => {
     if (!user?.id) return;
 
@@ -140,6 +185,7 @@ export default function PracticeScreen() {
             method: firstTopic.title,
             sessionNumber: firstTopic.topic_number
           }]);
+          console.log('🔄 Initialized first session with topic:', firstTopic.title);
         }
         return;
       }
@@ -248,9 +294,11 @@ export default function PracticeScreen() {
     setMeditationSessions(newSessions);
   };
 
-  const validateMeditationSession = (duration: number): boolean => {
-    // Core business rule: minimum 15 minutes to count as valid session
-    return duration >= 15;
+  const validateMeditationSession = (session: {duration: string, method: string}): boolean => {
+    const duration = parseInt(session.duration);
+    const hasValidDuration = !isNaN(duration) && duration > 0;
+    const hasValidMethod = session.method && session.method.trim().length > 0;
+    return hasValidDuration && hasValidMethod;
   };
 
   const handleSaveMeditationRecord = async () => {
@@ -267,11 +315,10 @@ export default function PracticeScreen() {
 
     // Validate sessions
     const validSessions = meditationSessions.filter(session => {
+      const isValid = validateMeditationSession(session);
       const duration = parseInt(session.duration);
-      const hasValidDuration = !isNaN(duration) && duration > 0;
-      const hasValidMethod = session.method && session.method.trim().length > 0;
-      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${hasValidDuration && hasValidMethod}`);
-      return hasValidDuration && hasValidMethod;
+      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${isValid}`);
+      return isValid;
     });
 
     console.log('📋 Valid sessions count:', validSessions.length);
@@ -324,10 +371,8 @@ export default function PracticeScreen() {
 
         console.log('✅ Meditation record saved:', meditationData);
 
-        // Check if this session counts as a valid "座"
-        if (validateMeditationSession(duration)) {
-          validSessionCount++;
-        }
+        // Every valid session now counts as one "座" (simplified rule)
+        validSessionCount++;
       }
 
       console.log('🔄 Updating project progress...');
@@ -351,7 +396,7 @@ export default function PracticeScreen() {
 
       Alert.alert(
         '记录成功', 
-        `本次观修:\n总时长: ${totalMinutes} 分钟\n有效座数: ${validSessionCount} 座\n\n(单座需≥15分钟才计入有效座数)`
+        `本次观修:\n总时长: ${totalMinutes} 分钟\n完成座数: ${validSessionCount} 座`
       );
 
       setShowMeditationModal(false);
@@ -686,28 +731,22 @@ export default function PracticeScreen() {
                 } else {
                   // Time type: calculate total duration and current period progress
                   if (project.target_period === 'weekly') {
-                    const startDate = new Date(project.start_date || new Date());
-                    const endDate = new Date(project.target_end_date || new Date());
-                    const totalWeeks = Math.ceil((endDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
-
-                    // Get current week's progress (approximation - would need actual DB query for accuracy)
-                    const currentWeekSessions = todayCount; // This should be weekly count from DB query
+                    // For weekly meditation practices
+                    const currentWeekSessions = todayCount; // This represents valid sessions count for the week
 
                     return {
-                      primaryText: `${project.practices.name}(周)：${totalWeeks}周`,
-                      secondaryText: `(本周：${currentWeekSessions}/${dailyTarget})`,
+                      primaryText: `${project.practices.name}`,
+                      secondaryText: `(本周目标：${dailyTarget}座)`,
                       progressText: `本周进度: ${currentWeekSessions} / ${dailyTarget} 座`
                     };
                   } else {
-                    // Daily time type
-                    const startDate = new Date(project.start_date || new Date());
-                    const endDate = new Date(project.target_end_date || new Date());
-                    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+                    // Daily meditation practices
+                    const currentDaySessions = todayCount; // This represents valid sessions count for today
 
                     return {
-                      primaryText: `${project.practices.name}(日)：${totalDays}天`,
-                      secondaryText: `(今天：${todayCount}/${dailyTarget}座)`,
-                      progressText: `今日进度: ${todayCount} / ${dailyTarget} 座`
+                      primaryText: `${project.practices.name}`,
+                      secondaryText: `(每日目标：${dailyTarget}座)`,
+                      progressText: `今日进度: ${currentDaySessions} / ${dailyTarget} 座`
                     };
                   }
                 }
@@ -780,6 +819,36 @@ export default function PracticeScreen() {
                     ) : (
                       <View style={styles.timeBasedActions}>
                         <Text style={styles.timeBasedHint}>点击下方按钮记录观修</Text>
+                        {/* Show current period meditation details */}
+                        <TouchableOpacity
+                          style={styles.sessionDetailsButton}
+                          onPress={async () => {
+                            const details = await getCurrentPeriodMeditationDetails(
+                              project.id, 
+                              project.practice_id, 
+                              project.target_period || 'daily'
+                            );
+                            
+                            if (details.length > 0) {
+                              const sessionList = details.map((session, index) => 
+                                `第${index + 1}座: ${session.duration_minutes}分钟`
+                              ).join('\n');
+                              
+                              Alert.alert(
+                                `${project.target_period === 'weekly' ? '本周' : '今日'}观修详情`,
+                                `有效座数: ${details.length}座\n\n${sessionList}`,
+                                [{ text: '确定', style: 'default' }]
+                              );
+                            } else {
+                              Alert.alert(
+                                '提示',
+                                `${project.target_period === 'weekly' ? '本周' : '今日'}暂无观修记录`
+                              );
+                            }
+                          }}
+                        >
+                          <Text style={styles.sessionDetailsText}>查看详情</Text>
+                        </TouchableOpacity>
                       </View>
                     )}
 
@@ -944,7 +1013,7 @@ export default function PracticeScreen() {
                 🧘 记录"{selectedProjectForRecord?.practices.name}"观修
               </Text>
               <Text style={styles.modalSubtitle}>
-                请记录您的观修座次（单座≥15分钟才计入有效座数）
+                请记录您的观修座次
               </Text>
 
               {meditationSessions.map((session, index) => (
@@ -974,6 +1043,7 @@ export default function PracticeScreen() {
                             console.log('🔄 Selected topic:', selectedTopic);
                             if (selectedTopic) {
                               updateMeditationSession(index, 'method', selectedTopic.title);
+                              console.log('🔄 Method updated to:', selectedTopic.title);
                             }
                           }}
                           style={styles.topicPicker}
@@ -1033,13 +1103,11 @@ export default function PracticeScreen() {
                   {session.duration && parseInt(session.duration) > 0 && (
                     <Text style={[
                       styles.sessionValidation,
-                      validateMeditationSession(parseInt(session.duration)) 
-                        ? styles.validSession 
-                        : styles.invalidSession
+                      validateMeditationSession(session) ? styles.validSession : styles.invalidSession
                     ]}>
-                      {validateMeditationSession(parseInt(session.duration))
-                        ? '✅ 有效座（≥15分钟）'
-                        : '⚠️ 时长不足15分钟，不计入有效座数'
+                      {validateMeditationSession(session) ? 
+                        `✅ 有效座（${parseInt(session.duration)}分钟）` : 
+                        `⚠️ 需要完善信息（${parseInt(session.duration)}分钟）`
                       }
                     </Text>
                   )}
@@ -1684,6 +1752,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     fontStyle: 'italic',
+    marginBottom: 8,
+  },
+  sessionDetailsButton: {
+    backgroundColor: '#f0f8ff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#e0e8ff',
+  },
+  sessionDetailsText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '500',
   },
   customCountInput: {
     backgroundColor: '#fff',
