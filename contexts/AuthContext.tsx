@@ -219,21 +219,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
 
-      // Set a timeout for database operations
+      // Set a shorter timeout for database operations
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Database operation timeout')), 5000);
+        setTimeout(() => reject(new Error('Database operation timeout (3s)')), 3000);
       });
 
       const dbOperation = async () => {
+        // First check if we can connect to Supabase at all
+        const { data: connectionTest, error: connectionError } = await supabase
+          .from('users')
+          .select('count')
+          .limit(1)
+          .maybeSingle();
+
+        if (connectionError) {
+          console.error('❌ AuthContext: Database connection failed:', connectionError);
+          throw new Error(`Database connection failed: ${connectionError.message}`);
+        }
+
+        // Check if user exists
         const { data: existingUser, error: fetchError } = await supabase
           .from('users')
           .select('id')
           .eq('email', user.email)
-          .single();
+          .maybeSingle();
 
-        if (fetchError && fetchError.code !== 'PGRST116') {
+        if (fetchError) {
           console.error('❌ AuthContext: Error checking user existence:', fetchError);
-          throw fetchError;
+          throw new Error(`User lookup failed: ${fetchError.message}`);
         }
 
         if (!existingUser) {
@@ -249,8 +262,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (insertError) {
             console.error('❌ AuthContext: Error creating user:', insertError);
-            throw insertError;
+            throw new Error(`User creation failed: ${insertError.message}`);
           }
+          console.log('✅ AuthContext: New user created in database');
         } else {
           console.log('✅ AuthContext: User already exists in database:', user.email);
         }
@@ -258,9 +272,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await Promise.race([dbOperation(), timeoutPromise]);
     } catch (error) {
-      console.error('❌ AuthContext: Error ensuring user in database:', error);
-      // Don't throw the error - continue with authentication even if database sync fails
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('❌ AuthContext: Error ensuring user in database:', errorMessage);
       console.log('⚠️ AuthContext: Continuing without database sync due to error');
+      
+      // Optional: You could set a flag here to retry later or show a warning to the user
+      // For now, we continue gracefully as designed
     }
   };
 
