@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -65,15 +64,15 @@ export default function StudyScreen() {
 
     try {
       console.log('🔄 Loading study data for user:', user.id);
-      
+
       // Load user's courses
       const userCoursesData = await getUserCourses(user.id);
       setUserCourses(userCoursesData);
-      
+
       // Load all available courses
       const allCoursesData = await studyService.getCourses();
       setAllCourses(allCoursesData);
-      
+
       // Load progress data
       const progressData = await studyService.getUserStudyProgress(user.id);
       const organizedProgress = processProgressData(progressData, userCoursesData);
@@ -130,7 +129,7 @@ export default function StudyScreen() {
       const courseId = record.course_id;
       if (progressMap[courseId] && record.lesson) {
         const lessonNum = record.lesson.lesson_number;
-        
+
         // Track listen count for each lesson
         progressMap[courseId].listenCount[lessonNum] = 
           (progressMap[courseId].listenCount[lessonNum] || 0) + record.study_count_for_lesson;
@@ -183,11 +182,11 @@ export default function StudyScreen() {
     try {
       console.log('🔄 加入课程:', courseId);
       setJoiningCourse(courseId);
-      
+
       const userCourse = await studyService.joinCourse(user.id, courseId);
-      
+
       setUserCourses(prev => [...prev, userCourse]);
-      
+
       const newProgress: StudyProgress = {
         courseId: courseId,
         currentLesson: 1,
@@ -197,10 +196,10 @@ export default function StudyScreen() {
         lastStudiedLesson: 1
       };
       setProgress(prev => [...prev, newProgress]);
-      
+
       Alert.alert('成功', '课程已加入，开始学习吧！');
       setViewMode('home');
-      
+
       console.log('✅ 课程加入成功');
     } catch (error) {
       console.error('❌ Error joining course:', error);
@@ -212,7 +211,7 @@ export default function StudyScreen() {
 
   const pauseCourse = async (courseId: string) => {
     if (!user) return;
-    
+
     try {
       await studyService.updateCourseStatus(user.id, courseId, 'paused');
       setUserCourses(prev => 
@@ -229,7 +228,7 @@ export default function StudyScreen() {
 
   const resumeCourse = async (courseId: string) => {
     if (!user) return;
-    
+
     try {
       await studyService.updateCourseStatus(user.id, courseId, 'active');
       setUserCourses(prev => 
@@ -246,7 +245,7 @@ export default function StudyScreen() {
 
   const quitCourse = async (courseId: string) => {
     if (!user) return;
-    
+
     Alert.alert(
       '确认退出',
       '确定要退出这门课程吗？学习进度将会保留。',
@@ -375,7 +374,7 @@ export default function StudyScreen() {
                 <Text style={styles.lastStudied}>
                   上次完成：第{currentLesson}课
                 </Text>
-                
+
                 <TouchableOpacity 
                   style={styles.continueButton}
                   onPress={(e) => {
@@ -413,7 +412,7 @@ export default function StudyScreen() {
               {userCourses.map(userCourse => {
                 const courseProgress = getCourseProgress(userCourse.course_id);
                 const progressPercentage = courseProgress?.progressPercentage || 0;
-                
+
                 return (
                   <View key={userCourse.id} style={styles.manageCourseCard}>
                     <View style={styles.courseHeader}>
@@ -424,7 +423,7 @@ export default function StudyScreen() {
                         {userCourse.course.teacher} | {userCourse.course.total_lessons}课 | {progressPercentage.toFixed(1)}%完成
                       </Text>
                     </View>
-                    
+
                     <View style={styles.buttonRow}>
                       {userCourse.status === 'active' ? (
                         <>
@@ -478,7 +477,7 @@ export default function StudyScreen() {
                       {course.teacher} | {course.total_lessons}课
                     </Text>
                   </View>
-                  
+
                   <TouchableOpacity
                     style={[
                       styles.joinButton,
@@ -504,7 +503,7 @@ export default function StudyScreen() {
   if (viewMode === 'courseDetail' && selectedCourse) {
     const courseProgress = getCourseProgress(selectedCourse.course_id);
     const lessons = courseLessons[selectedCourse.course_id] || [];
-    
+
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
@@ -527,11 +526,11 @@ export default function StudyScreen() {
           </View>
 
           <Text style={styles.sectionTitle}>课程内容：</Text>
-          
+
           {lessons.map(lesson => {
             const listenCount = courseProgress?.listenCount[lesson.lesson_number] || 0;
             const isCompleted = listenCount > 0;
-            
+
             return (
               <View key={lesson.id} style={styles.lessonItem}>
                 <View style={styles.lessonHeader}>
@@ -540,7 +539,7 @@ export default function StudyScreen() {
                     {listenCount > 0 && `✅ (${listenCount}次)`}
                   </Text>
                 </View>
-                
+
                 <TouchableOpacity 
                   style={styles.recordButton}
                   onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number)}
