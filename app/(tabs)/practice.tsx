@@ -73,14 +73,21 @@ export default function PracticeScreen() {
       console.log('🔄 Loading practice data for user:', user.id);
 
       const projects = await practiceService.getUserPracticeProjects(user.id);
-      console.log('📋 User practice projects:', projects); // Log the projects data
+      console.log('📋 User practice projects:', projects);
       console.log('📋 Loaded practice projects:', projects.length);
       setPracticeProjects(projects);
 
       const today = new Date().toISOString().split('T')[0];
       const records = await dailyRecordService.getTodayRecords(user.id, today);
       console.log('📅 Loaded today records:', records.length);
-      setTodayRecords(records);
+      
+      // Convert records array to object for easier access
+      const recordsMap = records.reduce((acc, record) => {
+        acc[record.practice_project_id] = record.count;
+        return acc;
+      }, {});
+      
+      setTodayRecords(recordsMap);
     } catch (error) {
       console.error('Error loading practice data:', error);
     } finally {
@@ -531,12 +538,10 @@ export default function PracticeScreen() {
 
                   <View style={styles.progressInfo}>
                     <Text style={styles.progressText}>
-                      {project.current_count} / {project.target_count}{' '}
-                      {project.practices.unit}
+                      {project.current_count} / {project.target_count} {project.practices.unit}
                     </Text>
                     <Text style={styles.dailyProgress}>
-                      今日: {todayCount} / {dailyTarget}{' '}
-                      {project.practices.unit}
+                      今日: {todayCount} / {dailyTarget} {project.practices.unit}
                     </Text>
                     
                     <Text style={styles.targetPeriod}>

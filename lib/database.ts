@@ -226,13 +226,7 @@ export const dailyRecordService = {
   async getTodayRecords(userId: string, date: string): Promise<DailyRecord[]> {
     const { data, error } = await supabase
       .from('daily_records')
-      .select(`
-        *,
-        practice_project:user_practice_projects(
-          *,
-          practice:practices(*)
-        )
-      `)
+      .select('*')
       .eq('user_id', userId)
       .eq('record_date', date);
 
