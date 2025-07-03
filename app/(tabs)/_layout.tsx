@@ -64,6 +64,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="index"
+        options={{
+          title: '🏠 首页',
+          tabBarIcon: ({ color, focused }) => (
+            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           href: null, // Hide the profile tab
