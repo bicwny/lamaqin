@@ -20,6 +20,7 @@ interface UserCourse {
   course_id: string;
   status: 'active' | 'completed' | 'paused';
   joined_date: string;
+  progress_percentage: number;
   course: Course;
 }
 
@@ -29,15 +30,27 @@ interface StudyProgress {
   listenCount: Record<number, number>;
   totalLessonsStudied: number;
   progressPercentage: number;
+  lastStudiedLesson: number;
 }
+
+interface CourseLesson {
+  id: string;
+  lesson_number: number;
+  title: string;
+  course_id: string;
+}
+
+type ViewMode = 'home' | 'manage' | 'courseDetail';
 
 export default function StudyScreen() {
   const { user } = useAuth();
   const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [progress, setProgress] = useState<StudyProgress[]>([]);
+  const [courseLessons, setCourseLessons] = useState<Record<string, CourseLesson[]>>({});
   const [loading, setLoading] = useState(true);
-  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [selectedCourse, setSelectedCourse] = useState<UserCourse | null>(null);
   const [joiningCourse, setJoiningCourse] = useState<string | null>(null);
 
   useEffect(() => {
@@ -66,6 +79,14 @@ export default function StudyScreen() {
       const organizedProgress = processProgressData(progressData, userCoursesData);
       setProgress(organizedProgress);
 
+      // Load lessons for enrolled courses
+      const lessonsData: Record<string, CourseLesson[]> = {};
+      for (const userCourse of userCoursesData) {
+        const lessons = await studyService.getCourseLessons(userCourse.course_id);
+        lessonsData[userCourse.course_id] = lessons;
+      }
+      setCourseLessons(lessonsData);
+
       console.log('📚 Loaded user courses:', userCoursesData.length);
       console.log('📖 Loaded progress records:', progressData.length);
     } catch (error) {
@@ -80,12 +101,10 @@ export default function StudyScreen() {
 
   const getUserCourses = async (userId: string): Promise<UserCourse[]> => {
     try {
-      // 使用真正的user_courses表
       const userCourses = await studyService.getUserCourses(userId);
       return userCourses;
     } catch (error) {
       console.error('❌ Error getting user courses:', error);
-      // 如果user_courses表还没有数据，返回空数组
       return [];
     }
   };
@@ -101,22 +120,24 @@ export default function StudyScreen() {
         currentLesson: 1,
         listenCount: {},
         totalLessonsStudied: 0,
-        progressPercentage: 0
+        progressPercentage: userCourse.progress_percentage || 0,
+        lastStudiedLesson: 1
       };
     });
 
     // Process study records
     studyRecords.forEach(record => {
       const courseId = record.course_id;
-      if (progressMap[courseId]) {
-        const lessonNum = record.lesson?.lesson_number || 1;
+      if (progressMap[courseId] && record.lesson) {
+        const lessonNum = record.lesson.lesson_number;
         
         // Track listen count for each lesson
         progressMap[courseId].listenCount[lessonNum] = 
-          (progressMap[courseId].listenCount[lessonNum] || 0) + 1;
+          (progressMap[courseId].listenCount[lessonNum] || 0) + record.study_count_for_lesson;
 
-        // Update current lesson (latest lesson studied)
-        if (lessonNum > progressMap[courseId].currentLesson) {
+        // Update last studied lesson
+        if (lessonNum > progressMap[courseId].lastStudiedLesson) {
+          progressMap[courseId].lastStudiedLesson = lessonNum;
           progressMap[courseId].currentLesson = lessonNum;
         }
       }
@@ -161,48 +182,115 @@ export default function StudyScreen() {
 
     try {
       console.log('🔄 加入课程:', courseId);
-      setJoiningCourse(courseId); // 设置加载状态
+      setJoiningCourse(courseId);
       
-      // 真正的加入课程逻辑
       const userCourse = await studyService.joinCourse(user.id, courseId);
       
-      // 即时更新本地状态
       setUserCourses(prev => [...prev, userCourse]);
       
-      // 初始化进度数据
       const newProgress: StudyProgress = {
         courseId: courseId,
         currentLesson: 1,
         listenCount: {},
         totalLessonsStudied: 0,
-        progressPercentage: 0
+        progressPercentage: 0,
+        lastStudiedLesson: 1
       };
       setProgress(prev => [...prev, newProgress]);
       
       Alert.alert('成功', '课程已加入，开始学习吧！');
-      setShowCourseModal(false);
+      setViewMode('home');
       
       console.log('✅ 课程加入成功');
     } catch (error) {
       console.error('❌ Error joining course:', error);
       Alert.alert('错误', '加入课程失败，请重试');
     } finally {
-      setJoiningCourse(null); // 清除加载状态
+      setJoiningCourse(null);
     }
+  };
+
+  const pauseCourse = async (courseId: string) => {
+    if (!user) return;
+    
+    try {
+      await studyService.updateCourseStatus(user.id, courseId, 'paused');
+      setUserCourses(prev => 
+        prev.map(uc => 
+          uc.course_id === courseId ? { ...uc, status: 'paused' } : uc
+        )
+      );
+      Alert.alert('成功', '课程已暂停');
+    } catch (error) {
+      console.error('Error pausing course:', error);
+      Alert.alert('错误', '暂停失败，请重试');
+    }
+  };
+
+  const resumeCourse = async (courseId: string) => {
+    if (!user) return;
+    
+    try {
+      await studyService.updateCourseStatus(user.id, courseId, 'active');
+      setUserCourses(prev => 
+        prev.map(uc => 
+          uc.course_id === courseId ? { ...uc, status: 'active' } : uc
+        )
+      );
+      Alert.alert('成功', '课程已恢复');
+    } catch (error) {
+      console.error('Error resuming course:', error);
+      Alert.alert('错误', '恢复失败，请重试');
+    }
+  };
+
+  const quitCourse = async (courseId: string) => {
+    if (!user) return;
+    
+    Alert.alert(
+      '确认退出',
+      '确定要退出这门课程吗？学习进度将会保留。',
+      [
+        { text: '取消', style: 'cancel' },
+        {
+          text: '退出',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await studyService.quitCourse(user.id, courseId);
+              setUserCourses(prev => prev.filter(uc => uc.course_id !== courseId));
+              setProgress(prev => prev.filter(p => p.courseId !== courseId));
+              Alert.alert('成功', '已退出课程');
+            } catch (error) {
+              console.error('Error quitting course:', error);
+              Alert.alert('错误', '退出失败，请重试');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const getCourseProgress = (courseId: string) => {
     return progress.find(p => p.courseId === courseId);
   };
 
-  const handleManageCourses = () => {
-    setShowCourseModal(true);
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return '✅';
+      case 'paused': return '⏸️';
+      case 'completed': return '🎉';
+      default: return '📖';
+    }
   };
 
-  const handleContinueStudy = (courseId: string) => {
-    const courseProgress = getCourseProgress(courseId);
-    const currentLesson = courseProgress?.currentLesson || 1;
-    recordStudy(courseId, currentLesson);
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'active': return '学习中';
+      case 'paused': return '已暂停';
+      case 'completed': return '已完成';
+      default: return '未开始';
+    }
   };
 
   const availableCourses = allCourses.filter(course => 
@@ -220,210 +308,253 @@ export default function StudyScreen() {
     );
   }
 
-  // Zero State: No courses added yet
-  if (userCourses.length === 0) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.header}>
-            <Text style={styles.title}>📚 闻思学习</Text>
-            <Text style={styles.subtitle}>系统学习佛法课程</Text>
-          </View>
-
-          <View style={styles.emptyState}>
-            <View style={styles.iconContainer}>
-              <Ionicons name="book-outline" size={80} color="#9CA3AF" />
+  // Home View
+  if (viewMode === 'home') {
+    if (userCourses.length === 0) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+            <View style={styles.header}>
+              <Text style={styles.title}>📚 闻思学习</Text>
+              <Text style={styles.subtitle}>系统学习佛法课程</Text>
             </View>
 
-            <Text style={styles.emptyTitle}>还没有课程，开始学习吧</Text>
-            <Text style={styles.emptyDescription}>
-              选择您感兴趣的课程，开始系统的闻思学习
-            </Text>
-
-            <TouchableOpacity style={styles.browseButton} onPress={handleManageCourses}>
-              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-              <Text style={styles.browseButtonText}>管理课程</Text>
-            </TouchableOpacity>
-
-            <View style={styles.courseContainer}>
-              <Text style={styles.courseTitle}>推荐课程：</Text>
-              <View style={styles.courses}>
-                {allCourses.slice(0, 3).map(course => (
-                  <View key={course.id} style={styles.courseItem}>
-                    <Text style={styles.courseName}>{course.name}</Text>
-                    <Text style={styles.courseInfo}>
-                      {course.teacher} • {course.total_lessons}课
-                    </Text>
-                  </View>
-                ))}
+            <View style={styles.emptyState}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="book-outline" size={80} color="#9CA3AF" />
               </View>
-            </View>
-          </View>
-        </ScrollView>
 
-        {/* Course Management Modal */}
-        <Modal
-          visible={showCourseModal}
-          animationType="slide"
-          presentationStyle="pageSheet"
-        >
-          <SafeAreaView style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>可加入课程</Text>
-              <TouchableOpacity onPress={() => setShowCourseModal(false)}>
-                <Ionicons name="close" size={24} color="#666" />
+              <Text style={styles.emptyTitle}>还没有课程，开始学习吧</Text>
+              <Text style={styles.emptyDescription}>
+                选择您感兴趣的课程，开始系统的闻思学习
+              </Text>
+
+              <TouchableOpacity 
+                style={styles.browseButton} 
+                onPress={() => setViewMode('manage')}
+              >
+                <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+                <Text style={styles.browseButtonText}>管理课程</Text>
               </TouchableOpacity>
             </View>
-            
-            <FlatList
-              data={availableCourses}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.courseModalItem}>
-                  <View style={styles.courseModalInfo}>
-                    <Text style={styles.courseModalName}>{item.name}</Text>
-                    <Text style={styles.courseModalDetails}>
-                      {item.teacher} • {item.total_lessons}课
-                    </Text>
-                    {item.description && (
-                      <Text style={styles.courseModalDescription}>
-                        {item.description}
-                      </Text>
-                    )}
-                  </View>
-                  <TouchableOpacity
-                    style={[
-                      styles.joinButton,
-                      joiningCourse === item.id && styles.joinButtonLoading
-                    ]}
-                    onPress={() => joinCourse(item.id)}
-                    disabled={joiningCourse === item.id}
-                  >
-                    {joiningCourse === item.id ? (
-                      <Text style={styles.joinButtonText}>加入中...</Text>
-                    ) : (
-                      <Text style={styles.joinButtonText}>加入学习</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              )}
-            />
-          </SafeAreaView>
-        </Modal>
+          </ScrollView>
+        </SafeAreaView>
+      );
+    }
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.header}>
+            <Text style={styles.title}>📚 闻思学习</Text>
+            <TouchableOpacity onPress={() => setViewMode('manage')}>
+              <Text style={styles.manageButton}>管理课程</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.sectionTitle}>我的课程：</Text>
+
+          {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
+            const courseProgress = getCourseProgress(userCourse.course_id);
+            const currentLesson = courseProgress?.currentLesson || 1;
+            const progressPercentage = courseProgress?.progressPercentage || 0;
+
+            return (
+              <TouchableOpacity 
+                key={userCourse.id} 
+                style={styles.courseCard}
+                onPress={() => {
+                  setSelectedCourse(userCourse);
+                  setViewMode('courseDetail');
+                }}
+              >
+                <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                <Text style={styles.courseInfo}>
+                  {userCourse.course.total_lessons}课 | 完成 {progressPercentage.toFixed(1)}%
+                </Text>
+                <Text style={styles.lastStudied}>
+                  上次完成：第{currentLesson}课
+                </Text>
+                
+                <TouchableOpacity 
+                  style={styles.continueButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    recordStudy(userCourse.course_id, currentLesson);
+                  }}
+                >
+                  <Text style={styles.continueButtonText}>继续学习</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
-  // Active State: User has courses
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.title}>📚 闻思学习</Text>
-          <TouchableOpacity onPress={handleManageCourses}>
-            <Ionicons name="add-circle-outline" size={24} color="#007AFF" />
-          </TouchableOpacity>
-        </View>
-
-        {userCourses.map(userCourse => {
-          const courseProgress = getCourseProgress(userCourse.course_id);
-          const currentLesson = courseProgress?.currentLesson || 1;
-          const listenCount = courseProgress?.listenCount[currentLesson] || 0;
-          const progressPercentage = courseProgress?.progressPercentage || 0;
-
-          return (
-            <View key={userCourse.id} style={styles.courseCard}>
-              <Text style={styles.courseName}>{userCourse.course.name}</Text>
-              {userCourse.course.teacher && (
-                <Text style={styles.teacher}>授课: {userCourse.course.teacher}</Text>
-              )}
-
-              <View style={styles.progressInfo}>
-                <Text style={styles.progressText}>
-                  当前课程: 第 {currentLesson} 课 / 共 {userCourse.course.total_lessons} 课
-                </Text>
-                <Text style={styles.progressText}>
-                  完成进度: {progressPercentage.toFixed(1)}%
-                </Text>
-                <Text style={styles.listenCount}>
-                  本课听闻次数: {listenCount}
-                </Text>
-              </View>
-
-              <View style={styles.buttonRow}>
-                <TouchableOpacity 
-                  style={styles.studyButton}
-                  onPress={() => handleContinueStudy(userCourse.course_id)}
-                >
-                  <Text style={styles.buttonText}>记录闻思 +1</Text>
-                </TouchableOpacity>
-
-                {currentLesson < userCourse.course.total_lessons && (
-                  <TouchableOpacity 
-                    style={styles.nextButton}
-                    onPress={() => recordStudy(userCourse.course_id, currentLesson + 1)}
-                  >
-                    <Text style={styles.buttonText}>下一课</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={styles.progressBar}>
-                <View 
-                  style={[
-                    styles.progressFill, 
-                    { width: `${progressPercentage}%` }
-                  ]} 
-                />
-              </View>
-            </View>
-          );
-        })}
-      </ScrollView>
-
-      {/* Course Management Modal */}
-      <Modal
-        visible={showCourseModal}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>可加入课程</Text>
-            <TouchableOpacity onPress={() => setShowCourseModal(false)}>
-              <Ionicons name="close" size={24} color="#666" />
+  // Course Management View
+  if (viewMode === 'manage') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => setViewMode('home')}>
+              <Ionicons name="arrow-back" size={24} color="#007AFF" />
             </TouchableOpacity>
+            <Text style={styles.title}>📚 课程管理</Text>
+            <View style={{width: 24}} />
           </View>
-          
-          <FlatList
-            data={availableCourses}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.courseModalItem}>
-                <View style={styles.courseModalInfo}>
-                  <Text style={styles.courseModalName}>{item.name}</Text>
-                  <Text style={styles.courseModalDetails}>
-                    {item.teacher} • {item.total_lessons}课
-                  </Text>
-                  {item.description && (
-                    <Text style={styles.courseModalDescription}>
-                      {item.description}
+
+          {userCourses.length > 0 && (
+            <>
+              <Text style={styles.sectionTitle}>我的课程：</Text>
+              {userCourses.map(userCourse => {
+                const courseProgress = getCourseProgress(userCourse.course_id);
+                const progressPercentage = courseProgress?.progressPercentage || 0;
+                
+                return (
+                  <View key={userCourse.id} style={styles.manageCourseCard}>
+                    <View style={styles.courseHeader}>
+                      <Text style={styles.courseName}>
+                        {userCourse.course.name} {getStatusIcon(userCourse.status)}{getStatusText(userCourse.status)}
+                      </Text>
+                      <Text style={styles.courseDetails}>
+                        {userCourse.course.teacher} | {userCourse.course.total_lessons}课 | {progressPercentage.toFixed(1)}%完成
+                      </Text>
+                    </View>
+                    
+                    <View style={styles.buttonRow}>
+                      {userCourse.status === 'active' ? (
+                        <>
+                          <TouchableOpacity 
+                            style={styles.primaryButton}
+                            onPress={() => {
+                              setSelectedCourse(userCourse);
+                              setViewMode('courseDetail');
+                            }}
+                          >
+                            <Text style={styles.buttonText}>继续学习</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity 
+                            style={styles.secondaryButton}
+                            onPress={() => pauseCourse(userCourse.course_id)}
+                          >
+                            <Text style={styles.secondaryButtonText}>暂停</Text>
+                          </TouchableOpacity>
+                        </>
+                      ) : userCourse.status === 'paused' ? (
+                        <>
+                          <TouchableOpacity 
+                            style={styles.primaryButton}
+                            onPress={() => resumeCourse(userCourse.course_id)}
+                          >
+                            <Text style={styles.buttonText}>恢复学习</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity 
+                            style={styles.dangerButton}
+                            onPress={() => quitCourse(userCourse.course_id)}
+                          >
+                            <Text style={styles.buttonText}>退出课程</Text>
+                          </TouchableOpacity>
+                        </>
+                      ) : null}
+                    </View>
+                  </View>
+                );
+              })}
+            </>
+          )}
+
+          {availableCourses.length > 0 && (
+            <>
+              <Text style={styles.sectionTitle}>可加入课程：</Text>
+              {availableCourses.map(course => (
+                <View key={course.id} style={styles.availableCourseCard}>
+                  <View style={styles.courseHeader}>
+                    <Text style={styles.courseName}>{course.name}</Text>
+                    <Text style={styles.courseDetails}>
+                      {course.teacher} | {course.total_lessons}课
                     </Text>
-                  )}
+                  </View>
+                  
+                  <TouchableOpacity
+                    style={[
+                      styles.joinButton,
+                      joiningCourse === course.id && styles.joinButtonLoading
+                    ]}
+                    onPress={() => joinCourse(course.id)}
+                    disabled={joiningCourse === course.id}
+                  >
+                    <Text style={styles.joinButtonText}>
+                      {joiningCourse === course.id ? '加入中...' : '加入学习'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  style={styles.joinButton}
-                  onPress={() => joinCourse(item.id)}
+              ))}
+            </>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // Course Detail View
+  if (viewMode === 'courseDetail' && selectedCourse) {
+    const courseProgress = getCourseProgress(selectedCourse.course_id);
+    const lessons = courseLessons[selectedCourse.course_id] || [];
+    
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => setViewMode('home')}>
+              <Ionicons name="arrow-back" size={24} color="#007AFF" />
+            </TouchableOpacity>
+            <Text style={styles.title}>📚 {selectedCourse.course.name}</Text>
+            <View style={{width: 24}} />
+          </View>
+
+          <View style={styles.courseInfoCard}>
+            <Text style={styles.courseInfoTitle}>课程信息：</Text>
+            <Text style={styles.courseInfoText}>👨‍🏫 {selectedCourse.course.teacher}</Text>
+            <Text style={styles.courseInfoText}>📖 总课数：{selectedCourse.course.total_lessons}课</Text>
+            <Text style={styles.courseInfoText}>
+              📊 完成进度：{(courseProgress?.progressPercentage || 0).toFixed(1)}% 
+              ({courseProgress?.totalLessonsStudied || 0}/{selectedCourse.course.total_lessons}课)
+            </Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>课程内容：</Text>
+          
+          {lessons.map(lesson => {
+            const listenCount = courseProgress?.listenCount[lesson.lesson_number] || 0;
+            const isCompleted = listenCount > 0;
+            
+            return (
+              <View key={lesson.id} style={styles.lessonItem}>
+                <View style={styles.lessonHeader}>
+                  <Text style={styles.lessonTitle}>
+                    ├ 第{lesson.lesson_number}课：{lesson.title} {isCompleted ? '✅' : '☐'} 
+                    {listenCount > 0 && `✅ (${listenCount}次)`}
+                  </Text>
+                </View>
+                
+                <TouchableOpacity 
+                  style={styles.recordButton}
+                  onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number)}
                 >
-                  <Text style={styles.joinButtonText}>加入学习</Text>
+                  <Text style={styles.recordButtonText}>记录</Text>
                 </TouchableOpacity>
               </View>
-            )}
-          />
-        </SafeAreaView>
-      </Modal>
-    </SafeAreaView>
-  );
+            );
+          })}
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -466,6 +597,18 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
+  manageButton: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 12,
+  },
   courseCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -478,43 +621,83 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  manageCourseCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  availableCourseCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  courseHeader: {
+    marginBottom: 12,
+  },
   courseName: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
   },
-  teacher: {
+  courseInfo: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 12,
-  },
-  progressInfo: {
-    marginBottom: 12,
-  },
-  progressText: {
-    fontSize: 16,
     marginBottom: 4,
   },
-  listenCount: {
+  courseDetails: {
     fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '500',
+    color: '#666',
+  },
+  lastStudied: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 12,
+  },
+  continueButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  continueButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
   buttonRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 12,
   },
-  studyButton: {
+  primaryButton: {
     flex: 1,
     backgroundColor: '#007AFF',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
-  nextButton: {
+  secondaryButton: {
     flex: 1,
-    backgroundColor: '#34C759',
+    backgroundColor: '#F2F2F7',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  dangerButton: {
+    flex: 1,
+    backgroundColor: '#FF3B30',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -523,15 +706,73 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-  progressBar: {
-    height: 6,
-    backgroundColor: '#E5E5E7',
-    borderRadius: 3,
-    overflow: 'hidden',
+  secondaryButtonText: {
+    color: '#007AFF',
+    fontWeight: '600',
   },
-  progressFill: {
-    height: '100%',
+  joinButton: {
     backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignSelf: 'flex-end',
+  },
+  joinButtonLoading: {
+    backgroundColor: '#9CA3AF',
+  },
+  joinButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  courseInfoCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  courseInfoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  courseInfoText: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  lessonItem: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 12,
+    marginHorizontal: 16,
+    marginVertical: 2,
+    borderRadius: 8,
+  },
+  lessonHeader: {
+    flex: 1,
+  },
+  lessonTitle: {
+    fontSize: 14,
+    fontFamily: 'monospace',
+  },
+  recordButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  recordButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   emptyState: {
     flex: 1,
@@ -565,92 +806,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
-    marginBottom: 40,
   },
   browseButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
-  },
-  courseContainer: {
-    alignItems: 'center',
-  },
-  courseTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 16,
-  },
-  courses: {
-    alignItems: 'stretch',
-  },
-  courseItem: {
-    backgroundColor: '#F9FAFB',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    minWidth: 250,
-  },
-  courseInfo: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  // Modal styles
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  courseModalItem: {
-    flexDirection: 'row',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    alignItems: 'center',
-  },
-  courseModalInfo: {
-    flex: 1,
-    marginRight: 16,
-  },
-  courseModalName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  courseModalDetails: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  courseModalDescription: {
-    fontSize: 12,
-    color: '#888',
-    lineHeight: 16,
-  },
-  joinButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  joinButtonLoading: {
-    backgroundColor: '#9CA3AF',
-  },
-  joinButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
