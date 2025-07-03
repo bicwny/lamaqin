@@ -210,15 +210,17 @@ export default function PracticeScreen() {
   };
 
   const handleCustomRecord = async (project: PracticeProject) => {
-    setSelectedProjectForCount(project);
-
+    console.log('🔄 handleCustomRecord called with project:', project.id, project.practices.name);
+    
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
+      setSelectedProjectForRecord(project); // Set the correct state for meditation
       setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
       await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
       // For count-based practices, show the custom count modal
+      setSelectedProjectForCount(project); // Set the correct state for count
       setShowCountModal(true);
       setCustomCount(''); // Reset the custom count
     }
