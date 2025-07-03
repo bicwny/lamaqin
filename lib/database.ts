@@ -1,4 +1,3 @@
-
 import { supabase, testConnection } from './supabase';
 import { Database } from '@/types/database';
 
@@ -35,7 +34,7 @@ export const userService = {
       .select('*')
       .eq('id', userId)
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -47,7 +46,7 @@ export const userService = {
       .eq('id', userId)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -58,7 +57,7 @@ export const userService = {
       .insert({ id: userId, ...profile })
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -71,7 +70,7 @@ export const practiceService = {
       .from('themes')
       .select('*')
       .order('created_at');
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -81,7 +80,7 @@ export const practiceService = {
       .from('practices')
       .select('*')
       .order('name');
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -95,7 +94,7 @@ export const practiceService = {
       `)
       .eq('user_id', userId)
       .order('created_at');
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -106,7 +105,7 @@ export const practiceService = {
       .insert(project)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -118,7 +117,7 @@ export const practiceService = {
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   }
@@ -138,7 +137,7 @@ export const dailyRecordService = {
       `)
       .eq('user_id', userId)
       .eq('record_date', date);
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -149,14 +148,14 @@ export const dailyRecordService = {
       .insert(record)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     // Update practice project progress
     await practiceService.updatePracticeProject(record.practice_project_id, {
       current_count: data.count // This should be cumulative - need to handle properly
     });
-    
+
     return data;
   }
 };
@@ -168,12 +167,12 @@ export const meditationService = {
       .from('meditation_records')
       .select('*')
       .eq('user_id', userId);
-    
+
     if (startDate) query = query.gte('record_date', startDate);
     if (endDate) query = query.lte('record_date', endDate);
-    
+
     const { data, error } = await query.order('record_date', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -184,7 +183,7 @@ export const meditationService = {
       .insert(record)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -194,9 +193,9 @@ export const meditationService = {
       .from('meditation_records')
       .select('session_number')
       .eq('user_id', userId);
-    
+
     if (error) throw error;
-    
+
     const uniqueSessions = new Set(data?.map(r => r.session_number) || []);
     return {
       completedSessions: uniqueSessions.size,
@@ -212,7 +211,7 @@ export const studyService = {
       .from('courses')
       .select('*')
       .order('name');
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -227,91 +226,69 @@ export const studyService = {
       `)
       .eq('user_id', userId)
       .order('study_date', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   },
 
-  async recordStudy(record: Omit<StudyRecord, 'id' | 'created_at'>): Promise<StudyRecord> {
-    // First, try to find or create the lesson
-    let lessonId = record.lesson_id;
-    
-    // If it's a simple format like "courseId-lesson-number", try to find the actual lesson
-    if (lessonId.includes('-lesson-')) {
-      const [courseId, , lessonNumber] = lessonId.split('-');
-      
-      // Try to find the actual lesson in course_lessons table
-      const { data: existingLesson } = await supabase
-        .from('course_lessons')
-        .select('id')
-        .eq('course_id', courseId)
-        .eq('lesson_number', parseInt(lessonNumber))
-        .single();
-      
-      if (existingLesson) {
-        lessonId = existingLesson.id;
-      } else {
-        // Create a new lesson record if it doesn't exist
-        const { data: newLesson } = await supabase
-          .from('course_lessons')
-          .insert({
-            course_id: courseId,
-            lesson_number: parseInt(lessonNumber),
-            title: `第${lessonNumber}课`,
-            content_summary: ''
-          })
-          .select('id')
-          .single();
-        
-        if (newLesson) {
-          lessonId = newLesson.id;
-        }
-      }
+  async recordStudy(record: {
+    user_id: string;
+    course_id: string;
+    lesson_number: number;
+    study_date: string;
+    study_count_for_lesson: number;
+  }) {
+    // First, get or create the actual lesson record
+    const { data: lesson, error: lessonError } = await supabase
+      .from('course_lessons')
+      .select('id')
+      .eq('course_id', record.course_id)
+      .eq('lesson_number', record.lesson_number)
+      .single();
+
+    if (lessonError) {
+      console.error('❌ Error finding lesson:', lessonError);
+      throw lessonError;
     }
+
+    const studyRecord = {
+      user_id: record.user_id,
+      course_id: record.course_id,
+      lesson_id: lesson.id,
+      study_date: record.study_date,
+      study_count_for_lesson: record.study_count_for_lesson
+    };
 
     const { data, error } = await supabase
       .from('study_records')
-      .insert({
-        ...record,
-        lesson_id: lessonId
-      })
+      .insert(studyRecord)
       .select()
       .single();
-    
+
     if (error) throw error;
+
+    // Update progress after recording
+    await this.updateCourseProgress(record.user_id, record.course_id);
+
     return data;
   },
 
-  async getUserCourses(userId: string) {
-    try {
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select(`
-          *,
-          courses!inner(*)
-        `)
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('joined_date');
-      
-      if (error) {
-        console.error('❌ Error getting user courses:', error);
-        // Return empty array if table doesn't exist
-        if (error.code === 'PGRST116' || error.message.includes('does not exist')) {
-          return [];
-        }
-        throw error;
-      }
-      
-      // Transform the data to match expected structure
-      return data?.map(userCourse => ({
-        ...userCourse,
-        course: userCourse.courses
-      })) || [];
-    } catch (err) {
-      console.error('❌ getUserCourses failed:', err);
-      return [];
+  async getUserCourses(userId: string): Promise<UserCourse[]> {
+    const { data, error } = await supabase
+      .from('user_courses')
+      .select(`
+        *,
+        course:course_id(*)
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'active');
+
+    if (error) {
+      console.error('❌ getUserCourses failed:', error);
+      throw error;
     }
+
+    return data || [];
   },
 
   async joinCourse(userId: string, courseId: string) {
@@ -327,24 +304,24 @@ export const studyService = {
         })
         .select()
         .single();
-      
+
       if (insertError) {
         console.error('❌ Error inserting user course:', insertError);
         throw insertError;
       }
-      
+
       // Then fetch the course data separately
       const { data: courseData, error: courseError } = await supabase
         .from('courses')
         .select('*')
         .eq('id', courseId)
         .single();
-      
+
       if (courseError) {
         console.error('❌ Error fetching course data:', courseError);
         throw courseError;
       }
-      
+
       return {
         ...userCourseData,
         course: courseData
@@ -398,7 +375,7 @@ export const mindfulnessService = {
       .eq('user_id', userId)
       .eq('record_date', date)
       .order('record_time');
-    
+
     if (error) throw error;
     return data || [];
   },
@@ -409,7 +386,7 @@ export const mindfulnessService = {
       .insert(record)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
@@ -421,7 +398,7 @@ export const mindfulnessService = {
       .eq('user_id', userId)
       .gte('record_date', startDate)
       .lte('record_date', endDate);
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -439,4 +416,15 @@ export const statsService = {
       achievements: []
     };
   }
+};
+
+export type UserCourse = {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: string;
+  joined_date: string;
+  progress_percentage: number;
+  updated_at: string;
+  course: any;
 };
