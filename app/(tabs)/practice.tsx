@@ -664,8 +664,8 @@ export default function PracticeScreen() {
                     
                     return {
                       primaryText: `${project.practices.name}(日)：${totalDays}天`,
-                      secondaryText: `(今天：${todayCount}座)`,
-                      progressText: `今日进度: ${todayCount} 座`
+                      secondaryText: `(今天：${todayCount}/${dailyTarget}座)`,
+                      progressText: `今日进度: ${todayCount} / ${dailyTarget} 座`
                     };
                   }
                 }
