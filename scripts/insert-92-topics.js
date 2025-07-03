@@ -140,14 +140,19 @@ async function insertTopics() {
 
     console.log('📋 Found practice ID:', practice.id);
 
-    // Clear existing topics
+    // Clear existing topics if table exists
     const { error: deleteError } = await supabase
       .from('meditation_topics')
       .delete()
       .eq('practice_id', practice.id);
 
-    if (deleteError) {
+    if (deleteError && deleteError.code !== '42P01') {
       console.error('❌ Error clearing existing topics:', deleteError);
+      return;
+    } else if (deleteError && deleteError.code === '42P01') {
+      console.log('⚠️ Table meditation_topics does not exist. Please create it first in Supabase dashboard.');
+      console.log('📋 Run the SQL in scripts/create-meditation-topics-manual.sql in your Supabase SQL Editor');
+      return;
     } else {
       console.log('✅ Cleared existing topics');
     }
