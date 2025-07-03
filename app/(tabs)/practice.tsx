@@ -618,11 +618,13 @@ export default function PracticeScreen() {
                     const endDate = new Date(project.target_end_date || new Date());
                     const totalWeeks = Math.ceil((endDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
                     
-                    // For weekly: show week progress (would need database query for accurate count)
+                    // Get current week's progress (approximation - would need actual DB query for accuracy)
+                    const currentWeekSessions = todayCount; // This should be weekly count from DB query
+                    
                     return {
-                      primaryText: `${totalWeeks}周`,
-                      secondaryText: `(本周：${todayCount}/${dailyTarget})`,
-                      progressText: `本周进度`
+                      primaryText: `${project.practices.name}(周)：${totalWeeks}周`,
+                      secondaryText: `(本周：${currentWeekSessions}/${dailyTarget})`,
+                      progressText: `本周进度: ${currentWeekSessions} / ${dailyTarget} 座`
                     };
                   } else {
                     // Daily time type
@@ -631,9 +633,9 @@ export default function PracticeScreen() {
                     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
                     
                     return {
-                      primaryText: `${totalDays}天`,
+                      primaryText: `${project.practices.name}(日)：${totalDays}天`,
                       secondaryText: `(今天：${todayCount}座)`,
-                      progressText: `今日进度`
+                      progressText: `今日进度: ${todayCount} 座`
                     };
                   }
                 }
@@ -645,7 +647,10 @@ export default function PracticeScreen() {
                 <View key={project.id} style={styles.practiceCard}>
                   <View style={styles.practiceHeader}>
                     <Text style={styles.practiceName}>
-                      {project.practices.name || '修行项目'}
+                      {project.practices.type === 'time' ? 
+                        displayInfo.primaryText : 
+                        (project.practices.name || '修行项目')
+                      }
                     </Text>
                     <Text style={[styles.status, isCompleted && styles.completed]}>
                       {isCompleted ? '✅' : '☐'}
@@ -653,15 +658,28 @@ export default function PracticeScreen() {
                   </View>
 
                   <View style={styles.progressInfo}>
-                    <Text style={styles.progressText}>
-                      {displayInfo.primaryText}
-                    </Text>
-                    <Text style={styles.dailyProgress}>
-                      {displayInfo.progressText}: {todayCount} / {dailyTarget} {project.practices.unit}
-                    </Text>
-                    <Text style={styles.targetPeriod}>
-                      {displayInfo.secondaryText}
-                    </Text>
+                    {project.practices.type === 'count' ? (
+                      <>
+                        <Text style={styles.progressText}>
+                          {displayInfo.primaryText}
+                        </Text>
+                        <Text style={styles.dailyProgress}>
+                          {displayInfo.progressText}
+                        </Text>
+                        <Text style={styles.targetPeriod}>
+                          {displayInfo.secondaryText}
+                        </Text>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.dailyProgress}>
+                          {displayInfo.progressText}
+                        </Text>
+                        <Text style={styles.targetPeriod}>
+                          {displayInfo.secondaryText}
+                        </Text>
+                      </>
+                    )}
                   </View>
 
                   <View style={styles.progressBar}>
