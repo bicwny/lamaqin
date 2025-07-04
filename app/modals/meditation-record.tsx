@@ -117,12 +117,24 @@ export default function MeditationRecordScreen() {
           reflection: recordData.reflection
         });
         Alert.alert('成功', '观修记录已更新', [
-          { text: '确定', onPress: () => router.back() }
+          { text: '确定', onPress: () => {
+            // Navigate back to previous screen
+            router.dismiss();
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)/practice');
+            }
+          }}
         ]);
       } else {
         await meditationService.recordMeditationWithReflection(recordData);
         Alert.alert('成功', '观修记录已保存', [
-          { text: '确定', onPress: () => router.back() }
+          { text: '确定', onPress: () => {
+            // Navigate back to practice tab
+            router.dismiss();
+            router.replace('/(tabs)/practice');
+          }}
         ]);
       }
     } catch (error) {
