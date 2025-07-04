@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -43,7 +44,8 @@ export default function MeditationHistoryScreen() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState<MeditationRecord | null>(null);
   const [editDuration, setEditDuration] = useState('');
-  const [editMethod, setEditMethod] = useState('');
+  const [editSessionNumber, setEditSessionNumber] = useState(1);
+  const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
   const [saving, setSaving] = useState(false);
 
   const PAGE_SIZE = 12;
@@ -134,11 +136,43 @@ export default function MeditationHistoryScreen() {
     }
   };
 
-  const handleEdit = (record: MeditationRecord) => {
+  const handleEdit = async (record: MeditationRecord) => {
     setEditingRecord(record);
     setEditDuration(record.duration_minutes.toString());
-    setEditMethod(record.method || '');
+    setEditSessionNumber(record.session_number || 1);
+    
+    // Load meditation topics
+    await loadMeditationTopics();
+    
     setShowEditModal(true);
+  };
+
+  const loadMeditationTopics = async () => {
+    try {
+      console.log('🧘 Loading meditation topics for editing');
+      const { data, error } = await supabase
+        .from('meditation_topics')
+        .select('topic_number, title, description')
+        .eq('practice_id', practiceId)
+        .order('topic_number', { ascending: true });
+
+      if (error) throw error;
+
+      console.log('📚 Loaded meditation topics for edit:', data?.length || 0);
+      setMeditationTopics(data || []);
+    } catch (error) {
+      console.error('Error loading meditation topics:', error);
+      // Create fallback topics
+      const fallbackTopics = [];
+      for (let i = 1; i <= 92; i++) {
+        fallbackTopics.push({
+          topic_number: i,
+          title: `思维闲暇之本体`,
+          description: `第${i}修法`
+        });
+      }
+      setMeditationTopics(fallbackTopics);
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -150,6 +184,10 @@ export default function MeditationHistoryScreen() {
       return;
     }
 
+    // Get the selected topic to update method
+    const selectedTopic = meditationTopics.find(t => t.topic_number === editSessionNumber);
+    const method = selectedTopic ? selectedTopic.title : `第${editSessionNumber}座修行`;
+
     setSaving(true);
     try {
       console.log('🔄 Updating meditation record:', editingRecord.id);
@@ -158,7 +196,8 @@ export default function MeditationHistoryScreen() {
         .from('meditation_records')
         .update({
           duration_minutes: duration,
-          method: editMethod.trim()
+          session_number: editSessionNumber,
+          method: method
         })
         .eq('id', editingRecord.id)
         .eq('user_id', user.id);
@@ -173,7 +212,7 @@ export default function MeditationHistoryScreen() {
       // Update local state
       setRecords(prev => prev.map(record => 
         record.id === editingRecord.id 
-          ? { ...record, duration_minutes: duration, method: editMethod.trim() }
+          ? { ...record, duration_minutes: duration, session_number: editSessionNumber, method: method }
           : record
       ));
 
@@ -288,14 +327,11 @@ export default function MeditationHistoryScreen() {
               <View key={record.id} style={styles.recordCard}>
                 <View style={styles.recordHeader}>
                   <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
-                  <Text style={styles.sessionNumber}>第{record.session_number}座</Text>
+                  <Text style={styles.sessionNumber}>第{record.session_number}座 {record.method}</Text>
                 </View>
                 
                 <View style={styles.recordContent}>
                   <Text style={styles.duration}>{record.duration_minutes} 分钟</Text>
-                  {record.method && (
-                    <Text style={styles.method}>{record.method}</Text>
-                  )}
                 </View>
 
                 <View style={styles.recordActions}>
@@ -361,15 +397,32 @@ export default function MeditationHistoryScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>观修方法/备注</Text>
-              <TextInput
-                style={[styles.input, styles.multilineInput]}
-                value={editMethod}
-                onChangeText={setEditMethod}
-                placeholder="观修方法或备注"
-                multiline={true}
-                numberOfLines={3}
-              />
+              <Text style={styles.inputLabel}>选择观修内容</Text>
+              {meditationTopics.length > 0 ? (
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={editSessionNumber}
+                    onValueChange={(value) => setEditSessionNumber(value)}
+                    style={styles.topicPicker}
+                  >
+                    {meditationTopics.map((topic) => (
+                      <Picker.Item 
+                        key={topic.topic_number} 
+                        label={`第${topic.topic_number}座 - ${topic.title}`} 
+                        value={topic.topic_number} 
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              ) : (
+                <TextInput
+                  style={styles.input}
+                  value={editSessionNumber.toString()}
+                  onChangeText={(value) => setEditSessionNumber(parseInt(value) || 1)}
+                  keyboardType="numeric"
+                  placeholder="座数编号"
+                />
+              )}
             </View>
 
             <View style={styles.modalActions}>
@@ -591,6 +644,17 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 80,
     textAlignVertical: 'top',
+  },
+  pickerContainer: {
+    backgroundColor: '#f8f9fa',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  topicPicker: {
+    backgroundColor: '#fff',
+    height: 40,
   },
   modalActions: {
     flexDirection: 'row',
