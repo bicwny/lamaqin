@@ -322,25 +322,48 @@ export const dailyRecordService = {
 
 // Meditation Records
 export const meditationService = {
-  async getMeditationRecords(userId: string, startDate?: string, endDate?: string): Promise<MeditationRecord[]> {
+  async getMeditationRecords(userId: string, practiceId?: string): Promise<MeditationRecord[]> {
     let query = supabase
       .from('meditation_records')
-      .select('*')
-      .eq('user_id', userId);
+      .select('id, user_id, practice_id, record_date, duration_minutes, session_number, method, reflection, reflection_created_at, created_at')
+      .eq('user_id', userId)
+      .order('record_date', { ascending: false })
+      .order('created_at', { ascending: false });
 
-    if (startDate) query = query.gte('record_date', startDate);
-    if (endDate) query = query.lte('record_date', endDate);
+    if (practiceId) {
+      query = query.eq('practice_id', practiceId);
+    }
 
-    const { data, error } = await query.order('record_date', { ascending: false });
+    const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Error loading meditation records:', error);
+      throw error;
+    }
+
     return data || [];
   },
 
   async recordMeditation(record: Omit<MeditationRecord, 'id' | 'created_at'>): Promise<MeditationRecord> {
+    const recordData: any = {
+      user_id: record.user_id,
+      practice_id: record.practice_id,
+      record_date: record.record_date,
+      duration_minutes: record.duration_minutes,
+      created_at: new Date().toISOString()
+    };
+
+    // Add optional fields
+    if (record.session_number) recordData.session_number = record.session_number;
+    if (record.method) recordData.method = record.method;
+    if (record.reflection && record.reflection.trim()) {
+      recordData.reflection = record.reflection;
+      recordData.reflection_created_at = new Date().toISOString();
+    }
+
     const { data, error } = await supabase
       .from('meditation_records')
-      .insert(record)
+      .insert(recordData)
       .select()
       .single();
 
@@ -380,12 +403,18 @@ export const meditationService = {
     reflection?: string;
   }): Promise<MeditationRecord> {
     const recordData: any = {
-      ...record,
+      user_id: record.user_id,
+      practice_id: record.practice_id,
+      record_date: record.record_date,
+      duration_minutes: record.duration_minutes,
       created_at: new Date().toISOString()
     };
 
-    // 如果有观后感，记录创建时间
+    // Add optional fields
+    if (record.session_number) recordData.session_number = record.session_number;
+    if (record.method) recordData.method = record.method;
     if (record.reflection && record.reflection.trim()) {
+      recordData.reflection = record.reflection;
       recordData.reflection_created_at = new Date().toISOString();
     }
 
@@ -438,7 +467,7 @@ export const meditationService = {
     }
   ): Promise<MeditationRecord> {
     const updateData: any = { ...updates };
-    
+
     // 如果更新了观后感，记录更新时间
     if (updates.reflection !== undefined) {
       updateData.reflection_created_at = new Date().toISOString();
@@ -529,7 +558,7 @@ export const meditationService = {
   }> {
     const today = new Date().toISOString().split('T')[0];
     let startDate = today;
-    
+
     if (period === 'weekly') {
       const startOfWeek = new Date();
       startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
