@@ -158,8 +158,7 @@ export default function MeditationHistoryScreen() {
         .from('meditation_records')
         .update({
           duration_minutes: duration,
-          method: editMethod.trim(),
-          updated_at: new Date().toISOString()
+          method: editMethod.trim()
         })
         .eq('id', editingRecord.id)
         .eq('user_id', user.id);
