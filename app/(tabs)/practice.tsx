@@ -282,11 +282,16 @@ export default function PracticeScreen() {
     console.log('🔄 handleCustomRecord called with project:', project.id, project.practices.name);
 
     if (project.practices.type === 'time') {
-      // For meditation/time-based practices, show meditation recording modal
-      setSelectedProjectForRecord(project); // Set the correct state for meditation
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
-      await loadMeditationTopics(project.practice_id);
-      setShowMeditationModal(true);
+      // For meditation/time-based practices, navigate directly to meditation-history
+      router.push({
+        pathname: '/meditation-history' as const,
+        params: {
+          projectId: project.id,
+          practiceId: project.practice_id,
+          practiceName: project.practices?.name || '观修',
+          mode: 'record' // Add mode parameter to indicate we want to record
+        }
+      });
     } else {
       // For count-based practices, show the custom count modal
       setSelectedProjectForCount(project); // Set the correct state for count
