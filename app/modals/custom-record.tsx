@@ -81,7 +81,7 @@ export default function CustomRecordScreen() {
         .from('daily_records')
         .insert({
           user_id: user.id,
-          practice_id: project.practice_id,
+          practice_project_id: projectId,
           record_date: new Date().toISOString().split('T')[0],
           count: countNum,
           notes: notes.trim() || null
