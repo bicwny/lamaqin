@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,11 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  RefreshControl,
   Alert,
   ActivityIndicator,
+  RefreshControl,
+  SafeAreaView,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
@@ -56,6 +56,12 @@ export default function PracticeScreen() {
       loadPracticeData();
     }
   }, [user]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadPracticeData();
+    }, [user])
+  );
 
   const loadPracticeData = async () => {
     if (!user?.id) return;
@@ -171,7 +177,7 @@ export default function PracticeScreen() {
 
   const handleCustomRecord = async (projectId: string, practiceName: string) => {
     console.log('🔄 handleCustomRecord called with project:', projectId, practiceName);
-    
+
     const project = projects.find(p => p.id === projectId);
     if (!project) {
       Alert.alert('错误', '未找到修行项目');
@@ -301,7 +307,7 @@ export default function PracticeScreen() {
                         {progress.isCompleted ? ' ✅' : ' ☐'}
                       </Text>
                     )}
-                    
+
                     <WeeklyProgressDisplay 
                       project={project} 
                       user={user}
