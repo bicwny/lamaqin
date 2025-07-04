@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
@@ -30,6 +30,7 @@ export default function MeditationHistoryScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { projectId, practiceId, practiceName, targetPeriod } = useLocalSearchParams();
+  const pageActiveRef = useRef(true);
 
   const [records, setRecords] = useState<MeditationRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,12 +48,37 @@ export default function MeditationHistoryScreen() {
 
   const PAGE_SIZE = 12;
 
+  // Track when page is focused/unfocused
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('🏠 Meditation history page focused');
+      pageActiveRef.current = true;
+      
+      return () => {
+        console.log('🚪 Meditation history page unfocused');
+        pageActiveRef.current = false;
+      };
+    }, [])
+  );
+
   useEffect(() => {
-    loadRecords(true);
-  }, []);
+    console.log('🔄 MeditationHistory: Initial load, user:', user?.id, 'practiceId:', practiceId);
+    if (user?.id && practiceId) {
+      loadRecords(true);
+    }
+  }, [user?.id, practiceId]);
 
   const loadRecords = async (reset = false) => {
-    if (!user?.id || !practiceId) return;
+    if (!user?.id || !practiceId) {
+      console.log('⚠️ MeditationHistory: Missing user or practiceId, user:', user?.id, 'practiceId:', practiceId);
+      return;
+    }
+
+    // Prevent operations if page is not active
+    if (!pageActiveRef.current) {
+      console.log('⚠️ MeditationHistory: Page not active, skipping load');
+      return;
+    }
 
     try {
       const currentPage = reset ? 0 : page;
@@ -231,7 +257,14 @@ export default function MeditationHistoryScreen() {
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => {
+            console.log('🔙 Back button pressed from meditation history');
+            if (pageActiveRef.current) {
+              router.back();
+            } else {
+              console.log('⚠️ Page not active, preventing navigation');
+            }
+          }}
         >
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>

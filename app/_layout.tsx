@@ -1,67 +1,56 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { DebugInfo } from '@/components/DebugInfo';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
-  const router = useRouter();
 
-  console.log('🔍 RootLayoutNav render - user:', user?.email, 'loading:', loading);
-  console.log('📋 User object:', JSON.stringify(user, null, 2));
+  console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
+  console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');
 
+  // Add debugging for unexpected navigation
   useEffect(() => {
-    if (!loading && user) {
-      console.log('🚀 Navigating to study tab after login...');
-      router.replace('(tabs)/study');
+    if (!loading) {
+      console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
+      if (user) {
+        console.log('✅ User authenticated, should show tabs');
+      } else {
+        console.log('❌ No user, should show auth');
+      }
     }
   }, [user, loading]);
 
   if (loading) {
     console.log('⏳ Showing loading screen...');
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <DebugInfo />
-      </View>
-    );
+    return null; // or a loading screen
   }
 
   console.log('✅ Auth state resolved, user:', user ? 'logged in' : 'not logged in');
   console.log('📱 About to render Stack with screens');
-  console.log('🎯 Will show:', user ? '(tabs) screen' : 'auth screen');
+
+  if (user) {
+    console.log('🎯 Will show: (tabs) screen');
+  } else {
+    console.log('🎯 Will show: auth screen');
+  }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {user ? (
-          <Stack.Screen
-            name="(tabs)"
-            options={{ headerShown: false }}
-            key="authenticated"
-          />
-        ) : (
-          <Stack.Screen
-            name="auth"
-            options={{
-              headerShown: false,
-              animationTypeForReplace: 'pop'
-            }}
-            key="unauthenticated"
-          />
-        )}
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack screenOptions={{ headerShown: false }}>
+      {user ? (
+        <Stack.Screen name="(tabs)" />
+      ) : (
+        <Stack.Screen name="auth" />
+      )}
+      <Stack.Screen name="meditation-history" options={{ presentation: 'modal' }} />
+    </Stack>
   );
 }
 
