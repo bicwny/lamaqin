@@ -8,12 +8,446 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  SafeAreaView,
 } from 'react-native';
 import { router, useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+
+export default function MeditationHistoryScreen() {
+  const { user } = useAuth();
+  const {
+    practiceId,
+    practiceProjectId,
+    practiceName
+  } = useLocalSearchParams<{
+    practiceId: string;
+    practiceProjectId: string;
+    practiceName: string;
+  }>();
+
+  const [records, setRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const RECORDS_PER_PAGE = 12;
+
+  useEffect(() => {
+    if (user && practiceId) {
+      loadRecords(true);
+    }
+  }, [user, practiceId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user && practiceId) {
+        loadRecords(true);
+      }
+    }, [user, practiceId])
+  );
+
+  const loadRecords = async (reset = false) => {
+    if (!user || !practiceId) return;
+
+    try {
+      if (reset) {
+        setLoading(true);
+        setPage(0);
+        setHasMore(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const allRecords = await meditationService.getMeditationRecords(user.id, practiceId);
+      const startIndex = reset ? 0 : (page + 1) * RECORDS_PER_PAGE;
+      const endIndex = startIndex + RECORDS_PER_PAGE;
+      const pageRecords = allRecords.slice(startIndex, endIndex);
+
+      if (reset) {
+        setRecords(pageRecords);
+      } else {
+        setRecords(prev => [...prev, ...pageRecords]);
+      }
+
+      setHasMore(endIndex < allRecords.length);
+      if (!reset) {
+        setPage(prev => prev + 1);
+      }
+
+      console.log('📅 Loaded records:', pageRecords.length);
+    } catch (error) {
+      console.error('❌ Error loading records:', error);
+      Alert.alert('错误', '加载记录失败');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadRecords(true);
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore && !loadingMore) {
+      loadRecords(false);
+    }
+  };
+
+  const handleEdit = (record: any) => {
+    router.push({
+      pathname: '/modals/meditation-record',
+      params: {
+        practiceId,
+        practiceProjectId,
+        practiceName,
+        editRecordId: record.id
+      }
+    });
+  };
+
+  const handleDelete = async (record: any) => {
+    Alert.alert(
+      '确认删除',
+      '确定要删除这条观修记录吗？',
+      [
+        { text: '取消', style: 'cancel' },
+        { 
+          text: '删除', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await meditationService.deleteMeditationRecord(record.id, user?.id || '');
+              Alert.alert('成功', '记录已删除');
+              loadRecords(true); // 重新加载历史记录
+            } catch (error) {
+              console.error('❌ Error deleting record:', error);
+              Alert.alert('错误', '删除失败，请重试');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      weekday: 'short'
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>正在加载记录...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
+      </View>
+
+      {/* Records List */}
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+          const paddingToBottom = 20;
+          if (layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom) {
+            handleLoadMore();
+          }
+        }}
+        scrollEventThrottle={400}
+      >
+        {records.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>📭 暂无观修记录</Text>
+            <Text style={styles.emptySubtext}>开始您的第一次观修吧！</Text>
+          </View>
+        ) : (
+          <View style={styles.recordsList}>
+            {records.map((record) => (
+              <View key={record.id} style={styles.recordCard}>
+                <View style={styles.recordHeader}>
+                  <Text style={styles.recordDate}>
+                    {formatDate(record.record_date)}
+                  </Text>
+                  <Text style={styles.recordTime}>
+                    {formatTime(record.created_at)}
+                  </Text>
+                </View>
+
+                <View style={styles.recordContent}>
+                  <Text style={styles.recordDuration}>
+                    时长: {record.duration_minutes} 分钟
+                  </Text>
+                  
+                  {record.session_number && (
+                    <Text style={styles.recordSession}>
+                      第 {record.session_number} 座
+                    </Text>
+                  )}
+
+                  {record.method && (
+                    <Text style={styles.recordMethod}>
+                      方法: {record.method}
+                    </Text>
+                  )}
+
+                  {record.reflection && (
+                    <View style={styles.reflectionContainer}>
+                      <Text style={styles.reflectionLabel}>观后感:</Text>
+                      <Text style={styles.reflectionText} numberOfLines={3}>
+                        {record.reflection}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.recordActions}>
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => handleEdit(record)}
+                  >
+                    <Text style={styles.editButtonText}>编辑</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(record)}
+                  >
+                    <Text style={styles.deleteButtonText}>删除</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+
+            {hasMore && (
+              <TouchableOpacity
+                style={styles.loadMoreButton}
+                onPress={handleLoadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? (
+                  <ActivityIndicator color={Colors.primary} />
+                ) : (
+                  <Text style={styles.loadMoreText}>加载更多</Text>
+                )}
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 80,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999',
+  },
+  recordsList: {
+    padding: 16,
+  },
+  recordCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  recordDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  recordTime: {
+    fontSize: 14,
+    color: '#666',
+  },
+  recordContent: {
+    marginBottom: 12,
+  },
+  recordDuration: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
+  recordSession: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  recordMethod: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  reflectionContainer: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  reflectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  reflectionText: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  recordActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  loadMoreButton: {
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  loadMoreText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+});
 
 interface MeditationRecord {
   id: string;
