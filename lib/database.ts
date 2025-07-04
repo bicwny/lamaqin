@@ -392,16 +392,16 @@ export const meditationService = {
     return data;
   },
 
-  // 🆕 创建带观后感的观修记录
   async recordMeditationWithReflection(record: {
     user_id: string;
     practice_id: string;
     record_date: string;
     duration_minutes: number;
     session_number?: number;
-    method?: string;
     reflection?: string;
   }): Promise<MeditationRecord> {
+    console.log('💾 Saving meditation record to Supabase:', record);
+
     const recordData: any = {
       user_id: record.user_id,
       practice_id: record.practice_id,
@@ -412,11 +412,12 @@ export const meditationService = {
 
     // Add optional fields
     if (record.session_number) recordData.session_number = record.session_number;
-    if (record.method) recordData.method = record.method;
     if (record.reflection && record.reflection.trim()) {
       recordData.reflection = record.reflection;
       recordData.reflection_created_at = new Date().toISOString();
     }
+
+    console.log('📝 Final record data being inserted:', recordData);
 
     const { data, error } = await supabase
       .from('meditation_records')
@@ -424,7 +425,12 @@ export const meditationService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Error saving meditation record:', error);
+      throw error;
+    }
+
+    console.log('✅ Meditation record saved successfully:', data);
     return data;
   },
 
