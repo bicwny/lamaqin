@@ -39,8 +39,30 @@ export default function PracticeConfigScreen() {
       : '1',
     targetPeriod: 'daily',
     duration: '100', // For time-based practices when daily is selected
+    durationType: '100', // Predefined duration options
+    customEndDate: '', // For custom duration
   });
   const [saving, setSaving] = useState(false);
+
+  const getDurationDays = () => {
+    if (practiceType !== 'count') return 0;
+    
+    if (formData.durationType === 'custom') {
+      if (!formData.customEndDate) return 0;
+      const today = new Date();
+      const endDate = new Date(formData.customEndDate);
+      const diffTime = endDate.getTime() - today.getTime();
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+    
+    switch (formData.durationType) {
+      case '30': return 30;
+      case '60': return 60;
+      case '100': return 100;
+      case '365': return 365;
+      default: return parseInt(formData.durationType) || 100;
+    }
+  };
 
   const handleSave = async () => {
     if (!practiceId || !user?.id) {
@@ -61,9 +83,15 @@ export default function PracticeConfigScreen() {
     }
 
     // For count-based practices, validate duration
-    if (practiceType === 'count' && !formData.duration) {
-      Alert.alert('错误', '请填写持续天数');
-      return;
+    if (practiceType === 'count') {
+      if (formData.durationType === 'custom' && !formData.customEndDate) {
+        Alert.alert('错误', '请选择结束日期');
+        return;
+      }
+      if (formData.durationType !== 'custom' && !formData.durationType) {
+        Alert.alert('错误', '请选择持续时间');
+        return;
+      }
     }
 
     setSaving(true);
@@ -84,11 +112,31 @@ export default function PracticeConfigScreen() {
         endDate.setDate(endDate.getDate() + durationDays);
         targetEndDate = endDate.toISOString().split('T')[0];
       } else if (practiceType === 'count') {
-        // For count-based practices, use the specified duration
-        const durationDays = parseInt(formData.duration);
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + durationDays);
-        targetEndDate = endDate.toISOString().split('T')[0];
+        // For count-based practices, calculate duration based on type
+        if (formData.durationType === 'custom') {
+          targetEndDate = formData.customEndDate;
+        } else {
+          let durationDays;
+          switch (formData.durationType) {
+            case '30':
+              durationDays = 30;
+              break;
+            case '60':
+              durationDays = 60;
+              break;
+            case '100':
+              durationDays = 100;
+              break;
+            case '365':
+              durationDays = 365;
+              break;
+            default:
+              durationDays = parseInt(formData.durationType) || 100;
+          }
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + durationDays);
+          targetEndDate = endDate.toISOString().split('T')[0];
+        }
       } else if (formData.targetPeriod === 'daily') {
         // For other daily practices
         const days = Math.ceil(finalTargetCount / parseInt(formData.dailyTarget));
@@ -251,15 +299,56 @@ export default function PracticeConfigScreen() {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>持续天数</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.duration}
-            onChangeText={(text) => setFormData({...formData, duration: text})}
-            keyboardType="numeric"
-            placeholder="如：100"
-          />
-          <Text style={styles.inputHint}>
+          <Text style={styles.inputLabel}>持续时间</Text>
+          <View style={styles.durationSelector}>
+            {['30', '60', '100', '365', 'custom'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.durationOption,
+                  formData.durationType === option && styles.selectedDurationOption
+                ]}
+                onPress={() => setFormData({...formData, durationType: option})}
+              >
+                <Text style={[
+                  styles.durationOptionText,
+                  formData.durationType === option && styles.selectedDurationOptionText
+                ]}>
+                  {option === '30' ? '30天' : 
+                   option === '60' ? '60天' :
+                   option === '100' ? '100天' :
+                   option === '365' ? '1年' :
+                   '自定义'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {formData.durationType === 'custom' && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>结束日期</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.customEndDate}
+              onChangeText={(text) => setFormData({...formData, customEndDate: text})}
+              placeholder="YYYY-MM-DD"
+            />
+          </View>
+        )}
+
+        <View style={styles.calculationInfo}>
+          <Text style={styles.calculationLabel}>目标统计</Text>
+          <Text style={styles.calculationText}>
+            总目标：{formData.targetCount} {practiceUnit}
+          </Text>
+          <Text style={styles.calculationText}>
+            每日目标：{formData.dailyTarget} {practiceUnit}
+          </Text>
+          <Text style={styles.calculationText}>
+            平均每日需完成：{Math.ceil(parseInt(formData.targetCount || '0') / getDurationDays())} {practiceUnit}
+          </Text>
+          <Text style={styles.calculationHint}>
             预计完成天数：{Math.ceil(parseInt(formData.targetCount || '0') / parseInt(formData.dailyTarget || '1'))} 天
           </Text>
         </View>
@@ -386,6 +475,56 @@ const styles = StyleSheet.create({
   },
   selectedPeriodButtonText: {
     color: 'white',
+  },
+  durationSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  durationOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  selectedDurationOption: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  durationOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedDurationOptionText: {
+    color: 'white',
+  },
+  calculationInfo: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 8,
+  },
+  calculationLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  calculationText: {
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  calculationHint: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   footer: {
     flexDirection: 'row',
