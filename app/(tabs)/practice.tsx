@@ -42,6 +42,13 @@ interface Practice {
   description?: string;
 }
 
+interface MeditationSession {
+  duration: string;
+  method: string;
+  sessionNumber: number;
+  reflection?: string; // 🆕 观后感字段
+}
+
 export default function PracticeScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -251,7 +258,9 @@ export default function PracticeScreen() {
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
   const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
-  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string, sessionNumber: number}[]>([{duration: '', method: '', sessionNumber: 1}]);
+  const [meditationSessions, setMeditationSessions] = useState<MeditationSession[]>([
+    { duration: '', method: '', sessionNumber: 1, reflection: '' }
+  ]);
   const [recordingMeditation, setRecordingMeditation] = useState(false);
   const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
 
@@ -275,7 +284,7 @@ export default function PracticeScreen() {
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
       setSelectedProjectForRecord(project); // Set the correct state for meditation
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
       await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
@@ -287,8 +296,15 @@ export default function PracticeScreen() {
   };
 
   const addMeditationSession = () => {
-    const nextSessionNumber = Math.max(...meditationSessions.map(s => s.sessionNumber), 0) + 1;
-    setMeditationSessions([...meditationSessions, {duration: '', method: '', sessionNumber: nextSessionNumber}]);
+    setMeditationSessions(prev => [
+      ...prev,
+      { 
+        duration: '', 
+        method: '', 
+        sessionNumber: prev.length + 1,
+        reflection: ''
+      }
+    ]);
   };
 
   const removeMeditationSession = (index: number) => {
@@ -415,7 +431,7 @@ export default function PracticeScreen() {
 
       setShowMeditationModal(false);
       setSelectedProjectForRecord(null);
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
       setMeditationTopics([]);
     } catch (error) {
       console.error('❌ Error saving meditation:', error);

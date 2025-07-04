@@ -674,3 +674,546 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  Modal,
+  TextInput,
+  RefreshControl,
+  ActivityIndicator
+} from 'react-native';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
+import { meditationService, MeditationRecord } from '@/lib/database';
+
+interface ExtendedMeditationRecord extends MeditationRecord {
+  topic_title?: string;
+}
+
+export default function MeditationHistoryScreen() {
+  const { projectId, projectName } = useLocalSearchParams<{
+    projectId: string;
+    projectName: string;
+  }>();
+  const { user } = useAuth();
+  
+  const [records, setRecords] = useState<ExtendedMeditationRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [reflectionModalVisible, setReflectionModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<ExtendedMeditationRecord | null>(null);
+  const [editDuration, setEditDuration] = useState('');
+  const [editReflection, setEditReflection] = useState('');
+  const [meditationTopics, setMeditationTopics] = useState<Array<{
+    topic_number: number;
+    title: string;
+  }>>([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    if (!user || !projectId) return;
+
+    try {
+      setLoading(true);
+      
+      // 获取观修记录
+      const meditationRecords = await meditationService.getMeditationRecords(user.id);
+      
+      // 获取观修方法目录
+      const topics = await meditationService.getMeditationTopics(projectId);
+      setMeditationTopics(topics);
+      
+      // 为记录添加标题信息
+      const extendedRecords = meditationRecords.map(record => ({
+        ...record,
+        topic_title: topics.find(t => t.topic_number === record.session_number)?.title
+      }));
+      
+      setRecords(extendedRecords);
+    } catch (error) {
+      console.error('❌ 加载观修历史失败:', error);
+      Alert.alert('错误', '加载观修历史失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
+
+  const handleEdit = (record: ExtendedMeditationRecord) => {
+    setSelectedRecord(record);
+    setEditDuration(record.duration_minutes.toString());
+    setEditReflection(record.reflection || '');
+    setEditModalVisible(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedRecord || !user) return;
+
+    const duration = parseInt(editDuration);
+    if (isNaN(duration) || duration <= 0) {
+      Alert.alert('错误', '请输入有效的观修时长（大于0分钟）');
+      return;
+    }
+
+    try {
+      await meditationService.updateMeditationRecord(
+        selectedRecord.id,
+        user.id,
+        {
+          duration_minutes: duration,
+          reflection: editReflection.trim() || undefined
+        }
+      );
+
+      Alert.alert('成功', '观修记录已更新');
+      setEditModalVisible(false);
+      await loadData();
+    } catch (error) {
+      console.error('❌ 更新记录失败:', error);
+      Alert.alert('错误', '更新记录失败');
+    }
+  };
+
+  const handleDelete = (record: ExtendedMeditationRecord) => {
+    Alert.alert(
+      '确认删除',
+      `确定要删除 ${record.record_date} 的观修记录吗？`,
+      [
+        { text: '取消', style: 'cancel' },
+        {
+          text: '删除',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await meditationService.deleteMeditationRecord(record.id, user!.id);
+              Alert.alert('成功', '记录已删除');
+              await loadData();
+            } catch (error) {
+              console.error('❌ 删除记录失败:', error);
+              Alert.alert('错误', '删除记录失败');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleViewReflection = (record: ExtendedMeditationRecord) => {
+    setSelectedRecord(record);
+    setReflectionModalVisible(true);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long'
+    });
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Stack.Screen options={{ title: `${projectName} - 历史记录` }} />
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>加载中...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen 
+        options={{ 
+          title: `${projectName} - 历史记录`,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text style={styles.backButton}>← 返回</Text>
+            </TouchableOpacity>
+          )
+        }} 
+      />
+      
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        {records.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>暂无观修记录</Text>
+            <Text style={styles.emptySubtext}>开始您的观修修行吧</Text>
+          </View>
+        ) : (
+          records.map((record) => (
+            <View key={record.id} style={styles.recordCard}>
+              <View style={styles.recordHeader}>
+                <Text style={styles.recordDate}>
+                  {formatDate(record.record_date)}
+                </Text>
+                <View style={styles.recordActions}>
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => handleEdit(record)}
+                  >
+                    <Text style={styles.editButtonText}>编辑</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(record)}
+                  >
+                    <Text style={styles.deleteButtonText}>删除</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              
+              <View style={styles.recordContent}>
+                <Text style={styles.recordDuration}>
+                  观修时长：{record.duration_minutes} 分钟
+                </Text>
+                
+                {record.topic_title && (
+                  <Text style={styles.recordTopic}>
+                    修行方法：第{record.session_number}修法 - {record.topic_title}
+                  </Text>
+                )}
+                
+                {record.reflection ? (
+                  <TouchableOpacity
+                    style={styles.reflectionPreview}
+                    onPress={() => handleViewReflection(record)}
+                  >
+                    <Text style={styles.reflectionLabel}>观后感：</Text>
+                    <Text style={styles.reflectionText} numberOfLines={2}>
+                      {record.reflection}
+                    </Text>
+                    <Text style={styles.viewMoreText}>点击查看完整观后感 →</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addReflectionButton}
+                    onPress={() => handleEdit(record)}
+                  >
+                    <Text style={styles.addReflectionText}>+ 添加观后感</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          ))
+        )}
+      </ScrollView>
+
+      {/* 编辑记录模态框 */}
+      <Modal
+        visible={editModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setEditModalVisible(false)}>
+              <Text style={styles.modalCancelButton}>取消</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>编辑观修记录</Text>
+            <TouchableOpacity onPress={handleSaveEdit}>
+              <Text style={styles.modalSaveButton}>保存</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView style={styles.modalContent}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+              <TextInput
+                style={styles.textInput}
+                value={editDuration}
+                onChangeText={setEditDuration}
+                keyboardType="numeric"
+                placeholder="请输入观修时长"
+              />
+            </View>
+            
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>观后感（可选）</Text>
+              <TextInput
+                style={[styles.textInput, styles.multilineInput]}
+                value={editReflection}
+                onChangeText={setEditReflection}
+                multiline
+                numberOfLines={6}
+                placeholder="记录您在这次观修中的体验、感悟和思考..."
+                textAlignVertical="top"
+              />
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* 观后感查看模态框 */}
+      <Modal
+        visible={reflectionModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setReflectionModalVisible(false)}>
+              <Text style={styles.modalCancelButton}>关闭</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>观后感</Text>
+            <TouchableOpacity 
+              onPress={() => {
+                setReflectionModalVisible(false);
+                if (selectedRecord) handleEdit(selectedRecord);
+              }}
+            >
+              <Text style={styles.modalSaveButton}>编辑</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView style={styles.modalContent}>
+            {selectedRecord && (
+              <View>
+                <Text style={styles.reflectionDateText}>
+                  {formatDate(selectedRecord.record_date)} · {selectedRecord.duration_minutes}分钟
+                </Text>
+                {selectedRecord.topic_title && (
+                  <Text style={styles.reflectionTopicText}>
+                    第{selectedRecord.session_number}修法 - {selectedRecord.topic_title}
+                  </Text>
+                )}
+                <Text style={styles.reflectionFullText}>
+                  {selectedRecord.reflection || '暂无观后感'}
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5'
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5'
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666'
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#007AFF',
+    paddingHorizontal: 10
+  },
+  scrollView: {
+    flex: 1,
+    padding: 16
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 8
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999'
+  },
+  recordCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  recordDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1
+  },
+  recordActions: {
+    flexDirection: 'row'
+  },
+  editButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginRight: 8
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '500'
+  },
+  deleteButton: {
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '500'
+  },
+  recordContent: {
+    gap: 8
+  },
+  recordDuration: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500'
+  },
+  recordTopic: {
+    fontSize: 14,
+    color: '#666'
+  },
+  reflectionPreview: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#007AFF'
+  },
+  reflectionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#007AFF',
+    marginBottom: 4
+  },
+  reflectionText: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20
+  },
+  viewMoreText: {
+    fontSize: 12,
+    color: '#007AFF',
+    marginTop: 4,
+    fontWeight: '500'
+  },
+  addReflectionButton: {
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center'
+  },
+  addReflectionText: {
+    color: '#007AFF',
+    fontSize: 14,
+    fontWeight: '500'
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'white'
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0'
+  },
+  modalCancelButton: {
+    fontSize: 16,
+    color: '#666'
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#333'
+  },
+  modalSaveButton: {
+    fontSize: 16,
+    color: '#007AFF',
+    fontWeight: '600'
+  },
+  modalContent: {
+    flex: 1,
+    padding: 16
+  },
+  inputGroup: {
+    marginBottom: 20
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white'
+  },
+  multilineInput: {
+    height: 120
+  },
+  reflectionDateText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8
+  },
+  reflectionTopicText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16
+  },
+  reflectionFullText: {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 24
+  }
+});
