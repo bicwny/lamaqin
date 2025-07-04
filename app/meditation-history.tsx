@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
@@ -28,6 +28,7 @@ interface MeditationRecord {
 
 export default function MeditationHistoryScreen() {
   const { user } = useAuth();
+  const navigation = useRouter();
   const { projectId, practiceId, practiceName, targetPeriod } = useLocalSearchParams();
   const pageActiveRef = useRef(true);
 
@@ -203,10 +204,11 @@ export default function MeditationHistoryScreen() {
           style={styles.backButton}
           onPress={() => {
             console.log('🔙 Back button pressed from meditation history');
-            if (pageActiveRef.current) {
-              router.back();
+            if (navigation.canGoBack()) {
+              navigation.back();
             } else {
-              console.log('⚠️ Page not active, preventing navigation');
+              // Fallback: navigate to practice tab
+              router.replace('/(tabs)/practice');
             }
           }}
         >

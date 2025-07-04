@@ -75,7 +75,7 @@ export default function PracticeScreen() {
 
   // Count recording states
   const [showCountModal, setShowCountModal] = useState(false);
-  const [selectedProjectForCount, setSelectedProjectForCount] = useState<PracticeProject | null>(null);
+  const [selectedProjectForCount, setSelectedProjectForCount = useState<PracticeProject | null>(null);
   const [customCount, setCustomCount] = useState('');
   const [recordingCount, setRecordingCount] = useState(false);
 
@@ -257,7 +257,7 @@ export default function PracticeScreen() {
 
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
-  const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
+  const [selectedProjectForRecord, setSelectedProjectForRecord = useState<PracticeProject | null>(null);
   const [meditationSessions, setMeditationSessions] = useState<MeditationSession[]>([
     { duration: '', method: '', sessionNumber: 1, reflection: '' }
   ]);
@@ -333,7 +333,7 @@ export default function PracticeScreen() {
 
   const handleSaveMeditationRecord = async () => {
     console.log('🔄 Starting meditation record save...');
-    
+
     if (!user?.id || !selectedProjectForRecord) {
       Alert.alert('错误', '用户信息或项目信息缺失');
       return;
@@ -777,12 +777,11 @@ export default function PracticeScreen() {
 
                             // Navigate to meditation history page
                             router.push({
-                              pathname: '/meditation-history',
+                              pathname: '/meditation-history' as const,
                               params: {
                                 projectId: project.id,
                                 practiceId: project.practice_id,
-                                practiceName: project.practices.name,
-                                targetPeriod: project.target_period || 'daily'
+                                practiceName: project.practices?.name || '观修'
                               }
                             });
                           }}
@@ -950,8 +949,7 @@ export default function PracticeScreen() {
           <ScrollView contentContainerStyle={styles.modalScrollContent}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>
-                🧘 记录"{selectedProjectForRecord?.practices.name}"观修
-              </Text>
+                🧘 记录"{selectedProjectForRecord?.practices.name}"观修              </Text>
               <Text style={styles.modalSubtitle}>
                 请记录您的观修座次
               </Text>
