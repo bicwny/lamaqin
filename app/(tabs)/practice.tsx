@@ -277,7 +277,6 @@ export default function PracticeScreen() {
           return (
             <View key={project.id} style={styles.projectCard}>
               <View style={styles.projectHeader}>
-                <Text style={styles.projectName}>{project.practices.name}</Text>
                 <Text style={styles.projectType}>
                   {project.practices.type === 'count' ? '计数类' : '计时类'}
                   {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
@@ -296,17 +295,9 @@ export default function PracticeScreen() {
                   </View>
                 ) : (
                   <View>
-                    {isTimeBasedWeekly ? (
-                      <Text style={styles.progressText}>
-                        {Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))}周 
-                        {progress.isCompleted ? ' ✅' : ' ☐'}
-                      </Text>
-                    ) : (
-                      <Text style={styles.progressText}>
-                        {Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天 
-                        {progress.isCompleted ? ' ✅' : ' ☐'}
-                      </Text>
-                    )}
+                    <Text style={styles.progressText}>
+                      {project.practices.name} ({progress.current}/{Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天)
+                    </Text>
 
                     <WeeklyProgressDisplay 
                       project={project} 
@@ -393,11 +384,13 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
   return (
     <View style={styles.weeklyProgress}>
       <Text style={styles.weeklyProgressText}>
-        本周进度: {details || '暂无记录'} / {target} 座
+        今天: {completed}/{target}{completed >= target ? ' ✅' : ''}
       </Text>
-      <Text style={styles.weeklyProgressSubtext}>
-        (本周: {completed}/{target})
-      </Text>
+      {details && (
+        <Text style={styles.weeklyProgressSubtext}>
+          {details}
+        </Text>
+      )}
     </View>
   );
 }
