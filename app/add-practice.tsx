@@ -27,14 +27,7 @@ export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPractice, setSelectedPractice] = useState<Practice | null>(null);
-  const [formData, setFormData] = useState({
-    targetCount: '',
-    dailyTarget: '',
-    targetPeriod: 'daily', // daily or weekly
-    targetEndDate: '',
-  });
-  const [saving, setSaving] = useState(false);
+  
 
   useEffect(() => {
     loadPractices();
@@ -77,82 +70,16 @@ export default function AddPracticeScreen() {
   };
 
   const handlePracticeSelect = (practice: Practice) => {
-    setSelectedPractice(practice);
-
-    // Set default values based on practice type
-    if (practice.type === 'count') {
-      setFormData({
-        targetCount: practice.name === '六字大明咒' ? '100000' : '10000',
-        dailyTarget: practice.name === '六字大明咒' ? '3000' : '108',
-        targetPeriod: 'daily',
-        targetEndDate: '',
-      });
-    } else {
-      // For time-based practices
-      setFormData({
-        targetCount: '92', // Default for meditation practices
-        dailyTarget: '2',
-        targetPeriod: 'daily',
-        targetEndDate: '',
-      });
-    }
-  };
-
-  const handleSave = async () => {
-    if (!selectedPractice || !user?.id) {
-      Alert.alert('错误', '请选择修行项目');
-      return;
-    }
-
-    // Validate form data
-    if (!formData.targetCount || !formData.dailyTarget) {
-      Alert.alert('错误', '请填写完整的目标信息');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      console.log('💾 Creating new practice project...');
-
-      // Calculate target end date if not provided
-      let targetEndDate = formData.targetEndDate;
-      if (!targetEndDate && formData.targetPeriod === 'daily') {
-        const days = Math.ceil(parseInt(formData.targetCount) / parseInt(formData.dailyTarget));
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + days);
-        targetEndDate = endDate.toISOString().split('T')[0];
-      }
-
-      const { data: newProject, error } = await supabase
-        .from('user_practice_projects')
-        .insert({
-          user_id: user.id,
-          practice_id: selectedPractice.id,
-          target_count: parseInt(formData.targetCount),
-          daily_target: parseInt(formData.dailyTarget),
-          target_period: formData.targetPeriod,
-          start_date: new Date().toISOString().split('T')[0],
-          target_end_date: targetEndDate,
-          status: 'active',
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      console.log('✅ Practice project created successfully:', newProject);
-      Alert.alert('成功', '修行项目已添加！', [
-        {
-          text: '确定',
-          onPress: () => router.back(),
-        },
-      ]);
-    } catch (error) {
-      console.error('Error creating practice project:', error);
-      Alert.alert('错误', '创建修行项目失败，请重试');
-    } finally {
-      setSaving(false);
-    }
+    // Navigate to configuration page with practice details
+    router.push({
+      pathname: '/practice-config',
+      params: {
+        practiceId: practice.id,
+        practiceName: practice.name,
+        practiceType: practice.type,
+        practiceUnit: practice.unit,
+      },
+    });
   };
 
   const renderPracticeSelector = () => (
@@ -184,79 +111,7 @@ export default function AddPracticeScreen() {
     </View>
   );
 
-  const renderConfiguration = () => {
-    if (!selectedPractice) return null;
-
-    return (
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>配置目标</Text>
-
-        <View style={styles.configForm}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>
-              {selectedPractice.type === 'count' ? '总目标数量' : '总目标座数'}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={formData.targetCount}
-              onChangeText={(text) => setFormData({...formData, targetCount: text})}
-              keyboardType="numeric"
-              placeholder={selectedPractice.type === 'count' ? '如：100000' : '如：92'}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>
-              每日目标 ({selectedPractice.unit})
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={formData.dailyTarget}
-              onChangeText={(text) => setFormData({...formData, dailyTarget: text})}
-              keyboardType="numeric"
-              placeholder={selectedPractice.type === 'count' ? '如：3000' : '如：2'}
-            />
-          </View>
-
-          {selectedPractice.type === 'time' && (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>目标周期</Text>
-              <View style={styles.periodSelector}>
-                <TouchableOpacity
-                  style={[
-                    styles.periodButton,
-                    formData.targetPeriod === 'daily' && styles.selectedPeriodButton
-                  ]}
-                  onPress={() => setFormData({...formData, targetPeriod: 'daily'})}
-                >
-                  <Text style={[
-                    styles.periodButtonText,
-                    formData.targetPeriod === 'daily' && styles.selectedPeriodButtonText
-                  ]}>
-                    每日
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.periodButton,
-                    formData.targetPeriod === 'weekly' && styles.selectedPeriodButton
-                  ]}
-                  onPress={() => setFormData({...formData, targetPeriod: 'weekly'})}
-                >
-                  <Text style={[
-                    styles.periodButtonText,
-                    formData.targetPeriod === 'weekly' && styles.selectedPeriodButtonText
-                  ]}>
-                    每周
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        </View>
-      </View>
-    );
-  };
+  
 
   if (loading) {
     return (
@@ -296,30 +151,7 @@ export default function AddPracticeScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {renderPracticeSelector()}
-        {renderConfiguration()}
       </ScrollView>
-
-      {selectedPractice && (
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => router.back()}
-          >
-            <Text style={styles.cancelButtonText}>取消</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.saveButton, saving && styles.disabledButton]}
-            onPress={handleSave}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="white" size="small" />
-            ) : (
-              <Text style={styles.saveButtonText}>添加修法</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
     </SafeAreaView>
   );
 }
