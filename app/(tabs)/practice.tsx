@@ -81,7 +81,7 @@ export default function PracticeScreen() {
 
     try {
       console.log('🔍 Getting meditation details for:', { projectId, practiceId, targetPeriod, userId: user.id });
-      
+
       const today = new Date();
       let startDate: string;
       let endDate: string;
@@ -92,19 +92,19 @@ export default function PracticeScreen() {
         const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Handle Sunday (0)
         const monday = new Date(today);
         monday.setDate(today.getDate() + mondayOffset);
-        
+
         const sunday = new Date(monday);
         sunday.setDate(monday.getDate() + 6);
-        
+
         startDate = monday.toISOString().split('T')[0];
         endDate = sunday.toISOString().split('T')[0];
-        
+
         console.log('📅 Weekly period:', { startDate, endDate });
       } else {
         // Daily: just today
         startDate = today.toISOString().split('T')[0];
         endDate = startDate;
-        
+
         console.log('📅 Daily period:', { startDate, endDate });
       }
 
@@ -190,7 +190,7 @@ export default function PracticeScreen() {
       // Prioritize database data
       if (data && data.length > 0) {
         setMeditationTopics(data);
-        
+
         // Initialize the first session with the first topic if method is empty
         if (meditationSessions.length > 0 && !meditationSessions[0].method) {
           const firstTopic = data[0];
@@ -271,7 +271,7 @@ export default function PracticeScreen() {
 
   const handleCustomRecord = async (project: PracticeProject) => {
     console.log('🔄 handleCustomRecord called with project:', project.id, project.practices.name);
-    
+
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
       setSelectedProjectForRecord(project); // Set the correct state for meditation
@@ -349,7 +349,7 @@ export default function PracticeScreen() {
       let totalMinutes = 0;
 
       console.log('🔄 Saving meditation sessions...');
-      
+
       // Save each meditation session to meditation_records table
       for (let i = 0; i < validSessions.length; i++) {
         const session = validSessions[i];
@@ -390,7 +390,7 @@ export default function PracticeScreen() {
       }
 
       console.log('🔄 Updating project progress...');
-      
+
       // Update project progress with valid session count (not total minutes)
       if (validSessionCount > 0) {
         await dailyRecordService.recordPractice(
@@ -844,7 +844,7 @@ export default function PracticeScreen() {
                               target_period: project.target_period,
                               name: project.practices.name
                             });
-                            
+
                             // Navigate to meditation history page
                             router.push({
                               pathname: '/meditation-history',
@@ -1050,7 +1050,7 @@ export default function PracticeScreen() {
                             console.log('🔄 Picker value changed to:', value);
                             updateMeditationSession(index, 'sessionNumber', value);
                             const selectedTopic = meditationTopics.find(t => t.topic_number === value);
-                            console.log('🔄 Selected topic:', selectedTopic);
+                            console.log('🔍 Selected topic:', selectedTopic);
                             if (selectedTopic) {
                               updateMeditationSession(index, 'method', selectedTopic.title);
                               console.log('🔄 Method updated to:', selectedTopic.title);
@@ -1061,7 +1061,7 @@ export default function PracticeScreen() {
                           {meditationTopics.map((topic) => (
                             <Picker.Item 
                               key={topic.topic_number} 
-                              label={`${topic.topic_number} - ${topic.title}`} 
+                              label={`第${topic.topic_number}座 - ${topic.title}`} 
                               value={topic.topic_number} 
                             />
                           ))}
