@@ -1,0 +1,22 @@
+Console.js:61 🔴 DELETE BUTTON PHYSICAL PRESS DETECTED - Record: 11f43830-c55c-40a5-bd57-e7ac6ba9e325
+Mt.forEach.n.<computed> @ Console.js:61
+onPress @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:154591
+onClick @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:31692
+processDispatchQueue @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14293
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14590
+batchedUpdates$1 @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:7961
+dispatchEventForPluginEventSystem @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14373
+dispatchEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16455
+dispatchDiscreteEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16437Understand this warning
+Console.js:61 🎯 DELETE BUTTON CLICKED - Record ID: 11f43830-c55c-40a5-bd57-e7ac6ba9e325
+Mt.forEach.n.<computed> @ Console.js:61
+handleDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:154251
+onPress @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:154592
+onClick @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:31692
+processDispatchQueue @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14293
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14590
+batchedUpdates$1 @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:7961
+dispatchEventForPluginEventSystem @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14373
+dispatchEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16455
+dispatchDiscreteEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16437Understand this warning
+Console.js:61 🎯 Delete button onPress triggered
