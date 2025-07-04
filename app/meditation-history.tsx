@@ -205,43 +205,29 @@ export default function MeditationHistoryScreen() {
       }
     };
 
-    // Cross-platform confirmation
-    if (Platform.OS === 'web') {
-      const message = `确定要删除这条观修记录吗？\n\n日期: ${formatDate(record.record_date)}\n时长: ${record.duration_minutes}分钟\n\n此操作无法撤销。`;
-      const confirmed = window.confirm(message);
-      console.warn('🌐 WEB CONFIRM DIALOG RESULT:', confirmed);
-
-      if (confirmed) {
-        console.warn('✅ USER CONFIRMED DELETE');
-        await executeDelete();
-      } else {
-        console.warn('🚫 USER CANCELLED DELETE');
-      }
-    } else {
-      // For mobile, use Alert.alert
-      Alert.alert(
-        '确认删除',
-        `确定要删除这条观修记录吗？\n\n日期: ${formatDate(record.record_date)}\n时长: ${record.duration_minutes}分钟\n\n此操作无法撤销。`,
-        [
-          { 
-            text: '取消', 
-            style: 'cancel',
-            onPress: () => {
-              console.warn('🚫 USER CANCELLED DELETE');
-            }
-          },
-          { 
-            text: '确认删除', 
-            style: 'destructive',
-            onPress: async () => {
-              console.warn('✅ USER CONFIRMED DELETE');
-              console.warn('🎯 Alert confirmation button pressed');
-              await executeDelete();
-            }
+    // Use Alert.alert for all platforms for consistent experience
+    Alert.alert(
+      '确认删除',
+      `确定要删除这条观修记录吗？\n\n日期: ${formatDate(record.record_date)}\n时长: ${record.duration_minutes}分钟\n\n此操作无法撤销。`,
+      [
+        { 
+          text: '取消', 
+          style: 'cancel',
+          onPress: () => {
+            console.warn('🚫 USER CANCELLED DELETE');
           }
-        ]
-      );
-    }
+        },
+        { 
+          text: '确认删除', 
+          style: 'destructive',
+          onPress: async () => {
+            console.warn('✅ USER CONFIRMED DELETE');
+            console.warn('🎯 Alert confirmation button pressed');
+            await executeDelete();
+          }
+        }
+      ]
+    );
   };
 
   const formatDate = (dateString: string) => {
