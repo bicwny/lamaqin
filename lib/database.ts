@@ -493,13 +493,40 @@ export const meditationService = {
 
   // 🆕 删除观修记录
   async deleteMeditationRecord(recordId: string, userId: string): Promise<void> {
+    console.log('🗑️ deleteMeditationRecord called with:', { recordId, userId });
+    
+    // First check if the record exists and belongs to the user
+    const { data: existingRecord, error: fetchError } = await supabase
+      .from('meditation_records')
+      .select('id, user_id')
+      .eq('id', recordId)
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError) {
+      console.error('❌ Error checking record existence:', fetchError);
+      throw new Error('无法找到要删除的记录');
+    }
+
+    if (!existingRecord) {
+      console.error('❌ Record not found or does not belong to user');
+      throw new Error('记录不存在或无权限删除');
+    }
+
+    console.log('✅ Record found, proceeding with deletion');
+
     const { error } = await supabase
       .from('meditation_records')
       .delete()
       .eq('id', recordId)
       .eq('user_id', userId);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Deletion error:', error);
+      throw error;
+    }
+
+    console.log('✅ Record deleted successfully from database');
   },
 
   // 🆕 获取观修方法目录

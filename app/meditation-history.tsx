@@ -123,13 +123,30 @@ export default function MeditationHistoryScreen() {
           text: '删除', 
           style: 'destructive',
           onPress: async () => {
+            console.log('🗑️ Starting delete operation for record:', record.id);
+            
+            if (!user?.id) {
+              console.error('❌ No user ID available for delete');
+              Alert.alert('错误', '用户认证失败，请重新登录');
+              return;
+            }
+
             try {
-              await meditationService.deleteMeditationRecord(record.id, user?.id || '');
+              console.log('🗑️ Calling deleteMeditationRecord with:', { recordId: record.id, userId: user.id });
+              
+              setLoading(true); // Show loading state
+              await meditationService.deleteMeditationRecord(record.id, user.id);
+              
+              console.log('✅ Record deleted successfully');
               Alert.alert('成功', '记录已删除');
-              loadRecords(true); // 重新加载历史记录
+              
+              // Reload records to reflect the deletion
+              await loadRecords(true);
             } catch (error) {
               console.error('❌ Error deleting record:', error);
-              Alert.alert('错误', '删除失败，请重试');
+              Alert.alert('错误', `删除失败: ${error.message || '请重试'}`);
+            } finally {
+              setLoading(false);
             }
           }
         }
