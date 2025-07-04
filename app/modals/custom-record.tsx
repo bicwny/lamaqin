@@ -69,14 +69,18 @@ export default function CustomRecordScreen() {
         .eq('user_id', user.id)
         .single();
 
-      if (projectError) throw projectError;
+      if (projectError) {
+        console.error('❌ Error fetching project:', projectError);
+        throw projectError;
+      }
 
-      // Insert the record
+      console.log('📋 Project data:', project);
+
+      // Insert the record into daily_records table
       const { data: record, error: recordError } = await supabase
-        .from('practice_records')
+        .from('daily_records')
         .insert({
           user_id: user.id,
-          project_id: projectId,
           practice_id: project.practice_id,
           record_date: new Date().toISOString().split('T')[0],
           count: countNum,
@@ -85,7 +89,12 @@ export default function CustomRecordScreen() {
         .select()
         .single();
 
-      if (recordError) throw recordError;
+      if (recordError) {
+        console.error('❌ Error inserting record:', recordError);
+        throw recordError;
+      }
+
+      console.log('✅ Daily record inserted:', record);
 
       // Update the project's current count
       const newCurrentCount = project.current_count + countNum;
@@ -98,8 +107,12 @@ export default function CustomRecordScreen() {
         .eq('id', projectId)
         .eq('user_id', user.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('❌ Error updating project:', updateError);
+        throw updateError;
+      }
 
+      console.log('✅ Project updated with new count:', newCurrentCount);
       console.log('✅ Count record saved successfully');
       showToast(`已记录 ${countNum} 次`);
       
@@ -107,7 +120,7 @@ export default function CustomRecordScreen() {
       router.back();
     } catch (error) {
       console.error('❌ Error saving count record:', error);
-      Alert.alert('错误', '保存失败，请重试');
+      Alert.alert('错误', `保存失败，请重试: ${error.message || '未知错误'}`);
     } finally {
       setLoading(false);
     }
