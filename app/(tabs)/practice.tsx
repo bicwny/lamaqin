@@ -192,7 +192,7 @@ export default function PracticeScreen() {
         setMeditationTopics(data);
 
         // Initialize the first session with the first topic if method is empty
-        if (meditationSessions.length > 0 && !meditationSessions[0].method && data.length > 0) {
+        if (meditationSessions.length > 0 && !meditationSessions[0].method) {
           const firstTopic = data[0];
           setMeditationSessions([{
             duration: meditationSessions[0].duration,
