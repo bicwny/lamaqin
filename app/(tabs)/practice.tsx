@@ -384,20 +384,20 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
 
   const completed = weeklyRecords.length;
   const target = project.daily_target;
+  
+  // Format weekly progress details
   const details = weeklyRecords.map((record, index) => 
     `第${index + 1}座: ${record.duration_minutes}分钟`
-  ).join('; ');
+  ).join('；');
 
   return (
     <View style={styles.weeklyProgress}>
       <Text style={styles.weeklyProgressText}>
         本周进度: {details || '暂无记录'} / {target} 座
       </Text>
-      {project.practices.type === 'time' && (
-        <Text style={styles.weeklyProgressSubtext}>
-          (本周: {completed}/{target})
-        </Text>
-      )}
+      <Text style={styles.weeklyProgressSubtext}>
+        (本周: {completed}/{target})
+      </Text>
     </View>
   );
 }
