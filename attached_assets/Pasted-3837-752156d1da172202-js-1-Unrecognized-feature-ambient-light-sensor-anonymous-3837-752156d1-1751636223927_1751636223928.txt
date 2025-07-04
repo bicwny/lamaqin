@@ -1,0 +1,719 @@
+3837-752156d1da172202.js:1 Unrecognized feature: 'ambient-light-sensor'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'battery'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'layout-animations'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'legacy-image-formats'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'navigation-override'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'oversized-images'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'publickey-credentials'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'speaker-selection'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'unoptimized-images'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'unsized-media'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Unrecognized feature: 'pointer-lock'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+3837-752156d1da172202.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+n @ main-b1d98e5b70c3078c.js:1
+u @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ main-b1d98e5b70c3078c.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+navigateTo @ 3837-752156d1da172202.js:1
+refresh @ 3837-752156d1da172202.js:1
+(anonymous) @ 3837-752156d1da172202.js:1
+(anonymous) @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:6
+onClick @ _app-1dfc359d2d776d85.js:11
+(anonymous) @ _app-1dfc359d2d776d85.js:1
+eB @ framework-c2be319115910dbc.js:1
+eH @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+re @ framework-c2be319115910dbc.js:1
+rt @ framework-c2be319115910dbc.js:1
+(anonymous) @ framework-c2be319115910dbc.js:1
+uT @ framework-c2be319115910dbc.js:1
+eM @ framework-c2be319115910dbc.js:1
+ru @ framework-c2be319115910dbc.js:1
+tB @ framework-c2be319115910dbc.js:1
+tD @ framework-c2be319115910dbc.js:1
+n @ _app-1dfc359d2d776d85.js:38
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+Console.js:61 Running application "main" with appParams:
+ {rootTag: '#root', hydrate: undefined} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Console.js:61 "shadow*" style props are deprecated. Use "boxShadow".
+Mt.forEach.n.<computed> @ Console.js:61
+warnOnce @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:25630
+preprocess @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:25524
+compileAndInsertAtomic @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:22520
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:22563
+create @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:22551
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:74548
+loadModuleImplementation @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:256
+guardedLoadModule @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:163
+metroRequire @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:83
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:76025
+loadModuleImplementation @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:256
+guardedLoadModule @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:163
+metroRequire @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:83
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:43856
+loadModuleImplementation @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:256
+guardedLoadModule @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:163
+metroRequire @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:83
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:43659
+loadModuleImplementation @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:256
+guardedLoadModule @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156
+metroRequire @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:83
+get @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:43520
+metroContext @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:43639
+loadRoute @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:73489
+getDirectoryTree @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:73563
+getRoutes @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:73353
+getRoutes @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:73230
+useStore @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:69984
+ContextNavigator @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:76241
+react-stack-bottom-frame @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:17954
+renderWithHooks @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:9271
+updateFunctionComponent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:10540
+beginWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:11158
+runWithFiberInDEV @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:6499
+performUnitOfWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13743
+workLoopConcurrent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13739
+renderRootConcurrent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13722
+performWorkOnRoot @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13358
+performWorkOnRootViaSchedulerTask @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14184
+performWorkUntilDeadline @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:19803
+Console.js:61 🔍 RootLayoutNav render - user: null loading: true
+Console.js:61 📋 User object: null
+Console.js:61 ⏳ Showing loading screen...
+Console.js:61 🔍 Checking auth state...
+Console.js:61 🔄 Auth state changed: SIGNED_IN fob.design@gmail.com
+Console.js:61 ✅ Found verified session for: fob.design@gmail.com
+Console.js:61 🔍 AuthContext: Checking if user exists in database: fob.design@gmail.com
+Console.js:61 ❌ AuthContext: Error ensuring user in database: Database operation timeout (3s)
+Mt.forEach.n.<computed> @ Console.js:61
+registerError @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3595
+console.error @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3533
+ensureUserInDatabase @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:113939
+await in ensureUserInDatabase
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:113724
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:128329
+_notifyAllSubscribers @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:128327
+_recoverAndRefresh @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:128259
+await in _recoverAndRefresh
+_initialize @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:126438
+await in _initialize
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:126371
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:127358
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:129160
+Console.js:61 ⚠️ AuthContext: Continuing without database sync due to error
+Console.js:61 ✅ User state set successfully
+Console.js:61 🔍 RootLayoutNav render - user: fob.design@gmail.com loading: false
+Console.js:61 📋 User object: {
+  "id": "954dc879-cbfe-4b5f-a7ef-113acf1f5569",
+  "email": "fob.design@gmail.com"
+}
+Console.js:61 ✅ Auth state resolved, user: logged in
+Console.js:61 📱 About to render Stack with screens
+Console.js:61 🎯 Will show: (tabs) screen
+Console.js:61 props.pointerEvents is deprecated. Use style.pointerEvents
+Mt.forEach.n.<computed> @ Console.js:61
+warnOnce @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:25630
+createDOMProps @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:27450
+createElement @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26482
+View @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26423
+react-stack-bottom-frame @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:17954
+renderWithHooks @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:9271
+updateForwardRef @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:10446
+beginWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:11214
+runWithFiberInDEV @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:6499
+performUnitOfWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13743
+workLoopSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13637
+renderRootSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13621
+performWorkOnRoot @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13358
+performWorkOnRootViaSchedulerTask @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14184
+performWorkUntilDeadline @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:19803
+Console.js:61 🔄 Loading practice data for user: 954dc879-cbfe-4b5f-a7ef-113acf1f5569
+Console.js:61 🔄 Auth state changed in RootLayoutNav, user: fob.design@gmail.com
+Console.js:61 ✅ User authenticated, should show tabs
+Console.js:61 🔄 Loading practice data for user: 954dc879-cbfe-4b5f-a7ef-113acf1f5569
+Console.js:61 ✅ Found verified session for: fob.design@gmail.com
+Console.js:61 🔍 AuthContext: Checking if user exists in database: fob.design@gmail.com
+Console.js:61 🔄 Auth state changed: INITIAL_SESSION fob.design@gmail.com
+Console.js:61 📋 User practice projects: (12) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Console.js:61 📋 Loaded practice projects: 12
+Console.js:61 ✅ AuthContext: User already exists in database: fob.design@gmail.com
+Console.js:61 📋 User practice projects: (12) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Console.js:61 📋 Loaded practice projects: 12
+Console.js:61 Unexpected text node: . A text node cannot be a child of a <View>.
+Mt.forEach.n.<computed> @ Console.js:61
+registerError @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3595
+console.error @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3533
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26369
+View @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26367
+react-stack-bottom-frame @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:17954
+renderWithHooks @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:9271
+updateForwardRef @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:10446
+beginWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:11214
+runWithFiberInDEV @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:6499
+performUnitOfWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13743
+workLoopSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13637
+renderRootSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13621
+performWorkOnRoot @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13358
+performWorkOnRootViaSchedulerTask @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14184
+performWorkUntilDeadline @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:19803
+Console.js:61 ✅ AuthContext: User already exists in database: fob.design@gmail.com
+Console.js:61 ✅ User state set successfully
+Console.js:61 🔍 RootLayoutNav render - user: fob.design@gmail.com loading: false
+Console.js:61 📋 User object: {
+  "id": "954dc879-cbfe-4b5f-a7ef-113acf1f5569",
+  "email": "fob.design@gmail.com"
+}
+Console.js:61 ✅ Auth state resolved, user: logged in
+Console.js:61 📱 About to render Stack with screens
+Console.js:61 🎯 Will show: (tabs) screen
+Console.js:61 Unexpected text node: . A text node cannot be a child of a <View>.
+Mt.forEach.n.<computed> @ Console.js:61
+registerError @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3595
+console.error @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3533
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26369
+View @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26367
+react-stack-bottom-frame @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:17954
+renderWithHooks @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:9271
+updateForwardRef @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:10446
+beginWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:11214
+runWithFiberInDEV @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:6499
+performUnitOfWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13743
+workLoopSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13637
+renderRootSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13621
+performWorkOnRoot @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13358
+performWorkOnRootViaSchedulerTask @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14184
+performWorkUntilDeadline @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:19803
+Console.js:61 🔄 Loading practice data for user: 954dc879-cbfe-4b5f-a7ef-113acf1f5569
+Console.js:61 🔄 Loading practice data for user: 954dc879-cbfe-4b5f-a7ef-113acf1f5569
+Console.js:61 🔄 Auth state changed in RootLayoutNav, user: fob.design@gmail.com
+Console.js:61 ✅ User authenticated, should show tabs
+Console.js:61 📋 User practice projects: (12) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Console.js:61 📋 Loaded practice projects: 12
+Console.js:61 Unexpected text node: . A text node cannot be a child of a <View>.
+Mt.forEach.n.<computed> @ Console.js:61
+registerError @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3595
+console.error @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3533
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26369
+View @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26367
+react-stack-bottom-frame @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:17954
+renderWithHooks @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:9271
+updateForwardRef @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:10446
+beginWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:11214
+runWithFiberInDEV @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:6499
+performUnitOfWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13743
+workLoopSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13637
+renderRootSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13621
+performWorkOnRoot @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13358
+performWorkOnRootViaSchedulerTask @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14184
+performWorkUntilDeadline @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:19803
+Console.js:61 📋 User practice projects: (12) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]
+Console.js:61 📋 Loaded practice projects: 12
+Console.js:61 Unexpected text node: . A text node cannot be a child of a <View>.
+Mt.forEach.n.<computed> @ Console.js:61
+registerError @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3595
+console.error @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:3533
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26369
+View @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:26367
+react-stack-bottom-frame @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:17954
+renderWithHooks @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:9271
+updateForwardRef @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:10446
+beginWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:11214
+runWithFiberInDEV @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:6499
+performUnitOfWork @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13743
+workLoopSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13637
+renderRootSync @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13621
+performWorkOnRoot @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:13358
+performWorkOnRootViaSchedulerTask @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14184
+performWorkUntilDeadline @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:19803
