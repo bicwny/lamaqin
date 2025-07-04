@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -79,7 +78,7 @@ export default function AddPracticeScreen() {
 
   const handlePracticeSelect = (practice: Practice) => {
     setSelectedPractice(practice);
-    
+
     // Set default values based on practice type
     if (practice.type === 'count') {
       setFormData({
@@ -165,13 +164,11 @@ export default function AddPracticeScreen() {
             key={practice.id}
             style={[
               styles.practiceCard,
-              selectedPractice?.id === practice.id && styles.selectedPracticeCard
             ]}
             onPress={() => handlePracticeSelect(practice)}
           >
             <Text style={[
               styles.practiceName,
-              selectedPractice?.id === practice.id && styles.selectedPracticeName
             ]}>
               {practice.name}
             </Text>
@@ -193,7 +190,7 @@ export default function AddPracticeScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>配置目标</Text>
-        
+
         <View style={styles.configForm}>
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>
@@ -296,7 +293,7 @@ export default function AddPracticeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
-      
+
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {renderPracticeSelector()}
         {renderConfiguration()}
@@ -393,20 +390,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  selectedPracticeCard: {
-    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   practiceName: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
     marginBottom: 4,
-  },
-  selectedPracticeName: {
-    color: Colors.primary,
   },
   practiceType: {
     fontSize: 14,
