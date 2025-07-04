@@ -10,6 +10,8 @@ import {
   Alert,
   ActivityIndicator,
   SafeAreaView,
+  ToastAndroid,
+  Platform,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
@@ -43,6 +45,15 @@ export default function MeditationRecordScreen() {
   }>>([]);
 
   const isEditing = !!editRecordId;
+
+  // Toast function for cross-platform support
+  const showToast = (message: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      Alert.alert('提示', message);
+    }
+  };
 
   useEffect(() => {
     loadMeditationTopics();
@@ -117,20 +128,20 @@ export default function MeditationRecordScreen() {
           session_number: recordData.session_number,
           reflection: recordData.reflection
         });
-        Alert.alert('成功', '观修记录已更新', [
-          { text: '确定', onPress: () => {
-            // Simply go back to the previous screen
-            router.back();
-          }}
-        ]);
+        console.log('✅ Meditation record updated successfully');
+        showToast('观修记录已更新');
+        // Navigate back with a small delay to ensure toast shows
+        setTimeout(() => {
+          router.back();
+        }, 500);
       } else {
-        await meditationService.recordMeditationWithReflection(recordData);
-        Alert.alert('成功', '观修记录已保存', [
-          { text: '确定', onPress: () => {
-            // Navigate back to practice tab
-            router.back();
-          }}
-        ]);
+        const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
+        console.log('✅ New meditation record saved:', savedRecord.id);
+        showToast('观修记录已保存');
+        // Navigate back with a small delay to ensure toast shows
+        setTimeout(() => {
+          router.back();
+        }, 500);
       }
     } catch (error) {
       console.error('❌ Error saving meditation record:', error);

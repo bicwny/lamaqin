@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { practiceService, dailyRecordService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
@@ -83,6 +83,16 @@ export default function PracticeScreen() {
     loadPracticeData();
   }, [user]);
 
+  // Refresh data when the page gains focus (user returns from meditation record page)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user?.id) {
+        console.log('🔄 Practice page gained focus, refreshing data...');
+        loadPracticeData();
+      }
+    }, [user?.id])
+  );
+
   const getCurrentPeriodMeditationDetails = async (projectId: string, practiceId: string, targetPeriod: 'daily' | 'weekly') => {
     if (!user?.id) return [];
 
@@ -152,8 +162,10 @@ export default function PracticeScreen() {
       setPracticeProjects(projects);
 
       const today = new Date().toISOString().split('T')[0];
+      
+      // For count-based practices, get daily records
       const records = await dailyRecordService.getTodayRecords(user.id, today);
-      console.log('📅 Loaded today records:', records.length);
+      console.log('📅 Loaded today daily records:', records.length);
 
       // Convert records array to object for easier access
       const recordsMap = records.reduce((acc, record) => {
@@ -161,7 +173,48 @@ export default function PracticeScreen() {
         return acc;
       }, {});
 
+      // For time-based practices, get meditation session counts
+      for (const project of projects) {
+        if (project.practices.type === 'time') {
+          try {
+            let startDate = today;
+            let endDate = today;
+
+            // For weekly practices, get current week data
+            if (project.target_period === 'weekly') {
+              const todayDate = new Date();
+              const dayOfWeek = todayDate.getDay();
+              const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Handle Sunday (0)
+              const monday = new Date(todayDate);
+              monday.setDate(todayDate.getDate() + mondayOffset);
+
+              const sunday = new Date(monday);
+              sunday.setDate(monday.getDate() + 6);
+
+              startDate = monday.toISOString().split('T')[0];
+              endDate = sunday.toISOString().split('T')[0];
+            }
+
+            // Count meditation sessions for the period
+            const { data: sessionCount } = await supabase
+              .from('meditation_records')
+              .select('id', { count: 'exact' })
+              .eq('user_id', user.id)
+              .eq('practice_id', project.practice_id)
+              .gte('record_date', startDate)
+              .lte('record_date', endDate);
+
+            recordsMap[project.id] = sessionCount || 0;
+            console.log(`📊 ${project.practices.name} sessions (${project.target_period}):`, sessionCount);
+          } catch (error) {
+            console.error(`❌ Error loading sessions for ${project.practices.name}:`, error);
+            recordsMap[project.id] = 0;
+          }
+        }
+      }
+
       setTodayRecords(recordsMap);
+      console.log('📊 Final records map:', recordsMap);
     } catch (error) {
       console.error('Error loading practice data:', error);
     } finally {
