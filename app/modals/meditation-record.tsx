@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
@@ -16,7 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
 
-export default function MeditationRecordModal() {
+export default function MeditationRecordScreen() {
   const { user } = useAuth();
   const { 
     practiceId, 
@@ -110,7 +111,6 @@ export default function MeditationRecordModal() {
       };
 
       if (isEditing) {
-        // 更新现有记录
         await meditationService.updateMeditationRecord(editRecordId, user.id, {
           duration_minutes: recordData.duration_minutes,
           session_number: recordData.session_number,
@@ -120,7 +120,6 @@ export default function MeditationRecordModal() {
           { text: '确定', onPress: () => router.back() }
         ]);
       } else {
-        // 创建新记录
         await meditationService.recordMeditationWithReflection(recordData);
         Alert.alert('成功', '观修记录已保存', [
           { text: '确定', onPress: () => router.back() }
@@ -137,43 +136,38 @@ export default function MeditationRecordModal() {
   const selectedTopic = meditationTopics.find(t => t.topic_number === parseInt(sessionNumber));
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen 
-        options={{ 
-          title: isEditing ? '编辑观修记录' : '记录观修',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.cancelButton}>取消</Text>
-            </TouchableOpacity>
-          ),
-          headerRight: () => (
-            <TouchableOpacity onPress={handleSave} disabled={loading}>
-              {loading ? (
-                <ActivityIndicator color={Colors.primary} />
-              ) : (
-                <Text style={styles.saveButton}>保存</Text>
-              )}
-            </TouchableOpacity>
-          )
-        }} 
-      />
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          📝 {isEditing ? '编辑观修记录' : '记录新的观修'}
+        </Text>
+      </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📿 {practiceName}</Text>
-          
-          <View style={styles.inputGroup}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.formContainer}>
+          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+
+          {/* Duration Input */}
+          <View style={styles.inputSection}>
             <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+            <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
             <TextInput
               style={styles.textInput}
               value={duration}
               onChangeText={setDuration}
               keyboardType="numeric"
-              placeholder="请输入观修时长，如：30"
+              placeholder="30"
             />
           </View>
 
-          <View style={styles.inputGroup}>
+          {/* Topic Selection */}
+          <View style={styles.inputSection}>
             <Text style={styles.inputLabel}>选择观修内容</Text>
             {loadingTopics ? (
               <ActivityIndicator style={styles.loadingIndicator} />
@@ -204,6 +198,7 @@ export default function MeditationRecordModal() {
             )}
           </View>
 
+          {/* Topic Description */}
           {selectedTopic?.description && (
             <View style={styles.topicDescription}>
               <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
@@ -213,7 +208,8 @@ export default function MeditationRecordModal() {
             </View>
           )}
 
-          <View style={styles.inputGroup}>
+          {/* Reflection Input */}
+          <View style={styles.inputSection}>
             <Text style={styles.inputLabel}>观后感（可选）</Text>
             <Text style={styles.inputHint}>
               记录您在这次观修中的体验、感悟和思考...
@@ -224,7 +220,7 @@ export default function MeditationRecordModal() {
               onChangeText={setReflection}
               multiline
               numberOfLines={6}
-              placeholder="例如：今日观修思维闲暇之本体，深感人身难得。通过观想八种闲暇和十种圆满，认识到现在的修行条件是多么珍贵..."
+              placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
               textAlignVertical="top"
             />
             <Text style={styles.characterCount}>
@@ -233,59 +229,106 @@ export default function MeditationRecordModal() {
           </View>
         </View>
       </ScrollView>
-    </View>
+
+      {/* Save Button */}
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity 
+          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>💾 保存记录</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f8f9fa'
   },
-  content: {
-    flex: 1,
-    padding: 16
-  },
-  section: {
+  header: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2
   },
-  sectionTitle: {
-    fontSize: 18,
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  headerTitle: {
+    fontSize: 20,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    marginBottom: 4
   },
-  inputGroup: {
-    marginBottom: 20
+  content: {
+    flex: 1,
+    padding: 16
+  },
+  formContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  practiceTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef'
+  },
+  inputSection: {
+    marginBottom: 24
   },
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 8
+    marginBottom: 6
   },
   inputHint: {
     fontSize: 14,
-    color: '#666',
+    color: '#6c757d',
     marginBottom: 8,
     lineHeight: 20
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#ced4da',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    color: '#333'
   },
   multilineInput: {
     height: 120,
@@ -293,51 +336,72 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#ced4da',
     borderRadius: 8,
     backgroundColor: 'white',
     overflow: 'hidden'
   },
   picker: {
-    height: 50
+    height: 50,
+    color: '#333'
   },
   topicDescription: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fff3cd',
     borderRadius: 8,
-    padding: 12,
+    padding: 16,
     marginBottom: 16,
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.primary
+    borderLeftWidth: 4,
+    borderLeftColor: '#ffc107'
   },
   topicDescriptionLabel: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: Colors.primary,
-    marginBottom: 4
+    color: '#856404',
+    marginBottom: 6
   },
   topicDescriptionText: {
     fontSize: 14,
-    color: '#666',
+    color: '#856404',
     lineHeight: 20
   },
   characterCount: {
     fontSize: 12,
-    color: '#999',
+    color: '#6c757d',
     textAlign: 'right',
     marginTop: 4
   },
   loadingIndicator: {
     padding: 20
   },
-  cancelButton: {
-    color: '#666',
-    fontSize: 16,
-    paddingHorizontal: 10
+  bottomContainer: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
   },
   saveButton: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '600',
-    paddingHorizontal: 10
+    backgroundColor: '#ffc107',
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  saveButtonDisabled: {
+    opacity: 0.6
+  },
+  saveButtonText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '600'
   }
 });
