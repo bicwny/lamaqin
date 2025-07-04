@@ -327,7 +327,8 @@ export default function MeditationHistoryScreen() {
               <View key={record.id} style={styles.recordCard}>
                 <View style={styles.recordHeader}>
                   <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
-                  <Text style={styles.sessionNumber}>第{record.session_number}座 {record.method}</Text>
+                  <Text style={styles.sessionNumber}>第{record.session_number}座</Text>
+                  <Text style={styles.methodTitle}>{record.method}</Text>
                 </View>
                 
                 <View style={styles.recordContent}>
@@ -535,6 +536,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.primary,
     fontWeight: '500',
+  },
+  methodTitle: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
+    marginTop: 2,
   },
   recordContent: {
     marginBottom: 12,
