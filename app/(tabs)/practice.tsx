@@ -172,7 +172,7 @@ export default function PracticeScreen() {
   };
 
   const handleAddPractice = () => {
-    router.push('/modals/add-practice');
+    router.push('/add-practice');
   };
 
   const handleCustomRecord = async (projectId: string, practiceName: string) => {
