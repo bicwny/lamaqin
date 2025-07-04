@@ -1,0 +1,33 @@
+ Error updating record: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+❌ Error saving edit: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+🔄 Updating meditation record: 0af5c7f5-ff3f-4533-85a7-5b5df1c72c33
+❌ Error updating record: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+❌ Error saving edit: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+🔄 Updating meditation record: 0af5c7f5-ff3f-4533-85a7-5b5df1c72c33
+❌ Error updating record: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+❌ Error saving edit: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+🔄 Updating meditation record: 0af5c7f5-ff3f-4533-85a7-5b5df1c72c33
+❌ Error updating record: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+❌ Error saving edit: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+🔄 Updating meditation record: 0af5c7f5-ff3f-4533-85a7-5b5df1c72c33
+❌ Error updating record: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
+
+❌ Error saving edit: 
+Object {code: "PGRST204", details: null, hint: null, message: "Could not find the 'updated_at' column of 'meditation_records' in the schema cache"}
