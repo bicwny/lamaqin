@@ -42,6 +42,13 @@ interface Practice {
   description?: string;
 }
 
+interface MeditationSession {
+  duration: string;
+  method: string;
+  sessionNumber: number;
+  reflection?: string; // 🆕 观后感字段
+}
+
 export default function PracticeScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -251,7 +258,9 @@ export default function PracticeScreen() {
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
   const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
-  const [meditationSessions, setMeditationSessions] = useState<{duration: string, method: string, sessionNumber: number}[]>([{duration: '', method: '', sessionNumber: 1}]);
+  const [meditationSessions, setMeditationSessions] = useState<MeditationSession[]>([
+    { duration: '', method: '', sessionNumber: 1, reflection: '' }
+  ]);
   const [recordingMeditation, setRecordingMeditation] = useState(false);
   const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
 
@@ -275,7 +284,7 @@ export default function PracticeScreen() {
     if (project.practices.type === 'time') {
       // For meditation/time-based practices, show meditation recording modal
       setSelectedProjectForRecord(project); // Set the correct state for meditation
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
+      setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
       await loadMeditationTopics(project.practice_id);
       setShowMeditationModal(true);
     } else {
@@ -287,8 +296,15 @@ export default function PracticeScreen() {
   };
 
   const addMeditationSession = () => {
-    const nextSessionNumber = Math.max(...meditationSessions.map(s => s.sessionNumber), 0) + 1;
-    setMeditationSessions([...meditationSessions, {duration: '', method: '', sessionNumber: nextSessionNumber}]);
+    setMeditationSessions(prev => [
+      ...prev,
+      { 
+        duration: '', 
+        method: '', 
+        sessionNumber: prev.length + 1,
+        reflection: ''
+      }
+    ]);
   };
 
   const removeMeditationSession = (index: number) => {
@@ -317,112 +333,26 @@ export default function PracticeScreen() {
 
   const handleSaveMeditationRecord = async () => {
     console.log('🔄 Starting meditation record save...');
-    console.log('📋 User ID:', user?.id);
-    console.log('📋 Selected project:', selectedProjectForRecord?.id);
-    console.log('📋 Meditation sessions:', meditationSessions);
-
+    
     if (!user?.id || !selectedProjectForRecord) {
-      console.log('❌ Missing user or project');
       Alert.alert('错误', '用户信息或项目信息缺失');
       return;
     }
 
-    // Validate sessions
-    const validSessions = meditationSessions.filter(session => {
-      const isValid = validateMeditationSession(session);
-      const duration = parseInt(session.duration);
-      console.log(`📋 Session validation - Duration: ${duration}, Method: "${session.method}", Valid: ${isValid}`);
-      return isValid;
+    // Use simplified modal approach - navigate to dedicated modal
+    router.push({
+      pathname: '/modals/meditation-record',
+      params: {
+        practiceId: selectedProjectForRecord.practice_id,
+        practiceProjectId: selectedProjectForRecord.id,
+        practiceName: selectedProjectForRecord.practices.name
+      }
     });
 
-    console.log('📋 Valid sessions count:', validSessions.length);
-
-    if (validSessions.length === 0) {
-      Alert.alert('提示', '请至少添加一次有效的观修记录\n\n请确保：\n• 时长大于0分钟\n• 观修方法不为空');
-      return;
-    }
-
-    setRecordingMeditation(true);
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      let validSessionCount = 0;
-      let totalMinutes = 0;
-
-      console.log('🔄 Saving meditation sessions...');
-
-      // Save each meditation session to meditation_records table
-      for (let i = 0; i < validSessions.length; i++) {
-        const session = validSessions[i];
-        const duration = parseInt(session.duration);
-        totalMinutes += duration;
-
-        console.log(`🔄 Saving session ${i + 1}:`, {
-          user_id: user.id,
-          practice_id: selectedProjectForRecord.practice_id,
-          record_date: today,
-          session_number: session.sessionNumber,
-          duration_minutes: duration,
-          method: session.method
-        });
-
-        // Save to meditation_records with the topic number as session number
-        const { data: meditationData, error: meditationError } = await supabase
-          .from('meditation_records')
-          .insert({
-            user_id: user.id,
-            practice_id: selectedProjectForRecord.practice_id,
-            record_date: today,
-            session_number: session.sessionNumber, // This should be the topic_number from picker selection
-            duration_minutes: duration,
-            method: session.method
-          })
-          .select();
-
-        if (meditationError) {
-          console.error('❌ Error saving meditation record:', meditationError);
-          throw meditationError;
-        }
-
-        console.log('✅ Meditation record saved:', meditationData);
-
-        // Every valid session now counts as one "座" (simplified rule)
-        validSessionCount++;
-      }
-
-      console.log('🔄 Updating project progress...');
-
-      // Update project progress with valid session count (not total minutes)
-      if (validSessionCount > 0) {
-        await dailyRecordService.recordPractice(
-          user.id, 
-          selectedProjectForRecord.id, 
-          validSessionCount, 
-          today
-        );
-        console.log('✅ Project progress updated with', validSessionCount, 'valid sessions');
-      }
-
-      // Reload practice data to reflect the changes
-      console.log('🔄 Reloading practice data...');
-      await loadPracticeData();
-
-      console.log('✅ Meditation record save completed successfully');
-
-      Alert.alert(
-        '记录成功', 
-        `本次观修:\n总时长: ${totalMinutes} 分钟\n完成座数: ${validSessionCount} 座`
-      );
-
-      setShowMeditationModal(false);
-      setSelectedProjectForRecord(null);
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1}]);
-      setMeditationTopics([]);
-    } catch (error) {
-      console.error('❌ Error saving meditation:', error);
-      Alert.alert('错误', `保存观修记录失败\n\n错误信息: ${error.message || '未知错误'}`);
-    } finally {
-      setRecordingMeditation(false);
-    }
+    // Close current modal
+    setShowMeditationModal(false);
+    setSelectedProjectForRecord(null);
+    setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
   };
 
   const handleSelectIndividualPractice = async () => {

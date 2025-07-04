@@ -348,19 +348,215 @@ export const meditationService = {
     return data;
   },
 
-  async getMeditationProgress(userId: string): Promise<{ completedSessions: number; totalSessions: number }> {
+  // 🆕 观后感功能扩展
+  async updateMeditationReflection(
+    recordId: string,
+    reflection: string,
+    userId: string
+  ): Promise<MeditationRecord> {
     const { data, error } = await supabase
       .from('meditation_records')
-      .select('session_number')
+      .update({
+        reflection,
+        reflection_created_at: new Date().toISOString()
+      })
+      .eq('id', recordId)
+      .eq('user_id', userId) // 安全检查：确保用户只能修改自己的记录
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 创建带观后感的观修记录
+  async recordMeditationWithReflection(record: {
+    user_id: string;
+    practice_id: string;
+    record_date: string;
+    duration_minutes: number;
+    session_number?: number;
+    method?: string;
+    reflection?: string;
+  }): Promise<MeditationRecord> {
+    const recordData: any = {
+      ...record,
+      created_at: new Date().toISOString()
+    };
+
+    // 如果有观后感，记录创建时间
+    if (record.reflection && record.reflection.trim()) {
+      recordData.reflection_created_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .insert(recordData)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 获取带观后感的记录详情
+  async getMeditationRecordWithReflection(recordId: string, userId: string): Promise<MeditationRecord | null> {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .select('*')
+      .eq('id', recordId)
+      .eq('user_id', userId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 获取有观后感的记录统计
+  async getReflectionStats(userId: string): Promise<{ totalRecords: number; withReflection: number }> {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .select('id, reflection')
       .eq('user_id', userId);
 
     if (error) throw error;
 
-    const uniqueSessions = new Set(data?.map(r => r.session_number) || []);
+    const totalRecords = data?.length || 0;
+    const withReflection = data?.filter(record => record.reflection && record.reflection.trim().length > 0).length || 0;
+
+    return { totalRecords, withReflection };
+  },
+
+  // 🆕 编辑观修记录（包括时长和观后感）
+  async updateMeditationRecord(
+    recordId: string,
+    userId: string,
+    updates: {
+      duration_minutes?: number;
+      reflection?: string;
+      session_number?: number;
+    }
+  ): Promise<MeditationRecord> {
+    const updateData: any = { ...updates };
+    
+    // 如果更新了观后感，记录更新时间
+    if (updates.reflection !== undefined) {
+      updateData.reflection_created_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .update(updateData)
+      .eq('id', recordId)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 删除观修记录
+  async deleteMeditationRecord(recordId: string, userId: string): Promise<void> {
+    const { error } = await supabase
+      .from('meditation_records')
+      .delete()
+      .eq('id', recordId)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+  },
+
+  // 🆕 获取观修方法目录
+  async getMeditationTopics(practiceId: string): Promise<Array<{
+    id: string;
+    topic_number: number;
+    title: string;
+    description?: string;
+  }>> {
+    const { data, error } = await supabase
+      .from('meditation_topics')
+      .select('id, topic_number, title, description')
+      .eq('practice_id', practiceId)
+      .order('topic_number');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // 🆕 简化版本：每座就是每条记录
+  async getMeditationProgress(userId: string, practiceId?: string): Promise<{ 
+    completedSessions: number; 
+    totalSessions: number;
+    currentWeekSessions: number;
+    todaySessions: number;
+  }> {
+    let query = supabase
+      .from('meditation_records')
+      .select('id, record_date, session_number')
+      .eq('user_id', userId);
+
+    if (practiceId) {
+      query = query.eq('practice_id', practiceId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const records = data || [];
+    const today = new Date().toISOString().split('T')[0];
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    const weekStart = startOfWeek.toISOString().split('T')[0];
+
     return {
-      completedSessions: uniqueSessions.size,
-      totalSessions: 92
+      completedSessions: records.length, // 每条记录 = 1座
+      totalSessions: 92,
+      currentWeekSessions: records.filter(r => r.record_date >= weekStart).length,
+      todaySessions: records.filter(r => r.record_date === today).length
     };
+  },
+
+  // 🆕 获取周期内的观修详情（用于主页显示）
+  async getPeriodMeditationDetails(
+    userId: string,
+    practiceId: string,
+    period: 'daily' | 'weekly'
+  ): Promise<{
+    sessions: Array<{ duration: number; sessionNumber?: number }>;
+    detailString: string;
+  }> {
+    const today = new Date().toISOString().split('T')[0];
+    let startDate = today;
+    
+    if (period === 'weekly') {
+      const startOfWeek = new Date();
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+      startDate = startOfWeek.toISOString().split('T')[0];
+    }
+
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .select('duration_minutes, session_number, created_at')
+      .eq('user_id', userId)
+      .eq('practice_id', practiceId)
+      .gte('record_date', startDate)
+      .lte('record_date', today)
+      .order('created_at');
+
+    if (error) throw error;
+
+    const sessions = (data || []).map((record, index) => ({
+      duration: record.duration_minutes,
+      sessionNumber: record.session_number || (index + 1)
+    }));
+
+    const detailString = sessions
+      .map((session, index) => `第${index + 1}座: ${session.duration}分钟`)
+      .join('; ');
+
+    return { sessions, detailString };
   }
 };
 

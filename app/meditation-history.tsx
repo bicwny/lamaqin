@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -7,14 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  Modal,
-  TextInput,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { meditationService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 
@@ -24,11 +21,12 @@ interface MeditationRecord {
   duration_minutes: number;
   session_number: number;
   method: string;
+  reflection?: string;
+  reflection_created_at?: string;
   created_at: string;
 }
 
 export default function MeditationHistoryScreen() {
-  const router = useRouter();
   const { user } = useAuth();
   const { projectId, practiceId, practiceName, targetPeriod } = useLocalSearchParams();
   const pageActiveRef = useRef(true);
@@ -39,14 +37,7 @@ export default function MeditationHistoryScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
-
-  // Edit modal states
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<MeditationRecord | null>(null);
-  const [editDuration, setEditDuration] = useState('');
-  const [editSessionNumber, setEditSessionNumber] = useState(1);
   const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
-  const [saving, setSaving] = useState(false);
 
   const PAGE_SIZE = 12;
 
@@ -55,7 +46,7 @@ export default function MeditationHistoryScreen() {
     React.useCallback(() => {
       console.log('🏠 Meditation history page focused');
       pageActiveRef.current = true;
-      
+
       return () => {
         console.log('🚪 Meditation history page unfocused');
         pageActiveRef.current = false;
@@ -67,8 +58,20 @@ export default function MeditationHistoryScreen() {
     console.log('🔄 MeditationHistory: Initial load, user:', user?.id, 'practiceId:', practiceId);
     if (user?.id && practiceId) {
       loadRecords(true);
+      loadMeditationTopics();
     }
   }, [user?.id, practiceId]);
+
+  const loadMeditationTopics = async () => {
+    if (!practiceId) return;
+
+    try {
+      const topics = await meditationService.getMeditationTopics(practiceId as string);
+      setMeditationTopics(topics);
+    } catch (error) {
+      console.error('❌ Error loading meditation topics:', error);
+    }
+  };
 
   const loadRecords = async (reset = false) => {
     if (!user?.id || !practiceId) {
@@ -90,7 +93,7 @@ export default function MeditationHistoryScreen() {
 
       const { data, error } = await supabase
         .from('meditation_records')
-        .select('id, record_date, duration_minutes, session_number, method, created_at')
+        .select('id, record_date, duration_minutes, session_number, method, reflection, reflection_created_at, created_at')
         .eq('user_id', user.id)
         .eq('practice_id', practiceId)
         .order('record_date', { ascending: false })
@@ -136,138 +139,41 @@ export default function MeditationHistoryScreen() {
     }
   };
 
-  const handleEdit = async (record: MeditationRecord) => {
-    setEditingRecord(record);
-    setEditDuration(record.duration_minutes.toString());
-    setEditSessionNumber(record.session_number || 1);
-    
-    // Load meditation topics
-    await loadMeditationTopics();
-    
-    setShowEditModal(true);
-  };
-
-  const loadMeditationTopics = async () => {
-    try {
-      console.log('🧘 Loading meditation topics for editing');
-      const { data, error } = await supabase
-        .from('meditation_topics')
-        .select('topic_number, title, description')
-        .eq('practice_id', practiceId)
-        .order('topic_number', { ascending: true });
-
-      if (error) throw error;
-
-      console.log('📚 Loaded meditation topics for edit:', data?.length || 0);
-      setMeditationTopics(data || []);
-    } catch (error) {
-      console.error('Error loading meditation topics:', error);
-      // Create fallback topics
-      const fallbackTopics = [];
-      for (let i = 1; i <= 92; i++) {
-        fallbackTopics.push({
-          topic_number: i,
-          title: `思维闲暇之本体`,
-          description: `第${i}修法`
-        });
+  const handleEdit = (record: any) => {
+    console.log('🔄 Edit record:', record.id);
+    router.push({
+      pathname: '/modals/meditation-record',
+      params: {
+        practiceId: projectId,
+        practiceProjectId: practiceId,
+        practiceName: practiceName,
+        editRecordId: record.id
       }
-      setMeditationTopics(fallbackTopics);
-    }
+    });
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingRecord || !user?.id) return;
-
-    const duration = parseInt(editDuration);
-    if (isNaN(duration) || duration <= 0) {
-      Alert.alert('提示', '请输入有效的时长');
-      return;
-    }
-
-    // Get the selected topic to update method
-    const selectedTopic = meditationTopics.find(t => t.topic_number === editSessionNumber);
-    const method = selectedTopic ? selectedTopic.title : `第${editSessionNumber}座修行`;
-
-    setSaving(true);
-    try {
-      console.log('🔄 Updating meditation record:', editingRecord.id);
-
-      const { error } = await supabase
-        .from('meditation_records')
-        .update({
-          duration_minutes: duration,
-          session_number: editSessionNumber,
-          method: method
-        })
-        .eq('id', editingRecord.id)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('❌ Error updating record:', error);
-        throw error;
-      }
-
-      console.log('✅ Record updated successfully');
-
-      // Update local state
-      setRecords(prev => prev.map(record => 
-        record.id === editingRecord.id 
-          ? { ...record, duration_minutes: duration, session_number: editSessionNumber, method: method }
-          : record
-      ));
-
-      setShowEditModal(false);
-      setEditingRecord(null);
-      Alert.alert('成功', '记录已更新');
-    } catch (error) {
-      console.error('❌ Error saving edit:', error);
-      Alert.alert('错误', '更新记录失败');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = (record: MeditationRecord) => {
+  const handleDelete = async (record: any) => {
     Alert.alert(
       '确认删除',
-      '您确定要删除这条记录吗？此操作无法撤销。',
+      '确定要删除这条观修记录吗？',
       [
         { text: '取消', style: 'cancel' },
         { 
           text: '删除', 
           style: 'destructive',
-          onPress: () => performDelete(record)
+          onPress: async () => {
+            try {
+              await meditationService.deleteMeditationRecord(record.id);
+              Alert.alert('成功', '记录已删除');
+              loadRecords(true); // 重新加载历史记录
+            } catch (error) {
+              console.error('❌ Error deleting record:', error);
+              Alert.alert('错误', '删除失败，请重试');
+            }
+          }
         }
       ]
     );
-  };
-
-  const performDelete = async (record: MeditationRecord) => {
-    if (!user?.id) return;
-
-    try {
-      console.log('🔄 Deleting meditation record:', record.id);
-
-      const { error } = await supabase
-        .from('meditation_records')
-        .delete()
-        .eq('id', record.id)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('❌ Error deleting record:', error);
-        throw error;
-      }
-
-      console.log('✅ Record deleted successfully');
-
-      // Remove from local state
-      setRecords(prev => prev.filter(r => r.id !== record.id));
-      Alert.alert('成功', '记录已删除');
-    } catch (error) {
-      console.error('❌ Error deleting record:', error);
-      Alert.alert('错误', '删除记录失败');
-    }
   };
 
   const formatDate = (dateString: string) => {
@@ -323,33 +229,99 @@ export default function MeditationHistoryScreen() {
           </View>
         ) : (
           <>
-            {records.map((record) => (
-              <View key={record.id} style={styles.recordCard}>
-                <View style={styles.recordHeader}>
-                  <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
-                  <Text style={styles.sessionNumber}>第{record.session_number}座 {record.method}</Text>
-                </View>
-                
-                <View style={styles.recordContent}>
-                  <Text style={styles.duration}>{record.duration_minutes} 分钟</Text>
-                </View>
+            {records.map((record) => {
+              const topic = meditationTopics.find(t => t.topic_number === record.session_number);
+              const topicTitle = topic ? topic.title : null;
 
-                <View style={styles.recordActions}>
-                  <TouchableOpacity 
-                    style={styles.editButton}
-                    onPress={() => handleEdit(record)}
-                  >
-                    <Text style={styles.editButtonText}>编辑</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(record)}
-                  >
-                    <Text style={styles.deleteButtonText}>删除</Text>
-                  </TouchableOpacity>
+              return (
+                <View key={record.id} style={styles.recordCard}>
+                  <View style={styles.recordHeader}>
+                    <View style={styles.recordInfo}>
+                      <Text style={styles.recordDate}>
+                        {formatDate(record.record_date)}
+                      </Text>
+
+                      <View style={styles.recordDetails}>
+                        <Text style={styles.recordDuration}>
+                          时长：{record.duration_minutes} 分钟
+                        </Text>
+
+                        {record.session_number && (
+                          <Text style={styles.sessionNumber}>
+                            第 {record.session_number} 座
+                          </Text>
+                        )}
+
+                        {topicTitle && (
+                          <Text style={styles.topicTitle}>
+                            方法：{topicTitle}
+                          </Text>
+                        )}
+                      </View>
+
+                      {/* 观后感显示 */}
+                      {record.reflection ? (
+                        <View style={styles.reflectionContainer}>
+                          <Text style={styles.reflectionLabel}>观后感：</Text>
+                          <TouchableOpacity 
+                            style={styles.reflectionPreview}
+                            onPress={() => {
+                              Alert.alert(
+                                '观后感',
+                                record.reflection,
+                                [{ text: '关闭', style: 'cancel' }]
+                              );
+                            }}
+                          >
+                            <Text style={styles.reflectionText}>
+                              {record.reflection.length > 80
+                                ? `${record.reflection.substring(0, 80)}...`
+                                : record.reflection
+                              }
+                            </Text>
+                            {record.reflection.length > 80 && (
+                              <Text style={styles.viewMoreText}>
+                                点击查看完整内容 →
+                              </Text>
+                            )}
+                            {record.reflection_created_at && (
+                              <Text style={styles.reflectionDate}>
+                                记录于 {formatDate(record.reflection_created_at.split('T')[0])}
+                              </Text>
+                            )}
+                          </TouchableOpacity>
+                        </View>
+                      ) : (
+                        <TouchableOpacity
+                          style={styles.addReflectionButton}
+                          onPress={() => handleEdit(record)}
+                        >
+                          <Text style={styles.addReflectionText}>
+                            + 添加观后感
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+
+                    <View style={styles.recordActions}>
+                      <TouchableOpacity
+                        onPress={() => handleEdit(record)}
+                        style={styles.editButton}
+                      >
+                        <Text style={styles.editButtonText}>编辑</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => handleDelete(record)}
+                        style={styles.deleteButton}
+                      >
+                        <Text style={styles.deleteButtonText}>删除</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
 
             {/* Load More Button */}
             {hasMore && (
@@ -372,82 +344,6 @@ export default function MeditationHistoryScreen() {
           </>
         )}
       </ScrollView>
-
-      {/* Edit Modal */}
-      <Modal
-        visible={showEditModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowEditModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>🧘 编辑观修记录</Text>
-            <Text style={styles.modalSubtitle}>请修改您本次观修的信息：</Text>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-              <TextInput
-                style={styles.input}
-                value={editDuration}
-                onChangeText={setEditDuration}
-                keyboardType="numeric"
-                placeholder="如：30"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>选择观修内容</Text>
-              {meditationTopics.length > 0 ? (
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={editSessionNumber}
-                    onValueChange={(value) => setEditSessionNumber(value)}
-                    style={styles.topicPicker}
-                  >
-                    {meditationTopics.map((topic) => (
-                      <Picker.Item 
-                        key={topic.topic_number} 
-                        label={`第${topic.topic_number}座 - ${topic.title}`} 
-                        value={topic.topic_number} 
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              ) : (
-                <TextInput
-                  style={styles.input}
-                  value={editSessionNumber.toString()}
-                  onChangeText={(value) => setEditSessionNumber(parseInt(value) || 1)}
-                  keyboardType="numeric"
-                  placeholder="座数编号"
-                />
-              )}
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity 
-                style={styles.cancelButton}
-                onPress={() => setShowEditModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>取消</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={[styles.confirmButton, saving && styles.confirmButtonDisabled]}
-                onPress={handleSaveEdit}
-                disabled={saving}
-              >
-                {saving ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.confirmButtonText}>更新记录</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -511,9 +407,10 @@ const styles = StyleSheet.create({
   },
   recordCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
+    marginHorizontal: 0,
+    marginVertical: 6,
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -523,40 +420,86 @@ const styles = StyleSheet.create({
   recordHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+  },
+  recordInfo: {
+    flex: 1,
   },
   recordDate: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  recordDetails: {
+    marginBottom: 8,
+  },
+  recordDuration: {
+    fontSize: 14,
+    color: '#2c3e50',
+    fontWeight: '500',
+    marginBottom: 4,
   },
   sessionNumber: {
     fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '500',
-  },
-  recordContent: {
-    marginBottom: 12,
-  },
-  duration: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    color: '#7f8c8d',
     marginBottom: 4,
   },
-  method: {
+  topicTitle: {
     fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+    color: '#27ae60',
+    fontWeight: '500',
+  },
+  reflectionContainer: {
+    marginTop: 8,
+  },
+  reflectionLabel: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 4,
+  },
+  reflectionPreview: {
+    backgroundColor: '#f8f9fa',
+    padding: 10,
+    borderRadius: 6,
+    borderLeftWidth: 3,
+    borderLeftColor: '#f39c12',
+  },
+  reflectionText: {
+    fontSize: 13,
+    color: '#2c3e50',
+    lineHeight: 18,
+  },
+  viewMoreText: {
+    fontSize: 11,
+    color: '#3498db',
+    marginTop: 4,
+  },
+  reflectionDate: {
+    fontSize: 11,
+    color: '#95a5a6',
+    marginTop: 4,
+  },
+  addReflectionButton: {
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#3498db',
+    borderStyle: 'dashed',
+    borderRadius: 6,
+    padding: 8,
+    alignItems: 'center',
+  },
+  addReflectionText: {
+    color: '#3498db',
+    fontSize: 12,
   },
   recordActions: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     gap: 8,
+    marginLeft: 12,
   },
   editButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#3498db',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -567,7 +510,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   deleteButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#e74c3c',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -596,100 +539,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 16,
     marginBottom: 20,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    width: '90%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 6,
-  },
-  input: {
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    color: '#333',
-  },
-  multilineInput: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  pickerContainer: {
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  topicPicker: {
-    backgroundColor: '#fff',
-    height: 40,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  cancelButton: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    flex: 1,
-    marginRight: 8,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  confirmButton: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    flex: 1,
-    marginLeft: 8,
-    alignItems: 'center',
-  },
-  confirmButtonDisabled: {
-    opacity: 0.6,
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
