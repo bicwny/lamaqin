@@ -287,17 +287,29 @@ export default function PracticeScreen() {
                 {project.practices.type === 'count' ? (
                   <View>
                     <Text style={styles.progressText}>
-                      {progress.current}/{progress.target} {project.practices.unit}
+                      {project.practices.name}
+                    </Text>
+                    <Text style={styles.progressNumbers}>
+                      {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
                     </Text>
                     <Text style={styles.dailyTarget}>
-                      (每日目标: {project.daily_target} {project.practices.unit})
+                      每日目标: {project.daily_target.toLocaleString()} {project.practices.unit}
                     </Text>
                   </View>
                 ) : (
                   <View>
                     <Text style={styles.progressText}>
-                      {project.practices.name} ({progress.current}/{Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天)
+                      {project.practices.name}
                     </Text>
+                    {project.target_period === 'weekly' ? (
+                      <Text style={styles.progressNumbers}>
+                        本周目标: {project.target_count}座 (每日{project.daily_target}座)
+                      </Text>
+                    ) : (
+                      <Text style={styles.progressNumbers}>
+                        总进度: {progress.current}/{progress.target}天
+                      </Text>
+                    )}
 
                     <WeeklyProgressDisplay 
                       project={project} 
@@ -333,66 +345,108 @@ export default function PracticeScreen() {
 
 // Component to display weekly progress for time-based practices
 function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; user: any }) {
+  const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadWeeklyRecords();
-  }, [project.id]);
+    loadRecords();
+  }, [project.id, user?.id]);
 
-  const loadWeeklyRecords = async () => {
+  const loadRecords = async () => {
     if (!user?.id) return;
 
     try {
-      const today = new Date();
-      const startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay());
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-      const { data: records, error } = await supabase
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Get today's records
+      const { data: todayData, error: todayError } = await supabase
         .from('meditation_records')
         .select('*')
         .eq('user_id', user.id)
         .eq('practice_id', project.practice_id)
-        .gte('record_date', startOfWeek.toISOString().split('T')[0])
-        .lte('record_date', endOfWeek.toISOString().split('T')[0])
+        .eq('record_date', today)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (todayError) throw todayError;
 
-      setWeeklyRecords(records || []);
+      // Get this week's records for weekly projects
+      if (project.target_period === 'weekly') {
+        const startOfWeek = new Date();
+        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+        const { data: weeklyData, error: weeklyError } = await supabase
+          .from('meditation_records')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('practice_id', project.practice_id)
+          .gte('record_date', startOfWeek.toISOString().split('T')[0])
+          .lte('record_date', endOfWeek.toISOString().split('T')[0])
+          .order('created_at', { ascending: true });
+
+        if (weeklyError) throw weeklyError;
+        setWeeklyRecords(weeklyData || []);
+      }
+
+      setTodayRecords(todayData || []);
     } catch (error) {
-      console.error('Error loading weekly records:', error);
+      console.error('Error loading records:', error);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <Text style={styles.weeklyProgressText}>加载中...</Text>;
+    return (
+      <View style={styles.weeklyProgress}>
+        <Text style={styles.weeklyProgressText}>加载中...</Text>
+      </View>
+    );
   }
 
-  const completed = weeklyRecords.length;
+  const isWeekly = project.target_period === 'weekly';
+  const todayCount = todayRecords.length;
   const target = project.daily_target;
   
-  // Format weekly progress details
-  const details = weeklyRecords.map((record, index) => 
-    `第${index + 1}座: ${record.duration_minutes}分钟`
+  // Format session details for today
+  const todayDetails = todayRecords.map((record, index) => 
+    `第${index + 1}座${record.duration_minutes}分钟`
   ).join('；');
 
-  return (
-    <View style={styles.weeklyProgress}>
-      <Text style={styles.weeklyProgressText}>
-        今天: {completed}/{target}{completed >= target ? ' ✅' : ''}
-      </Text>
-      {details && (
-        <Text style={styles.weeklyProgressSubtext}>
-          {details}
+  if (isWeekly) {
+    const weeklyCount = weeklyRecords.length;
+    const weeklyTarget = project.target_count;
+    
+    return (
+      <View style={styles.weeklyProgress}>
+        <Text style={styles.weeklyProgressText}>
+          本周进度: {weeklyCount}/{weeklyTarget}座
+          {weeklyCount >= weeklyTarget ? ' ✅' : ''}
         </Text>
-      )}
-    </View>
-  );
+        {todayCount > 0 && (
+          <Text style={styles.weeklyProgressSubtext}>
+            今日: {todayDetails}
+          </Text>
+        )}
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.weeklyProgress}>
+        <Text style={styles.weeklyProgressText}>
+          今日进度: {todayCount}/{target}座
+          {todayCount >= target ? ' ✅' : ''}
+        </Text>
+        {todayDetails && (
+          <Text style={styles.weeklyProgressSubtext}>
+            {todayDetails}
+          </Text>
+        )}
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -497,6 +551,12 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 16,
     fontWeight: '500',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  progressNumbers: {
+    fontSize: 15,
+    fontWeight: '400',
     color: Colors.text,
     marginBottom: 4,
   },
