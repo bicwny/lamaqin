@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   RefreshControl,
   SafeAreaView,
+  ToastAndroid,
+  Platform,
 } from 'react-native';
 import { router, useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
@@ -113,14 +115,16 @@ export default function MeditationHistoryScreen() {
     });
   };
 
+  const [deletingRecords, setDeletingRecords] = useState<Set<string>>(new Set());
+
   const handleDelete = async (record: any) => {
     Alert.alert(
       '确认删除',
-      '确定要删除这条观修记录吗？',
+      `确定要删除这条观修记录吗？\n\n日期: ${formatDate(record.record_date)}\n时长: ${record.duration_minutes}分钟\n\n此操作无法撤销。`,
       [
         { text: '取消', style: 'cancel' },
         { 
-          text: '删除', 
+          text: '确认删除', 
           style: 'destructive',
           onPress: async () => {
             console.log('🗑️ Starting delete operation for record:', record.id);
@@ -131,22 +135,45 @@ export default function MeditationHistoryScreen() {
               return;
             }
 
+            // Step 1: Optimistic update - mark record as deleting
+            setDeletingRecords(prev => new Set(prev).add(record.id));
+
             try {
               console.log('🗑️ Calling deleteMeditationRecord with:', { recordId: record.id, userId: user.id });
               
-              setLoading(true); // Show loading state
+              // Step 2: Send delete request to database
               await meditationService.deleteMeditationRecord(record.id, user.id);
               
               console.log('✅ Record deleted successfully');
-              Alert.alert('成功', '记录已删除');
               
-              // Reload records to reflect the deletion
-              await loadRecords(true);
+              // Step 3a: Remove from UI immediately (optimistic)
+              setRecords(prev => prev.filter(r => r.id !== record.id));
+              
+              // Step 4a: Show success toast
+              Platform.OS === 'android' 
+                ? ToastAndroid.show('✅ 记录已删除', ToastAndroid.SHORT)
+                : Alert.alert('成功', '记录已删除');
+              
             } catch (error) {
               console.error('❌ Error deleting record:', error);
-              Alert.alert('错误', `删除失败: ${error.message || '请重试'}`);
+              
+              // Step 3b & 4b: Revert optimistic update and show error
+              setDeletingRecords(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(record.id);
+                return newSet;
+              });
+              
+              Platform.OS === 'android' 
+                ? ToastAndroid.show('❌ 删除失败，请重试', ToastAndroid.LONG)
+                : Alert.alert('错误', `删除失败: ${error.message || '请重试'}`);
             } finally {
-              setLoading(false);
+              // Clean up deleting state
+              setDeletingRecords(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(record.id);
+                return newSet;
+              });
             }
           }
         }
@@ -215,60 +242,82 @@ export default function MeditationHistoryScreen() {
           </View>
         ) : (
           <View style={styles.recordsList}>
-            {records.map((record) => (
-              <View key={record.id} style={styles.recordCard}>
-                <View style={styles.recordHeader}>
-                  <Text style={styles.recordDate}>
-                    {formatDate(record.record_date)}
-                  </Text>
-                  <Text style={styles.recordTime}>
-                    {formatTime(record.created_at)}
-                  </Text>
-                </View>
-
-                <View style={styles.recordContent}>
-                  <Text style={styles.recordDuration}>
-                    时长: {record.duration_minutes} 分钟
-                  </Text>
-                  
-                  {record.session_number && (
-                    <Text style={styles.recordSession}>
-                      第 {record.session_number} 座
-                    </Text>
-                  )}
-
-                  {record.method && (
-                    <Text style={styles.recordMethod}>
-                      方法: {record.method}
-                    </Text>
-                  )}
-
-                  {record.reflection && (
-                    <View style={styles.reflectionContainer}>
-                      <Text style={styles.reflectionLabel}>观后感:</Text>
-                      <Text style={styles.reflectionText} numberOfLines={3}>
-                        {record.reflection}
-                      </Text>
+            {records.map((record) => {
+              const isDeleting = deletingRecords.has(record.id);
+              return (
+                <View 
+                  key={record.id} 
+                  style={[
+                    styles.recordCard,
+                    isDeleting && styles.recordCardDeleting
+                  ]}
+                >
+                  {isDeleting && (
+                    <View style={styles.deletingOverlay}>
+                      <ActivityIndicator color="#dc3545" size="small" />
+                      <Text style={styles.deletingText}>删除中...</Text>
                     </View>
                   )}
-                </View>
+                  
+                  <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
+                    <Text style={styles.recordDate}>
+                      {formatDate(record.record_date)}
+                    </Text>
+                    <Text style={styles.recordTime}>
+                      {formatTime(record.created_at)}
+                    </Text>
+                  </View>
 
-                <View style={styles.recordActions}>
-                  <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={() => handleEdit(record)}
-                  >
-                    <Text style={styles.editButtonText}>编辑</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(record)}
-                  >
-                    <Text style={styles.deleteButtonText}>删除</Text>
-                  </TouchableOpacity>
+                  <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
+                    <Text style={styles.recordDuration}>
+                      时长: {record.duration_minutes} 分钟
+                    </Text>
+                    
+                    {record.session_number && (
+                      <Text style={styles.recordSession}>
+                        第 {record.session_number} 座
+                      </Text>
+                    )}
+
+                    {record.method && (
+                      <Text style={styles.recordMethod}>
+                        方法: {record.method}
+                      </Text>
+                    )}
+
+                    {record.reflection && (
+                      <View style={styles.reflectionContainer}>
+                        <Text style={styles.reflectionLabel}>观后感:</Text>
+                        <Text style={styles.reflectionText} numberOfLines={3}>
+                          {record.reflection}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.recordActions}>
+                    <TouchableOpacity
+                      style={[styles.editButton, isDeleting && styles.disabledButton]}
+                      onPress={() => handleEdit(record)}
+                      disabled={isDeleting}
+                    >
+                      <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
+                        编辑
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.deleteButton, isDeleting && styles.disabledButton]}
+                      onPress={() => handleDelete(record)}
+                      disabled={isDeleting}
+                    >
+                      <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
+                        删除
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
 
             {hasMore && (
               <TouchableOpacity
@@ -463,5 +512,37 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: 16,
     fontWeight: '500',
+  },
+  recordCardDeleting: {
+    opacity: 0.6,
+    position: 'relative',
+  },
+  deletingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deletingText: {
+    color: '#dc3545',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  disabledContent: {
+    opacity: 0.5,
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  disabledButtonText: {
+    opacity: 0.5,
   },
 });
