@@ -93,6 +93,7 @@ export default function MeditationRecordScreen() {
       return false;
     }
 
+    console.log('✅ Form validation passed:', { duration: durationNum, sessionNumber: sessionNum });
     return true;
   };
 
