@@ -9,7 +9,9 @@ import {
   ActivityIndicator,
   TextInput,
   SafeAreaView,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -44,15 +46,17 @@ export default function PracticeConfigScreen() {
     startDate: new Date().toISOString().split('T')[0], // Start date for count practices
   });
   const [saving, setSaving] = useState(false);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
   const getDurationDays = () => {
     if (practiceType !== 'count') return 0;
     
     if (formData.durationType === 'custom') {
       if (!formData.customEndDate) return 0;
-      const today = new Date();
+      const startDate = new Date(formData.startDate);
       const endDate = new Date(formData.customEndDate);
-      const diffTime = endDate.getTime() - today.getTime();
+      const diffTime = endDate.getTime() - startDate.getTime();
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
     
@@ -62,6 +66,26 @@ export default function PracticeConfigScreen() {
       case '100': return 100;
       case '365': return 365;
       default: return parseInt(formData.durationType) || 100;
+    }
+  };
+
+  const handleStartDateChange = (event: any, selectedDate?: Date) => {
+    setShowStartDatePicker(false);
+    if (selectedDate) {
+      setFormData({
+        ...formData,
+        startDate: selectedDate.toISOString().split('T')[0]
+      });
+    }
+  };
+
+  const handleEndDateChange = (event: any, selectedDate?: Date) => {
+    setShowEndDatePicker(false);
+    if (selectedDate) {
+      setFormData({
+        ...formData,
+        customEndDate: selectedDate.toISOString().split('T')[0]
+      });
     }
   };
 
@@ -289,12 +313,22 @@ export default function PracticeConfigScreen() {
 
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>开始日期</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.startDate || new Date().toISOString().split('T')[0]}
-            onChangeText={(text) => setFormData({...formData, startDate: text})}
-            placeholder="YYYY-MM-DD"
-          />
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => setShowStartDatePicker(true)}
+          >
+            <Text style={styles.datePickerButtonText}>
+              {formData.startDate || new Date().toISOString().split('T')[0]}
+            </Text>
+          </TouchableOpacity>
+          {showStartDatePicker && (
+            <DateTimePicker
+              value={new Date(formData.startDate || new Date().toISOString().split('T')[0])}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleStartDateChange}
+            />
+          )}
         </View>
 
         <View style={styles.inputGroup}>
@@ -340,12 +374,23 @@ export default function PracticeConfigScreen() {
         {formData.durationType === 'custom' && (
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>结束日期</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.customEndDate}
-              onChangeText={(text) => setFormData({...formData, customEndDate: text})}
-              placeholder="YYYY-MM-DD"
-            />
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => setShowEndDatePicker(true)}
+            >
+              <Text style={styles.datePickerButtonText}>
+                {formData.customEndDate || '选择结束日期'}
+              </Text>
+            </TouchableOpacity>
+            {showEndDatePicker && (
+              <DateTimePicker
+                value={formData.customEndDate ? new Date(formData.customEndDate) : new Date()}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleEndDateChange}
+                minimumDate={new Date(formData.startDate)}
+              />
+            )}
           </View>
         )}
 
@@ -574,5 +619,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: 'white',
+  },
+  datePickerButton: {
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+  },
+  datePickerButtonText: {
+    fontSize: 16,
+    color: Colors.text,
   },
 });
