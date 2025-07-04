@@ -89,7 +89,6 @@ export interface MeditationRecord {
   session_number: number; // 1-92
   duration_minutes: number;
   session_attempt: number; // 1-3+
-  method?: string;
   created_at: string;
 }
 
