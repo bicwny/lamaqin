@@ -422,10 +422,9 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
     return (
       <View style={styles.weeklyProgress}>
         <Text style={styles.weeklyProgressText}>
-          本周进度: {weeklyCount}/{weeklyTarget}座
-          {weeklyCount >= weeklyTarget ? ' ✅' : ''}
+          本周进度: {weeklyCount}/{weeklyTarget}座{weeklyCount >= weeklyTarget ? ' ✅' : ''}
         </Text>
-        {todayCount > 0 && (
+        {todayCount > 0 && todayDetails && (
           <Text style={styles.weeklyProgressSubtext}>
             今日: {todayDetails}
           </Text>
@@ -436,10 +435,9 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
     return (
       <View style={styles.weeklyProgress}>
         <Text style={styles.weeklyProgressText}>
-          今日进度: {todayCount}/{target}座
-          {todayCount >= target ? ' ✅' : ''}
+          今日进度: {todayCount}/{target}座{todayCount >= target ? ' ✅' : ''}
         </Text>
-        {todayDetails && (
+        {todayCount > 0 && todayDetails && (
           <Text style={styles.weeklyProgressSubtext}>
             {todayDetails}
           </Text>
