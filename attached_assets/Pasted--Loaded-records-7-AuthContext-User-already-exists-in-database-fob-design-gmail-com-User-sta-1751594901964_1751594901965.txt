@@ -1,0 +1,50 @@
+📊 Loaded records: 7
+✅ AuthContext: User already exists in database: fob.design@gmail.com
+✅ User state set successfully
+🔍 RootLayoutNav render - user: fob.design@gmail.com loading: false
+📋 User object: {
+  "id": "954dc879-cbfe-4b5f-a7ef-113acf1f5569",
+  "email": "fob.design@gmail.com"
+}
+✅ Auth state resolved, user: logged in
+📱 About to render Stack with screens
+🎯 Will show: (tabs) screen
+🔄 Auth state changed in RootLayoutNav, user: fob.design@gmail.com
+✅ User authenticated, should show tabs
+🔄 Auth state changed: SIGNED_IN fob.design@gmail.com
+✅ Found verified session for: fob.design@gmail.com
+🔍 AuthContext: Checking if user exists in database: fob.design@gmail.com
+🔙 Back button pressed from meditation history
+The action 'GO_BACK' was not handled by any navigator.
+
+Is there any screen to go back to?
+
+This is a development-only warning and won't be shown in production.
+❌ AuthContext: Error ensuring user in database: Database operation timeout (3s)
+⚠️ AuthContext: Continuing without database sync due to error
+✅ User state set successfully
+🔍 RootLayoutNav render - user: fob.design@gmail.com loading: false
+📋 User object: {
+  "id": "954dc879-cbfe-4b5f-a7ef-113acf1f5569",
+  "email": "fob.design@gmail.com"
+}
+✅ Auth state resolved, user: logged in
+📱 About to render Stack with screens
+🎯 Will show: (tabs) screen
+🔄 Auth state changed in RootLayoutNav, user: fob.design@gmail.com
+✅ User authenticated, should show tabs
+✅ AuthContext: User already exists in database: fob.design@gmail.com
+🔙 Back button pressed from meditation history
+The action 'GO_BACK' was not handled by any navigator.
+
+Is there any screen to go back to?
+
+This is a development-only warning and won't be shown in production.
+
+Is there any screen to go back to?
+
+This is a development-only warning and won&#x27;t be shown in production.
+at t.value (https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://252f9010-f5c0-46c9-a6a2-a978f866ad4e-00-26cetbz4gwz9r.worf.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

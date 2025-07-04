@@ -1,4 +1,3 @@
-
 // Buddhist Practice Tracking App - Database Types
 
 export interface User {
@@ -86,12 +85,11 @@ export interface MeditationRecord {
   user_id: string;
   practice_id: string;
   record_date: string;
-  session_number: number; // 1-92
   duration_minutes: number;
-  session_attempt: number; // 1-3+
-  method?: string; // 观修方法描述
-  reflection?: string; // 🆕 观后感内容
-  reflection_created_at?: string; // 🆕 观后感创建时间
+  session_number?: number;
+  method?: string;
+  reflection?: string;
+  reflection_created_at?: string;
   created_at: string;
 }
 
