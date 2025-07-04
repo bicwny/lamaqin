@@ -26,15 +26,6 @@ export type MeditationRecord = Database['public']['Tables']['meditation_records'
 export type StudyRecord = Database['public']['Tables']['study_records']['Row'];
 export type MindfulnessRecord = Database['public']['Tables']['mindfulness_records']['Row'];
 
-interface MeditationRecord {
-  user_id: string;
-  practice_id: string;
-  record_date: string;
-  duration_minutes: number;
-  session_number?: number;
-  reflection?: string;
-}
-
 interface PracticeRecord {
   user_id: string;
   project_id: string;
