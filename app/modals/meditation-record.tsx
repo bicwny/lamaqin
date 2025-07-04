@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -136,13 +135,13 @@ export default function MeditationRecordScreen() {
         }, 500);
       } else {
         const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
-        console.log('✅ New meditation record saved:', savedRecord.id);
-        showToast('观修记录已保存');
-        // Navigate back with a small delay to ensure toast shows
-        setTimeout(() => {
-          router.back();
-        }, 500);
-      }
+        console.log('✅ Record saved successfully');
+
+      // Show success toast
+      showToast('观修记录已保存成功');
+
+      // Navigate back to practice page
+      router.back();
     } catch (error) {
       console.error('❌ Error saving meditation record:', error);
       Alert.alert('错误', '保存失败，请重试');
@@ -156,7 +155,7 @@ export default function MeditationRecordScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       {/* Custom Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => {
