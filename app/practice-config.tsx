@@ -60,6 +60,12 @@ export default function PracticeConfigScreen() {
       return;
     }
 
+    // For count-based practices, validate duration
+    if (practiceType === 'count' && !formData.duration) {
+      Alert.alert('错误', '请填写持续天数');
+      return;
+    }
+
     setSaving(true);
     try {
       console.log('💾 Creating new practice project...');
@@ -77,8 +83,14 @@ export default function PracticeConfigScreen() {
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + durationDays);
         targetEndDate = endDate.toISOString().split('T')[0];
+      } else if (practiceType === 'count') {
+        // For count-based practices, use the specified duration
+        const durationDays = parseInt(formData.duration);
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + durationDays);
+        targetEndDate = endDate.toISOString().split('T')[0];
       } else if (formData.targetPeriod === 'daily') {
-        // For count-based practices or other daily practices
+        // For other daily practices
         const days = Math.ceil(finalTargetCount / parseInt(formData.dailyTarget));
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + days);
@@ -236,6 +248,20 @@ export default function PracticeConfigScreen() {
             keyboardType="numeric"
             placeholder={practiceName === '六字大明咒' ? '如：3000' : '如：108'}
           />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>持续天数</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.duration}
+            onChangeText={(text) => setFormData({...formData, duration: text})}
+            keyboardType="numeric"
+            placeholder="如：100"
+          />
+          <Text style={styles.inputHint}>
+            预计完成天数：{Math.ceil(parseInt(formData.targetCount || '0') / parseInt(formData.dailyTarget || '1'))} 天
+          </Text>
         </View>
       </>
     );
