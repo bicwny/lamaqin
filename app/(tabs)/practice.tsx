@@ -365,14 +365,14 @@ export default function PracticeScreen() {
           method: session.method
         });
 
-        // Save to meditation_records with the user-selected session number
+        // Save to meditation_records with the topic number as session number
         const { data: meditationData, error: meditationError } = await supabase
           .from('meditation_records')
           .insert({
             user_id: user.id,
             practice_id: selectedProjectForRecord.practice_id,
             record_date: today,
-            session_number: session.sessionNumber,
+            session_number: session.sessionNumber, // This should be the topic_number from picker selection
             duration_minutes: duration,
             method: session.method
           })
