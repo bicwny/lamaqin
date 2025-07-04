@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   practiceList: {
-    maxHeight: 300,
+    flex: 1,
   },
   practiceCard: {
     backgroundColor: 'white',
