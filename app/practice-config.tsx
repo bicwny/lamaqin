@@ -41,6 +41,7 @@ export default function PracticeConfigScreen() {
     duration: '100', // For time-based practices when daily is selected
     durationType: '100', // Predefined duration options
     customEndDate: '', // For custom duration
+    startDate: new Date().toISOString().split('T')[0], // Start date for count practices
   });
   const [saving, setSaving] = useState(false);
 
@@ -133,8 +134,9 @@ export default function PracticeConfigScreen() {
             default:
               durationDays = parseInt(formData.durationType) || 100;
           }
-          const endDate = new Date();
-          endDate.setDate(endDate.getDate() + durationDays);
+          const startDate = new Date(formData.startDate || new Date().toISOString().split('T')[0]);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + durationDays);
           targetEndDate = endDate.toISOString().split('T')[0];
         }
       } else if (formData.targetPeriod === 'daily') {
@@ -159,7 +161,7 @@ export default function PracticeConfigScreen() {
           target_count: finalTargetCount,
           daily_target: parseInt(formData.dailyTarget),
           target_period: formData.targetPeriod,
-          start_date: new Date().toISOString().split('T')[0],
+          start_date: formData.startDate || new Date().toISOString().split('T')[0],
           target_end_date: targetEndDate,
           status: 'active',
         })
@@ -282,6 +284,16 @@ export default function PracticeConfigScreen() {
             onChangeText={(text) => setFormData({...formData, targetCount: text})}
             keyboardType="numeric"
             placeholder={practiceName === '六字大明咒' ? '如：100000' : '如：10000'}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>开始日期</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.startDate || new Date().toISOString().split('T')[0]}
+            onChangeText={(text) => setFormData({...formData, startDate: text})}
+            placeholder="YYYY-MM-DD"
           />
         </View>
 
