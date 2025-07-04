@@ -26,6 +26,15 @@ export type MeditationRecord = Database['public']['Tables']['meditation_records'
 export type StudyRecord = Database['public']['Tables']['study_records']['Row'];
 export type MindfulnessRecord = Database['public']['Tables']['mindfulness_records']['Row'];
 
+interface PracticeRecord {
+  user_id: string;
+  project_id: string;
+  practice_id: string;
+  record_date: string;
+  count: number;
+  notes?: string;
+}
+
 // User Management
 export const userService = {
   async getProfile(userId: string): Promise<User | null> {
@@ -63,8 +72,46 @@ export const userService = {
   }
 };
 
-// Practice Management
 export const practiceService = {
+  // Record a count-based practice
+  async recordCountPractice(record: PracticeRecord) {
+    try {
+      console.log('🔄 Recording count practice...', record);
+
+      const { data, error } = await supabase
+        .from('practice_records')
+        .insert(record)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      console.log('✅ Count practice recorded successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ Error recording count practice:', error);
+      throw error;
+    }
+  },
+
+  // Get practice records for a project
+  async getPracticeRecords(projectId: string, userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('practice_records')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('user_id', userId)
+        .order('record_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('❌ Error fetching practice records:', error);
+      throw error;
+    }
+  },
+
   async getAllThemes(): Promise<Theme[]> {
     const { data, error } = await supabase
       .from('themes')
@@ -494,7 +541,7 @@ export const meditationService = {
   // 🆕 删除观修记录
   async deleteMeditationRecord(recordId: string, userId: string): Promise<void> {
     console.log('🗑️ deleteMeditationRecord called with:', { recordId, userId });
-    
+
     // First check if the record exists and belongs to the user
     const { data: existingRecord, error: fetchError } = await supabase
       .from('meditation_records')
