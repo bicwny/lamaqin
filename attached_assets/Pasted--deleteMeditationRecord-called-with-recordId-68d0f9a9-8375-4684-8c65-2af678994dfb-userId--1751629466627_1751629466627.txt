@@ -1,0 +1,43 @@
+🗑️ deleteMeditationRecord called with: {recordId: '68d0f9a9-8375-4684-8c65-2af678994dfb', userId: '954dc879-cbfe-4b5f-a7ef-113acf1f5569'}
+Console.js:61 ✅ Record found, proceeding with deletion
+Console.js:61 ✅ Record deleted successfully from database
+Console.js:61 ✅ DATABASE DELETE SUCCESS - Record removed from database
+Mt.forEach.n.<computed> @ Console.js:61
+executeDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:155995
+await in executeDelete
+handleDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156055
+onPress @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156321
+onClick @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:31692
+processDispatchQueue @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14293
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14590
+batchedUpdates$1 @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:7961
+dispatchEventForPluginEventSystem @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14373
+dispatchEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16455
+dispatchDiscreteEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16437Understand this warning
+Console.js:61 ✅ UI UPDATE SUCCESS - Record removed from list
+Mt.forEach.n.<computed> @ Console.js:61
+executeDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:155999
+await in executeDelete
+handleDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156055
+onPress @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156321
+onClick @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:31692
+processDispatchQueue @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14293
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14590
+batchedUpdates$1 @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:7961
+dispatchEventForPluginEventSystem @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14373
+dispatchEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16455
+dispatchDiscreteEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16437Understand this warning
+Console.js:61 📱 WEB SUCCESS - Record deleted
+Mt.forEach.n.<computed> @ Console.js:61
+executeDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156006
+await in executeDelete
+handleDelete @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156055
+onPress @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:156321
+onClick @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:31692
+processDispatchQueue @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14293
+(anonymous) @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14590
+batchedUpdates$1 @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:7961
+dispatchEventForPluginEventSystem @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:14373
+dispatchEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16455
+dispatchDiscreteEvent @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.routerRoot=app:16437Understand this warning
+Console.js:61 🧹 CLEANUP COMPLETE - Deleting state cleared
