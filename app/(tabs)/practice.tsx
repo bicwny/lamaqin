@@ -388,7 +388,7 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
   // Format weekly progress details
   const details = weeklyRecords.map((record, index) => 
     `第${index + 1}座: ${record.duration_minutes}分钟`
-  ).join(' / ');
+  ).join('；');
 
   return (
     <View style={styles.weeklyProgress}>
