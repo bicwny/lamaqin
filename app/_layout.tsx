@@ -49,7 +49,13 @@ function RootLayoutNav() {
       ) : (
         <Stack.Screen name="auth" />
       )}
-      <Stack.Screen name="meditation-history" options={{ presentation: 'modal' }} />
+      <Stack.Screen 
+          name="meditation-history" 
+          options={{ 
+            headerShown: false,
+            presentation: 'card'
+          }} 
+        />
     </Stack>
   );
 }
