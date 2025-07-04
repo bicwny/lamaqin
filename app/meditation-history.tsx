@@ -8,10 +8,8 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  TextInput,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { router, useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
@@ -31,7 +29,7 @@ interface MeditationRecord {
 export default function MeditationHistoryScreen() {
   const { user } = useAuth();
   const navigation = useRouter();
-  const { projectId, practiceId, practiceName, targetPeriod, mode } = useLocalSearchParams();
+  const { projectId, practiceId, practiceName, targetPeriod } = useLocalSearchParams();
   const pageActiveRef = useRef(true);
 
   const [records, setRecords] = useState<MeditationRecord[]>([]);
@@ -41,13 +39,6 @@ export default function MeditationHistoryScreen() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
   const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
-
-  // Record mode states
-  const [isRecordMode, setIsRecordMode] = useState(mode === 'record');
-  const [duration, setDuration] = useState('');
-  const [sessionNumber, setSessionNumber] = useState('1');
-  const [reflection, setReflection] = useState('');
-  const [saving, setSaving] = useState(false);
 
   const PAGE_SIZE = 12;
 
@@ -186,55 +177,6 @@ export default function MeditationHistoryScreen() {
     );
   };
 
-  const validateForm = () => {
-    const durationNum = parseInt(duration);
-    if (isNaN(durationNum) || durationNum <= 0) {
-      Alert.alert('提示', '请输入有效的观修时长（大于0分钟）');
-      return false;
-    }
-
-    const sessionNum = parseInt(sessionNumber);
-    if (isNaN(sessionNum) || sessionNum < 1) {
-      Alert.alert('提示', '请选择有效的观修内容');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSaveRecord = async () => {
-    if (!user || !validateForm()) return;
-
-    setSaving(true);
-    try {
-      const recordData = {
-        user_id: user.id,
-        practice_id: practiceId as string,
-        record_date: new Date().toISOString().split('T')[0],
-        duration_minutes: parseInt(duration),
-        session_number: parseInt(sessionNumber),
-        reflection: reflection.trim() || undefined
-      };
-
-      await meditationService.recordMeditationWithReflection(recordData);
-      Alert.alert('成功', '观修记录已保存');
-      
-      // Reset form and exit record mode
-      setDuration('');
-      setSessionNumber('1');
-      setReflection('');
-      setIsRecordMode(false);
-      
-      // Reload records
-      loadRecords(true);
-    } catch (error) {
-      console.error('❌ Error saving meditation record:', error);
-      Alert.alert('错误', '保存失败，请重试');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('zh-CN', {
@@ -258,114 +200,22 @@ export default function MeditationHistoryScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => {
-              console.log('🔙 Back button pressed from meditation history');
-              // Always go back to practice tab
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => {
+            console.log('🔙 Back button pressed from meditation history');
+            if (navigation.canGoBack()) {
+              navigation.back();
+            } else {
+              // Fallback: navigate to practice tab
               router.replace('/(tabs)/practice');
-            }}
-          >
-            <Text style={styles.backButtonText}>← 返回</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.recordButton, isRecordMode && styles.recordButtonActive]}
-            onPress={() => setIsRecordMode(!isRecordMode)}
-          >
-            <Text style={[styles.recordButtonText, isRecordMode && styles.recordButtonTextActive]}>
-              {isRecordMode ? '取消记录' : '📝 记录观修'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        
+            }
+          }}
+        >
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
         <Text style={styles.title}>{practiceName} - 历史记录</Text>
       </View>
-
-      {/* Record Form */}
-      {isRecordMode && (
-        <View style={styles.recordForm}>
-          <Text style={styles.formTitle}>📝 记录新的观修</Text>
-          
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-            <TextInput
-              style={styles.textInput}
-              value={duration}
-              onChangeText={setDuration}
-              keyboardType="numeric"
-              placeholder="请输入观修时长，如：30"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>选择观修内容</Text>
-            {meditationTopics.length > 0 ? (
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={parseInt(sessionNumber)}
-                  onValueChange={(value) => setSessionNumber(value.toString())}
-                  style={styles.picker}
-                >
-                  {meditationTopics.map((topic) => (
-                    <Picker.Item 
-                      key={topic.topic_number} 
-                      label={`第${topic.topic_number}座 - ${topic.title}`} 
-                      value={topic.topic_number} 
-                    />
-                  ))}
-                </Picker>
-              </View>
-            ) : (
-              <TextInput
-                style={styles.textInput}
-                value={sessionNumber}
-                onChangeText={setSessionNumber}
-                keyboardType="numeric"
-                placeholder="座数编号"
-              />
-            )}
-          </View>
-
-          {meditationTopics.find(t => t.topic_number === parseInt(sessionNumber))?.description && (
-            <View style={styles.topicDescription}>
-              <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
-              <Text style={styles.topicDescriptionText}>
-                {meditationTopics.find(t => t.topic_number === parseInt(sessionNumber))?.description}
-              </Text>
-            </View>
-          )}
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>观后感（可选）</Text>
-            <Text style={styles.inputHint}>
-              记录您在这次观修中的体验、感悟和思考...
-            </Text>
-            <TextInput
-              style={[styles.textInput, styles.multilineInput]}
-              value={reflection}
-              onChangeText={setReflection}
-              multiline
-              numberOfLines={4}
-              placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
-              textAlignVertical="top"
-            />
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
-            onPress={handleSaveRecord}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.saveButtonText}>💾 保存记录</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
 
       {/* Records List */}
       <ScrollView 
@@ -524,132 +374,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
   backButton: {
-    padding: 4,
+    marginBottom: 8,
   },
   backButtonText: {
     fontSize: 16,
     color: Colors.primary,
     fontWeight: '500',
   },
-  recordButton: {
-    backgroundColor: '#f0f8ff',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-  },
-  recordButtonActive: {
-    backgroundColor: Colors.primary,
-  },
-  recordButtonText: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  recordButtonTextActive: {
-    color: '#fff',
-  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-  },
-  recordForm: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  formTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-  },
-  inputHint: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 6,
-    lineHeight: 16,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  multilineInput: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    backgroundColor: '#fff',
-    overflow: 'hidden',
-  },
-  picker: {
-    height: 40,
-  },
-  topicDescription: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 6,
-    padding: 12,
-    marginBottom: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
-  },
-  topicDescriptionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.primary,
-    marginBottom: 4,
-  },
-  topicDescriptionText: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
-  },
-  saveButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  saveButtonDisabled: {
-    opacity: 0.6,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   scrollView: {
     flex: 1,
