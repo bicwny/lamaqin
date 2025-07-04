@@ -118,44 +118,72 @@ export default function MeditationHistoryScreen() {
   const [deletingRecords, setDeletingRecords] = useState<Set<string>>(new Set());
 
   const handleDelete = async (record: any) => {
+    console.warn('🎯 DELETE BUTTON CLICKED - Record ID:', record.id);
+    console.warn('🎯 Delete button onPress triggered');
+    
     Alert.alert(
       '确认删除',
       `确定要删除这条观修记录吗？\n\n日期: ${formatDate(record.record_date)}\n时长: ${record.duration_minutes}分钟\n\n此操作无法撤销。`,
       [
-        { text: '取消', style: 'cancel' },
+        { 
+          text: '取消', 
+          style: 'cancel',
+          onPress: () => {
+            console.warn('🚫 USER CANCELLED DELETE');
+          }
+        },
         { 
           text: '确认删除', 
           style: 'destructive',
           onPress: async () => {
-            console.log('🗑️ Starting delete operation for record:', record.id);
+            console.warn('✅ USER CONFIRMED DELETE');
+            console.warn('🎯 Alert confirmation button pressed');
+            console.warn('🗑️ DELETE OPERATION START - Record ID:', record.id);
+            console.warn('🗑️ User ID:', user?.id);
+            console.warn('🗑️ Record Details:', {
+              id: record.id,
+              date: record.record_date,
+              duration: record.duration_minutes
+            });
             
             if (!user?.id) {
-              console.error('❌ No user ID available for delete');
+              console.error('❌ DELETE FAILED - No user ID available');
               Alert.alert('错误', '用户认证失败，请重新登录');
               return;
             }
 
             // Step 1: Optimistic update - mark record as deleting
             setDeletingRecords(prev => new Set(prev).add(record.id));
+            console.warn('🔄 OPTIMISTIC UPDATE - Marking record as deleting');
 
             try {
-              console.log('🗑️ Calling deleteMeditationRecord with:', { recordId: record.id, userId: user.id });
+              console.warn('🗑️ CALLING DATABASE DELETE - recordId:', record.id, 'userId:', user.id);
               
               // Step 2: Send delete request to database
               await meditationService.deleteMeditationRecord(record.id, user.id);
               
-              console.log('✅ Record deleted successfully');
+              console.warn('✅ DATABASE DELETE SUCCESS - Record removed from database');
               
               // Step 3a: Remove from UI immediately (optimistic)
               setRecords(prev => prev.filter(r => r.id !== record.id));
+              console.warn('✅ UI UPDATE SUCCESS - Record removed from list');
               
               // Step 4a: Show success toast
-              Platform.OS === 'android' 
-                ? ToastAndroid.show('✅ 记录已删除', ToastAndroid.SHORT)
-                : Alert.alert('成功', '记录已删除');
+              if (Platform.OS === 'android') {
+                ToastAndroid.show('✅ 记录已删除', ToastAndroid.SHORT);
+                console.warn('📱 ANDROID TOAST SHOWN - Delete success');
+              } else {
+                Alert.alert('成功', '记录已删除');
+                console.warn('📱 IOS ALERT SHOWN - Delete success');
+              }
               
             } catch (error) {
-              console.error('❌ Error deleting record:', error);
+              console.error('❌ DELETE OPERATION FAILED:', error);
+              console.error('❌ Error details:', {
+                message: error.message,
+                code: error.code,
+                details: error.details
+              });
               
               // Step 3b & 4b: Revert optimistic update and show error
               setDeletingRecords(prev => {
@@ -163,10 +191,15 @@ export default function MeditationHistoryScreen() {
                 newSet.delete(record.id);
                 return newSet;
               });
+              console.warn('🔄 REVERTED OPTIMISTIC UPDATE - Record restored to list');
               
-              Platform.OS === 'android' 
-                ? ToastAndroid.show('❌ 删除失败，请重试', ToastAndroid.LONG)
-                : Alert.alert('错误', `删除失败: ${error.message || '请重试'}`);
+              if (Platform.OS === 'android') {
+                ToastAndroid.show('❌ 删除失败，请重试', ToastAndroid.LONG);
+                console.warn('📱 ANDROID TOAST SHOWN - Delete error');
+              } else {
+                Alert.alert('错误', `删除失败: ${error.message || '请重试'}`);
+                console.warn('📱 IOS ALERT SHOWN - Delete error');
+              }
             } finally {
               // Clean up deleting state
               setDeletingRecords(prev => {
@@ -174,6 +207,7 @@ export default function MeditationHistoryScreen() {
                 newSet.delete(record.id);
                 return newSet;
               });
+              console.warn('🧹 CLEANUP COMPLETE - Deleting state cleared');
             }
           }
         }
@@ -307,7 +341,10 @@ export default function MeditationHistoryScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.deleteButton, isDeleting && styles.disabledButton]}
-                      onPress={() => handleDelete(record)}
+                      onPress={() => {
+                        console.warn('🔴 DELETE BUTTON PHYSICAL PRESS DETECTED - Record:', record.id);
+                        handleDelete(record);
+                      }}
                       disabled={isDeleting}
                     >
                       <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
