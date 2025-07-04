@@ -118,15 +118,26 @@ export default function MeditationHistoryScreen() {
   const [deletingRecords, setDeletingRecords] = useState<Set<string>>(new Set());
 
   const handleDelete = async (record: any) => {
+    console.warn('🎯 DELETE BUTTON CLICKED - Record ID:', record.id);
+    console.warn('🎯 Delete button onPress triggered');
+    
     Alert.alert(
       '确认删除',
       `确定要删除这条观修记录吗？\n\n日期: ${formatDate(record.record_date)}\n时长: ${record.duration_minutes}分钟\n\n此操作无法撤销。`,
       [
-        { text: '取消', style: 'cancel' },
+        { 
+          text: '取消', 
+          style: 'cancel',
+          onPress: () => {
+            console.warn('🚫 USER CANCELLED DELETE');
+          }
+        },
         { 
           text: '确认删除', 
           style: 'destructive',
           onPress: async () => {
+            console.warn('✅ USER CONFIRMED DELETE');
+            console.warn('🎯 Alert confirmation button pressed');
             console.warn('🗑️ DELETE OPERATION START - Record ID:', record.id);
             console.warn('🗑️ User ID:', user?.id);
             console.warn('🗑️ Record Details:', {
@@ -330,7 +341,10 @@ export default function MeditationHistoryScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.deleteButton, isDeleting && styles.disabledButton]}
-                      onPress={() => handleDelete(record)}
+                      onPress={() => {
+                        console.warn('🔴 DELETE BUTTON PHYSICAL PRESS DETECTED - Record:', record.id);
+                        handleDelete(record);
+                      }}
                       disabled={isDeleting}
                     >
                       <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
