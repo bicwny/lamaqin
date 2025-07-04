@@ -181,88 +181,9 @@ export default function PracticeScreen() {
     }
   };
 
-  const loadMeditationTopics = async (practiceId: string) => {
-    try {
-      console.log('🧘 Loading meditation topics for practice:', practiceId);
-      const { data, error } = await supabase
-        .from('meditation_topics')
-        .select('topic_number, title, description')
-        .eq('practice_id', practiceId)
-        .order('topic_number', { ascending: true });
+  // Meditation topics loading moved to full-screen page
 
-      if (error) throw error;
-
-      console.log('📚 Loaded meditation topics from database:', data?.length || 0);
-
-      // Prioritize database data
-      if (data && data.length > 0) {
-        setMeditationTopics(data);
-
-        // Initialize the first session with the first topic if method is empty
-        if (meditationSessions.length > 0 && !meditationSessions[0].method) {
-          const firstTopic = data[0];
-          setMeditationSessions([{
-            duration: meditationSessions[0].duration,
-            method: firstTopic.title,
-            sessionNumber: firstTopic.topic_number
-          }]);
-          console.log('🔄 Initialized first session with topic:', firstTopic.title);
-        }
-        return;
-      }
-
-      // Fallback: Check if this is a meditation practice and create default topics
-      if (selectedProjectForRecord?.practices.name?.includes('前行') || 
-          selectedProjectForRecord?.practices.name?.includes('观修') ||
-          selectedProjectForRecord?.practices.name?.includes('禅修')) {
-
-        console.log('🔄 Creating default meditation topics for 前行观修');
-        // For meditation practices, create numbered topics
-        const defaultTopics = [];
-        for (let i = 1; i <= 92; i++) {
-          defaultTopics.push({
-            topic_number: i,
-            title: `第${i}座观修`,
-            description: `前行实修法第${i}座的观修内容，深入修持佛法要义`
-          });
-        }
-        setMeditationTopics(defaultTopics);
-      } else {
-        // For other time-based practices, create a simple numbered list
-        console.log('🔄 Creating default topics for other practices');
-        const defaultTopics = [];
-        for (let i = 1; i <= 30; i++) {
-          defaultTopics.push({
-            topic_number: i,
-            title: `第${i}座修行`,
-            description: `${selectedProjectForRecord?.practices.name}第${i}座的修行内容`
-          });
-        }
-        setMeditationTopics(defaultTopics);
-      }
-    } catch (error) {
-      console.error('Error loading meditation topics:', error);
-      // Ultimate fallback
-      const defaultTopics = [];
-      for (let i = 1; i <= 30; i++) {
-        defaultTopics.push({
-          topic_number: i,
-          title: `第${i}座修行`,
-          description: `修行第${i}座的相关内容`
-        });
-      }
-      setMeditationTopics(defaultTopics);
-    }
-  };
-
-  // Meditation recording states
-  const [showMeditationModal, setShowMeditationModal] = useState(false);
-  const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
-  const [meditationSessions, setMeditationSessions] = useState<MeditationSession[]>([
-    { duration: '', method: '', sessionNumber: 1, reflection: '' }
-  ]);
-  const [recordingMeditation, setRecordingMeditation] = useState(false);
-  const [meditationTopics, setMeditationTopics] = useState<{topic_number: number, title: string, description: string}[]>([]);
+  // Meditation recording states (removed - now handled by full-screen page)
 
   const handleRecordPractice = async (projectId: string, amount: number) => {
     if (!user?.id) return;
@@ -282,11 +203,15 @@ export default function PracticeScreen() {
     console.log('🔄 handleCustomRecord called with project:', project.id, project.practices.name);
 
     if (project.practices.type === 'time') {
-      // For meditation/time-based practices, show meditation recording modal
-      setSelectedProjectForRecord(project); // Set the correct state for meditation
-      setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
-      await loadMeditationTopics(project.practice_id);
-      setShowMeditationModal(true);
+      // For meditation/time-based practices, navigate to full-screen page
+      router.push({
+        pathname: '/modals/meditation-record',
+        params: {
+          practiceId: project.practice_id,
+          practiceProjectId: project.id,
+          practiceName: project.practices.name
+        }
+      });
     } else {
       // For count-based practices, show the custom count modal
       setSelectedProjectForCount(project); // Set the correct state for count
@@ -295,65 +220,7 @@ export default function PracticeScreen() {
     }
   };
 
-  const addMeditationSession = () => {
-    setMeditationSessions(prev => [
-      ...prev,
-      { 
-        duration: '', 
-        method: '', 
-        sessionNumber: prev.length + 1,
-        reflection: ''
-      }
-    ]);
-  };
-
-  const removeMeditationSession = (index: number) => {
-    if (meditationSessions.length > 1) {
-      const newSessions = meditationSessions.filter((_, i) => i !== index);
-      setMeditationSessions(newSessions);
-    }
-  };
-
-  const updateMeditationSession = (index: number, field: 'duration' | 'method' | 'sessionNumber', value: string | number) => {
-    const newSessions = [...meditationSessions];
-    if (field === 'sessionNumber') {
-      newSessions[index][field] = value as number;
-    } else {
-      newSessions[index][field] = value as string;
-    }
-    setMeditationSessions(newSessions);
-  };
-
-  const validateMeditationSession = (session: {duration: string, method: string}): boolean => {
-    const duration = parseInt(session.duration);
-    const hasValidDuration = !isNaN(duration) && duration > 0;
-    const hasValidMethod = session.method && session.method.trim().length > 0;
-    return hasValidDuration && hasValidMethod;
-  };
-
-  const handleSaveMeditationRecord = async () => {
-    console.log('🔄 Starting meditation record save...');
-
-    if (!user?.id || !selectedProjectForRecord) {
-      Alert.alert('错误', '用户信息或项目信息缺失');
-      return;
-    }
-
-    // Use simplified modal approach - navigate to dedicated modal
-    router.push({
-      pathname: '/modals/meditation-record',
-      params: {
-        practiceId: selectedProjectForRecord.practice_id,
-        practiceProjectId: selectedProjectForRecord.id,
-        practiceName: selectedProjectForRecord.practices.name
-      }
-    });
-
-    // Close current modal
-    setShowMeditationModal(false);
-    setSelectedProjectForRecord(null);
-    setMeditationSessions([{duration: '', method: '', sessionNumber: 1, reflection: ''}]);
-  };
+  // Meditation session management moved to full-screen page
 
   const handleSelectIndividualPractice = async () => {
     await loadAvailablePractices();
@@ -938,151 +805,7 @@ export default function PracticeScreen() {
         </View>
       </Modal>
 
-      {/* Meditation Recording Modal */}
-      <Modal
-        visible={showMeditationModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowMeditationModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <ScrollView contentContainerStyle={styles.modalScrollContent}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                🧘 记录"{selectedProjectForRecord?.practices.name}"观修              </Text>
-              <Text style={styles.modalSubtitle}>
-                请记录您的观修座次
-              </Text>
-
-              {meditationSessions.map((session, index) => (
-                <View key={index} style={styles.sessionContainer}>
-                  <View style={styles.sessionHeader}>
-                    <Text style={styles.sessionTitle}>第 {index + 1} 座</Text>
-                    {meditationSessions.length > 1 && (
-                      <TouchableOpacity
-                        style={styles.removeSessionButton}
-                        onPress={() => removeMeditationSession(index)}
-                      >
-                        <Text style={styles.removeSessionText}>✕</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-
-                  <View style={styles.sessionInputs}>
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>选择观修内容</Text>
-                      {meditationTopics.length > 0 ? (
-                        <Picker
-                          selectedValue={session.sessionNumber}
-                          onValueChange={(value) => {
-                            console.log('🔄 Picker value changed to:', value);
-                            updateMeditationSession(index, 'sessionNumber', value);
-                            const selectedTopic = meditationTopics.find(t => t.topic_number === value);
-                            console.log('🔍 Selected topic:', selectedTopic);
-                            if (selectedTopic) {
-                              updateMeditationSession(index, 'method', selectedTopic.title);
-                              console.log('🔄 Method updated to:', selectedTopic.title);
-                            }
-                          }}
-                          style={styles.topicPicker}
-                        >
-                          {meditationTopics.map((topic) => (
-                            <Picker.Item 
-                              key={topic.topic_number} 
-                              label={`第${topic.topic_number}座 - ${topic.title}`} 
-                              value={topic.topic_number} 
-                            />
-                          ))}
-                        </Picker>
-                      ) : (
-                        <TextInput
-                          style={styles.sessionInput}
-                          value={session.sessionNumber.toString()}
-                          onChangeText={(value) => updateMeditationSession(index, 'sessionNumber', parseInt(value) || 1)}
-                          keyboardType="numeric"
-                          placeholder="座数编号"
-                        />
-                      )}
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-                      <TextInput
-                        style={styles.sessionInput}
-                        value={session.duration}
-                        onChangeText={(value) => updateMeditationSession(index, 'duration', value)}
-                        keyboardType="numeric"
-                        placeholder="如：30"
-                      />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>观修方法/备注</Text>
-                      <TextInput
-                        style={styles.sessionInput}
-                        value={session.method}
-                        onChangeText={(value) => updateMeditationSession(index, 'method', value)}
-                        placeholder="观修方法或备注"
-                        multiline={true}
-                        numberOfLines={2}
-                      />
-                    </View>
-
-                    {meditationTopics.length > 0 && (
-                      <View style={styles.topicDescription}>
-                        <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
-                        <Text style={styles.topicDescriptionText}>
-                          {meditationTopics.find(t => t.topic_number === session.sessionNumber)?.description || ''}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {session.duration && parseInt(session.duration) > 0 && (
-                    <Text style={[
-                      styles.sessionValidation,
-                      validateMeditationSession(session) ? styles.validSession : styles.invalidSession
-                    ]}>
-                      {validateMeditationSession(session) ? 
-                        `✅ 有效座（${parseInt(session.duration)}分钟）` : 
-                        `⚠️ 需要完善信息（${parseInt(session.duration)}分钟）`
-                      }
-                    </Text>
-                  )}
-                </View>
-              ))}
-
-              <TouchableOpacity
-                style={styles.addSessionButton}
-                onPress={addMeditationSession}
-              >
-                <Text style={styles.addSessionText}>+ 添加更多座次</Text>
-              </TouchableOpacity>
-
-              <View style={styles.modalActions}>
-                <TouchableOpacity 
-                  style={styles.cancelButton}
-                  onPress={() => setShowMeditationModal(false)}
-                >
-                  <Text style={styles.cancelButtonText}>取消</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.confirmButton, recordingMeditation && styles.confirmButtonDisabled]}
-                  onPress={handleSaveMeditationRecord}
-                  disabled={recordingMeditation}
-                >
-                  {recordingMeditation ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.confirmButtonText}>保存记录</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          </ScrollView>
-        </View>
-      </Modal>
+      {/* Meditation Recording Modal removed - now using full-screen page */}
 
       {/* Custom Count Modal */}
       <Modal
@@ -1569,118 +1292,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  sessionContainer: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  sessionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sessionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  removeSessionButton: {
-    backgroundColor: '#dc3545',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  removeSessionText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  sessionInputs: {
-    gap: 12,
-  },
-  inputGroup: {
-    gap: 6,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  sessionInput: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    color: '#333',
-  },
-  sessionValidation: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: '500',
-    textAlign: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-  },
-  validSession: {
-    backgroundColor: '#d4edda',
-    color: '#155724',
-  },
-  invalidSession: {
-    backgroundColor: '#f8d7da',
-    color: '#721c24',
-  },
-  addSessionButton: {
-    backgroundColor: '#e9ecef',
-    borderRadius: 6,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderStyle: 'dashed',
-  },
-  addSessionText: {
-    color: '#6c757d',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  topicPicker: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    height: 40,
-  },
-  topicDescription: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 6,
-    padding: 12,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  topicDescriptionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#495057',
-    marginBottom: 4,
-  },
-  topicDescriptionText: {
-    fontSize: 13,
-    color: '#6c757d',
-    lineHeight: 18,
-  },
+  // Meditation modal styles removed - now using full-screen page
   timeBasedActions: {
     flex: 1,
     justifyContent: 'center',
