@@ -348,6 +348,150 @@ export const meditationService = {
     return data;
   },
 
+  // 🆕 添加观后感到现有记录
+  async addReflection(recordId: string, reflection: string): Promise<MeditationRecord> {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .update({ 
+        reflection,
+        reflection_created_at: new Date().toISOString()
+      })
+      .eq('id', recordId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 更新观后感
+  async updateReflection(recordId: string, reflection: string): Promise<MeditationRecord> {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .update({ reflection })
+      .eq('id', recordId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 删除观后感
+  async removeReflection(recordId: string): Promise<MeditationRecord> {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .update({ 
+        reflection: null,
+        reflection_created_at: null
+      })
+      .eq('id', recordId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 记录观修时直接包含观后感
+  async recordMeditationWithReflection(
+    record: Omit<MeditationRecord, 'id' | 'created_at'> & { reflection?: string }
+  ): Promise<MeditationRecord> {
+    const { reflection, ...meditationRecord } = record;
+    
+    const recordData = {
+      ...meditationRecord,
+      reflection: reflection || null,
+      reflection_created_at: reflection ? new Date().toISOString() : null
+    };
+
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .insert(recordData)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 获取带观后感的记录
+  async getMeditationRecordsWithReflections(
+    userId: string, 
+    practiceId?: string,
+    limit: number = 12,
+    offset: number = 0
+  ): Promise<MeditationRecord[]> {
+    let query = supabase
+      .from('meditation_records')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (practiceId) {
+      query = query.eq('practice_id', practiceId);
+    }
+
+    const { data, error } = await query
+      .order('record_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // 🆕 更新现有记录的观修信息
+  async updateMeditationRecord(
+    recordId: string, 
+    updates: Partial<Pick<MeditationRecord, 'duration_minutes' | 'session_number' | 'reflection'>>
+  ): Promise<MeditationRecord> {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .update(updates)
+      .eq('id', recordId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  // 🆕 删除观修记录
+  async deleteMeditationRecord(recordId: string): Promise<void> {
+    const { error } = await supabase
+      .from('meditation_records')
+      .delete()
+      .eq('id', recordId);
+
+    if (error) throw error;
+  },
+
+  // 🆕 获取特定日期范围内有观后感的记录
+  async getReflectionsSummary(
+    userId: string, 
+    startDate: string, 
+    endDate: string
+  ): Promise<{ totalRecords: number; recordsWithReflections: number; reflectionRate: number }> {
+    const { data: allRecords, error: allError } = await supabase
+      .from('meditation_records')
+      .select('id, reflection')
+      .eq('user_id', userId)
+      .gte('record_date', startDate)
+      .lte('record_date', endDate);
+
+    if (allError) throw allError;
+
+    const totalRecords = allRecords?.length || 0;
+    const recordsWithReflections = allRecords?.filter(r => r.reflection && r.reflection.trim() !== '').length || 0;
+    const reflectionRate = totalRecords > 0 ? (recordsWithReflections / totalRecords) * 100 : 0;
+
+    return {
+      totalRecords,
+      recordsWithReflections,
+      reflectionRate: Math.round(reflectionRate * 100) / 100
+    };
+  },
+
   async getMeditationProgress(userId: string): Promise<{ completedSessions: number; totalSessions: number }> {
     const { data, error } = await supabase
       .from('meditation_records')
