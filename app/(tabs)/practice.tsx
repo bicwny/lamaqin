@@ -75,7 +75,7 @@ export default function PracticeScreen() {
 
   // Count recording states
   const [showCountModal, setShowCountModal] = useState(false);
-  const [selectedProjectForCount, setSelectedProjectForCount = useState<PracticeProject | null>(null);
+  const [selectedProjectForCount, setSelectedProjectForCount] = useState<PracticeProject | null>(null);
   const [customCount, setCustomCount] = useState('');
   const [recordingCount, setRecordingCount] = useState(false);
 
@@ -257,7 +257,7 @@ export default function PracticeScreen() {
 
   // Meditation recording states
   const [showMeditationModal, setShowMeditationModal] = useState(false);
-  const [selectedProjectForRecord, setSelectedProjectForRecord = useState<PracticeProject | null>(null);
+  const [selectedProjectForRecord, setSelectedProjectForRecord] = useState<PracticeProject | null>(null);
   const [meditationSessions, setMeditationSessions] = useState<MeditationSession[]>([
     { duration: '', method: '', sessionNumber: 1, reflection: '' }
   ]);
