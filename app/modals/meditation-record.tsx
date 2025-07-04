@@ -118,13 +118,8 @@ export default function MeditationRecordScreen() {
         });
         Alert.alert('成功', '观修记录已更新', [
           { text: '确定', onPress: () => {
-            // Navigate back to previous screen
-            router.dismiss();
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/(tabs)/practice');
-            }
+            // Simply go back to the previous screen
+            router.back();
           }}
         ]);
       } else {
@@ -132,8 +127,7 @@ export default function MeditationRecordScreen() {
         Alert.alert('成功', '观修记录已保存', [
           { text: '确定', onPress: () => {
             // Navigate back to practice tab
-            router.dismiss();
-            router.replace('/(tabs)/practice');
+            router.back();
           }}
         ]);
       }
@@ -153,7 +147,13 @@ export default function MeditationRecordScreen() {
       
       {/* Custom Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/practice');
+          }
+        }} style={styles.backButton}>
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
