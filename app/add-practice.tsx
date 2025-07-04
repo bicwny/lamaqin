@@ -66,6 +66,8 @@ export default function AddPracticeScreen() {
       const availablePractices = allPractices?.filter(p => !existingPracticeIds.has(p.id)) || [];
 
       console.log('📋 Available practices:', availablePractices.length);
+      console.log('🔍 Available practice names:', availablePractices.map(p => p.name));
+      console.log('🚫 Existing practice IDs:', Array.from(existingPracticeIds));
       setPractices(availablePractices);
     } catch (error) {
       console.error('Error loading practices:', error);
