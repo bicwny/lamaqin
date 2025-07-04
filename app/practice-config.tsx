@@ -36,8 +36,9 @@ export default function PracticeConfigScreen() {
       : '92',
     dailyTarget: practiceType === 'count'
       ? (practiceName === '六字大明咒' ? '3000' : '108')
-      : '2',
+      : '1',
     targetPeriod: 'daily',
+    duration: '100', // For time-based practices when daily is selected
   });
   const [saving, setSaving] = useState(false);
 
@@ -53,16 +54,40 @@ export default function PracticeConfigScreen() {
       return;
     }
 
+    // For time-based practices with daily frequency, validate duration
+    if (practiceType === 'time' && formData.targetPeriod === 'daily' && !formData.duration) {
+      Alert.alert('错误', '请填写持续天数');
+      return;
+    }
+
     setSaving(true);
     try {
       console.log('💾 Creating new practice project...');
 
-      // Calculate target end date
+      let finalTargetCount = parseInt(formData.targetCount);
       let targetEndDate = '';
-      if (formData.targetPeriod === 'daily') {
-        const days = Math.ceil(parseInt(formData.targetCount) / parseInt(formData.dailyTarget));
+
+      // Calculate target end date and final target count based on practice type and period
+      if (practiceType === 'time' && formData.targetPeriod === 'daily') {
+        // For daily time practices, calculate total sessions based on duration
+        const durationDays = parseInt(formData.duration);
+        const sessionsPerDay = parseInt(formData.dailyTarget);
+        finalTargetCount = sessionsPerDay * durationDays;
+        
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + durationDays);
+        targetEndDate = endDate.toISOString().split('T')[0];
+      } else if (formData.targetPeriod === 'daily') {
+        // For count-based practices or other daily practices
+        const days = Math.ceil(finalTargetCount / parseInt(formData.dailyTarget));
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + days);
+        targetEndDate = endDate.toISOString().split('T')[0];
+      } else if (formData.targetPeriod === 'weekly') {
+        // For weekly practices
+        const weeks = Math.ceil(finalTargetCount / parseInt(formData.dailyTarget));
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + (weeks * 7));
         targetEndDate = endDate.toISOString().split('T')[0];
       }
 
@@ -71,7 +96,7 @@ export default function PracticeConfigScreen() {
         .insert({
           user_id: user.id,
           practice_id: practiceId,
-          target_count: parseInt(formData.targetCount),
+          target_count: finalTargetCount,
           daily_target: parseInt(formData.dailyTarget),
           target_period: formData.targetPeriod,
           start_date: new Date().toISOString().split('T')[0],
@@ -98,6 +123,124 @@ export default function PracticeConfigScreen() {
     }
   };
 
+  const renderTimeConfiguration = () => {
+    if (practiceType !== 'time') return null;
+
+    return (
+      <>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>修行频率</Text>
+          <View style={styles.periodSelector}>
+            <TouchableOpacity
+              style={[
+                styles.periodButton,
+                formData.targetPeriod === 'daily' && styles.selectedPeriodButton
+              ]}
+              onPress={() => setFormData({...formData, targetPeriod: 'daily'})}
+            >
+              <Text style={[
+                styles.periodButtonText,
+                formData.targetPeriod === 'daily' && styles.selectedPeriodButtonText
+              ]}>
+                每日
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.periodButton,
+                formData.targetPeriod === 'weekly' && styles.selectedPeriodButton
+              ]}
+              onPress={() => setFormData({...formData, targetPeriod: 'weekly'})}
+            >
+              <Text style={[
+                styles.periodButtonText,
+                formData.targetPeriod === 'weekly' && styles.selectedPeriodButtonText
+              ]}>
+                每周
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {formData.targetPeriod === 'daily' ? (
+          <>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>
+                每日座数 ({practiceUnit})
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={formData.dailyTarget}
+                onChangeText={(text) => setFormData({...formData, dailyTarget: text})}
+                keyboardType="numeric"
+                placeholder="如：1"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>持续天数</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.duration}
+                onChangeText={(text) => setFormData({...formData, duration: text})}
+                keyboardType="numeric"
+                placeholder="如：100"
+              />
+              <Text style={styles.inputHint}>
+                总目标：{parseInt(formData.dailyTarget || '0') * parseInt(formData.duration || '0')} 座
+              </Text>
+            </View>
+          </>
+        ) : (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>
+              总目标座数
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={formData.targetCount}
+              onChangeText={(text) => setFormData({...formData, targetCount: text})}
+              keyboardType="numeric"
+              placeholder="如：92"
+            />
+          </View>
+        )}
+      </>
+    );
+  };
+
+  const renderCountConfiguration = () => {
+    if (practiceType !== 'count') return null;
+
+    return (
+      <>
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>总目标数量</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.targetCount}
+            onChangeText={(text) => setFormData({...formData, targetCount: text})}
+            keyboardType="numeric"
+            placeholder={practiceName === '六字大明咒' ? '如：100000' : '如：10000'}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>
+            每日目标 ({practiceUnit})
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={formData.dailyTarget}
+            onChangeText={(text) => setFormData({...formData, dailyTarget: text})}
+            keyboardType="numeric"
+            placeholder={practiceName === '六字大明咒' ? '如：3000' : '如：108'}
+          />
+        </View>
+      </>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: '配置修法目标', headerShown: true }} />
@@ -111,67 +254,8 @@ export default function PracticeConfigScreen() {
         </View>
 
         <View style={styles.configForm}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>
-              {practiceType === 'count' ? '总目标数量' : '总目标座数'}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={formData.targetCount}
-              onChangeText={(text) => setFormData({...formData, targetCount: text})}
-              keyboardType="numeric"
-              placeholder={practiceType === 'count' ? '如：100000' : '如：92'}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>
-              每日目标 ({practiceUnit})
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={formData.dailyTarget}
-              onChangeText={(text) => setFormData({...formData, dailyTarget: text})}
-              keyboardType="numeric"
-              placeholder={practiceType === 'count' ? '如：3000' : '如：2'}
-            />
-          </View>
-
-          {practiceType === 'time' && (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>目标周期</Text>
-              <View style={styles.periodSelector}>
-                <TouchableOpacity
-                  style={[
-                    styles.periodButton,
-                    formData.targetPeriod === 'daily' && styles.selectedPeriodButton
-                  ]}
-                  onPress={() => setFormData({...formData, targetPeriod: 'daily'})}
-                >
-                  <Text style={[
-                    styles.periodButtonText,
-                    formData.targetPeriod === 'daily' && styles.selectedPeriodButtonText
-                  ]}>
-                    每日
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.periodButton,
-                    formData.targetPeriod === 'weekly' && styles.selectedPeriodButton
-                  ]}
-                  onPress={() => setFormData({...formData, targetPeriod: 'weekly'})}
-                >
-                  <Text style={[
-                    styles.periodButtonText,
-                    formData.targetPeriod === 'weekly' && styles.selectedPeriodButtonText
-                  ]}>
-                    每周
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+          {renderTimeConfiguration()}
+          {renderCountConfiguration()}
         </View>
       </View>
 
@@ -245,6 +329,11 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: 'white',
+  },
+  inputHint: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 4,
   },
   periodSelector: {
     flexDirection: 'row',
