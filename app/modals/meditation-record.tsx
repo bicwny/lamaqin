@@ -136,12 +136,13 @@ export default function MeditationRecordScreen() {
       } else {
         const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
         console.log('✅ Record saved successfully');
-
-      // Show success toast
-      showToast('观修记录已保存成功');
-
-      // Navigate back to practice page
-      router.back();
+        
+        // Show success toast
+        showToast('观修记录已保存成功');
+        
+        // Navigate back to practice page
+        router.back();
+      }
     } catch (error) {
       console.error('❌ Error saving meditation record:', error);
       Alert.alert('错误', '保存失败，请重试');
