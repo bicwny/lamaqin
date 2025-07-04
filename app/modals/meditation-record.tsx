@@ -3,75 +3,75 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
+  StyleSheet,
   ScrollView,
+  TouchableOpacity,
+  TextInput,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions
+  ActivityIndicator,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Picker } from '@react-native-picker/picker';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
-import { meditationTopicsService } from '@/lib/meditation-topics';
-import type { MeditationRecord, MeditationTopic } from '@/types/database';
-
-const { height: screenHeight } = Dimensions.get('window');
+import { Colors } from '@/constants/Colors';
 
 export default function MeditationRecordModal() {
   const { user } = useAuth();
-  const params = useLocalSearchParams();
-  
-  // 路由参数
-  const practiceId = params.practiceId as string;
-  const practiceProjectId = params.practiceProjectId as string;
-  const editRecordId = params.editRecordId as string;
-  const practiceName = params.practiceName as string;
+  const { 
+    practiceId, 
+    practiceProjectId, 
+    practiceName,
+    editRecordId 
+  } = useLocalSearchParams<{
+    practiceId: string;
+    practiceProjectId: string;
+    practiceName: string;
+    editRecordId?: string;
+  }>();
 
-  // 表单状态
   const [duration, setDuration] = useState('');
-  const [sessionNumber, setSessionNumber] = useState('');
+  const [sessionNumber, setSessionNumber] = useState('1');
   const [reflection, setReflection] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState<MeditationTopic | null>(null);
-  
-  // 数据状态
-  const [topics, setTopics] = useState<MeditationTopic[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [loadingTopics, setLoadingTopics] = useState(true);
+  const [meditationTopics, setMeditationTopics] = useState<Array<{
+    topic_number: number;
+    title: string;
+    description?: string;
+  }>>([]);
+
+  const isEditing = !!editRecordId;
 
   useEffect(() => {
     loadMeditationTopics();
-    if (editRecordId) {
+    if (isEditing) {
       loadExistingRecord();
     }
   }, []);
 
   const loadMeditationTopics = async () => {
     try {
-      const topicsData = await meditationTopicsService.getAllTopics(practiceId);
-      setTopics(topicsData);
+      console.log('🔄 Loading meditation topics for practice:', practiceId);
+      const topics = await meditationService.getMeditationTopics(practiceId);
+      setMeditationTopics(topics);
+      console.log('📚 Loaded meditation topics:', topics.length);
     } catch (error) {
       console.error('❌ Error loading meditation topics:', error);
+    } finally {
+      setLoadingTopics(false);
     }
   };
 
   const loadExistingRecord = async () => {
+    if (!user || !editRecordId) return;
+
     try {
-      setIsEditing(true);
-      const records = await meditationService.getMeditationRecords(user!.id);
-      const record = records.find(r => r.id === editRecordId);
-      
+      const record = await meditationService.getMeditationRecordWithReflection(editRecordId, user.id);
       if (record) {
         setDuration(record.duration_minutes.toString());
-        setSessionNumber(record.session_number?.toString() || '');
+        setSessionNumber(record.session_number?.toString() || '1');
         setReflection(record.reflection || '');
-        
-        // 找到对应的观修方法
-        if (record.session_number) {
-          const topic = topics.find(t => t.topic_number === record.session_number);
-          setSelectedTopic(topic || null);
-        }
       }
     } catch (error) {
       console.error('❌ Error loading existing record:', error);
@@ -80,13 +80,15 @@ export default function MeditationRecordModal() {
   };
 
   const validateForm = () => {
-    if (!duration || isNaN(parseInt(duration)) || parseInt(duration) <= 0) {
-      Alert.alert('错误', '请输入有效的观修时长（分钟）');
+    const durationNum = parseInt(duration);
+    if (isNaN(durationNum) || durationNum <= 0) {
+      Alert.alert('提示', '请输入有效的观修时长（大于0分钟）');
       return false;
     }
 
-    if (sessionNumber && (isNaN(parseInt(sessionNumber)) || parseInt(sessionNumber) < 1 || parseInt(sessionNumber) > 92)) {
-      Alert.alert('错误', '座数必须在1-92之间');
+    const sessionNum = parseInt(sessionNumber);
+    if (isNaN(sessionNum) || sessionNum < 1) {
+      Alert.alert('提示', '请选择有效的观修内容');
       return false;
     }
 
@@ -103,14 +105,13 @@ export default function MeditationRecordModal() {
         practice_id: practiceId,
         record_date: new Date().toISOString().split('T')[0],
         duration_minutes: parseInt(duration),
-        session_number: sessionNumber ? parseInt(sessionNumber) : null,
-        session_attempt: 1, // 默认为第1次尝试
-        reflection: reflection.trim() || null
+        session_number: parseInt(sessionNumber),
+        reflection: reflection.trim() || undefined
       };
 
       if (isEditing) {
         // 更新现有记录
-        await meditationService.updateMeditationRecord(editRecordId, {
+        await meditationService.updateMeditationRecord(editRecordId, user.id, {
           duration_minutes: recordData.duration_minutes,
           session_number: recordData.session_number,
           reflection: recordData.reflection
@@ -133,188 +134,210 @@ export default function MeditationRecordModal() {
     }
   };
 
-  const handleTopicSelect = (topic: MeditationTopic) => {
-    setSelectedTopic(topic);
-    setSessionNumber(topic.topic_number.toString());
-  };
+  const selectedTopic = meditationTopics.find(t => t.topic_number === parseInt(sessionNumber));
 
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1, backgroundColor: '#f5f5f5' }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ padding: 20 }}>
-          {/* 标题 */}
-          <View style={{ alignItems: 'center', marginBottom: 30 }}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#2c3e50' }}>
-              🧘 {isEditing ? '编辑' : '记录'}观修
-            </Text>
-            <Text style={{ fontSize: 16, color: '#7f8c8d', marginTop: 5 }}>
-              {practiceName}
-            </Text>
-          </View>
+    <View style={styles.container}>
+      <Stack.Screen 
+        options={{ 
+          title: isEditing ? '编辑观修记录' : '记录观修',
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text style={styles.cancelButton}>取消</Text>
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={handleSave} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color={Colors.primary} />
+              ) : (
+                <Text style={styles.saveButton}>保存</Text>
+              )}
+            </TouchableOpacity>
+          )
+        }} 
+      />
 
-          {/* 观修时长 */}
-          <View style={{ marginBottom: 25 }}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#2c3e50', marginBottom: 8 }}>
-              观修时长 *
-            </Text>
+      <ScrollView style={styles.content}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📿 {practiceName}</Text>
+          
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>观修时长（分钟）</Text>
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: '#bdc3c7',
-                borderRadius: 8,
-                padding: 12,
-                fontSize: 16,
-                backgroundColor: '#fff'
-              }}
-              placeholder="请输入观修时长（分钟）"
+              style={styles.textInput}
               value={duration}
               onChangeText={setDuration}
               keyboardType="numeric"
+              placeholder="请输入观修时长，如：30"
             />
           </View>
 
-          {/* 座数选择 */}
-          <View style={{ marginBottom: 25 }}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#2c3e50', marginBottom: 8 }}>
-              第几座观修？（可选）
-            </Text>
-            <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: '#bdc3c7',
-                borderRadius: 8,
-                padding: 12,
-                fontSize: 16,
-                backgroundColor: '#fff',
-                marginBottom: 10
-              }}
-              placeholder="请输入座数（1-92）"
-              value={sessionNumber}
-              onChangeText={setSessionNumber}
-              keyboardType="numeric"
-            />
-            
-            {/* 显示选中的观修方法 */}
-            {selectedTopic && (
-              <View style={{
-                backgroundColor: '#e8f5e8',
-                padding: 12,
-                borderRadius: 8,
-                borderLeftWidth: 4,
-                borderLeftColor: '#27ae60'
-              }}>
-                <Text style={{ fontSize: 14, color: '#27ae60', fontWeight: '600' }}>
-                  第{selectedTopic.topic_number}座：{selectedTopic.title}
-                </Text>
-                {selectedTopic.description && (
-                  <Text style={{ fontSize: 12, color: '#2c3e50', marginTop: 4 }}>
-                    {selectedTopic.description}
-                  </Text>
-                )}
-              </View>
-            )}
-
-            {/* 快速选择观修方法 */}
-            {!selectedTopic && topics.length > 0 && (
-              <View>
-                <Text style={{ fontSize: 14, color: '#7f8c8d', marginBottom: 8 }}>
-                  或者从常用方法中选择：
-                </Text>
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false}
-                  style={{ marginBottom: 10 }}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>选择观修内容</Text>
+            {loadingTopics ? (
+              <ActivityIndicator style={styles.loadingIndicator} />
+            ) : meditationTopics.length > 0 ? (
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={parseInt(sessionNumber)}
+                  onValueChange={(value) => setSessionNumber(value.toString())}
+                  style={styles.picker}
                 >
-                  {topics.slice(0, 10).map((topic) => (
-                    <TouchableOpacity
-                      key={topic.id}
-                      onPress={() => handleTopicSelect(topic)}
-                      style={{
-                        backgroundColor: '#3498db',
-                        paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 15,
-                        marginRight: 8
-                      }}
-                    >
-                      <Text style={{ color: '#fff', fontSize: 12 }}>
-                        第{topic.topic_number}座
-                      </Text>
-                    </TouchableOpacity>
+                  {meditationTopics.map((topic) => (
+                    <Picker.Item 
+                      key={topic.topic_number} 
+                      label={`第${topic.topic_number}座 - ${topic.title}`} 
+                      value={topic.topic_number} 
+                    />
                   ))}
-                </ScrollView>
+                </Picker>
               </View>
+            ) : (
+              <TextInput
+                style={styles.textInput}
+                value={sessionNumber}
+                onChangeText={setSessionNumber}
+                keyboardType="numeric"
+                placeholder="座数编号"
+              />
             )}
           </View>
 
-          {/* 观后感 */}
-          <View style={{ marginBottom: 30 }}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#2c3e50', marginBottom: 8 }}>
-              观后感（可选）
-            </Text>
-            <Text style={{ fontSize: 12, color: '#7f8c8d', marginBottom: 8 }}>
-              记录您在这次观修中的感悟、体会或发现
+          {selectedTopic?.description && (
+            <View style={styles.topicDescription}>
+              <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
+              <Text style={styles.topicDescriptionText}>
+                {selectedTopic.description}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>观后感（可选）</Text>
+            <Text style={styles.inputHint}>
+              记录您在这次观修中的体验、感悟和思考...
             </Text>
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: '#bdc3c7',
-                borderRadius: 8,
-                padding: 12,
-                fontSize: 14,
-                backgroundColor: '#fff',
-                minHeight: 100,
-                textAlignVertical: 'top'
-              }}
-              placeholder="例如：今日观修"思维闲暇之本体"，深感人身难得。通过观想八种闲暇和十种圆满，认识到现在的修行条件是多么珍贵..."
+              style={[styles.textInput, styles.multilineInput]}
               value={reflection}
               onChangeText={setReflection}
               multiline
               numberOfLines={6}
+              placeholder="例如：今日观修思维闲暇之本体，深感人身难得。通过观想八种闲暇和十种圆满，认识到现在的修行条件是多么珍贵..."
+              textAlignVertical="top"
             />
-            <Text style={{ fontSize: 11, color: '#95a5a6', marginTop: 4 }}>
-              {reflection.length}/500 字
+            <Text style={styles.characterCount}>
+              {reflection.length} 字
             </Text>
-          </View>
-
-          {/* 操作按钮 */}
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{
-                flex: 1,
-                backgroundColor: '#95a5a6',
-                padding: 15,
-                borderRadius: 8,
-                alignItems: 'center'
-              }}
-            >
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
-                取消
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleSave}
-              disabled={loading}
-              style={{
-                flex: 2,
-                backgroundColor: loading ? '#bdc3c7' : '#27ae60',
-                padding: 15,
-                borderRadius: 8,
-                alignItems: 'center'
-              }}
-            >
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
-                {loading ? '保存中...' : (isEditing ? '更新记录' : '保存记录')}
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5'
+  },
+  content: {
+    flex: 1,
+    padding: 16
+  },
+  section: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  inputGroup: {
+    marginBottom: 20
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8
+  },
+  inputHint: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+    lineHeight: 20
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white'
+  },
+  multilineInput: {
+    height: 120,
+    textAlignVertical: 'top'
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    overflow: 'hidden'
+  },
+  picker: {
+    height: 50
+  },
+  topicDescription: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary
+  },
+  topicDescriptionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+    marginBottom: 4
+  },
+  topicDescriptionText: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20
+  },
+  characterCount: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'right',
+    marginTop: 4
+  },
+  loadingIndicator: {
+    padding: 20
+  },
+  cancelButton: {
+    color: '#666',
+    fontSize: 16,
+    paddingHorizontal: 10
+  },
+  saveButton: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
+    paddingHorizontal: 10
+  }
+});

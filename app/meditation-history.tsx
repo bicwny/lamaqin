@@ -276,29 +276,60 @@ export default function MeditationHistoryScreen() {
                       )}
 
                       {/* 🆕 显示观后感 */}
-                      {record.reflection && (
+                      {record.reflection ? (
                         <View style={{ marginTop: 8 }}>
                           <Text style={{ fontSize: 14, color: '#7f8c8d', marginBottom: 4 }}>观后感：</Text>
-                          <View style={{
-                            backgroundColor: '#f8f9fa',
-                            padding: 10,
-                            borderRadius: 6,
-                            borderLeftWidth: 3,
-                            borderLeftColor: '#f39c12'
-                          }}>
+                          <TouchableOpacity 
+                            style={{
+                              backgroundColor: '#f8f9fa',
+                              padding: 10,
+                              borderRadius: 6,
+                              borderLeftWidth: 3,
+                              borderLeftColor: '#f39c12'
+                            }}
+                            onPress={() => {
+                              Alert.alert(
+                                '观后感',
+                                record.reflection,
+                                [{ text: '关闭', style: 'cancel' }]
+                              );
+                            }}
+                          >
                             <Text style={{ fontSize: 13, color: '#2c3e50', lineHeight: 18 }}>
-                              {record.reflection.length > 100
-                                ? `${record.reflection.substring(0, 100)}...`
+                              {record.reflection.length > 80
+                                ? `${record.reflection.substring(0, 80)}...`
                                 : record.reflection
                               }
                             </Text>
+                            {record.reflection.length > 80 && (
+                              <Text style={{ fontSize: 11, color: '#3498db', marginTop: 4 }}>
+                                点击查看完整内容 →
+                              </Text>
+                            )}
                             {record.reflection_created_at && (
                               <Text style={{ fontSize: 11, color: '#95a5a6', marginTop: 4 }}>
                                 记录于 {formatDate(record.reflection_created_at.split('T')[0])}
                               </Text>
                             )}
-                          </View>
+                          </TouchableOpacity>
                         </View>
+                      ) : (
+                        <TouchableOpacity
+                          style={{
+                            marginTop: 8,
+                            borderWidth: 1,
+                            borderColor: '#3498db',
+                            borderStyle: 'dashed',
+                            borderRadius: 6,
+                            padding: 8,
+                            alignItems: 'center'
+                          }}
+                          onPress={() => handleEdit(record)}
+                        >
+                          <Text style={{ color: '#3498db', fontSize: 12 }}>
+                            + 添加观后感
+                          </Text>
+                        </TouchableOpacity>
                       )}
                     </View>
 

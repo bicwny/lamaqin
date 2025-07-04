@@ -369,6 +369,36 @@ export const meditationService = {
     return data;
   },
 
+  // 🆕 创建带观后感的观修记录
+  async recordMeditationWithReflection(record: {
+    user_id: string;
+    practice_id: string;
+    record_date: string;
+    duration_minutes: number;
+    session_number?: number;
+    method?: string;
+    reflection?: string;
+  }): Promise<MeditationRecord> {
+    const recordData: any = {
+      ...record,
+      created_at: new Date().toISOString()
+    };
+
+    // 如果有观后感，记录创建时间
+    if (record.reflection && record.reflection.trim()) {
+      recordData.reflection_created_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .insert(recordData)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   // 🆕 获取带观后感的记录详情
   async getMeditationRecordWithReflection(recordId: string, userId: string): Promise<MeditationRecord | null> {
     const { data, error } = await supabase
