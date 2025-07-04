@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Handle sign out
         if (event === 'SIGNED_OUT') {
           console.log('🚪 User signed out - clearing state');
+          console.log('🚪 Auth event that might trigger navigation:', event);
           setUser(null);
           setLoading(false);
           try {
