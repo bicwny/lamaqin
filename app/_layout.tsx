@@ -16,9 +16,16 @@ function RootLayoutNav() {
 
   console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
   console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');
+  console.log('🕐 RootLayoutNav timestamp:', new Date().toISOString());
 
   // Handle navigation based on auth state
   useEffect(() => {
+    console.log('🔄 RootLayoutNav useEffect triggered:', {
+      loading,
+      user: user?.email || null,
+      timestamp: new Date().toISOString()
+    });
+    
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
@@ -26,6 +33,8 @@ function RootLayoutNav() {
       } else {
         console.log('❌ No user, should show auth');
       }
+    } else {
+      console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
     }
   }, [user, loading]);
 
