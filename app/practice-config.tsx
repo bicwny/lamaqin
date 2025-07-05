@@ -54,9 +54,8 @@ export default function PracticeConfigScreen() {
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
-  const [customEndDate, setCustomEndDate] = useState(new Date());
+  const [customEndDate, setCustomEndDate] = useState(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const [customDays, setCustomDays] = useState('');
 
   // Calculated values
   const [suggestedDaily, setSuggestedDaily] = useState(0);
@@ -85,11 +84,7 @@ export default function PracticeConfigScreen() {
         end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
         break;
       case '自定义':
-        if (customDays) {
-          end = new Date(start.getTime() + parseInt(customDays) * 24 * 60 * 60 * 1000);
-        } else {
-          end = customEndDate;
-        }
+        end = customEndDate;
         break;
       default:
         end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
@@ -491,14 +486,29 @@ export default function PracticeConfigScreen() {
 
           {durationMode === '自定义' && (
             <View style={styles.customInputContainer}>
-              <Text style={styles.customInputLabel}>请输入天数</Text>
-              <TextInput
-                style={styles.customInput}
-                value={customDays}
-                onChangeText={setCustomDays}
-                placeholder="例如: 90"
-                keyboardType="numeric"
-              />
+              <Text style={styles.customInputLabel}>选择结束日期</Text>
+              <TouchableOpacity
+                style={styles.customDateButton}
+                onPress={() => setShowCustomDatePicker(true)}
+              >
+                <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
+                <Text style={styles.dateButtonIcon}>📅</Text>
+              </TouchableOpacity>
+              
+              {showCustomDatePicker && (
+                <DateTimePicker
+                  value={customEndDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)} // At least one day after start
+                  onChange={(event, selectedDate) => {
+                    setShowCustomDatePicker(Platform.OS === 'ios');
+                    if (selectedDate) {
+                      setCustomEndDate(selectedDate);
+                    }
+                  }}
+                />
+              )}
             </View>
           )}
         </View>
@@ -797,15 +807,20 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  customInput: {
+  customDateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 6,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    color: '#333',
+    paddingVertical: 12,
     borderWidth: 1,
     borderColor: '#e9ecef',
+  },
+  customDateButtonText: {
+    fontSize: 16,
+    color: '#333',
   },
   summaryContainer: {
     backgroundColor: '#f8f9fa',
