@@ -47,8 +47,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
+        // Handle token refresh or initial session
+        if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+          console.log('🔄 Session event:', event);
+          if (session?.user && session.user.email_confirmed_at) {
+            console.log('✅ Session maintained for:', session.user.email);
+            
+            // Store session data
+            try {
+              await AsyncStorage.setItem('sb-repl-auth-token', JSON.stringify(session));
+              await AsyncStorage.setItem('@user_session', JSON.stringify({
+                id: session.user.id,
+                email: session.user.email,
+                dharma_name: session.user.user_metadata?.dharma_name,
+              }));
+            } catch (err) {
+              console.log('⚠️ Failed to store session in event handler:', err);
+            }
+
+            // Only update user if not already set to prevent unnecessary re-renders
+            if (!user || user.id !== session.user.id) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email!,
+                dharma_name: session.user.user_metadata?.dharma_name,
+              });
+              console.log('✅ User state updated from session event');
+            }
+          } else if (!session) {
+            console.log('⚠️ No session in refresh/initial event - checking stored session');
+            // Before clearing user, check if we have a stored session
+            try {
+              const storedUserData = await AsyncStorage.getItem('@user_session');
+              if (storedUserData && !user) {
+                const userData = JSON.parse(storedUserData);
+                console.log('🔄 Restoring user from stored data:', userData.email);
+                setUser(userData);
+              } else {
+                console.log('❌ No stored session available, clearing user');
+                setUser(null);
+              }
+            } catch (err) {
+              console.log('⚠️ Error checking stored session:', err);
+              setUser(null);
+            }
+          }
+          setLoading(false);
+          return;
+        }
+
         // Handle successful authentication
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_IN') {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
 
@@ -85,14 +134,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔍 Checking auth state...');
       setLoading(true);
 
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Auth check timeout')), 10000);
-      });
+      // First try to get session from storage directly
+      let storedSession = null;
+      try {
+        const storedData = await AsyncStorage.getItem('sb-repl-auth-token');
+        if (storedData) {
+          console.log('📦 Found session data in storage');
+          storedSession = JSON.parse(storedData);
+        }
+      } catch (storageError) {
+        console.log('⚠️ Error reading from storage:', storageError);
+      }
 
-      const authPromise = supabase.auth.getSession();
-
-      const { data: { session }, error } = await Promise.race([authPromise, timeoutPromise]) as any;
+      // Then get session from Supabase
+      const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
         console.error('❌ Auth session error:', error);
@@ -101,10 +156,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (session?.user && session.user.email_confirmed_at) {
+      // Validate session
+      const validSession = session?.user && session.user.email_confirmed_at;
+      const hasStoredSession = storedSession && storedSession.access_token;
+
+      if (validSession) {
         console.log('✅ Found verified session for:', session.user.email);
 
-        // Set user immediately, database sync is optional
+        // Store session data manually to ensure persistence
+        try {
+          await AsyncStorage.setItem('sb-repl-auth-token', JSON.stringify(session));
+          await AsyncStorage.setItem('@user_session', JSON.stringify({
+            id: session.user.id,
+            email: session.user.email,
+            dharma_name: session.user.user_metadata?.dharma_name,
+          }));
+          console.log('💾 Session stored successfully');
+        } catch (storageError) {
+          console.log('⚠️ Failed to store session:', storageError);
+        }
+
+        // Set user state
         setUser({
           id: session.user.id,
           email: session.user.email!,
@@ -112,9 +184,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         console.log('✅ User state set successfully');
 
-        // Create user in database if doesn't exist (non-blocking, doesn't affect loading)
+        // Create user in database if doesn't exist (non-blocking)
         ensureUserInDatabase(session.user).catch(err => {
           console.log('⚠️ Database sync failed but continuing:', err.message);
+        });
+      } else if (hasStoredSession && storedSession.user) {
+        console.log('🔄 Using stored session data for:', storedSession.user.email);
+        // Try to restore from stored session
+        setUser({
+          id: storedSession.user.id,
+          email: storedSession.user.email,
+          dharma_name: storedSession.user.user_metadata?.dharma_name,
         });
       } else if (session?.user && !session.user.email_confirmed_at) {
         console.log('⏳ User exists but email not verified');
