@@ -86,7 +86,7 @@ export default function ProfileScreen() {
     practiceYears: 3,
     location: '纽约',
     className: '入行班',
-    email: user?.email || 'dorje@example.com',
+    email: user.email, // user is guaranteed to exist due to early return
     registrationDate: '2025-01-01'
   });
 
