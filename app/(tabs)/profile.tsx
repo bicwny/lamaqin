@@ -25,7 +25,7 @@ interface TodaySummary {
 }
 
 export default function ProfileScreen() {
-  const { user, signOut, clearAllCache } = useAuth();
+  const { user, signOut, clearAllCache, loading } = useAuth();
   const router = useRouter();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
