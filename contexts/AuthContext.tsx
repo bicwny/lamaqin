@@ -47,8 +47,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
+        // Handle token refresh or initial session
+        if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+          console.log('🔄 Session event:', event);
+          if (session?.user && session.user.email_confirmed_at) {
+            console.log('✅ Session maintained for:', session.user.email);
+            // Only update user if not already set to prevent unnecessary re-renders
+            if (!user || user.id !== session.user.id) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email!,
+                dharma_name: session.user.user_metadata?.dharma_name,
+              });
+              console.log('✅ User state updated from session event');
+            }
+          } else if (!session) {
+            console.log('⚠️ No session in refresh/initial event');
+            setUser(null);
+          }
+          setLoading(false);
+          return;
+        }
+
         // Handle successful authentication
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_IN') {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
 
@@ -87,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Auth check timeout')), 10000);
+        setTimeout(() => reject(new Error('Auth check timeout')), 15000);
       });
 
       const authPromise = supabase.auth.getSession();
@@ -103,6 +125,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (session?.user && session.user.email_confirmed_at) {
         console.log('✅ Found verified session for:', session.user.email);
+
+        // Try to refresh the session to ensure it's still valid
+        try {
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) {
+            console.log('⚠️ Session refresh failed:', refreshError.message);
+            // Continue with existing session if refresh fails
+          } else if (refreshData.session) {
+            console.log('✅ Session refreshed successfully');
+          }
+        } catch (refreshErr) {
+          console.log('⚠️ Session refresh error:', refreshErr);
+        }
 
         // Set user immediately, database sync is optional
         setUser({
