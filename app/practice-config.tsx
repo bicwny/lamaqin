@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   View,
@@ -9,6 +10,7 @@ import {
   TextInput,
   SafeAreaView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
@@ -44,16 +46,19 @@ export default function PracticeConfigScreen() {
     practiceUnit: string;
   };
 
+  // Goal setting mode for count-based practices
+  const [goalMode, setGoalMode] = useState<'total' | 'daily'>('total');
+
   const [formData, setFormData] = useState({
     targetCount: practiceType === 'count' 
-      ? (practiceName === '六字大明咒' ? '100000' : '10000')
+      ? (practiceName === '六字大明咒' ? '400000' : '10000')
       : '92',
     dailyTarget: practiceType === 'count'
-      ? (practiceName === '六字大明咒' ? '3000' : '108')
+      ? (practiceName === '六字大明咒' ? '1096' : '108')
       : '1',
     targetPeriod: 'daily',
     duration: '100', // For time-based practices when daily is selected
-    durationType: '100', // Predefined duration options
+    durationType: '365', // Predefined duration options (1 year default)
     customEndDate: '', // For custom duration
     startDate: new Date().toISOString().split('T')[0], // Start date for count practices
   });
@@ -77,7 +82,7 @@ export default function PracticeConfigScreen() {
       case '60': return 60;
       case '100': return 100;
       case '365': return 365;
-      default: return parseInt(formData.durationType) || 100;
+      default: return parseInt(formData.durationType) || 365;
     }
   };
 
@@ -99,6 +104,37 @@ export default function PracticeConfigScreen() {
         customEndDate: selectedDate.toISOString().split('T')[0]
       });
     }
+  };
+
+  // Calculate intelligent suggestions based on user input
+  const getIntelligentSummary = () => {
+    if (practiceType !== 'count') return null;
+
+    const totalCount = parseInt(formData.targetCount || '0');
+    const dailyCount = parseInt(formData.dailyTarget || '0');
+    const durationDays = getDurationDays();
+
+    if (goalMode === 'total' && totalCount > 0 && durationDays > 0) {
+      const suggestedDaily = Math.ceil(totalCount / durationDays);
+      return {
+        mode: 'total',
+        totalCount,
+        durationDays,
+        suggestedDaily,
+        message: `您需要在约 ${durationDays} 天内完成，总计 ${totalCount.toLocaleString()} ${practiceUnit}。\n\n👉 建议每日持诵约 ${suggestedDaily.toLocaleString()} ${practiceUnit}。`
+      };
+    } else if (goalMode === 'daily' && dailyCount > 0 && durationDays > 0) {
+      const calculatedTotal = dailyCount * durationDays;
+      return {
+        mode: 'daily',
+        dailyCount,
+        durationDays,
+        calculatedTotal,
+        message: `您计划每日持诵 ${dailyCount.toLocaleString()} ${practiceUnit}，持续 ${durationDays} 天。\n\n📊 总计将完成 ${calculatedTotal.toLocaleString()} ${practiceUnit}。`
+      };
+    }
+
+    return null;
   };
 
   const handleSave = async () => {
@@ -136,10 +172,31 @@ export default function PracticeConfigScreen() {
       console.log('💾 Creating new practice project...');
 
       let finalTargetCount = parseInt(formData.targetCount);
+      let finalDailyTarget = parseInt(formData.dailyTarget);
       let targetEndDate = '';
 
-      // Calculate target end date and final target count based on practice type and period
-      if (practiceType === 'time' && formData.targetPeriod === 'daily') {
+      // For count-based practices, calculate based on goal mode
+      if (practiceType === 'count') {
+        const durationDays = getDurationDays();
+        
+        if (goalMode === 'total') {
+          // User set total count, calculate daily target
+          finalDailyTarget = Math.ceil(finalTargetCount / durationDays);
+        } else {
+          // User set daily target, calculate total count
+          finalTargetCount = finalDailyTarget * durationDays;
+        }
+
+        // Calculate target end date
+        if (formData.durationType === 'custom') {
+          targetEndDate = formData.customEndDate;
+        } else {
+          const startDate = new Date(formData.startDate || new Date().toISOString().split('T')[0]);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + durationDays);
+          targetEndDate = endDate.toISOString().split('T')[0];
+        }
+      } else if (practiceType === 'time' && formData.targetPeriod === 'daily') {
         // For daily time practices, calculate total sessions based on duration
         const durationDays = parseInt(formData.duration);
         const sessionsPerDay = parseInt(formData.dailyTarget);
@@ -148,33 +205,6 @@ export default function PracticeConfigScreen() {
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + durationDays);
         targetEndDate = endDate.toISOString().split('T')[0];
-      } else if (practiceType === 'count') {
-        // For count-based practices, calculate duration based on type
-        if (formData.durationType === 'custom') {
-          targetEndDate = formData.customEndDate;
-        } else {
-          let durationDays;
-          switch (formData.durationType) {
-            case '30':
-              durationDays = 30;
-              break;
-            case '60':
-              durationDays = 60;
-              break;
-            case '100':
-              durationDays = 100;
-              break;
-            case '365':
-              durationDays = 365;
-              break;
-            default:
-              durationDays = parseInt(formData.durationType) || 100;
-          }
-          const startDate = new Date(formData.startDate || new Date().toISOString().split('T')[0]);
-          const endDate = new Date(startDate);
-          endDate.setDate(startDate.getDate() + durationDays);
-          targetEndDate = endDate.toISOString().split('T')[0];
-        }
       } else if (formData.targetPeriod === 'daily') {
         // For other daily practices
         const days = Math.ceil(finalTargetCount / parseInt(formData.dailyTarget));
@@ -195,7 +225,7 @@ export default function PracticeConfigScreen() {
           user_id: user.id,
           practice_id: practiceId,
           target_count: finalTargetCount,
-          daily_target: parseInt(formData.dailyTarget),
+          daily_target: finalDailyTarget,
           target_period: formData.targetPeriod,
           start_date: formData.startDate || new Date().toISOString().split('T')[0],
           target_end_date: targetEndDate,
@@ -310,151 +340,242 @@ export default function PracticeConfigScreen() {
   const renderCountConfiguration = () => {
     if (practiceType !== 'count') return null;
 
+    const intelligentSummary = getIntelligentSummary();
+
     return (
       <>
+        {/* Goal Setting Mode Selector */}
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>总目标数量</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.targetCount}
-            onChangeText={(text) => setFormData({...formData, targetCount: text})}
-            keyboardType="numeric"
-            placeholder={practiceName === '六字大明咒' ? '如：100000' : '如：10000'}
-          />
+          <Text style={styles.inputLabel}>您想如何设定目标？</Text>
+          <View style={styles.goalModeSelector}>
+            <TouchableOpacity
+              style={[
+                styles.goalModeButton,
+                goalMode === 'total' && styles.selectedGoalModeButton
+              ]}
+              onPress={() => {
+                setGoalMode('total');
+                // When switching to total mode, auto-calculate daily target
+                const totalCount = parseInt(formData.targetCount || '0');
+                const durationDays = getDurationDays();
+                if (totalCount > 0 && durationDays > 0) {
+                  const suggestedDaily = Math.ceil(totalCount / durationDays);
+                  setFormData({...formData, dailyTarget: suggestedDaily.toString()});
+                }
+              }}
+            >
+              <Text style={[
+                styles.goalModeButtonText,
+                goalMode === 'total' && styles.selectedGoalModeButtonText
+              ]}>
+                🔘 按总数目标
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.goalModeButton,
+                goalMode === 'daily' && styles.selectedGoalModeButton
+              ]}
+              onPress={() => {
+                setGoalMode('daily');
+                // When switching to daily mode, auto-calculate total
+                const dailyCount = parseInt(formData.dailyTarget || '0');
+                const durationDays = getDurationDays();
+                if (dailyCount > 0 && durationDays > 0) {
+                  const calculatedTotal = dailyCount * durationDays;
+                  setFormData({...formData, targetCount: calculatedTotal.toString()});
+                }
+              }}
+            >
+              <Text style={[
+                styles.goalModeButtonText,
+                goalMode === 'daily' && styles.selectedGoalModeButtonText
+              ]}>
+                ⚫️ 按每日目标
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
+        {/* Goal Details - Conditional Input */}
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>开始日期</Text>
-          {Platform.OS === 'web' ? (
-            <>
+          <Text style={styles.inputLabel}>目标详情</Text>
+          {goalMode === 'total' ? (
+            <View style={styles.goalInputContainer}>
+              <Text style={styles.goalInputLabel}>总目标数量：</Text>
+              <TextInput
+                style={styles.goalInput}
+                value={formData.targetCount}
+                onChangeText={(text) => {
+                  setFormData({...formData, targetCount: text});
+                  // Auto-calculate daily target when total changes
+                  const totalCount = parseInt(text || '0');
+                  const durationDays = getDurationDays();
+                  if (totalCount > 0 && durationDays > 0) {
+                    const suggestedDaily = Math.ceil(totalCount / durationDays);
+                    setFormData(prev => ({...prev, targetCount: text, dailyTarget: suggestedDaily.toString()}));
+                  }
+                }}
+                keyboardType="numeric"
+                placeholder={practiceName === '六字大明咒' ? '400000' : '10000'}
+              />
+              <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+            </View>
+          ) : (
+            <View style={styles.goalInputContainer}>
+              <Text style={styles.goalInputLabel}>每日持诵：</Text>
+              <TextInput
+                style={styles.goalInput}
+                value={formData.dailyTarget}
+                onChangeText={(text) => {
+                  setFormData({...formData, dailyTarget: text});
+                  // Auto-calculate total when daily changes
+                  const dailyCount = parseInt(text || '0');
+                  const durationDays = getDurationDays();
+                  if (dailyCount > 0 && durationDays > 0) {
+                    const calculatedTotal = dailyCount * durationDays;
+                    setFormData(prev => ({...prev, dailyTarget: text, targetCount: calculatedTotal.toString()}));
+                  }
+                }}
+                keyboardType="numeric"
+                placeholder={practiceName === '六字大明咒' ? '1096' : '108'}
+              />
+              <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Time Planning */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>时间规划</Text>
+          
+          {/* Start Date */}
+          <View style={styles.timeInputRow}>
+            <Text style={styles.timeInputLabel}>开始时间：</Text>
+            {Platform.OS === 'web' ? (
               <TextInput
                 style={[
-                  styles.input,
+                  styles.timeInput,
                   Platform.OS === 'web' && formData.startDate && !isValidDate(formData.startDate) && styles.inputError
                 ]}
                 value={formData.startDate || new Date().toISOString().split('T')[0]}
                 onChangeText={(text) => setFormData({...formData, startDate: text})}
                 placeholder="YYYY-MM-DD"
               />
-              {Platform.OS === 'web' && formData.startDate && !isValidDate(formData.startDate) && (
-                <Text style={styles.errorText}>请输入有效日期 (YYYY-MM-DD)</Text>
-              )}
-            </>
-          ) : (
-            <TouchableOpacity
-              style={styles.datePickerButton}
-              onPress={() => setShowStartDatePicker(true)}
-            >
-              <Text style={styles.datePickerButtonText}>
-                {formData.startDate || new Date().toISOString().split('T')[0]}
-              </Text>
-            </TouchableOpacity>
-          )}
-          {showStartDatePicker && (
-            <DateTimePicker
-              value={new Date(formData.startDate || new Date().toISOString().split('T')[0])}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleStartDateChange}
-            />
-          )}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>
-            每日目标 ({practiceUnit})
-          </Text>
-          <TextInput
-            style={styles.input}
-            value={formData.dailyTarget}
-            onChangeText={(text) => setFormData({...formData, dailyTarget: text})}
-            keyboardType="numeric"
-            placeholder={practiceName === '六字大明咒' ? '如：3000' : '如：108'}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>持续时间</Text>
-          <View style={styles.durationSelector}>
-            {['30', '60', '100', '365', 'custom'].map((option) => (
+            ) : (
               <TouchableOpacity
-                key={option}
-                style={[
-                  styles.durationOption,
-                  formData.durationType === option && styles.selectedDurationOption
-                ]}
-                onPress={() => setFormData({...formData, durationType: option})}
+                style={styles.timeInputButton}
+                onPress={() => setShowStartDatePicker(true)}
               >
-                <Text style={[
-                  styles.durationOptionText,
-                  formData.durationType === option && styles.selectedDurationOptionText
-                ]}>
-                  {option === '30' ? '30天' : 
-                   option === '60' ? '60天' :
-                   option === '100' ? '100天' :
-                   option === '365' ? '1年' :
-                   '自定义'}
+                <Text style={styles.timeInputButtonText}>
+                  {formData.startDate || new Date().toISOString().split('T')[0]}
                 </Text>
               </TouchableOpacity>
-            ))}
+            )}
           </View>
-        </View>
 
-        {formData.durationType === 'custom' && (
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>结束日期</Text>
-            {Platform.OS === 'web' ? (
-              <>
+          {/* Duration */}
+          <View style={styles.timeInputRow}>
+            <Text style={styles.timeInputLabel}>持续时间：</Text>
+            <View style={styles.durationSelector}>
+              {['30', '60', '100', '365', 'custom'].map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[
+                    styles.durationChip,
+                    formData.durationType === option && styles.selectedDurationChip
+                  ]}
+                  onPress={() => {
+                    setFormData({...formData, durationType: option});
+                    // Recalculate suggestions when duration changes
+                    setTimeout(() => {
+                      if (goalMode === 'total') {
+                        const totalCount = parseInt(formData.targetCount || '0');
+                        const newDurationDays = option === 'custom' ? getDurationDays() : parseInt(option) || 365;
+                        if (totalCount > 0 && newDurationDays > 0) {
+                          const suggestedDaily = Math.ceil(totalCount / newDurationDays);
+                          setFormData(prev => ({...prev, dailyTarget: suggestedDaily.toString()}));
+                        }
+                      } else {
+                        const dailyCount = parseInt(formData.dailyTarget || '0');
+                        const newDurationDays = option === 'custom' ? getDurationDays() : parseInt(option) || 365;
+                        if (dailyCount > 0 && newDurationDays > 0) {
+                          const calculatedTotal = dailyCount * newDurationDays;
+                          setFormData(prev => ({...prev, targetCount: calculatedTotal.toString()}));
+                        }
+                      }
+                    }, 100);
+                  }}
+                >
+                  <Text style={[
+                    styles.durationChipText,
+                    formData.durationType === option && styles.selectedDurationChipText
+                  ]}>
+                    {option === '30' ? '30天' : 
+                     option === '60' ? '60天' :
+                     option === '100' ? '100天' :
+                     option === '365' ? '1年' :
+                     '自定义'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Custom End Date */}
+          {formData.durationType === 'custom' && (
+            <View style={styles.timeInputRow}>
+              <Text style={styles.timeInputLabel}>结束日期：</Text>
+              {Platform.OS === 'web' ? (
                 <TextInput
                   style={[
-                    styles.input,
+                    styles.timeInput,
                     Platform.OS === 'web' && formData.customEndDate && !isValidDate(formData.customEndDate) && styles.inputError
                   ]}
                   value={formData.customEndDate || ''}
                   onChangeText={(text) => setFormData({...formData, customEndDate: text})}
                   placeholder="YYYY-MM-DD"
                 />
-                {Platform.OS === 'web' && formData.customEndDate && !isValidDate(formData.customEndDate) && (
-                  <Text style={styles.errorText}>请输入有效日期 (YYYY-MM-DD)</Text>
-                )}
-              </>
-            ) : (
-              <TouchableOpacity
-                style={styles.datePickerButton}
-                onPress={() => setShowEndDatePicker(true)}
-              >
-                <Text style={styles.datePickerButtonText}>
-                  {formData.customEndDate || '选择结束日期'}
-                </Text>
-              </TouchableOpacity>
-            )}
-            {showEndDatePicker && (
-              <DateTimePicker
-                value={formData.customEndDate ? new Date(formData.customEndDate) : new Date()}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleEndDateChange}
-                minimumDate={new Date(formData.startDate)}
-              />
-            )}
+              ) : (
+                <TouchableOpacity
+                  style={styles.timeInputButton}
+                  onPress={() => setShowEndDatePicker(true)}
+                >
+                  <Text style={styles.timeInputButtonText}>
+                    {formData.customEndDate || '选择结束日期'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
+
+        {/* Intelligent Summary */}
+        {intelligentSummary && (
+          <View style={styles.intelligentSummary}>
+            <Text style={styles.summaryLabel}>📝 根据您的设置：</Text>
+            <Text style={styles.summaryText}>{intelligentSummary.message}</Text>
           </View>
         )}
 
-        <View style={styles.calculationInfo}>
-          <Text style={styles.calculationLabel}>目标统计</Text>
-          <Text style={styles.calculationText}>
-            总目标：{formData.targetCount} {practiceUnit}
-          </Text>
-          <Text style={styles.calculationText}>
-            每日目标：{formData.dailyTarget} {practiceUnit}
-          </Text>
-          <Text style={styles.calculationText}>
-            平均每日需完成：{Math.ceil(parseInt(formData.targetCount || '0') / getDurationDays())} {practiceUnit}
-          </Text>
-          <Text style={styles.calculationHint}>
-            预计完成天数：{Math.ceil(parseInt(formData.targetCount || '0') / parseInt(formData.dailyTarget || '1'))} 天
-          </Text>
-        </View>
+        {/* Date Pickers */}
+        {showStartDatePicker && (
+          <DateTimePicker
+            value={new Date(formData.startDate || new Date().toISOString().split('T')[0])}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleStartDateChange}
+          />
+        )}
+        {showEndDatePicker && (
+          <DateTimePicker
+            value={formData.customEndDate ? new Date(formData.customEndDate) : new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleEndDateChange}
+            minimumDate={new Date(formData.startDate)}
+          />
+        )}
       </>
     );
   };
@@ -463,7 +584,7 @@ export default function PracticeConfigScreen() {
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: '配置修法目标', headerShown: true }} />
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
           <Text style={styles.practiceType}>
@@ -475,7 +596,7 @@ export default function PracticeConfigScreen() {
           {renderTimeConfiguration()}
           {renderCountConfiguration()}
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
@@ -492,7 +613,7 @@ export default function PracticeConfigScreen() {
           {saving ? (
             <ActivityIndicator color="white" size="small" />
           ) : (
-            <Text style={styles.saveButtonText}>添加修法</Text>
+            <Text style={styles.saveButtonText}>确认添加项目</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -553,6 +674,135 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: 4,
   },
+  goalModeSelector: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  goalModeButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    alignItems: 'center',
+  },
+  selectedGoalModeButton: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  goalModeButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedGoalModeButtonText: {
+    color: 'white',
+  },
+  goalInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 8,
+    backgroundColor: '#f8f9fa',
+  },
+  goalInputLabel: {
+    fontSize: 16,
+    color: Colors.text,
+    marginRight: 8,
+  },
+  goalInput: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+    textAlign: 'right',
+    paddingVertical: 4,
+  },
+  goalInputUnit: {
+    fontSize: 16,
+    color: Colors.text,
+    marginLeft: 8,
+  },
+  timeInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  timeInputLabel: {
+    fontSize: 14,
+    color: Colors.text,
+    width: 80,
+  },
+  timeInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 6,
+    padding: 8,
+    fontSize: 14,
+    backgroundColor: 'white',
+  },
+  timeInputButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 6,
+    padding: 8,
+    backgroundColor: 'white',
+  },
+  timeInputButtonText: {
+    fontSize: 14,
+    color: Colors.text,
+  },
+  durationSelector: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  durationChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+  },
+  selectedDurationChip: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  durationChipText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedDurationChipText: {
+    color: 'white',
+  },
+  intelligentSummary: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  summaryText: {
+    fontSize: 14,
+    color: Colors.text,
+    lineHeight: 20,
+  },
   periodSelector: {
     flexDirection: 'row',
     gap: 12,
@@ -578,56 +828,6 @@ const styles = StyleSheet.create({
   },
   selectedPeriodButtonText: {
     color: 'white',
-  },
-  durationSelector: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  durationOption: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    backgroundColor: 'white',
-    minWidth: 60,
-    alignItems: 'center',
-  },
-  selectedDurationOption: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  durationOptionText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.text,
-  },
-  selectedDurationOptionText: {
-    color: 'white',
-  },
-  calculationInfo: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
-  },
-  calculationLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  calculationText: {
-    fontSize: 14,
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  calculationHint: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 4,
-    fontStyle: 'italic',
   },
   footer: {
     flexDirection: 'row',
@@ -665,18 +865,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: 'white',
-  },
-  datePickerButton: {
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-  },
-  datePickerButtonText: {
-    fontSize: 16,
-    color: Colors.text,
   },
   inputError: {
     borderColor: 'red',
