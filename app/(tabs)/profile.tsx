@@ -295,32 +295,32 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             ⚙️ 应用设置
           </ThemedText>
 
-          <TouchableOpacity style={styles.settingItem} onPress={handleNotificationSettings}>
-            <Text style={styles.settingIcon}>🔔</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={handleNotificationSettings}>
+            <Text style={styles.menuItemIcon}>🔔</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>通知设置</ThemedText>
             </View>
             <Text style={styles.settingAction}>></Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem} onPress={handlePracticeGoals}>
-            <Text style={styles.settingIcon}>🎯</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={handlePracticeGoals}>
+            <Text style={styles.menuItemIcon}>🎯</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>修行目标</ThemedText>
             </View>
             <Text style={styles.settingAction}>></Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingIcon}>🌙</Text>
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemIcon}>🌙</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>夜间模式</ThemedText>
             </View>
             <Text style={styles.settingAction}>关闭</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingIcon}>🌍</Text>
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemIcon}>🌍</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>语言选择</ThemedText>
             </View>
@@ -368,15 +368,15 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             🛠️ 功能管理
           </ThemedText>
 
-          <TouchableOpacity style={styles.settingItem} onPress={handleThemeManagement}>
-            <Text style={styles.settingIcon}>🎯</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={handleThemeManagement}>
+            <Text style={styles.menuItemIcon}>🎯</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>主题管理</ThemedText>
             </View>
             <Text style={styles.settingAction}>></Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.settingIcon}>📚</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>课程管理</ThemedText>
@@ -384,7 +384,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             <Text style={styles.settingAction}>></Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.settingIcon}>⏰</Text>
             <View style={styles.settingContent}>
               <ThemedText style={styles.settingTitle}>提醒设置</ThemedText>
@@ -525,4 +525,184 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  header: {
+    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  profileIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+    color: '#fff',
+  },
+  userName: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: 'white',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  userInfo: {
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.95)',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  sectionContainer: {
+    backgroundColor: 'white',
+    marginTop: 16,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+    overflow: 'hidden',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2c3e50',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+    backgroundColor: '#f8f9fa',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f3f4',
+    backgroundColor: 'white',
+  },
+  lastMenuItem: {
+    borderBottomWidth: 0,
+  },
+  menuItemIcon: {
+    fontSize: 22,
+    marginRight: 16,
+    width: 30,
+    textAlign: 'center',
+    color: '#5a6c7d',
+  },
+  menuItemText: {
+    flex: 1,
+    fontSize: 17,
+    color: '#2c3e50',
+    fontWeight: '500',
+  },
+  menuItemSubtext: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginTop: 2,
+  },
+  chevron: {
+    fontSize: 18,
+    color: '#bdc3c7',
+    fontWeight: '600',
+  },
+  signOutButton: {
+    backgroundColor: '#e74c3c',
+    marginHorizontal: 20,
+    marginVertical: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#e74c3c',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  signOutText: {
+    color: 'white',
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 28,
+    width: '85%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: '#2c3e50',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginBottom: 28,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  modalButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 10,
+    minWidth: 90,
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    backgroundColor: '#ecf0f1',
+  },
+  modalButtonConfirm: {
+    backgroundColor: '#e74c3c',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalButtonTextCancel: {
+    color: '#2c3e50',
+  },
+  modalButtonTextConfirm: {
+    color: 'white',
+  },
+});
