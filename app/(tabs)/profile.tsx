@@ -35,9 +35,23 @@ export default function ProfileScreen() {
 
   // Only redirect if explicitly logged out (not during loading)
   useEffect(() => {
+    console.log('🔵 Profile useEffect triggered:', {
+      user: user?.email || null,
+      loading,
+      isSigningOut,
+      timestamp: new Date().toISOString()
+    });
+    
     if (!loading && !user && !isSigningOut) {
       console.log('🔵 Profile: No user found after loading completed, redirecting to login');
+      console.log('🔵 Profile: Redirect conditions met - loading:', loading, 'user:', user, 'isSigningOut:', isSigningOut);
       router.replace('/auth/login');
+    } else {
+      console.log('🔵 Profile: NOT redirecting because:', {
+        loading: loading ? 'still loading' : 'loading complete',
+        user: user ? 'user exists' : 'no user',
+        isSigningOut: isSigningOut ? 'signing out' : 'not signing out'
+      });
     }
   }, [user, loading, router, isSigningOut]);
 
