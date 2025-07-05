@@ -275,32 +275,7 @@ export default function StudyScreen() {
     }
   };
 
-  const quitCourse = async (courseId: string) => {
-    if (!user) return;
-
-    Alert.alert(
-      '确认退出',
-      '确定要退出这门课程吗？学习进度将会保留。',
-      [
-        { text: '取消', style: 'cancel' },
-        {
-          text: '退出',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await studyService.quitCourse(user.id, courseId);
-              setUserCourses(prev => prev.filter(uc => uc.course_id !== courseId));
-              setProgress(prev => prev.filter(p => p.courseId !== courseId));
-              Alert.alert('成功', '已退出课程');
-            } catch (error) {
-              console.error('Error quitting course:', error);
-              Alert.alert('错误', '退出失败，请重试');
-            }
-          }
-        }
-      ]
-    );
-  };
+  
 
   const getCourseProgress = (courseId: string) => {
     return progress.find(p => p.courseId === courseId);
@@ -483,20 +458,12 @@ export default function StudyScreen() {
                           </TouchableOpacity>
                         </>
                       ) : userCourse.status === 'paused' ? (
-                        <>
-                          <TouchableOpacity 
-                            style={styles.primaryButton}
-                            onPress={() => resumeCourse(userCourse.course_id)}
-                          >
-                            <Text style={styles.buttonText}>恢复学习</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity 
-                            style={styles.dangerButton}
-                            onPress={() => quitCourse(userCourse.course_id)}
-                          >
-                            <Text style={styles.buttonText}>退出课程</Text>
-                          </TouchableOpacity>
-                        </>
+                        <TouchableOpacity 
+                          style={styles.primaryButton}
+                          onPress={() => resumeCourse(userCourse.course_id)}
+                        >
+                          <Text style={styles.buttonText}>恢复学习</Text>
+                        </TouchableOpacity>
                       ) : null}
                     </View>
                   </View>
