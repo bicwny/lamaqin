@@ -283,7 +283,6 @@ export default function PracticeConfigScreen() {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>2. 目标详情</Text>
       
-      {/* Time Planning Mode Selection */}
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>时间规划模式</Text>
         <View style={styles.segmentedControl}>
