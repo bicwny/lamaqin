@@ -183,6 +183,14 @@ export default function StudyScreen() {
       console.log('🔄 加入课程:', courseId);
       setJoiningCourse(courseId);
 
+      // Check if user is already enrolled
+      const isAlreadyEnrolled = userCourses.some(uc => uc.course_id === courseId);
+      if (isAlreadyEnrolled) {
+        Alert.alert('提示', '您已经加入了这门课程');
+        setViewMode('home');
+        return;
+      }
+
       const userCourse = await studyService.joinCourse(user.id, courseId);
 
       setUserCourses(prev => [...prev, userCourse]);
@@ -203,7 +211,14 @@ export default function StudyScreen() {
       console.log('✅ 课程加入成功');
     } catch (error) {
       console.error('❌ Error joining course:', error);
-      Alert.alert('错误', '加入课程失败，请重试');
+      // Handle duplicate key error specifically
+      if (error?.code === '23505') {
+        Alert.alert('提示', '您已经加入了这门课程');
+        // Reload data to sync state
+        loadStudyData();
+      } else {
+        Alert.alert('错误', '加入课程失败，请重试');
+      }
     } finally {
       setJoiningCourse(null);
     }
