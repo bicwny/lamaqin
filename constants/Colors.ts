@@ -11,7 +11,7 @@ export const Colors = {
   primary: '#D4AF37',      // Golden - enlightenment
   secondary: '#8B4513',    // Brown - earth/stability
   accent: '#FF6B35',       // Orange - energy/compassion
-  background: '#F5F5DC',   // Beige - peaceful
+  background: '#FFFFFF',   // White - purity and peace
   surface: '#FFFFFF',      // White - purity
   text: '#2F4F4F',         // Dark slate gray
   textSecondary: '#696969', // Dim gray
@@ -28,7 +28,7 @@ export const Colors = {
 
   light: {
     text: '#2F4F4F',
-    background: '#F5F5DC',
+    background: '#FFFFFF',
     tint: tintColorLight,
     icon: '#687076',
     tabIconDefault: '#696969',
