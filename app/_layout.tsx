@@ -45,7 +45,7 @@ function RootLayoutNav() {
     return (
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen 
-          name="loading" 
+          name="(tabs)" 
           options={{ headerShown: false }}
         />
       </Stack>
