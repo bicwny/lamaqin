@@ -6,7 +6,7 @@ import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { AuthStateDebugger } from '@/components/AuthStateDebugger';
+
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -49,7 +49,6 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </ThemedView>
-        <AuthStateDebugger />
       </ScrollView>
     </ThemedView>
   );
