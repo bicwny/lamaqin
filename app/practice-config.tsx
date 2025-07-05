@@ -64,7 +64,7 @@ export default function PracticeConfigScreen() {
 
   useEffect(() => {
     calculateSuggestions();
-  }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, customDays, configMode]);
+  }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, configMode]);
 
   const getDurationInDays = () => {
     const start = startDate;
