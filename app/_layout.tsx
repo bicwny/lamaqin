@@ -33,10 +33,7 @@ function RootLayoutNav() {
         router.replace('/(tabs)');
       } else {
         console.log('❌ No user, should show auth');
-        // Use a timeout to ensure navigation happens after render
-        setTimeout(() => {
-          router.replace('/auth/login');
-        }, 100);
+        router.replace('/auth/login');
       }
     } else {
       console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
@@ -45,7 +42,14 @@ function RootLayoutNav() {
 
   if (loading) {
     console.log('⏳ Showing loading screen...');
-    return null; // or a loading screen
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen 
+          name="(tabs)" 
+          options={{ headerShown: false }}
+        />
+      </Stack>
+    );
   }
 
   console.log('✅ Auth state resolved, user:', user ? 'logged in' : 'not logged in');
@@ -60,7 +64,7 @@ function RootLayoutNav() {
   return (
     <Stack 
       screenOptions={{ headerShown: false }}
-      initialRouteName={user ? "(tabs)" : "auth"}
+      initialRouteName="auth"
     >
       <Stack.Screen 
         name="auth" 
