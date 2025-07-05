@@ -33,6 +33,13 @@ export default function ProfileScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // Redirect to auth if no user
+  useEffect(() => {
+    if (!user) {
+      router.replace('/auth/login');
+    }
+  }, [user, router]);
+
   const goBackToIndex = () => {
     router.push('/(tabs)/study');
   };
@@ -70,12 +77,17 @@ export default function ProfileScreen() {
     setShowLogoutModal(false);
   };
 
+  // Don't render anything if no user (will redirect via useEffect)
+  if (!user) {
+    return null;
+  }
+
   const [userProfile, setUserProfile] = useState<UserProfile>({
     dharmaName: '多吉丹',
     practiceYears: 3,
     location: '纽约',
     className: '入行班',
-    email: user?.email || 'dorje@example.com',
+    email: user?.email || '',
     registrationDate: '2025-01-01'
   });
 

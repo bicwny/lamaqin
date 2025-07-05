@@ -32,6 +32,18 @@ export default function ProfileScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // Redirect to auth if no user
+  useEffect(() => {
+    if (!user) {
+      router.replace('/auth/login');
+    }
+  }, [user, router]);
+
+  // Don't render anything if no user
+  if (!user) {
+    return null;
+  }
+
   const goBackToIndex = () => {
     router.push('/(tabs)/study');
   };
