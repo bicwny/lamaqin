@@ -49,6 +49,7 @@ export default function PracticeConfigScreen() {
   // Time-based configuration
   const [frequencyMode, setFrequencyMode] = useState<'weekly' | 'daily'>('weekly');
   const [sessionsTarget, setSessionsTarget] = useState('4'); // Default 4 sessions per week
+    const [weeklyGoal, setWeeklyGoal] = useState('');
 
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
@@ -131,10 +132,10 @@ export default function PracticeConfigScreen() {
         return;
       }
     } else {
-      if (configMode === 'fixed_duration' && !sessionsTarget) {
-        Alert.alert('错误', '请输入座数目标');
-        return;
-      }
+      if (!weeklyGoal) {
+          Alert.alert('错误', '请输入每周目标座数');
+          return;
+        }
     }
 
     setLoading(true);
@@ -192,7 +193,7 @@ export default function PracticeConfigScreen() {
         const { error } = await supabase
           .from('user_practice_projects')
           .insert({ ...projectData, goal_type: configMode });
-        
+
         if (error) throw error;
       } catch (error: any) {
         // If goal_type column doesn't exist, try without it
@@ -200,7 +201,7 @@ export default function PracticeConfigScreen() {
           const { error: fallbackError } = await supabase
             .from('user_practice_projects')
             .insert(projectData);
-          
+
           if (fallbackError) throw fallbackError;
         } else {
           throw error;
@@ -365,7 +366,7 @@ export default function PracticeConfigScreen() {
                 记录时需要选择具体修法主题和时长分钟数
               </Text>
             </View>
-            
+
             <View style={styles.inputRow}>
               <Text style={styles.inputPrefix}>每周目标</Text>
               <TextInput
