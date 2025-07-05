@@ -385,7 +385,7 @@ export default function StudyScreen() {
 
           <Text style={styles.sectionTitle}>我的课程：</Text>
 
-          {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
+          {userCourses.map(userCourse => {
             const courseProgress = getCourseProgress(userCourse.course_id);
             const currentLesson = courseProgress?.currentLesson || 1;
             const progressPercentage = courseProgress?.progressPercentage || 0;
@@ -393,30 +393,49 @@ export default function StudyScreen() {
             return (
               <TouchableOpacity 
                 key={userCourse.id} 
-                style={styles.courseCard}
+                style={[
+                  styles.courseCard,
+                  userCourse.status === 'paused' && styles.pausedCourseCard
+                ]}
                 onPress={() => {
                   setSelectedCourse(userCourse);
                   setViewMode('courseDetail');
                 }}
               >
-                <Text style={styles.courseName}>{userCourse.course.name}</Text>
-                <Text style={styles.courseInfo}>
-                  {userCourse.course.total_lessons}课 | 完成 {progressPercentage.toFixed(1)}%
-                </Text>
-                <Text style={styles.lastStudied}>
-                  上次完成：第{currentLesson}课
-                </Text>
+                <View style={styles.courseHeader}>
+                  <Text style={styles.courseName}>
+                    {userCourse.course.name} {getStatusIcon(userCourse.status)}
+                  </Text>
+                  <Text style={styles.courseInfo}>
+                    {userCourse.course.total_lessons}课 | 完成 {progressPercentage.toFixed(1)}%
+                  </Text>
+                  <Text style={styles.lastStudied}>
+                    上次完成：第{currentLesson}课
+                  </Text>
+                </View>
 
-                <TouchableOpacity 
-                  style={styles.continueButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    setSelectedCourse(userCourse);
-                    setViewMode('courseDetail');
-                  }}
-                >
-                  <Text style={styles.continueButtonText}>继续学习</Text>
-                </TouchableOpacity>
+                {userCourse.status === 'active' ? (
+                  <TouchableOpacity 
+                    style={styles.continueButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      setSelectedCourse(userCourse);
+                      setViewMode('courseDetail');
+                    }}
+                  >
+                    <Text style={styles.continueButtonText}>继续学习</Text>
+                  </TouchableOpacity>
+                ) : userCourse.status === 'paused' ? (
+                  <TouchableOpacity 
+                    style={styles.resumeButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      resumeCourse(userCourse.course_id);
+                    }}
+                  >
+                    <Text style={styles.resumeButtonText}>恢复学习</Text>
+                  </TouchableOpacity>
+                ) : null}
               </TouchableOpacity>
             );
           })}
@@ -654,6 +673,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  pausedCourseCard: {
+    backgroundColor: '#f8f9fa',
+    borderLeftWidth: 4,
+    borderLeftColor: '#ffc107',
+  },
   manageCourseCard: {
     backgroundColor: 'white',
     borderRadius: 12,
@@ -708,6 +732,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  resumeButton: {
+    backgroundColor: '#ffc107',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  resumeButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
