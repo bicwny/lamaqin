@@ -234,43 +234,71 @@ export default function PracticeScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>加载修行数据中...</Text>
-      </View>
+      <SafeAreaView className="flex-1">
+        <View className="flex-1 justify-center items-center bg-gray-50">
+          <ActivityIndicator size="large" color="#3b82f6" />
+          <Text className="mt-4 text-base text-gray-600">加载中...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (projects.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>📿 开始您的修行之旅</Text>
-        <Text style={styles.emptyDescription}>
-          还没有修行项目，点击下方按钮开始添加您的第一个修行目标吧！
-        </Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddPractice}>
-          <Text style={styles.addButtonText}>+ 添加修法</Text>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaView className="flex-1">
+        <View className="flex-1 bg-gray-50">
+          <View className="flex-row justify-between items-center p-4 bg-white border-b border-gray-200">
+            <View>
+              <Text className="text-2xl font-semibold text-gray-900">修行</Text>
+              <Text className="text-base text-gray-600 mt-1">Practice</Text>
+            </View>
+            <TouchableOpacity 
+              className="bg-blue-500 px-4 py-2 rounded-full"
+              onPress={() => router.push('/add-practice')}
+            >
+              <Text className="text-white font-medium">添加</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View className="flex-1 justify-center items-center p-8">
+            <Text className="text-2xl font-semibold text-gray-900 mb-4 text-center">开始你的修行之旅</Text>
+            <Text className="text-base text-gray-600 text-center mb-8 leading-6">
+              添加你的第一个修行项目，开始记录你的精神成长历程。
+            </Text>
+            <TouchableOpacity 
+              className="bg-blue-500 px-6 py-3 rounded-lg"
+              onPress={() => router.push('/add-practice')}
+            >
+              <Text className="text-white font-medium">添加修行项目</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView className="flex-1">
+      <View className="flex-1 bg-gray-50">
+        <View className="flex-row justify-between items-center p-4 bg-white border-b border-gray-200">
+          <View>
+            <Text className="text-2xl font-semibold text-gray-900">修行</Text>
+            <Text className="text-base text-gray-600 mt-1">Practice</Text>
+          </View>
+          <TouchableOpacity 
+            className="bg-blue-500 px-4 py-2 rounded-full"
+            onPress={() => router.push('/add-practice')}
+          >
+            <Text className="text-white font-medium">添加</Text>
+          </TouchableOpacity>
+        </View>
+
         <ScrollView
           style={styles.scrollView}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>📿 修行记录</Text>
-            <TouchableOpacity style={styles.addButton} onPress={handleAddPractice}>
-              <Text style={styles.addButtonText}>+ 添加修法</Text>
-            </TouchableOpacity>
-          </View>
-
           <View style={styles.projectsList}>
             {projects.map((project) => {
               const progress = calculateProgress(project);

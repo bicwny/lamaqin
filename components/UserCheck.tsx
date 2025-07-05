@@ -68,53 +68,7 @@ export function UserCheck() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-    margin: 10,
-    borderRadius: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  text: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  loading: {
-    fontSize: 14,
-    color: '#666',
-    fontStyle: 'italic',
-  },
-  error: {
-    fontSize: 14,
-    color: 'red',
-    marginBottom: 10,
-  },
-  success: {
-    fontSize: 14,
-    color: 'green',
-    fontWeight: 'bold',
-  },
-  userInfo: {
-    backgroundColor: '#e8f5e8',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
+const styles = StyleSheet.create({});Size: 16,
     fontWeight: '600',
   },
 });
