@@ -33,7 +33,7 @@ function RootLayoutNav() {
         router.replace('/(tabs)');
       } else {
         console.log('❌ No user, should show auth');
-        router.replace('/auth/login');
+        router.push('/auth/login');
       }
     } else {
       console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
@@ -64,7 +64,6 @@ function RootLayoutNav() {
   return (
     <Stack 
       screenOptions={{ headerShown: false }}
-      initialRouteName="auth"
     >
       <Stack.Screen 
         name="auth" 
