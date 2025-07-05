@@ -17,14 +17,16 @@ function RootLayoutNav() {
   console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
   console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');
 
-  // Add debugging for unexpected navigation
+  // Handle navigation based on auth state
   useEffect(() => {
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
-        console.log('✅ User authenticated, should show tabs');
+        console.log('✅ User authenticated, navigating to tabs');
+        router.replace('/(tabs)');
       } else {
-        console.log('❌ No user, should show auth');
+        console.log('❌ No user, navigating to auth');
+        router.replace('/auth');
       }
     }
   }, [user, loading]);
@@ -45,43 +47,21 @@ function RootLayoutNav() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {user ? (
-        <>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen 
-            name="meditation-history" 
-            options={{ 
-              headerShown: false,
-              presentation: 'card'
-            }} 
-          />
-          <Stack.Screen 
-            name="auth" 
-            options={{ 
-              headerShown: false,
-              presentation: 'modal'
-            }} 
-          />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="auth" />
-          <Stack.Screen 
-            name="(tabs)" 
-            options={{ 
-              headerShown: false,
-              presentation: 'modal'
-            }} 
-          />
-          <Stack.Screen 
-            name="meditation-history" 
-            options={{ 
-              headerShown: false,
-              presentation: 'card'
-            }} 
-          />
-        </>
-      )}
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen 
+        name="auth" 
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+      <Stack.Screen 
+        name="meditation-history" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }} 
+      />
     </Stack>
   );
 }
