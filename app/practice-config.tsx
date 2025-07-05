@@ -185,12 +185,27 @@ export default function PracticeConfigScreen() {
         target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
         status: 'active',
         current_count: 0,
-        goal_type: configMode,
       };
 
-      const { error } = await supabase
-        .from('user_practice_projects')
-        .insert(projectData);
+      // Try to include goal_type, but handle cases where column doesn't exist yet
+      try {
+        const { error } = await supabase
+          .from('user_practice_projects')
+          .insert({ ...projectData, goal_type: configMode });
+        
+        if (error) throw error;
+      } catch (error: any) {
+        // If goal_type column doesn't exist, try without it
+        if (error?.message?.includes('goal_type')) {
+          const { error: fallbackError } = await supabase
+            .from('user_practice_projects')
+            .insert(projectData);
+          
+          if (fallbackError) throw fallbackError;
+        } else {
+          throw error;
+        }
+      }
 
       if (error) throw error;
 
