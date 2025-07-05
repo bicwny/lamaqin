@@ -30,11 +30,10 @@ function RootLayoutNav() {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
         console.log('✅ User authenticated, should show tabs');
-        // Ensure we're on the tabs route
-        router.replace('/(tabs)/index');
+        // Use push instead of replace to avoid navigation conflicts
+        router.push('/(tabs)');
       } else {
         console.log('❌ No user, should show auth');
-        // Ensure we're on the auth route
         router.replace('/auth/login');
       }
     } else {
@@ -93,7 +92,14 @@ function RootLayoutNav() {
         }} 
       />
       <Stack.Screen 
-        name="modals" 
+        name="modals/custom-record" 
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+      <Stack.Screen 
+        name="modals/meditation-record" 
         options={{ 
           headerShown: false,
           presentation: 'modal'
