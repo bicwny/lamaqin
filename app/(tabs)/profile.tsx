@@ -27,18 +27,19 @@ interface TodaySummary {
 }
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const router = useRouter();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Redirect to auth if no user
+  // Only redirect if explicitly logged out (not during loading)
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user && !isSigningOut) {
+      console.log('🔵 Profile: No user found after loading completed, redirecting to login');
       router.replace('/auth/login');
     }
-  }, [user, router]);
+  }, [user, loading, router, isSigningOut]);
 
   const goBackToIndex = () => {
     router.push('/(tabs)/study');
@@ -77,8 +78,8 @@ export default function ProfileScreen() {
     setShowLogoutModal(false);
   };
 
-  // Don't render anything if no user (will redirect via useEffect)
-  if (!user) {
+  // Don't render anything if still loading or no user (will redirect via useEffect)
+  if (loading || (!user && !isSigningOut)) {
     return null;
   }
 
