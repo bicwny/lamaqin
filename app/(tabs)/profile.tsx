@@ -174,22 +174,6 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
     setShowShareModal(false);
   };
 
-  const handleEditProfile = () => {
-    Alert.alert('功能开发中', '个人资料编辑功能正在开发中');
-  };
-
-  const handleNotificationSettings = () => {
-    Alert.alert('通知设置', '🔔 通知设置功能正在开发中');
-  };
-
-  const handlePracticeGoals = () => {
-    Alert.alert('修行目标', '🎯 修行目标设置功能正在开发中');
-  };
-
-  const handleThemeManagement = () => {
-    Alert.alert('主题管理', '🎯 主题管理功能正在开发中');
-  };
-
   const handleDataExport = () => {
     Alert.alert(
       '📤 数据导出',
@@ -211,14 +195,6 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         { text: '确认备份', onPress: () => Alert.alert('成功', '数据已成功备份到云端') }
       ]
     );
-  };
-
-  const handleChangePassword = () => {
-    Alert.alert('修改密码', '🔐 密码修改功能正在开发中');
-  };
-
-  const handleChangeEmail = () => {
-    console.log('Change email pressed');
   };
 
   const handleClearCache = () => {
@@ -283,49 +259,6 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
               </ThemedText>
             </View>
           </View>
-
-          <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-            <Text style={styles.editButtonText}>编辑资料</Text>
-          </TouchableOpacity>
-        </ThemedView>
-
-        {/* Application Settings */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            ⚙️ 应用设置
-          </ThemedText>
-
-          <TouchableOpacity style={styles.menuItem} onPress={handleNotificationSettings}>
-            <Text style={styles.menuItemIcon}>🔔</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>通知设置</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={handlePracticeGoals}>
-            <Text style={styles.menuItemIcon}>🎯</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>修行目标</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemIcon}>🌙</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>夜间模式</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>关闭</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemIcon}>🌍</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>语言选择</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>简体中文</Text>
-          </TouchableOpacity>
         </ThemedView>
 
         {/* Data Management */}
@@ -347,52 +280,6 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
           </TouchableOpacity>
         </ThemedView>
 
-        {/* Account Security */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🔐 账户安全
-          </ThemedText>
-
-          <TouchableOpacity style={styles.dataButton} onPress={handleChangePassword}>
-            <Text style={styles.dataButtonText}>🔒 修改密码</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.dataButton} onPress={handleChangeEmail}>
-            <Text style={styles.dataButtonText}>📧 更换邮箱</Text>
-          </TouchableOpacity>
-        </ThemedView>
-
-        {/* Feature Management */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🛠️ 功能管理
-          </ThemedText>
-
-          <TouchableOpacity style={styles.menuItem} onPress={handleThemeManagement}>
-            <Text style={styles.menuItemIcon}>🎯</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>主题管理</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.settingIcon}>📚</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>课程管理</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.settingIcon}>⏰</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>提醒设置</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-        </ThemedView>
-
         {/* Practice Sharing */}
         <ThemedView style={styles.section}>
           <View style={styles.shareCard}>
@@ -404,37 +291,6 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
               <Text style={styles.shareButtonText}>生成分享</Text>
             </TouchableOpacity>
           </View>
-        </ThemedView>
-
-        {/* Help & Support */}
-        <ThemedView style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            ❓ 帮助支持
-          </ThemedText>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingIcon}>📖</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>使用指南</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingIcon}>💬</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>意见反馈</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingIcon}>ℹ️</Text>
-            <View style={styles.settingContent}>
-              <ThemedText style={styles.settingTitle}>关于应用</ThemedText>
-            </View>
-            <Text style={styles.settingAction}>></Text>
-          </TouchableOpacity>
         </ThemedView>
 
         {/* Sign Out */}
@@ -530,17 +386,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  loadingContainer: {
+  scrollView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
   },
   header: {
     backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -554,84 +401,110 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  profileIcon: {
-    fontSize: 48,
-    marginBottom: 12,
-    color: '#fff',
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
-  userName: {
-    fontSize: 28,
-    fontWeight: '700',
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
     color: 'white',
-    marginBottom: 8,
-    textAlign: 'center',
   },
-  userInfo: {
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.95)',
-    marginBottom: 4,
-    textAlign: 'center',
+  spacer: {
+    width: 40,
   },
-  sectionContainer: {
+  section: {
     backgroundColor: 'white',
     marginTop: 16,
     marginHorizontal: 16,
     borderRadius: 16,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
-    overflow: 'hidden',
+  },
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatarContainer: {
+    marginRight: 16,
+  },
+  avatar: {
+    fontSize: 48,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  userDetails: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  registrationDate: {
+    fontSize: 14,
+    color: '#666',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#2c3e50',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 12,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
+  },
+  dataButton: {
     backgroundColor: '#f8f9fa',
-  },
-  menuItem: {
-    flexDirection: 'row',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
     alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f3f4',
-    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
-  lastMenuItem: {
-    borderBottomWidth: 0,
-  },
-  menuItemIcon: {
-    fontSize: 22,
-    marginRight: 16,
-    width: 30,
-    textAlign: 'center',
-    color: '#5a6c7d',
-  },
-  menuItemText: {
-    flex: 1,
-    fontSize: 17,
-    color: '#2c3e50',
+  dataButtonText: {
+    fontSize: 16,
     fontWeight: '500',
+    color: '#333',
   },
-  menuItemSubtext: {
-    fontSize: 14,
-    color: '#7f8c8d',
-    marginTop: 2,
+  shareCard: {
+    alignItems: 'center',
   },
-  chevron: {
+  shareTitle: {
     fontSize: 18,
-    color: '#bdc3c7',
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
+  },
+  shareButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  shareButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
   },
   signOutButton: {
     backgroundColor: '#e74c3c',
-    marginHorizontal: 20,
-    marginVertical: 32,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -641,10 +514,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
+  signOutButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+  },
   signOutText: {
     color: 'white',
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
@@ -666,19 +542,38 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '600',
     marginBottom: 16,
     textAlign: 'center',
-    color: '#2c3e50',
+    color: '#333',
   },
-  modalText: {
+  modalSubtitle: {
     fontSize: 16,
-    color: '#7f8c8d',
-    marginBottom: 28,
+    color: '#666',
+    marginBottom: 16,
     textAlign: 'center',
-    lineHeight: 24,
   },
-  modalButtons: {
+  sharePreview: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  sharePreviewLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  shareTextContainer: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    maxHeight: 200,
+  },
+  shareText: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+  },
+  modalActions: {
     flexDirection: 'row',
     gap: 16,
   },
@@ -689,20 +584,47 @@ const styles = StyleSheet.create({
     minWidth: 90,
     alignItems: 'center',
   },
-  modalButtonCancel: {
+  cancelButton: {
     backgroundColor: '#ecf0f1',
   },
-  modalButtonConfirm: {
-    backgroundColor: '#e74c3c',
-  },
-  modalButtonText: {
+  cancelButtonText: {
+    color: '#2c3e50',
     fontSize: 16,
     fontWeight: '600',
   },
-  modalButtonTextCancel: {
-    color: '#2c3e50',
-  },
-  modalButtonTextConfirm: {
+  modalButtonText: {
     color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    backgroundColor: '#007AFF',
+  },
+  logoutModalContent: {
+    alignItems: 'center',
+  },
+  logoutModalIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  logoutModalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: '#333',
+  },
+  logoutModalMessage: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 28,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  logoutConfirmButton: {
+    backgroundColor: '#e74c3c',
+  },
+  logoutConfirmButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

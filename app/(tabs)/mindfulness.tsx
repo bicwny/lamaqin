@@ -155,36 +155,7 @@ export default function MindfulnessScreen() {
         </View>
       </View>
 
-      <View style={styles.historyCard}>
-        <Text style={styles.historyTitle}>今日记录</Text>
-
-        {todayRecords.length === 0 ? (
-          <Text style={styles.emptyText}>今天还没有记录</Text>
-        ) : (
-          todayRecords
-            .sort((a, b) => b.record_time.localeCompare(a.record_time))
-            .map((record, index) => (
-              <View key={index} style={styles.recordItem}>
-                <View style={styles.recordHeader}>
-                  <Text style={styles.recordTime}>
-                    {formatTime(record.record_time)}
-                  </Text>
-                  <Text style={[
-                    styles.recordType,
-                    record.mind_type === 'good' ? styles.goodType : styles.badType
-                  ]}>
-                    {record.mind_type === 'good' ? '😊 善心' : '😔 恶心'}
-                  </Text>
-                </View>
-                {record.description && (
-                  <Text style={styles.recordDescription}>
-                    {record.description}
-                  </Text>
-                )}
-              </View>
-            ))
-        )}
-      </View>
+      
     </ScrollView>
   );
 }
@@ -293,54 +264,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  historyCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  historyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#666',
-    fontStyle: 'italic',
-  },
-  recordItem: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    paddingVertical: 8,
-  },
-  recordHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  recordTime: {
-    fontSize: 14,
-    color: '#666',
-  },
-  recordType: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  goodType: {
-    color: '#34C759',
-  },
-  badType: {
-    color: '#FF3B30',
-  },
-  recordDescription: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
+  
 });

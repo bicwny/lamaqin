@@ -420,6 +420,13 @@ export default function StudyScreen() {
               </TouchableOpacity>
             );
           })}
+
+          {/* Course Summary Footer */}
+          <View style={styles.courseSummary}>
+            <Text style={styles.courseSummaryText}>
+              {userCourses.length}门课程已加入，{userCourses.filter(uc => uc.status === 'paused').length}门课程已隐藏
+            </Text>
+          </View>
         </ScrollView>
       </SafeAreaView>
     );
@@ -526,7 +533,8 @@ export default function StudyScreen() {
               ))}
             </>
           )}
-        </ScrollView>
+
+          </ScrollView>
       </SafeAreaView>
     );
   }
@@ -581,7 +589,8 @@ export default function StudyScreen() {
               </View>
             );
           })}
-        </ScrollView>
+
+          </ScrollView>
       </SafeAreaView>
     );
   }
@@ -847,5 +856,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  courseSummary: {
+    padding: 16,
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    marginTop: 16,
+  },
+  courseSummaryText: {
+    fontSize: 14,
+    color: '#6c757d',
   },
 });
