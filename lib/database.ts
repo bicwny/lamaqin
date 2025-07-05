@@ -791,21 +791,27 @@ export const studyService = {
   },
 
   async getUserCourses(userId: string): Promise<UserCourse[]> {
-    const { data, error } = await supabase
-      .from('user_courses')
-      .select(`
-        *,
-        course:course_id(*)
-      `)
-      .eq('user_id', userId)
-      .eq('status', 'active');
+    try {
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select(`
+          *,
+          course:courses(*)
+        `)
+        .eq('user_id', userId)
+        .order('joined_date', { ascending: false });
 
-    if (error) {
-      console.error('❌ getUserCourses failed:', error);
-      throw error;
+      if (error) {
+        console.error('❌ Error fetching user courses:', error);
+        throw error;
+      }
+
+      console.log('📚 Raw user courses data:', data);
+      return data || [];
+    } catch (err) {
+      console.error('❌ getUserCourses failed:', err);
+      throw err;
     }
-
-    return data || [];
   },
 
   async joinCourse(userId: string, courseId: string) {

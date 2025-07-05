@@ -100,7 +100,9 @@ export default function StudyScreen() {
 
   const getUserCourses = async (userId: string): Promise<UserCourse[]> => {
     try {
+      console.log('🔍 Fetching user courses for:', userId);
       const userCourses = await studyService.getUserCourses(userId);
+      console.log('✅ Successfully fetched user courses:', userCourses.length);
       return userCourses;
     } catch (error) {
       console.error('❌ Error getting user courses:', error);
@@ -183,12 +185,27 @@ export default function StudyScreen() {
       console.log('🔄 加入课程:', courseId);
       setJoiningCourse(courseId);
 
-      // Check if user is already enrolled
-      const isAlreadyEnrolled = userCourses.some(uc => uc.course_id === courseId);
-      if (isAlreadyEnrolled) {
+      // Check if user is already enrolled (both in state and database)
+      const isAlreadyEnrolledInState = userCourses.some(uc => uc.course_id === courseId);
+      if (isAlreadyEnrolledInState) {
         Alert.alert('提示', '您已经加入了这门课程');
         setViewMode('home');
         return;
+      }
+
+      // Double-check against database to catch sync issues
+      try {
+        const dbUserCourses = await studyService.getUserCourses(user.id);
+        const isAlreadyEnrolledInDb = dbUserCourses.some(uc => uc.course_id === courseId);
+        if (isAlreadyEnrolledInDb) {
+          console.log('⚠️ Course enrollment found in DB but not in state - syncing...');
+          setUserCourses(dbUserCourses);
+          Alert.alert('提示', '您已经加入了这门课程');
+          setViewMode('home');
+          return;
+        }
+      } catch (dbError) {
+        console.error('❌ Error checking database for existing enrollment:', dbError);
       }
 
       const userCourse = await studyService.joinCourse(user.id, courseId);
