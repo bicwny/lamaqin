@@ -1,9 +1,10 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import 'react-native-reanimated';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -16,14 +17,16 @@ function RootLayoutNav() {
   console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
   console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');
 
-  // Add debugging for unexpected navigation
+  // Handle navigation based on auth state
   useEffect(() => {
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
-        console.log('✅ User authenticated, should show tabs');
+        console.log('✅ User authenticated, navigating to tabs');
+        router.replace('/(tabs)');
       } else {
-        console.log('❌ No user, should show auth');
+        console.log('❌ No user, navigating to auth');
+        router.replace('/auth');
       }
     }
   }, [user, loading]);
@@ -44,18 +47,21 @@ function RootLayoutNav() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {user ? (
-        <Stack.Screen name="(tabs)" />
-      ) : (
-        <Stack.Screen name="auth" />
-      )}
+      <Stack.Screen name="(tabs)" />
       <Stack.Screen 
-          name="meditation-history" 
-          options={{ 
-            headerShown: false,
-            presentation: 'card'
-          }} 
-        />
+        name="auth" 
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+      <Stack.Screen 
+        name="meditation-history" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }} 
+      />
     </Stack>
   );
 }

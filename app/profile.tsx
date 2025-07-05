@@ -32,6 +32,18 @@ export default function ProfileScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // Redirect to auth if no user
+  useEffect(() => {
+    if (!user) {
+      router.replace('/auth/login');
+    }
+  }, [user, router]);
+
+  // Don't render anything if no user
+  if (!user) {
+    return null;
+  }
+
   const goBackToIndex = () => {
     router.push('/(tabs)/study');
   };
@@ -74,7 +86,7 @@ export default function ProfileScreen() {
     practiceYears: 3,
     location: '纽约',
     className: '入行班',
-    email: user?.email || 'dorje@example.com',
+    email: user.email, // user is guaranteed to exist due to early return
     registrationDate: '2025-01-01'
   });
 
