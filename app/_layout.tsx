@@ -22,11 +22,9 @@ function RootLayoutNav() {
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
-        console.log('✅ User authenticated, navigating to tabs');
-        router.replace('/(tabs)');
+        console.log('✅ User authenticated, should show tabs');
       } else {
-        console.log('❌ No user, navigating to auth');
-        router.replace('/auth');
+        console.log('❌ No user, should show auth');
       }
     }
   }, [user, loading]);
@@ -46,13 +44,23 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
+    <Stack 
+      screenOptions={{ headerShown: false }}
+      initialRouteName={user ? "(tabs)" : "auth"}
+    >
+      <Stack.Screen 
+        name="(tabs)" 
+        options={{ 
+          headerShown: false,
+          href: user ? "/(tabs)" : null
+        }} 
+      />
       <Stack.Screen 
         name="auth" 
         options={{ 
           headerShown: false,
-          presentation: 'modal'
+          presentation: 'modal',
+          href: !user ? "/auth" : null
         }} 
       />
       <Stack.Screen 
