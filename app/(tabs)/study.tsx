@@ -560,7 +560,7 @@ export default function StudyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
   },
   scrollView: {
     flex: 1,
@@ -574,43 +574,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 10,
-  },
   header: {
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    padding: 16,
+    backgroundColor: 'white',
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#333',
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginTop: 4,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 16,
   },
   manageButton: {
     color: '#007AFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 12,
+    color: '#333',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
   },
   courseCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
@@ -622,7 +623,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   manageCourseCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
@@ -634,7 +635,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   availableCourseCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
@@ -650,7 +651,8 @@ const styles = StyleSheet.create({
   },
   courseName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#333',
     marginBottom: 4,
   },
   courseInfo: {
@@ -664,7 +666,7 @@ const styles = StyleSheet.create({
   },
   lastStudied: {
     fontSize: 14,
-    color: '#888',
+    color: '#007AFF',
     marginBottom: 12,
   },
   continueButton: {
@@ -674,12 +676,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   continueButtonText: {
-    color: '#fff',
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 12,
   },
   primaryButton: {
     flex: 1,
