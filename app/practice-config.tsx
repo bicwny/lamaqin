@@ -94,7 +94,7 @@ export default function PracticeConfigScreen() {
     // Validation
     if (practiceType === 'time' && goalType === 'topic_progress') {
       if (!dailyTarget || parseInt(dailyTarget) < 1) {
-        Alert.alert('错误', '请设置每周最少完成的法门数量');
+        Alert.alert('错误', '请设置每个修法每周至少座数');
         return;
       }
     } else if (practiceType === 'time' && goalType === 'fixed_duration') {
@@ -141,7 +141,7 @@ export default function PracticeConfigScreen() {
         finalDailyTarget = parseInt(dailyTarget) || calculatedSummary.suggestedDaily || 0;
       }
 
-      const { error } = await supabase
+      const { data: projectData, error } = await supabase
         .from('user_practice_projects')
         .insert({
           user_id: user.id,
@@ -153,9 +153,31 @@ export default function PracticeConfigScreen() {
           target_end_date: endDate,
           status: 'active',
           goal_type: practiceType === 'time' ? goalType : 'fixed_duration',
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // If topic progress mode, initialize all 92 topics
+      if (practiceType === 'time' && goalType === 'topic_progress') {
+        const topicProgressData = Array.from({ length: 92 }, (_, i) => ({
+          user_id: user.id,
+          practice_project_id: projectData.id,
+          topic_number: i + 1,
+          weekly_target_sessions: parseInt(dailyTarget),
+          current_week_sessions: 0,
+          current_week_start_date: startDate,
+          total_completed_weeks: 0,
+          is_current_week_complete: false,
+        }));
+
+        const { error: topicError } = await supabase
+          .from('user_practice_topic_progress')
+          .insert(topicProgressData);
+
+        if (topicError) throw topicError;
+      }
 
       Alert.alert('成功', '修行项目已添加', [
         { text: '确定', onPress: () => router.back() }
@@ -187,7 +209,7 @@ export default function PracticeConfigScreen() {
             法门进度
           </Text>
           <Text style={styles.goalTypeDescription}>
-            92个法门逐步完成
+            每个法门每周至少x座
           </Text>
         </TouchableOpacity>
 
@@ -212,16 +234,16 @@ export default function PracticeConfigScreen() {
 
       {goalType === 'topic_progress' ? (
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>每周最少完成法门数量</Text>
+          <Text style={styles.inputLabel}>每个修法每周至少座数</Text>
           <TextInput
             style={styles.input}
             value={dailyTarget}
             onChangeText={setDailyTarget}
             keyboardType="numeric"
-            placeholder="例如：1"
+            placeholder="例如：2"
           />
           <Text style={styles.inputHint}>
-            建议每周至少完成1个法门，确保稳定进步
+            共92个修法，每个修法每周至少完成设定的座数
           </Text>
         </View>
       ) : (
@@ -337,13 +359,13 @@ export default function PracticeConfigScreen() {
                 • 总共92个法门需要完成
               </Text>
               <Text style={styles.summaryText}>
-                • 每周最少完成 {dailyTarget || 1} 个法门
+                • 每个法门每周至少 {dailyTarget || 1} 座
               </Text>
               <Text style={styles.summaryText}>
                 • 计划持续 {calculatedSummary.totalDays} 天（约 {calculatedSummary.totalWeeks} 周）
               </Text>
               <Text style={styles.summaryHighlight}>
-                👉 预计需要约 {Math.ceil(92 / (parseInt(dailyTarget) || 1))} 周完成所有法门
+                👉 每周总计至少 {92 * (parseInt(dailyTarget) || 1)} 座观修（92个法门 × {dailyTarget || 1}座）
               </Text>
             </View>
           ) : (
