@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import 'react-native-reanimated';
+import '../global.css';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
