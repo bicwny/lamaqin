@@ -166,17 +166,12 @@ export default function PracticeConfigScreen() {
           targetPeriod = 'weekly';
           // No end date for topic progress - it ends when all 92 topics are completed
         } else {
-          // Fixed duration mode
+          // Fixed duration mode - always weekly
           const days = getDurationInDays();
           endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
           finalDailyTarget = parseInt(sessionsTarget);
-          targetPeriod = frequencyMode;
-
-          if (frequencyMode === 'weekly') {
-            finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
-          } else {
-            finalTotalTarget = finalDailyTarget * days;
-          }
+          targetPeriod = 'weekly';
+          finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
         }
       }
 
@@ -325,7 +320,10 @@ export default function PracticeConfigScreen() {
               styles.segmentButton,
               configMode === 'fixed_duration' && styles.segmentButtonActive,
             ]}
-            onPress={() => setConfigMode('fixed_duration')}
+            onPress={() => {
+              setConfigMode('fixed_duration');
+              setFrequencyMode('weekly');
+            }}
           >
             <Text
               style={[
@@ -366,54 +364,17 @@ export default function PracticeConfigScreen() {
             </View>
           </View>
         ) : (
-          <>
-            <View style={styles.segmentedControl}>
-              <TouchableOpacity
-                style={[
-                  styles.segmentButton,
-                  frequencyMode === 'weekly' && styles.segmentButtonActive,
-                ]}
-                onPress={() => setFrequencyMode('weekly')}
-              >
-                <Text
-                  style={[
-                    styles.segmentButtonText,
-                    frequencyMode === 'weekly' && styles.segmentButtonTextActive,
-                  ]}
-                >
-                  每周
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.segmentButton,
-                  frequencyMode === 'daily' && styles.segmentButtonActive,
-                ]}
-                onPress={() => setFrequencyMode('daily')}
-              >
-                <Text
-                  style={[
-                    styles.segmentButtonText,
-                    frequencyMode === 'daily' && styles.segmentButtonTextActive,
-                  ]}
-                >
-                  每日
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.inputRow}>
-              <Text style={styles.inputPrefix}>{frequencyMode === 'weekly' ? '每周' : '每日'}完成</Text>
-              <TextInput
-                style={styles.textInput}
-                value={sessionsTarget}
-                onChangeText={setSessionsTarget}
-                placeholder="例如: 4"
-                keyboardType="numeric"
-              />
-              <Text style={styles.inputUnit}>座</Text>
-            </View>
-          </>
+          <View style={styles.inputRow}>
+            <Text style={styles.inputPrefix}>每周完成</Text>
+            <TextInput
+              style={styles.textInput}
+              value={sessionsTarget}
+              onChangeText={setSessionsTarget}
+              placeholder="例如: 4"
+              keyboardType="numeric"
+            />
+            <Text style={styles.inputUnit}>座</Text>
+          </View>
         )}
       </View>
     </>
@@ -592,10 +553,10 @@ export default function PracticeConfigScreen() {
                     🎯 固定时长模式：在约 {days} 天内完成
                   </Text>
                   <Text style={styles.summaryText}>
-                    📅 从 {formatDate(startDate)} 开始，{frequencyMode === 'weekly' ? '每周' : '每日'} {sessionsTarget} 座观修
+                    📅 从 {formatDate(startDate)} 开始，每周 {sessionsTarget} 座观修
                   </Text>
                   <Text style={styles.summaryHighlight}>
-                    👉 预计总计完成约 {Math.ceil(days / (frequencyMode === 'weekly' ? 7 : 1)) * parseInt(sessionsTarget)} 座观修
+                    👉 预计总计完成约 {Math.ceil(days / 7) * parseInt(sessionsTarget)} 座观修
                   </Text>
                 </View>
               ) : (
