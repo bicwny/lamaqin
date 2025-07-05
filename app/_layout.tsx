@@ -33,7 +33,7 @@ function RootLayoutNav() {
         router.replace('/(tabs)');
       } else {
         console.log('❌ No user, should show auth');
-        router.push('/auth/login');
+        router.replace('/auth');
       }
     } else {
       console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
