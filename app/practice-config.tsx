@@ -162,7 +162,7 @@ export default function PracticeConfigScreen() {
         if (configMode === 'topic_progress') {
           // For topic progress: 92 topics, user sets weekly goal
           finalTotalTarget = 92; // 92 meditation topics
-          finalDailyTarget = 4; // Default weekly sessions
+          finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
           targetPeriod = 'weekly';
           // No end date for topic progress - it ends when all 92 topics are completed
         } else {
@@ -343,13 +343,27 @@ export default function PracticeConfigScreen() {
         <Text style={styles.sectionTitle}>2. 修行频率</Text>
 
         {configMode === 'topic_progress' ? (
-          <View style={styles.topicProgressInfo}>
-            <Text style={styles.topicProgressText}>
-              🧘 92个修法，每个修法每周至少4座
-            </Text>
-            <Text style={styles.topicProgressSubtext}>
-              记录时需要选择具体修法主题和时长分钟数
-            </Text>
+          <View>
+            <View style={styles.topicProgressInfo}>
+              <Text style={styles.topicProgressText}>
+                🧘 92个修法进度模式
+              </Text>
+              <Text style={styles.topicProgressSubtext}>
+                记录时需要选择具体修法主题和时长分钟数
+              </Text>
+            </View>
+            
+            <View style={styles.inputRow}>
+              <Text style={styles.inputPrefix}>每周目标</Text>
+              <TextInput
+                style={styles.textInput}
+                value={sessionsTarget}
+                onChangeText={setSessionsTarget}
+                placeholder="例如: 4"
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputUnit}>座</Text>
+            </View>
           </View>
         ) : (
           <>
@@ -560,7 +574,7 @@ export default function PracticeConfigScreen() {
               {configMode === 'topic_progress' ? (
                 <View>
                   <Text style={styles.summaryText}>
-                    🎯 法门进度模式：92个修法，每周至少4座观修
+                    🎯 法门进度模式：92个修法，每周目标 {sessionsTarget || 4} 座观修
                   </Text>
                   <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始
