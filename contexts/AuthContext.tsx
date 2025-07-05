@@ -51,14 +51,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
 
-            // Create user in database if doesn't exist (non-blocking)
-            await ensureUserInDatabase(session.user);
+            // Set user immediately
             setUser({
               id: session.user.id,
               email: session.user.email!,
               dharma_name: session.user.user_metadata?.dharma_name,
             });
             console.log('✅ User state set successfully');
+
+            // Database sync is optional and non-blocking
+            ensureUserInDatabase(session.user).catch(err => {
+              console.log('⚠️ Database sync failed but continuing:', err.message);
+            });
           } else if (session?.user && !session.user.email_confirmed_at) {
             console.log('⏳ User exists but email not verified');
             setUser(null);
@@ -80,7 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔍 Checking auth state...');
       setLoading(true);
 
-      const { data: { session }, error } = await supabase.auth.getSession();
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Auth check timeout')), 10000);
+      });
+
+      const authPromise = supabase.auth.getSession();
+
+      const { data: { session }, error } = await Promise.race([authPromise, timeoutPromise]) as any;
 
       if (error) {
         console.error('❌ Auth session error:', error);
@@ -92,15 +103,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user && session.user.email_confirmed_at) {
         console.log('✅ Found verified session for:', session.user.email);
 
-        // Create user in database if doesn't exist (non-blocking)
-        await ensureUserInDatabase(session.user);
-
+        // Set user immediately, database sync is optional
         setUser({
           id: session.user.id,
           email: session.user.email!,
           dharma_name: session.user.user_metadata?.dharma_name,
         });
         console.log('✅ User state set successfully');
+
+        // Create user in database if doesn't exist (non-blocking, doesn't affect loading)
+        ensureUserInDatabase(session.user).catch(err => {
+          console.log('⚠️ Database sync failed but continuing:', err.message);
+        });
       } else if (session?.user && !session.user.email_confirmed_at) {
         console.log('⏳ User exists but email not verified');
         setUser(null);
@@ -110,6 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('❌ Auth check error:', error);
+      // Don't let auth errors prevent the app from loading
       setUser(null);
     } finally {
       setLoading(false);
