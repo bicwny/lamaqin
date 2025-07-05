@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -17,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { getCurrentWeekStart } from '@/lib/topic-progress';
 
 interface Practice {
   id: string;
@@ -36,19 +36,20 @@ export default function PracticeConfigScreen() {
 
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  
+
   // Main configuration mode
   const [configMode, setConfigMode] = useState<'total' | 'daily' | 'topic_progress' | 'fixed_duration'>(
     practiceType === 'time' ? 'topic_progress' : 'total'
   );
-  
+
   // Count-based configuration
   const [totalTarget, setTotalTarget] = useState('');
   const [dailyTarget, setDailyTarget] = useState('');
-  
-  // Time-based configuration (weekly only)
+
+  // Time-based configuration
+  const [frequencyMode, setFrequencyMode] = useState<'weekly' | 'daily'>('weekly');
   const [sessionsTarget, setSessionsTarget] = useState('4'); // Default 4 sessions per week
-  
+
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -60,6 +61,10 @@ export default function PracticeConfigScreen() {
   const [suggestedDaily, setSuggestedDaily] = useState(0);
   const [projectedTotal, setProjectedTotal] = useState(0);
   const [calculatedDays, setCalculatedDays] = useState(0);
+
+  const [targetPeriod, setTargetPeriod] = useState<'daily' | 'weekly'>('weekly');
+  const [goalType, setGoalType] = useState<'fixed_duration' | 'topic_progress'>('fixed_duration');
+  const [weeklyTopicTarget, setWeeklyTopicTarget] = useState(2);
 
   useEffect(() => {
     calculateSuggestions();
@@ -144,7 +149,7 @@ export default function PracticeConfigScreen() {
         const days = getDurationInDays();
         endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
         targetPeriod = 'daily';
-        
+
         if (configMode === 'total') {
           finalTotalTarget = parseInt(totalTarget);
           finalDailyTarget = Math.ceil(finalTotalTarget / days);
@@ -153,20 +158,25 @@ export default function PracticeConfigScreen() {
           finalTotalTarget = finalDailyTarget * days;
         }
       } else {
-        // Time-based practices (weekly only)
+        // Time-based practices
         if (configMode === 'topic_progress') {
           // For topic progress: 92 topics, user sets weekly goal
           finalTotalTarget = 92; // 92 meditation topics
-          finalDailyTarget = parseInt(sessionsTarget); // Weekly sessions
+          finalDailyTarget = 4; // Default weekly sessions
           targetPeriod = 'weekly';
           // No end date for topic progress - it ends when all 92 topics are completed
         } else {
           // Fixed duration mode
           const days = getDurationInDays();
           endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-          finalDailyTarget = parseInt(sessionsTarget); // Weekly sessions
-          targetPeriod = 'weekly';
-          finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
+          finalDailyTarget = parseInt(sessionsTarget);
+          targetPeriod = frequencyMode;
+
+          if (frequencyMode === 'weekly') {
+            finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
+          } else {
+            finalTotalTarget = finalDailyTarget * days;
+          }
         }
       }
 
@@ -297,6 +307,7 @@ export default function PracticeConfigScreen() {
             ]}
             onPress={() => {
               setConfigMode('topic_progress');
+              setFrequencyMode('weekly');
               setSessionsTarget('4');
             }}
           >
@@ -330,31 +341,55 @@ export default function PracticeConfigScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>2. 修行频率</Text>
-        
+
         {configMode === 'topic_progress' ? (
           <View style={styles.topicProgressInfo}>
             <Text style={styles.topicProgressText}>
-              🧘 92个修法，每周至少4座
+              🧘 92个修法，每个修法每周至少4座
             </Text>
             <Text style={styles.topicProgressSubtext}>
               记录时需要选择具体修法主题和时长分钟数
             </Text>
-            <View style={styles.inputRow}>
-              <Text style={styles.inputPrefix}>每周完成</Text>
-              <TextInput
-                style={styles.textInput}
-                value={sessionsTarget}
-                onChangeText={setSessionsTarget}
-                placeholder="例如: 4"
-                keyboardType="numeric"
-              />
-              <Text style={styles.inputUnit}>座</Text>
-            </View>
           </View>
         ) : (
-          <View style={styles.inputContainer}>
+          <>
+            <View style={styles.segmentedControl}>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  frequencyMode === 'weekly' && styles.segmentButtonActive,
+                ]}
+                onPress={() => setFrequencyMode('weekly')}
+              >
+                <Text
+                  style={[
+                    styles.segmentButtonText,
+                    frequencyMode === 'weekly' && styles.segmentButtonTextActive,
+                  ]}
+                >
+                  每周
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  frequencyMode === 'daily' && styles.segmentButtonActive,
+                ]}
+                onPress={() => setFrequencyMode('daily')}
+              >
+                <Text
+                  style={[
+                    styles.segmentButtonText,
+                    frequencyMode === 'daily' && styles.segmentButtonTextActive,
+                  ]}
+                >
+                  每日
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.inputRow}>
-              <Text style={styles.inputPrefix}>每周完成</Text>
+              <Text style={styles.inputPrefix}>{frequencyMode === 'weekly' ? '每周' : '每日'}完成</Text>
               <TextInput
                 style={styles.textInput}
                 value={sessionsTarget}
@@ -364,7 +399,7 @@ export default function PracticeConfigScreen() {
               />
               <Text style={styles.inputUnit}>座</Text>
             </View>
-          </View>
+          </>
         )}
       </View>
     </>
@@ -373,7 +408,7 @@ export default function PracticeConfigScreen() {
   const renderTimePlanning = () => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>3. 时间规划</Text>
-      
+
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>开始时间</Text>
         <TouchableOpacity
@@ -383,7 +418,7 @@ export default function PracticeConfigScreen() {
           <Text style={styles.dateButtonText}>{formatDate(startDate)}</Text>
           <Text style={styles.dateButtonIcon}>📅</Text>
         </TouchableOpacity>
-        
+
         {showStartDatePicker && (
           <DateTimePicker
             value={startDate}
@@ -435,7 +470,7 @@ export default function PracticeConfigScreen() {
               </TouchableOpacity>
             ))}
           </View>
-          
+
           <TouchableOpacity
             style={[
               styles.customButton,
@@ -463,7 +498,7 @@ export default function PracticeConfigScreen() {
                 <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
                 <Text style={styles.dateButtonIcon}>📅</Text>
               </TouchableOpacity>
-              
+
               {showCustomDatePicker && (
                 <DateTimePicker
                   value={customEndDate}
@@ -487,7 +522,7 @@ export default function PracticeConfigScreen() {
 
   const renderSmartSummary = () => {
     const days = calculatedDays;
-    
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>4. 智能总结</Text>
@@ -525,7 +560,7 @@ export default function PracticeConfigScreen() {
               {configMode === 'topic_progress' ? (
                 <View>
                   <Text style={styles.summaryText}>
-                    🎯 法门进度模式：92个修法，每周 {sessionsTarget} 座观修
+                    🎯 法门进度模式：92个修法，每周至少4座观修
                   </Text>
                   <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始
@@ -543,10 +578,10 @@ export default function PracticeConfigScreen() {
                     🎯 固定时长模式：在约 {days} 天内完成
                   </Text>
                   <Text style={styles.summaryText}>
-                    📅 从 {formatDate(startDate)} 开始，每周 {sessionsTarget} 座观修
+                    📅 从 {formatDate(startDate)} 开始，{frequencyMode === 'weekly' ? '每周' : '每日'} {sessionsTarget} 座观修
                   </Text>
                   <Text style={styles.summaryHighlight}>
-                    👉 预计总计完成约 {Math.ceil(days / 7) * parseInt(sessionsTarget)} 座观修
+                    👉 预计总计完成约 {Math.ceil(days / (frequencyMode === 'weekly' ? 7 : 1)) * parseInt(sessionsTarget)} 座观修
                   </Text>
                 </View>
               ) : (
@@ -851,5 +886,47 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
+  },
+  specialSection: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+  },
+  topicProgressConfig: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  configLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  configDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    textAlign: 'center',
+    minWidth: 60,
+    backgroundColor: '#fff',
+  },
+  helpText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

@@ -233,7 +233,8 @@ export const practiceService = {
     startDate?: string,
     targetEndDate?: string,
     targetPeriod?: 'daily' | 'weekly',
-    themeId?: string
+    themeId?: string,
+    goalType?: string
   ) {
     const { data, error } = await supabase
       .from('user_practice_projects')
@@ -246,6 +247,7 @@ export const practiceService = {
         start_date: startDate || new Date().toISOString().split('T')[0],
         target_end_date: targetEndDate || null,
         target_period: targetPeriod || 'daily',
+        goal_type: goalType || 'fixed_duration',
         status: 'active'
       })
       .select()
