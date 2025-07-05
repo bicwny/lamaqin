@@ -30,8 +30,12 @@ function RootLayoutNav() {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
         console.log('✅ User authenticated, should show tabs');
+        // Ensure we're on the tabs route
+        router.replace('/(tabs)/index');
       } else {
         console.log('❌ No user, should show auth');
+        // Ensure we're on the auth route
+        router.replace('/auth/login');
       }
     } else {
       console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
@@ -55,6 +59,7 @@ function RootLayoutNav() {
   return (
     <Stack 
       screenOptions={{ headerShown: false }}
+      initialRouteName={user ? "(tabs)" : "auth"}
     >
       {user ? (
         <>
@@ -73,13 +78,15 @@ function RootLayoutNav() {
           />
         </>
       ) : (
-        <Stack.Screen 
-          name="auth" 
-          options={{ 
-            headerShown: false,
-            presentation: 'card'
-          }} 
-        />
+        <>
+          <Stack.Screen 
+            name="auth" 
+            options={{ 
+              headerShown: false,
+              presentation: 'card'
+            }} 
+          />
+        </>
       )}
     </Stack>
   );

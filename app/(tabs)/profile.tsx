@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Modal, Share } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -27,7 +25,7 @@ interface TodaySummary {
 }
 
 export default function ProfileScreen() {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut, clearAllCache, loading } = useAuth();
   const router = useRouter();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -41,7 +39,7 @@ export default function ProfileScreen() {
       isSigningOut,
       timestamp: new Date().toISOString()
     });
-    
+
     if (!loading && !user && !isSigningOut) {
       console.log('🔵 Profile: No user found after loading completed, redirecting to login');
       console.log('🔵 Profile: Redirect conditions met - loading:', loading, 'user:', user, 'isSigningOut:', isSigningOut);
@@ -220,7 +218,30 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
   };
 
   const handleChangeEmail = () => {
-    Alert.alert('更换邮箱', '📧 邮箱更换功能正在开发中');
+    console.log('Change email pressed');
+  };
+
+  const handleClearCache = () => {
+    Alert.alert(
+      '清除所有缓存',
+      '这将清除所有缓存数据、登录信息和存储。您需要重新登录。确定继续吗？',
+      [
+        { text: '取消', style: 'cancel' },
+        { 
+          text: '确定清除', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              console.log('🧹 Cache clear initiated from profile');
+              await clearAllCache();
+            } catch (error) {
+              console.error('Cache clear error:', error);
+              Alert.alert('清除失败', '请稍后重试');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -321,7 +342,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             <Text style={styles.dataButtonText}>🔄 备份恢复</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.dataButton}>
+          <TouchableOpacity style={styles.dataButton} onPress={handleClearCache}>
             <Text style={styles.dataButtonText}>🗑️ 清除缓存</Text>
           </TouchableOpacity>
         </ThemedView>

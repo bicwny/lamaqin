@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
+import { Platform } from 'react-native';
 
 interface User {
   id: string;
@@ -15,6 +16,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, dharmaName?: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   forceLogoutAll: () => Promise<void>;
+  clearAllCache: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('🔄 Session event:', event);
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Session maintained for:', session.user.email);
-            
+
             // Store session data
             try {
               await AsyncStorage.setItem('sb-repl-auth-token', JSON.stringify(session));
@@ -283,7 +285,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Clear ALL possible storage locations
       console.log('🧹 AuthContext: Clearing ALL storage locations...');
-      
+
       // AsyncStorage (React Native) - only if window is available
       if (typeof window !== 'undefined') {
         try {
@@ -296,7 +298,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('⚠️ Error clearing AsyncStorage:', storageError);
         }
       }
-      
+
       // Web localStorage (if available)
       if (typeof window !== 'undefined' && window.localStorage) {
         window.localStorage.removeItem('supabase.auth.token');
@@ -304,7 +306,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.localStorage.removeItem('@user_session');
         console.log('🧹 AuthContext: Web localStorage cleared');
       }
-      
+
       // Web sessionStorage (if available) 
       if (typeof window !== 'undefined' && window.sessionStorage) {
         window.sessionStorage.removeItem('supabase.auth.token');
@@ -312,7 +314,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.sessionStorage.removeItem('@user_session');
         console.log('🧹 AuthContext: Web sessionStorage cleared');
       }
-      
+
       console.log('✅ AuthContext: All storage cleared');
 
       // Call Supabase signOut with global scope to clear all sessions
@@ -351,7 +353,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🛡️ AuthContext: Force clearing user state due to error');
       setUser(null);
       setLoading(false);
-      
+
       // Force clear storage even on error
       try {
         await AsyncStorage.clear();
@@ -362,8 +364,81 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (clearError) {
         console.error('❌ Error clearing storage:', clearError);
       }
-      
+
       throw error;
+    }
+  };
+
+  const clearAllCache = async () => {
+    try {
+      console.log('🧹 Starting comprehensive cache clear');
+      setLoading(true);
+
+      // 1. Clear AsyncStorage
+      console.log('📱 Clearing AsyncStorage');
+      await AsyncStorage.clear();
+
+      // 2. Clear Supabase session
+      console.log('🔐 Clearing Supabase session');
+      await supabase.auth.signOut({ scope: 'global' });
+
+      // 3. Clear web storage if on web platform
+      if (Platform.OS === 'web') {
+        console.log('🌐 Clearing web storage');
+        if (typeof window !== 'undefined') {
+          // Clear localStorage
+          window.localStorage.clear();
+          // Clear sessionStorage
+          window.sessionStorage.clear();
+          // Clear IndexedDB (Supabase uses this)
+          if (window.indexedDB) {
+            const databases = await window.indexedDB.databases();
+            await Promise.all(
+              databases.map(db => {
+                if (db.name) {
+                  return new Promise((resolve, reject) => {
+                    const deleteReq = window.indexedDB.deleteDatabase(db.name!);
+                    deleteReq.onsuccess = () => resolve(void 0);
+                    deleteReq.onerror = () => reject(deleteReq.error);
+                  });
+                }
+              })
+            );
+          }
+        }
+      }
+
+      // 4. Clear Expo SecureStore if available
+      try {
+        const { SecureStore } = await import('expo-secure-store');
+        console.log('🔒 Clearing Expo SecureStore');
+        const keys = await SecureStore.getItemAsync('supabase.auth.token');
+        if (keys) {
+          await SecureStore.deleteItemAsync('supabase.auth.token');
+        }
+      } catch (e) {
+        console.log('ℹ️ SecureStore not available or already cleared');
+      }
+
+      // 5. Reset user state
+      console.log('👤 Resetting user state');
+      setUser(null);
+
+      // 6. Force app reload on web
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        console.log('🔄 Reloading app');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }
+
+      console.log('✅ Cache cleared successfully');
+
+    } catch (error) {
+      console.error('❌ Cache clear error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -427,7 +502,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('❌ AuthContext: Error ensuring user in database:', errorMessage);
       console.log('⚠️ AuthContext: Continuing without database sync due to error');
-      
+
       // Optional: You could set a flag here to retry later or show a warning to the user
       // For now, we continue gracefully as designed
     }
@@ -436,10 +511,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const forceLogoutAll = async () => {
     try {
       console.log('🚨 FORCE LOGOUT: Starting complete authentication cleanup...');
-      
+
       setLoading(true);
       setUser(null);
-      
+
       // Clear ALL storage aggressively
       try {
         await AsyncStorage.clear();
@@ -447,7 +522,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         console.log('⚠️ FORCE LOGOUT: AsyncStorage clear failed:', e);
       }
-      
+
       // Clear web storage
       if (typeof window !== 'undefined') {
         try {
@@ -458,7 +533,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('⚠️ FORCE LOGOUT: Web storage clear failed:', e);
         }
       }
-      
+
       // Multiple Supabase logout attempts
       try {
         await supabase.auth.signOut({ scope: 'global' });
@@ -471,9 +546,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('⚠️ FORCE LOGOUT: Local signout also failed:', e2);
         }
       }
-      
+
       setLoading(false);
-      
+
       // Force reload on web
       if (typeof window !== 'undefined') {
         console.log('🔄 FORCE LOGOUT: Reloading page in 1 second...');
@@ -481,7 +556,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           window.location.href = window.location.origin;
         }, 1000);
       }
-      
+
       console.log('🎉 FORCE LOGOUT: Complete cleanup finished');
     } catch (error) {
       console.error('❌ FORCE LOGOUT: Error during cleanup:', error);
@@ -491,7 +566,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, forceLogoutAll }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, forceLogoutAll, clearAllCache }}>
       {children}
     </AuthContext.Provider>
   );
