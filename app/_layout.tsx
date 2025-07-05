@@ -43,31 +43,44 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack 
-      screenOptions={{ headerShown: false }}
-      initialRouteName={user ? "(tabs)" : "auth"}
-    >
-      <Stack.Screen 
-        name="auth" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="(tabs)" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="meditation-history" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
+    <Stack screenOptions={{ headerShown: false }}>
+      {user ? (
+        <>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen 
+            name="meditation-history" 
+            options={{ 
+              headerShown: false,
+              presentation: 'card'
+            }} 
+          />
+          <Stack.Screen 
+            name="auth" 
+            options={{ 
+              headerShown: false,
+              presentation: 'modal'
+            }} 
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="auth" />
+          <Stack.Screen 
+            name="(tabs)" 
+            options={{ 
+              headerShown: false,
+              presentation: 'modal'
+            }} 
+          />
+          <Stack.Screen 
+            name="meditation-history" 
+            options={{ 
+              headerShown: false,
+              presentation: 'card'
+            }} 
+          />
+        </>
+      )}
     </Stack>
   );
 }
