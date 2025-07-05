@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   View,
@@ -16,6 +15,19 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+
+// Helper function to validate date format (YYYY-MM-DD)
+const isValidDate = (dateString: string): boolean => {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+
+  const date = new Date(dateString);
+  const timestamp = date.getTime();
+
+  if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) return false;
+
+  return date.toISOString().slice(0, 10) === dateString;
+};
 
 export default function PracticeConfigScreen() {
   const { user } = useAuth();
@@ -51,7 +63,7 @@ export default function PracticeConfigScreen() {
 
   const getDurationDays = () => {
     if (practiceType !== 'count') return 0;
-    
+
     if (formData.durationType === 'custom') {
       if (!formData.customEndDate) return 0;
       const startDate = new Date(formData.startDate);
@@ -59,7 +71,7 @@ export default function PracticeConfigScreen() {
       const diffTime = endDate.getTime() - startDate.getTime();
       return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
-    
+
     switch (formData.durationType) {
       case '30': return 30;
       case '60': return 60;
@@ -132,7 +144,7 @@ export default function PracticeConfigScreen() {
         const durationDays = parseInt(formData.duration);
         const sessionsPerDay = parseInt(formData.dailyTarget);
         finalTargetCount = sessionsPerDay * durationDays;
-        
+
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + durationDays);
         targetEndDate = endDate.toISOString().split('T')[0];
@@ -313,14 +325,31 @@ export default function PracticeConfigScreen() {
 
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>开始日期</Text>
-          <TouchableOpacity
-            style={styles.datePickerButton}
-            onPress={() => setShowStartDatePicker(true)}
-          >
-            <Text style={styles.datePickerButtonText}>
-              {formData.startDate || new Date().toISOString().split('T')[0]}
-            </Text>
-          </TouchableOpacity>
+          {Platform.OS === 'web' ? (
+            <>
+              <TextInput
+                style={[
+                  styles.input,
+                  Platform.OS === 'web' && formData.startDate && !isValidDate(formData.startDate) && styles.inputError
+                ]}
+                value={formData.startDate || new Date().toISOString().split('T')[0]}
+                onChangeText={(text) => setFormData({...formData, startDate: text})}
+                placeholder="YYYY-MM-DD"
+              />
+              {Platform.OS === 'web' && formData.startDate && !isValidDate(formData.startDate) && (
+                <Text style={styles.errorText}>请输入有效日期 (YYYY-MM-DD)</Text>
+              )}
+            </>
+          ) : (
+            <TouchableOpacity
+              style={styles.datePickerButton}
+              onPress={() => setShowStartDatePicker(true)}
+            >
+              <Text style={styles.datePickerButtonText}>
+                {formData.startDate || new Date().toISOString().split('T')[0]}
+              </Text>
+            </TouchableOpacity>
+          )}
           {showStartDatePicker && (
             <DateTimePicker
               value={new Date(formData.startDate || new Date().toISOString().split('T')[0])}
@@ -374,14 +403,31 @@ export default function PracticeConfigScreen() {
         {formData.durationType === 'custom' && (
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>结束日期</Text>
-            <TouchableOpacity
-              style={styles.datePickerButton}
-              onPress={() => setShowEndDatePicker(true)}
-            >
-              <Text style={styles.datePickerButtonText}>
-                {formData.customEndDate || '选择结束日期'}
-              </Text>
-            </TouchableOpacity>
+            {Platform.OS === 'web' ? (
+              <>
+                <TextInput
+                  style={[
+                    styles.input,
+                    Platform.OS === 'web' && formData.customEndDate && !isValidDate(formData.customEndDate) && styles.inputError
+                  ]}
+                  value={formData.customEndDate || ''}
+                  onChangeText={(text) => setFormData({...formData, customEndDate: text})}
+                  placeholder="YYYY-MM-DD"
+                />
+                {Platform.OS === 'web' && formData.customEndDate && !isValidDate(formData.customEndDate) && (
+                  <Text style={styles.errorText}>请输入有效日期 (YYYY-MM-DD)</Text>
+                )}
+              </>
+            ) : (
+              <TouchableOpacity
+                style={styles.datePickerButton}
+                onPress={() => setShowEndDatePicker(true)}
+              >
+                <Text style={styles.datePickerButtonText}>
+                  {formData.customEndDate || '选择结束日期'}
+                </Text>
+              </TouchableOpacity>
+            )}
             {showEndDatePicker && (
               <DateTimePicker
                 value={formData.customEndDate ? new Date(formData.customEndDate) : new Date()}
@@ -416,7 +462,7 @@ export default function PracticeConfigScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: '配置修法目标', headerShown: true }} />
-      
+
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
@@ -631,5 +677,13 @@ const styles = StyleSheet.create({
   datePickerButtonText: {
     fontSize: 16,
     color: Colors.text,
+  },
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
