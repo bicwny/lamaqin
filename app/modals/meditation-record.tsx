@@ -3,14 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
+  ScrollView,
   ToastAndroid,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
@@ -136,10 +136,10 @@ export default function MeditationRecordScreen() {
       } else {
         const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
         console.log('✅ Record saved successfully');
-        
+
         // Show success toast
         showToast('观修记录已保存成功');
-        
+
         // Navigate back to practice page
         router.back();
       }

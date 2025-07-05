@@ -48,7 +48,7 @@ export default function PracticeConfigScreen() {
   
   // Time-based configuration
   const [targetPeriod, setTargetPeriod] = useState<'daily' | 'weekly'>('weekly');
-  const [sessionTarget, setSessionTarget] = useState('');
+  const [sessionTarget, setSessionTarget] = useState('4'); // Default 4 sessions per week for topic progress
   
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
@@ -121,6 +121,7 @@ export default function PracticeConfigScreen() {
       return;
     }
 
+    // Validation
     if (practiceType === 'count') {
       if (targetMode === 'total' && !totalTarget) {
         Alert.alert('错误', '请输入总目标数量');
@@ -131,7 +132,7 @@ export default function PracticeConfigScreen() {
         return;
       }
     } else {
-      if (!sessionTarget) {
+      if (targetMode === 'fixed_duration' && !sessionTarget) {
         Alert.alert('错误', '请输入座数目标');
         return;
       }
@@ -140,13 +141,14 @@ export default function PracticeConfigScreen() {
     setLoading(true);
 
     try {
-      const days = getDurationInDays();
-      const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-
       let finalTotalTarget: number;
       let finalDailyTarget: number;
+      let endDate: Date | null = null;
 
       if (practiceType === 'count') {
+        const days = getDurationInDays();
+        endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+        
         if (targetMode === 'total') {
           finalTotalTarget = parseInt(totalTarget);
           finalDailyTarget = Math.ceil(finalTotalTarget / days);
@@ -156,30 +158,35 @@ export default function PracticeConfigScreen() {
         }
       } else {
         if (targetMode === 'topic_progress') {
-          // For topic progress, set total target to 92 (total meditation topics)
-          finalTotalTarget = 92;
-          finalDailyTarget = parseInt(sessionTarget);
+          // For topic progress: 92 topics, minimum 4 sessions per week per topic
+          finalTotalTarget = 92; // 92 meditation topics
+          finalDailyTarget = 4; // Weekly sessions (stored as daily_target for weekly period)
+          // No end date for topic progress - it ends when all 92 topics are completed
         } else {
-          // For fixed duration
-          finalTotalTarget = parseInt(sessionTarget) * (targetPeriod === 'weekly' ? Math.ceil(days / 7) : days);
+          // Fixed duration mode
+          const days = getDurationInDays();
+          endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
           finalDailyTarget = parseInt(sessionTarget);
+          finalTotalTarget = finalDailyTarget * (targetPeriod === 'weekly' ? Math.ceil(days / 7) : days);
         }
       }
 
+      const projectData = {
+        user_id: user.id,
+        practice_id: practiceId,
+        target_count: finalTotalTarget,
+        daily_target: finalDailyTarget,
+        target_period: practiceType === 'time' ? (targetMode === 'topic_progress' ? 'weekly' : targetPeriod) : 'daily',
+        start_date: startDate.toISOString().split('T')[0],
+        target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
+        status: 'active',
+        current_count: 0,
+        goal_type: practiceType === 'time' ? targetMode : 'fixed_duration',
+      };
+
       const { error } = await supabase
         .from('user_practice_projects')
-        .insert({
-          user_id: user.id,
-          practice_id: practiceId,
-          target_count: finalTotalTarget,
-          daily_target: finalDailyTarget,
-          target_period: practiceType === 'time' ? targetPeriod : 'daily',
-          start_date: startDate.toISOString().split('T')[0],
-          target_end_date: practiceType === 'time' && targetMode === 'topic_progress' ? null : endDate.toISOString().split('T')[0],
-          status: 'not_started',
-          current_count: 0,
-          goal_type: practiceType === 'time' ? targetMode : 'fixed_duration',
-        });
+        .insert(projectData);
 
       if (error) throw error;
 
@@ -281,17 +288,20 @@ export default function PracticeConfigScreen() {
 
   const renderTimeBasedConfig = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>2. 目标详情</Text>
+      <Text style={styles.sectionTitle}>1. 您想如何设定目标？</Text>
       
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>时间规划模式</Text>
         <View style={styles.segmentedControl}>
           <TouchableOpacity
             style={[
               styles.segmentButton,
               targetMode === 'topic_progress' && styles.segmentButtonActive,
             ]}
-            onPress={() => setTargetMode('topic_progress')}
+            onPress={() => {
+              setTargetMode('topic_progress');
+              setTargetPeriod('weekly');
+              setSessionTarget('4');
+            }}
           >
             <Text
               style={[
@@ -322,60 +332,74 @@ export default function PracticeConfigScreen() {
       </View>
       
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>修行频率</Text>
-        <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            style={[
-              styles.segmentButton,
-              targetPeriod === 'weekly' && styles.segmentButtonActive,
-            ]}
-            onPress={() => setTargetPeriod('weekly')}
-          >
-            <Text
-              style={[
-                styles.segmentButtonText,
-                targetPeriod === 'weekly' && styles.segmentButtonTextActive,
-              ]}
-            >
-              每周
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.segmentButton,
-              targetPeriod === 'daily' && styles.segmentButtonActive,
-            ]}
-            onPress={() => setTargetPeriod('daily')}
-          >
-            <Text
-              style={[
-                styles.segmentButtonText,
-                targetPeriod === 'daily' && styles.segmentButtonTextActive,
-              ]}
-            >
-              每日
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.inputLabel}>2. 修行频率</Text>
         
-        <View style={styles.inputRow}>
-          <Text style={styles.inputPrefix}>{targetPeriod === 'weekly' ? '每周' : '每日'}完成</Text>
-          <TextInput
-            style={styles.textInput}
-            value={sessionTarget}
-            onChangeText={setSessionTarget}
-            placeholder="例如: 4"
-            keyboardType="numeric"
-          />
-          <Text style={styles.inputUnit}>座</Text>
-        </View>
+        {targetMode === 'topic_progress' ? (
+          <View style={styles.topicProgressInfo}>
+            <Text style={styles.topicProgressText}>
+              🧘 92个修法，每个修法每周至少 4 座
+            </Text>
+            <Text style={styles.topicProgressSubtext}>
+              记录时需要选择具体修法主题和时长
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.segmentedControl}>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  targetPeriod === 'weekly' && styles.segmentButtonActive,
+                ]}
+                onPress={() => setTargetPeriod('weekly')}
+              >
+                <Text
+                  style={[
+                    styles.segmentButtonText,
+                    targetPeriod === 'weekly' && styles.segmentButtonTextActive,
+                  ]}
+                >
+                  每周
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  targetPeriod === 'daily' && styles.segmentButtonActive,
+                ]}
+                onPress={() => setTargetPeriod('daily')}
+              >
+                <Text
+                  style={[
+                    styles.segmentButtonText,
+                    targetPeriod === 'daily' && styles.segmentButtonTextActive,
+                  ]}
+                >
+                  每日
+                </Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.inputRow}>
+              <Text style={styles.inputPrefix}>{targetPeriod === 'weekly' ? '每周' : '每日'}完成</Text>
+              <TextInput
+                style={styles.textInput}
+                value={sessionTarget}
+                onChangeText={setSessionTarget}
+                placeholder="例如: 4"
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputUnit}>座</Text>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
 
   const renderTimePlanning = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>3. 时间规划</Text>
+      <Text style={styles.sectionTitle}>3. 时间计划</Text>
       
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>开始时间</Text>
@@ -402,8 +426,19 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      {/* Only show duration selection for fixed_duration mode */}
-      {(practiceType === 'count' || targetMode === 'fixed_duration') && (
+      {targetMode === 'topic_progress' ? (
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>修行规划</Text>
+          <View style={styles.topicProgressInfo}>
+            <Text style={styles.topicProgressText}>
+              📚 将按照法门进度进行，从今天开始
+            </Text>
+            <Text style={styles.topicProgressSubtext}>
+              每个修法每周至少4座，直到92个修法全部完成
+            </Text>
+          </View>
+        </View>
+      ) : (
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>持续时间</Text>
           <View style={styles.durationOptions}>
@@ -499,31 +534,35 @@ export default function PracticeConfigScreen() {
             </View>
           ) : (
             <View>
-              {sessionTarget && (
+              {targetMode === 'topic_progress' ? (
                 <View>
-                  {targetMode === 'topic_progress' ? (
-                    <View>
-                      <Text style={styles.summaryText}>
-                        您将按照法门进度修行，{targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
-                      </Text>
-                      <Text style={styles.summaryHighlight}>
-                        👉 将持续到92个修法全部完成为止。
-                      </Text>
-                    </View>
-                  ) : (
-                    <View>
-                      <Text style={styles.summaryText}>
-                        您需要在约 {days} 天内完成，
-                      </Text>
-                      <Text style={styles.summaryText}>
-                        {targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
-                      </Text>
-                      <Text style={styles.summaryHighlight}>
-                        👉 预计总计完成约 {Math.ceil(days / (targetPeriod === 'weekly' ? 7 : 1)) * parseInt(sessionTarget)} 座观修。
-                      </Text>
-                    </View>
-                  )}
+                  <Text style={styles.summaryText}>
+                    🎯 法门进度模式：92个修法，每周至少4座观修
+                  </Text>
+                  <Text style={styles.summaryText}>
+                    📅 从 {formatDate(startDate)} 开始
+                  </Text>
+                  <Text style={styles.summaryHighlight}>
+                    👉 记录时需选择具体修法主题和观修时长
+                  </Text>
+                  <Text style={styles.summaryHighlight}>
+                    🏁 将持续到92个修法全部完成为止
+                  </Text>
                 </View>
+              ) : sessionTarget ? (
+                <View>
+                  <Text style={styles.summaryText}>
+                    🎯 固定时长模式：在约 {days} 天内完成
+                  </Text>
+                  <Text style={styles.summaryText}>
+                    📅 从 {formatDate(startDate)} 开始，{targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修
+                  </Text>
+                  <Text style={styles.summaryHighlight}>
+                    👉 预计总计完成约 {Math.ceil(days / (targetPeriod === 'weekly' ? 7 : 1)) * parseInt(sessionTarget)} 座观修
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.summaryText}>请设置座数目标以查看建议。</Text>
               )}
             </View>
           )}
@@ -792,6 +831,25 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     lineHeight: 22,
     marginTop: 8,
+  },
+  topicProgressInfo: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4a90e2',
+    marginTop: 8,
+  },
+  topicProgressText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  topicProgressSubtext: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    lineHeight: 20,
   },
   saveButton: {
     backgroundColor: Colors.primary,

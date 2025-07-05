@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -260,7 +259,7 @@ export default function PracticeScreen() {
               </View>
 
               <Text style={styles.practiceName}>{project.practices.name}</Text>
-              
+
               <View style={styles.progressContainer}>
                 {project.practices.type === 'count' ? (
                   <View>
