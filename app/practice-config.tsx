@@ -46,17 +46,15 @@ export default function PracticeConfigScreen() {
   const [totalTarget, setTotalTarget] = useState('');
   const [dailyTarget, setDailyTarget] = useState('');
   
-  // Time-based configuration
-  const [frequencyMode, setFrequencyMode] = useState<'weekly' | 'daily'>('weekly');
+  // Time-based configuration (weekly only)
   const [sessionsTarget, setSessionsTarget] = useState('4'); // Default 4 sessions per week
   
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
-  const [customEndDate, setCustomEndDate] = useState(new Date());
+  const [customEndDate, setCustomEndDate] = useState(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const [customDays, setCustomDays] = useState('');
 
   // Calculated values
   const [suggestedDaily, setSuggestedDaily] = useState(0);
@@ -65,7 +63,7 @@ export default function PracticeConfigScreen() {
 
   useEffect(() => {
     calculateSuggestions();
-  }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, customDays, configMode]);
+  }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, configMode]);
 
   const getDurationInDays = () => {
     const start = startDate;
@@ -85,11 +83,7 @@ export default function PracticeConfigScreen() {
         end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
         break;
       case '自定义':
-        if (customDays) {
-          end = new Date(start.getTime() + parseInt(customDays) * 24 * 60 * 60 * 1000);
-        } else {
-          end = customEndDate;
-        }
+        end = customEndDate;
         break;
       default:
         end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
@@ -159,25 +153,20 @@ export default function PracticeConfigScreen() {
           finalTotalTarget = finalDailyTarget * days;
         }
       } else {
-        // Time-based practices
+        // Time-based practices (weekly only)
         if (configMode === 'topic_progress') {
           // For topic progress: 92 topics, user sets weekly goal
           finalTotalTarget = 92; // 92 meditation topics
-          finalDailyTarget = 4; // Default weekly sessions
+          finalDailyTarget = parseInt(sessionsTarget); // Weekly sessions
           targetPeriod = 'weekly';
           // No end date for topic progress - it ends when all 92 topics are completed
         } else {
           // Fixed duration mode
           const days = getDurationInDays();
           endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-          finalDailyTarget = parseInt(sessionsTarget);
-          targetPeriod = frequencyMode;
-          
-          if (frequencyMode === 'weekly') {
-            finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
-          } else {
-            finalTotalTarget = finalDailyTarget * days;
-          }
+          finalDailyTarget = parseInt(sessionsTarget); // Weekly sessions
+          targetPeriod = 'weekly';
+          finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
         }
       }
 
@@ -308,7 +297,6 @@ export default function PracticeConfigScreen() {
             ]}
             onPress={() => {
               setConfigMode('topic_progress');
-              setFrequencyMode('weekly');
               setSessionsTarget('4');
             }}
           >
@@ -346,51 +334,13 @@ export default function PracticeConfigScreen() {
         {configMode === 'topic_progress' ? (
           <View style={styles.topicProgressInfo}>
             <Text style={styles.topicProgressText}>
-              🧘 92个修法，每个修法每周至少4座
+              🧘 92个修法，每周至少4座
             </Text>
             <Text style={styles.topicProgressSubtext}>
               记录时需要选择具体修法主题和时长分钟数
             </Text>
-          </View>
-        ) : (
-          <>
-            <View style={styles.segmentedControl}>
-              <TouchableOpacity
-                style={[
-                  styles.segmentButton,
-                  frequencyMode === 'weekly' && styles.segmentButtonActive,
-                ]}
-                onPress={() => setFrequencyMode('weekly')}
-              >
-                <Text
-                  style={[
-                    styles.segmentButtonText,
-                    frequencyMode === 'weekly' && styles.segmentButtonTextActive,
-                  ]}
-                >
-                  每周
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.segmentButton,
-                  frequencyMode === 'daily' && styles.segmentButtonActive,
-                ]}
-                onPress={() => setFrequencyMode('daily')}
-              >
-                <Text
-                  style={[
-                    styles.segmentButtonText,
-                    frequencyMode === 'daily' && styles.segmentButtonTextActive,
-                  ]}
-                >
-                  每日
-                </Text>
-              </TouchableOpacity>
-            </View>
-            
             <View style={styles.inputRow}>
-              <Text style={styles.inputPrefix}>{frequencyMode === 'weekly' ? '每周' : '每日'}完成</Text>
+              <Text style={styles.inputPrefix}>每周完成</Text>
               <TextInput
                 style={styles.textInput}
                 value={sessionsTarget}
@@ -400,7 +350,21 @@ export default function PracticeConfigScreen() {
               />
               <Text style={styles.inputUnit}>座</Text>
             </View>
-          </>
+          </View>
+        ) : (
+          <View style={styles.inputContainer}>
+            <View style={styles.inputRow}>
+              <Text style={styles.inputPrefix}>每周完成</Text>
+              <TextInput
+                style={styles.textInput}
+                value={sessionsTarget}
+                onChangeText={setSessionsTarget}
+                placeholder="例如: 4"
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputUnit}>座</Text>
+            </View>
+          </View>
         )}
       </View>
     </>
@@ -491,14 +455,29 @@ export default function PracticeConfigScreen() {
 
           {durationMode === '自定义' && (
             <View style={styles.customInputContainer}>
-              <Text style={styles.customInputLabel}>请输入天数</Text>
-              <TextInput
-                style={styles.customInput}
-                value={customDays}
-                onChangeText={setCustomDays}
-                placeholder="例如: 90"
-                keyboardType="numeric"
-              />
+              <Text style={styles.customInputLabel}>选择结束日期</Text>
+              <TouchableOpacity
+                style={styles.customDateButton}
+                onPress={() => setShowCustomDatePicker(true)}
+              >
+                <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
+                <Text style={styles.dateButtonIcon}>📅</Text>
+              </TouchableOpacity>
+              
+              {showCustomDatePicker && (
+                <DateTimePicker
+                  value={customEndDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)} // At least one day after start
+                  onChange={(event, selectedDate) => {
+                    setShowCustomDatePicker(Platform.OS === 'ios');
+                    if (selectedDate) {
+                      setCustomEndDate(selectedDate);
+                    }
+                  }}
+                />
+              )}
             </View>
           )}
         </View>
@@ -546,7 +525,7 @@ export default function PracticeConfigScreen() {
               {configMode === 'topic_progress' ? (
                 <View>
                   <Text style={styles.summaryText}>
-                    🎯 法门进度模式：92个修法，每周至少4座观修
+                    🎯 法门进度模式：92个修法，每周 {sessionsTarget} 座观修
                   </Text>
                   <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始
@@ -564,10 +543,10 @@ export default function PracticeConfigScreen() {
                     🎯 固定时长模式：在约 {days} 天内完成
                   </Text>
                   <Text style={styles.summaryText}>
-                    📅 从 {formatDate(startDate)} 开始，{frequencyMode === 'weekly' ? '每周' : '每日'} {sessionsTarget} 座观修
+                    📅 从 {formatDate(startDate)} 开始，每周 {sessionsTarget} 座观修
                   </Text>
                   <Text style={styles.summaryHighlight}>
-                    👉 预计总计完成约 {Math.ceil(days / (frequencyMode === 'weekly' ? 7 : 1)) * parseInt(sessionsTarget)} 座观修
+                    👉 预计总计完成约 {Math.ceil(days / 7) * parseInt(sessionsTarget)} 座观修
                   </Text>
                 </View>
               ) : (
@@ -797,15 +776,20 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  customInput: {
+  customDateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 6,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    color: '#333',
+    paddingVertical: 12,
     borderWidth: 1,
     borderColor: '#e9ecef',
+  },
+  customDateButtonText: {
+    fontSize: 16,
+    color: '#333',
   },
   summaryContainer: {
     backgroundColor: '#f8f9fa',
