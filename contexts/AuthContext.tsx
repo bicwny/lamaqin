@@ -14,6 +14,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string, dharmaName?: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
+  forceLogoutAll: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -195,39 +196,82 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Set loading to true to prevent any intermediate state issues
       setLoading(true);
 
-      // Clear local storage first
-      console.log('🧹 AuthContext: Clearing local storage...');
+      // Clear ALL possible storage locations
+      console.log('🧹 AuthContext: Clearing ALL storage locations...');
+      
+      // AsyncStorage (React Native)
       await AsyncStorage.removeItem('@auth_token');
       await AsyncStorage.removeItem('@user_session');
-      console.log('✅ AuthContext: Local storage cleared');
+      await AsyncStorage.removeItem('@supabase_auth_token');
+      await AsyncStorage.removeItem('supabase.auth.token');
+      
+      // Web localStorage (if available)
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem('supabase.auth.token');
+        window.localStorage.removeItem('@auth_token');
+        window.localStorage.removeItem('@user_session');
+        console.log('🧹 AuthContext: Web localStorage cleared');
+      }
+      
+      // Web sessionStorage (if available) 
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.removeItem('supabase.auth.token');
+        window.sessionStorage.removeItem('@auth_token');
+        window.sessionStorage.removeItem('@user_session');
+        console.log('🧹 AuthContext: Web sessionStorage cleared');
+      }
+      
+      console.log('✅ AuthContext: All storage cleared');
 
-      // Call Supabase signOut first
-      console.log('🔐 AuthContext: Calling Supabase signOut...');
+      // Call Supabase signOut with global scope to clear all sessions
+      console.log('🔐 AuthContext: Calling Supabase signOut with global scope...');
       const { error } = await supabase.auth.signOut({
         scope: 'global'
       });
 
       if (error) {
         console.error('❌ AuthContext: Supabase sign out error:', error);
-        // Still clear local state even if Supabase fails
+        // Try alternative logout method
+        console.log('🔄 AuthContext: Trying alternative logout...');
+        await supabase.auth.signOut();
       } else {
         console.log('✅ AuthContext: Supabase signOut completed successfully');
       }
 
-      // Force clear user state
-      console.log('🔄 AuthContext: Clearing user state...');
+      // Force clear user state immediately
+      console.log('🔄 AuthContext: Force clearing user state...');
       setUser(null);
       setLoading(false);
       console.log('✅ AuthContext: User state cleared');
 
-      console.log('🎉 AuthContext: Logout process completed - user should be redirected to login');
+      // Force reload to ensure clean state (web only)
+      if (typeof window !== 'undefined') {
+        console.log('🔄 AuthContext: Forcing page reload for clean state...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }
+
+      console.log('🎉 AuthContext: Complete logout process finished');
     } catch (error) {
       console.error('❌ AuthContext: Logout error:', error);
       // Ensure user state is cleared regardless
       console.log('🛡️ AuthContext: Force clearing user state due to error');
       setUser(null);
       setLoading(false);
-      throw error; // Re-throw so the UI can handle it
+      
+      // Force clear storage even on error
+      try {
+        await AsyncStorage.clear();
+        if (typeof window !== 'undefined') {
+          window.localStorage.clear();
+          window.sessionStorage.clear();
+        }
+      } catch (clearError) {
+        console.error('❌ Error clearing storage:', clearError);
+      }
+      
+      throw error;
     }
   };
 
@@ -297,8 +341,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const forceLogoutAll = async () => {
+    try {
+      console.log('🚨 FORCE LOGOUT: Starting complete authentication cleanup...');
+      
+      setLoading(true);
+      setUser(null);
+      
+      // Clear ALL storage aggressively
+      try {
+        await AsyncStorage.clear();
+        console.log('✅ FORCE LOGOUT: AsyncStorage completely cleared');
+      } catch (e) {
+        console.log('⚠️ FORCE LOGOUT: AsyncStorage clear failed:', e);
+      }
+      
+      // Clear web storage
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.clear();
+          window.sessionStorage.clear();
+          console.log('✅ FORCE LOGOUT: Web storage cleared');
+        } catch (e) {
+          console.log('⚠️ FORCE LOGOUT: Web storage clear failed:', e);
+        }
+      }
+      
+      // Multiple Supabase logout attempts
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+        console.log('✅ FORCE LOGOUT: Global signout completed');
+      } catch (e) {
+        console.log('⚠️ FORCE LOGOUT: Global signout failed, trying local:', e);
+        try {
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch (e2) {
+          console.log('⚠️ FORCE LOGOUT: Local signout also failed:', e2);
+        }
+      }
+      
+      setLoading(false);
+      
+      // Force reload on web
+      if (typeof window !== 'undefined') {
+        console.log('🔄 FORCE LOGOUT: Reloading page in 1 second...');
+        setTimeout(() => {
+          window.location.href = window.location.origin;
+        }, 1000);
+      }
+      
+      console.log('🎉 FORCE LOGOUT: Complete cleanup finished');
+    } catch (error) {
+      console.error('❌ FORCE LOGOUT: Error during cleanup:', error);
+      setUser(null);
+      setLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, forceLogoutAll }}>
       {children}
     </AuthContext.Provider>
   );
