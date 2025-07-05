@@ -362,7 +362,7 @@ export default function PracticeConfigScreen() {
                 • 每个法门每周至少 {dailyTarget || 1} 座
               </Text>
               <Text style={styles.summaryText}>
-                • 计划持续 {calculatedSummary.totalDays} 天（约 {calculatedSummary.totalWeeks} 周）
+                • 从今天开始，直到修完所有法门为止
               </Text>
               <Text style={styles.summaryHighlight}>
                 👉 每周总计至少 {92 * (parseInt(dailyTarget) || 1)} 座观修（92个法门 × {dailyTarget || 1}座）
