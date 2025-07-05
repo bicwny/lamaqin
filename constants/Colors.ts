@@ -19,12 +19,12 @@ export const Colors = {
   warning: '#FF8C00',      // Dark orange
   error: '#DC143C',        // Crimson
 
-  // Tab-specific colors
-  study: '#4169E1',        // Royal blue - wisdom
-  practice: '#D4AF37',     // Golden - practice
-  mindfulness: '#FF69B4',  // Hot pink - heart
-  stats: '#32CD32',        // Lime green - growth/progress
-  profile: '#8A2BE2',      // Blue violet - personal
+  // Unified golden theme for spiritual harmony
+  study: '#D4AF37',        // Golden - unified theme
+  practice: '#D4AF37',     // Golden - unified theme
+  mindfulness: '#D4AF37',  // Golden - unified theme
+  stats: '#D4AF37',        // Golden - unified theme
+  profile: '#D4AF37',      // Golden - unified theme
 
   light: {
     text: '#2F4F4F',
@@ -38,9 +38,9 @@ export const Colors = {
     secondary: '#2F4F4F',
     textSecondary: '#696969',
     practice: '#D4AF37',
-    study: '#4682B4',
-    mindfulness: '#FF69B4',
-    stats: '#32CD32',
+    study: '#D4AF37',
+    mindfulness: '#D4AF37',
+    stats: '#D4AF37',
     profile: '#D4AF37',
   },
   dark: {
