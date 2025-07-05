@@ -332,15 +332,64 @@ export default function PracticeConfigScreen() {
       <Text style={styles.sectionTitle}>时间规划</Text>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>持续时间（天）</Text>
-        <TextInput
-          style={styles.input}
-          value={duration}
-          onChangeText={setDuration}
-          keyboardType="numeric"
-          placeholder="例如：60"
-        />
+        <Text style={styles.inputLabel}>开始时间</Text>
+        <Text style={styles.input}>今天 ({new Date().toLocaleDateString('zh-CN')})</Text>
       </View>
+
+      {practiceType === 'time' && goalType === 'topic_progress' ? (
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>结束时间</Text>
+          <Text style={styles.inputHint}>直到修完所有92个法门为止</Text>
+        </View>
+      ) : (
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>持续时间</Text>
+          <View style={styles.durationSelector}>
+            {['30', '60', '100', '365'].map((days) => (
+              <TouchableOpacity
+                key={days}
+                style={[
+                  styles.durationButton,
+                  duration === days && styles.selectedDurationButton
+                ]}
+                onPress={() => setDuration(days)}
+              >
+                <Text style={[
+                  styles.durationButtonText,
+                  duration === days && styles.selectedDurationButtonText
+                ]}>
+                  {days === '365' ? '1年' : `${days}天`}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          
+          <TouchableOpacity
+            style={[
+              styles.customDurationButton,
+              !['30', '60', '100', '365'].includes(duration) && styles.selectedDurationButton
+            ]}
+            onPress={() => setDuration('')}
+          >
+            <Text style={[
+              styles.durationButtonText,
+              !['30', '60', '100', '365'].includes(duration) && styles.selectedDurationButtonText
+            ]}>
+              自定义
+            </Text>
+          </TouchableOpacity>
+
+          {!['30', '60', '100', '365'].includes(duration) && (
+            <TextInput
+              style={[styles.input, { marginTop: 8 }]}
+              value={duration}
+              onChangeText={setDuration}
+              keyboardType="numeric"
+              placeholder="请输入天数"
+            />
+          )}
+        </View>
+      )}
     </View>
   );
 
@@ -627,5 +676,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: 'white',
+  },
+  durationSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 8,
+  },
+  durationButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  selectedDurationButton: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  durationButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedDurationButtonText: {
+    color: 'white',
+  },
+  customDurationButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    alignItems: 'center',
+    flex: 1,
   },
 });
