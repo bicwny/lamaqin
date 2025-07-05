@@ -256,90 +256,94 @@ export default function PracticeScreen() {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <Text style={styles.title}>📿 修行记录</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddPractice}>
-          <Text style={styles.addButtonText}>+ 添加修法</Text>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>📿 修行记录</Text>
+            <TouchableOpacity style={styles.addButton} onPress={handleAddPractice}>
+              <Text style={styles.addButtonText}>+ 添加修法</Text>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.projectsList}>
-        {projects.map((project) => {
-          const progress = calculateProgress(project);
-          const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
+          <View style={styles.projectsList}>
+            {projects.map((project) => {
+              const progress = calculateProgress(project);
+              const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
-          return (
-            <View key={project.id} style={styles.projectCard}>
-              <View style={styles.projectHeader}>
-                <Text style={styles.projectType}>
-                  {project.practices.type === 'count' ? '计数类' : '计时类'}
-                  {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
-                </Text>
-              </View>
-
-              <View style={styles.progressContainer}>
-                {project.practices.type === 'count' ? (
-                  <View>
-                    <Text style={styles.progressText}>
-                      {project.practices.name}
-                    </Text>
-                    <Text style={styles.progressNumbers}>
-                      {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
-                    </Text>
-                    <Text style={styles.dailyTarget}>
-                      每日目标: {project.daily_target.toLocaleString()} {project.practices.unit}
+              return (
+                <View key={project.id} style={styles.projectCard}>
+                  <View style={styles.projectHeader}>
+                    <Text style={styles.projectType}>
+                      {project.practices.type === 'count' ? '计数类' : '计时类'}
+                      {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
                     </Text>
                   </View>
-                ) : (
-                  <View>
-                    <Text style={styles.progressText}>
-                      {project.practices.name}
-                    </Text>
-                    {project.target_period === 'weekly' ? (
-                      <Text style={styles.progressNumbers}>
-                        本周目标: {project.target_count}座 (每日{project.daily_target}座)
-                      </Text>
+
+                  <View style={styles.progressContainer}>
+                    {project.practices.type === 'count' ? (
+                      <View>
+                        <Text style={styles.progressText}>
+                          {project.practices.name}
+                        </Text>
+                        <Text style={styles.progressNumbers}>
+                          {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
+                        </Text>
+                        <Text style={styles.dailyTarget}>
+                          每日目标: {project.daily_target.toLocaleString()} {project.practices.unit}
+                        </Text>
+                      </View>
                     ) : (
-                      <Text style={styles.progressNumbers}>
-                        总进度: {progress.current}/{progress.target}天
-                      </Text>
+                      <View>
+                        <Text style={styles.progressText}>
+                          {project.practices.name}
+                        </Text>
+                        {project.target_period === 'weekly' ? (
+                          <Text style={styles.progressNumbers}>
+                            本周目标: {project.target_count}座 (每日{project.daily_target}座)
+                          </Text>
+                        ) : (
+                          <Text style={styles.progressNumbers}>
+                            总进度: {progress.current}/{progress.target}天
+                          </Text>
+                        )}
+
+                        <WeeklyProgressDisplay
+                          project={project}
+                          user={user}
+                        />
+                      </View>
                     )}
-
-                    <WeeklyProgressDisplay 
-                      project={project} 
-                      user={user}
-                    />
                   </View>
-                )}
-              </View>
 
-              <View style={styles.projectActions}>
-                <TouchableOpacity
-                  style={styles.detailsButton}
-                  onPress={() => handleViewDetails(project.id, project.practices.name)}
-                >
-                  <Text style={styles.detailsButtonText}>查看详情</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.recordButton}
-                  onPress={() => handleCustomRecord(project.id, project.practices.name)}
-                >
-                  <Text style={styles.recordButtonText}>
-                    {project.practices.type === 'time' ? '记录观修' : '记录'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          );
-        })}
+                  <View style={styles.projectActions}>
+                    <TouchableOpacity
+                      style={styles.detailsButton}
+                      onPress={() => handleViewDetails(project.id, project.practices.name)}
+                    >
+                      <Text style={styles.detailsButtonText}>查看详情</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.recordButton}
+                      onPress={() => handleCustomRecord(project.id, project.practices.name)}
+                    >
+                      <Text style={styles.recordButtonText}>
+                        {project.practices.type === 'time' ? '记录观修' : '记录'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -358,7 +362,7 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
 
     try {
       const today = new Date().toISOString().split('T')[0];
-      
+
       // Get today's records
       const { data: todayData, error: todayError } = await supabase
         .from('meditation_records')
@@ -409,16 +413,16 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
   const isWeekly = project.target_period === 'weekly';
   const todayCount = todayRecords.length;
   const target = project.daily_target;
-  
+
   // Format session details for today
-  const todayDetails = todayRecords.map((record, index) => 
+  const todayDetails = todayRecords.map((record, index) =>
     `第${index + 1}座${record.duration_minutes}分钟`
   ).join('；');
 
   if (isWeekly) {
     const weeklyCount = weeklyRecords.length;
     const weeklyTarget = project.target_count;
-    
+
     return (
       <View style={styles.weeklyProgress}>
         <Text style={styles.weeklyProgressText}>
@@ -448,6 +452,9 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
@@ -605,5 +612,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  scrollView: {
+    flex: 1,
   },
 });
