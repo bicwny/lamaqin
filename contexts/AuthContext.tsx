@@ -137,10 +137,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // First try to get session from storage directly
       let storedSession = null;
       try {
-        const storedData = await AsyncStorage.getItem('sb-repl-auth-token');
-        if (storedData) {
-          console.log('📦 Found session data in storage');
-          storedSession = JSON.parse(storedData);
+        // Use conditional storage access for web compatibility
+        if (typeof window !== 'undefined') {
+          const storedData = await AsyncStorage.getItem('sb-repl-auth-token');
+          if (storedData) {
+            console.log('📦 Found session data in storage');
+            storedSession = JSON.parse(storedData);
+          }
         }
       } catch (storageError) {
         console.log('⚠️ Error reading from storage:', storageError);
@@ -165,13 +168,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Store session data manually to ensure persistence
         try {
-          await AsyncStorage.setItem('sb-repl-auth-token', JSON.stringify(session));
-          await AsyncStorage.setItem('@user_session', JSON.stringify({
-            id: session.user.id,
-            email: session.user.email,
-            dharma_name: session.user.user_metadata?.dharma_name,
-          }));
-          console.log('💾 Session stored successfully');
+          if (typeof window !== 'undefined') {
+            await AsyncStorage.setItem('sb-repl-auth-token', JSON.stringify(session));
+            await AsyncStorage.setItem('@user_session', JSON.stringify({
+              id: session.user.id,
+              email: session.user.email,
+              dharma_name: session.user.user_metadata?.dharma_name,
+            }));
+            console.log('💾 Session stored successfully');
+          }
         } catch (storageError) {
           console.log('⚠️ Failed to store session:', storageError);
         }
@@ -279,11 +284,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear ALL possible storage locations
       console.log('🧹 AuthContext: Clearing ALL storage locations...');
       
-      // AsyncStorage (React Native)
-      await AsyncStorage.removeItem('@auth_token');
-      await AsyncStorage.removeItem('@user_session');
-      await AsyncStorage.removeItem('@supabase_auth_token');
-      await AsyncStorage.removeItem('supabase.auth.token');
+      // AsyncStorage (React Native) - only if window is available
+      if (typeof window !== 'undefined') {
+        try {
+          await AsyncStorage.removeItem('@auth_token');
+          await AsyncStorage.removeItem('@user_session');
+          await AsyncStorage.removeItem('@supabase_auth_token');
+          await AsyncStorage.removeItem('supabase.auth.token');
+          await AsyncStorage.removeItem('sb-repl-auth-token');
+        } catch (storageError) {
+          console.log('⚠️ Error clearing AsyncStorage:', storageError);
+        }
+      }
       
       // Web localStorage (if available)
       if (typeof window !== 'undefined' && window.localStorage) {
