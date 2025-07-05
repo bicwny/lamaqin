@@ -43,12 +43,15 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack 
+      screenOptions={{ headerShown: false }}
+      initialRouteName={user ? "(tabs)" : "auth"}
+    >
       <Stack.Screen 
         name="auth" 
         options={{ 
           headerShown: false,
-          presentation: user ? 'modal' : 'card'
+          presentation: 'card'
         }} 
       />
       <Stack.Screen 
