@@ -470,61 +470,62 @@ export default function PracticeConfigScreen() {
         <Text style={styles.sectionTitle}>4. 智能总结</Text>
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryTitle}>📝 根据您的设置：</Text>
-          
           {practiceType === 'count' ? (
-            <>
+            <View>
               <Text style={styles.summaryText}>
                 您需要在约 {days} 天内完成，
               </Text>
               {targetMode === 'total' && totalTarget ? (
-                <>
+                <View>
                   <Text style={styles.summaryText}>
                     总计 {parseInt(totalTarget).toLocaleString()} {practiceUnit}。
                   </Text>
                   <Text style={styles.summaryHighlight}>
                     👉 建议每日持诵约 {suggestedDaily.toLocaleString()} {practiceUnit}。
                   </Text>
-                </>
+                </View>
               ) : targetMode === 'daily' && dailyTarget ? (
-                <>
+                <View>
                   <Text style={styles.summaryText}>
                     每日 {parseInt(dailyTarget).toLocaleString()} {practiceUnit}。
                   </Text>
                   <Text style={styles.summaryHighlight}>
                     👉 预计总计完成 {projectedTotal.toLocaleString()} {practiceUnit}。
                   </Text>
-                </>
+                </View>
               ) : (
                 <Text style={styles.summaryText}>请设置目标数量以查看建议。</Text>
               )}
-            </>
+            </View>
           ) : (
-            sessionTarget && (
-              <>
-                {targetMode === 'topic_progress' ? (
-                  <>
-                    <Text style={styles.summaryText}>
-                      您将按照法门进度修行，{targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
-                    </Text>
-                    <Text style={styles.summaryHighlight}>
-                      👉 将持续到92个修法全部完成为止。
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.summaryText}>
-                      您需要在约 {days} 天内完成，
-                    </Text>
-                    <Text style={styles.summaryText}>
-                      {targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
-                    </Text>
-                    <Text style={styles.summaryHighlight}>
-                      👉 预计总计完成约 {Math.ceil(days / (targetPeriod === 'weekly' ? 7 : 1)) * parseInt(sessionTarget)} 座观修。
-                    </Text>
-                  </>
-                )}
-              </>
-            )
+            <View>
+              {sessionTarget && (
+                <View>
+                  {targetMode === 'topic_progress' ? (
+                    <View>
+                      <Text style={styles.summaryText}>
+                        您将按照法门进度修行，{targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
+                      </Text>
+                      <Text style={styles.summaryHighlight}>
+                        👉 将持续到92个修法全部完成为止。
+                      </Text>
+                    </View>
+                  ) : (
+                    <View>
+                      <Text style={styles.summaryText}>
+                        您需要在约 {days} 天内完成，
+                      </Text>
+                      <Text style={styles.summaryText}>
+                        {targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
+                      </Text>
+                      <Text style={styles.summaryHighlight}>
+                        👉 预计总计完成约 {Math.ceil(days / (targetPeriod === 'weekly' ? 7 : 1)) * parseInt(sessionTarget)} 座观修。
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
           )}
         </View>
       </View>
