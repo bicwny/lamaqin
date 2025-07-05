@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -5,495 +6,501 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   TextInput,
-  SafeAreaView,
+  Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-type GoalType = 'topic_progress' | 'fixed_duration';
-type TargetPeriod = 'daily' | 'weekly';
+interface Practice {
+  id: string;
+  name: string;
+  type: string;
+  unit: string;
+  description?: string;
+}
 
 export default function PracticeConfigScreen() {
-  const { user } = useAuth();
-  const params = useLocalSearchParams();
-  const { practiceId, practiceName, practiceType, practiceUnit } = params;
+  const { practiceId, practiceName, practiceType, practiceUnit } = useLocalSearchParams<{
+    practiceId: string;
+    practiceName: string;
+    practiceType: string;
+    practiceUnit: string;
+  }>();
 
-  // Form state
-  const [goalType, setGoalType] = useState<GoalType>('fixed_duration');
-  const [targetCount, setTargetCount] = useState('');
-  const [dailyTarget, setDailyTarget] = useState('');
-  const [targetPeriod, setTargetPeriod] = useState<TargetPeriod>('daily');
-  const [duration, setDuration] = useState('60');
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  
+  // Target configuration mode
+  const [targetMode, setTargetMode] = useState<'total' | 'daily'>('total');
+  
+  // Count-based configuration
+  const [totalTarget, setTotalTarget] = useState('');
+  const [dailyTarget, setDailyTarget] = useState('');
+  
+  // Time-based configuration
+  const [targetPeriod, setTargetPeriod] = useState<'daily' | 'weekly'>('weekly');
+  const [sessionTarget, setSessionTarget] = useState('');
+  
+  // Time planning
+  const [startDate, setStartDate] = useState(new Date());
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
+  const [customEndDate, setCustomEndDate] = useState(new Date());
+  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  const [customDays, setCustomDays] = useState('');
 
   // Calculated values
-  const [calculatedSummary, setCalculatedSummary] = useState<{
-    totalDays: number;
-    totalWeeks: number;
-    suggestedDaily?: number;
-    suggestedWeekly?: number;
-    projectedTotal?: number;
-  }>({ totalDays: 0, totalWeeks: 0 });
+  const [suggestedDaily, setSuggestedDaily] = useState(0);
+  const [projectedTotal, setProjectedTotal] = useState(0);
+  const [calculatedDays, setCalculatedDays] = useState(0);
 
   useEffect(() => {
-    calculateSummary();
-  }, [goalType, targetCount, dailyTarget, targetPeriod, duration]);
+    calculateSuggestions();
+  }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, customDays, targetMode]);
 
-  const calculateSummary = () => {
-    const durationDays = parseInt(duration) || 0;
-    const durationWeeks = Math.ceil(durationDays / 7);
+  const getDurationInDays = () => {
+    const start = startDate;
+    let end: Date;
 
-    let summary = {
-      totalDays: durationDays,
-      totalWeeks: durationWeeks,
-    };
-
-    if (practiceType === 'time') {
-      // Time-based practice calculations
-      if (goalType === 'fixed_duration') {
-        const daily = parseInt(dailyTarget) || 0;
-        const weekly = targetPeriod === 'weekly' ? daily : daily * 7;
-        summary = {
-          ...summary,
-          projectedTotal: targetPeriod === 'weekly' ? weekly * durationWeeks : daily * durationDays,
-        };
-      } else {
-        // topic_progress - show 92 topics info
-        const weeklyMin = parseInt(dailyTarget) || 1;
-        summary = {
-          ...summary,
-          suggestedWeekly: weeklyMin,
-        };
-      }
-    } else {
-      // Count-based practice calculations
-      const total = parseInt(targetCount) || 0;
-      const daily = parseInt(dailyTarget) || 0;
-
-      if (total && !daily) {
-        summary = { ...summary, suggestedDaily: Math.ceil(total / durationDays) };
-      } else if (daily && !total) {
-        summary = { ...summary, projectedTotal: daily * durationDays };
-      }
+    switch (durationMode) {
+      case '30天':
+        end = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '60天':
+        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
+        break;
+      case '100天':
+        end = new Date(start.getTime() + 100 * 24 * 60 * 60 * 1000);
+        break;
+      case '1年':
+        end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
+        break;
+      case '自定义':
+        if (customDays) {
+          end = new Date(start.getTime() + parseInt(customDays) * 24 * 60 * 60 * 1000);
+        } else {
+          end = customEndDate;
+        }
+        break;
+      default:
+        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
     }
 
-    setCalculatedSummary(summary);
+    return Math.ceil((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+  };
+
+  const calculateSuggestions = () => {
+    const days = getDurationInDays();
+    setCalculatedDays(days);
+
+    if (practiceType === 'count') {
+      if (targetMode === 'total' && totalTarget) {
+        const total = parseInt(totalTarget);
+        const suggested = Math.ceil(total / days);
+        setSuggestedDaily(suggested);
+      } else if (targetMode === 'daily' && dailyTarget) {
+        const daily = parseInt(dailyTarget);
+        const projected = daily * days;
+        setProjectedTotal(projected);
+      }
+    }
   };
 
   const handleSave = async () => {
     if (!user) {
-      Alert.alert('错误', '请先登录');
+      Alert.alert('错误', '用户未登录');
       return;
     }
 
-    // Validation
-    if (practiceType === 'time' && goalType === 'topic_progress') {
-      if (!dailyTarget || parseInt(dailyTarget) < 1) {
-        Alert.alert('错误', '请设置每个修法每周至少座数');
+    if (practiceType === 'count') {
+      if (targetMode === 'total' && !totalTarget) {
+        Alert.alert('错误', '请输入总目标数量');
         return;
       }
-    } else if (practiceType === 'time' && goalType === 'fixed_duration') {
-      if (!dailyTarget || parseInt(dailyTarget) < 1) {
-        Alert.alert('错误', '请设置' + (targetPeriod === 'daily' ? '每日' : '每周') + '目标座数');
+      if (targetMode === 'daily' && !dailyTarget) {
+        Alert.alert('错误', '请输入每日目标数量');
         return;
       }
-    } else if (practiceType === 'count') {
-      if (!targetCount && !dailyTarget) {
-        Alert.alert('错误', '请设置总目标或每日目标');
+    } else {
+      if (!sessionTarget) {
+        Alert.alert('错误', '请输入座数目标');
         return;
       }
-    }
-
-    if (!duration || parseInt(duration) < 1) {
-      Alert.alert('错误', '请设置持续时间');
-      return;
     }
 
     setLoading(true);
 
     try {
-      const startDate = new Date().toISOString().split('T')[0];
-      const endDate = new Date(Date.now() + parseInt(duration) * 24 * 60 * 60 * 1000)
-        .toISOString().split('T')[0];
+      const days = getDurationInDays();
+      const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
 
-      let finalTargetCount = 0;
-      let finalDailyTarget = 0;
+      let finalTotalTarget: number;
+      let finalDailyTarget: number;
 
-      if (practiceType === 'time') {
-        if (goalType === 'topic_progress') {
-          // For topic progress, we don't set a fixed target count
-          // Instead, we track progress through the 92 topics
-          finalTargetCount = 92; // Total topics
-          finalDailyTarget = parseInt(dailyTarget); // Weekly minimum
+      if (practiceType === 'count') {
+        if (targetMode === 'total') {
+          finalTotalTarget = parseInt(totalTarget);
+          finalDailyTarget = Math.ceil(finalTotalTarget / days);
         } else {
-          // Fixed duration
           finalDailyTarget = parseInt(dailyTarget);
-          finalTargetCount = calculatedSummary.projectedTotal || 0;
+          finalTotalTarget = finalDailyTarget * days;
         }
       } else {
-        // Count-based
-        finalTargetCount = parseInt(targetCount) || calculatedSummary.projectedTotal || 0;
-        finalDailyTarget = parseInt(dailyTarget) || calculatedSummary.suggestedDaily || 0;
+        finalTotalTarget = parseInt(sessionTarget) * (targetPeriod === 'weekly' ? Math.ceil(days / 7) : days);
+        finalDailyTarget = parseInt(sessionTarget);
       }
 
-      const { data: projectData, error } = await supabase
+      const { error } = await supabase
         .from('user_practice_projects')
         .insert({
           user_id: user.id,
           practice_id: practiceId,
-          target_count: finalTargetCount,
+          target_count: finalTotalTarget,
           daily_target: finalDailyTarget,
-          target_period: targetPeriod,
-          start_date: startDate,
-          target_end_date: endDate,
-          status: 'active',
-          goal_type: practiceType === 'time' ? goalType : 'fixed_duration',
-        })
-        .select()
-        .single();
+          target_period: practiceType === 'time' ? targetPeriod : 'daily',
+          start_date: startDate.toISOString().split('T')[0],
+          target_end_date: endDate.toISOString().split('T')[0],
+          status: 'not_started',
+          current_count: 0,
+        });
 
       if (error) throw error;
 
-      // If topic progress mode, initialize all 92 topics
-      if (practiceType === 'time' && goalType === 'topic_progress') {
-        const topicProgressData = Array.from({ length: 92 }, (_, i) => ({
-          user_id: user.id,
-          practice_project_id: projectData.id,
-          topic_number: i + 1,
-          weekly_target_sessions: parseInt(dailyTarget),
-          current_week_sessions: 0,
-          current_week_start_date: startDate,
-          total_completed_weeks: 0,
-          is_current_week_complete: false,
-        }));
-
-        const { error: topicError } = await supabase
-          .from('user_practice_topic_progress')
-          .insert(topicProgressData);
-
-        if (topicError) throw topicError;
-      }
-
       Alert.alert('成功', '修行项目已添加', [
-        { text: '确定', onPress: () => router.back() }
+        {
+          text: '确定',
+          onPress: () => router.back(),
+        },
       ]);
     } catch (error) {
-      console.error('Error saving practice:', error);
+      console.error('Error saving practice project:', error);
       Alert.alert('错误', '保存失败，请重试');
     } finally {
       setLoading(false);
     }
   };
 
+  const formatDate = (date: Date) => {
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+  };
+
+  const renderTargetModeSelector = () => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>1. 您想如何设定目标？</Text>
+      <View style={styles.segmentedControl}>
+        <TouchableOpacity
+          style={[
+            styles.segmentButton,
+            targetMode === 'total' && styles.segmentButtonActive,
+          ]}
+          onPress={() => setTargetMode('total')}
+        >
+          <Text
+            style={[
+              styles.segmentButtonText,
+              targetMode === 'total' && styles.segmentButtonTextActive,
+            ]}
+          >
+            按总数目标
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.segmentButton,
+            targetMode === 'daily' && styles.segmentButtonActive,
+          ]}
+          onPress={() => setTargetMode('daily')}
+        >
+          <Text
+            style={[
+              styles.segmentButtonText,
+              targetMode === 'daily' && styles.segmentButtonTextActive,
+            ]}
+          >
+            按每日目标
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const renderTargetDetails = () => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>2. 目标详情</Text>
+      <View style={styles.inputContainer}>
+        {targetMode === 'total' ? (
+          <>
+            <Text style={styles.inputLabel}>总目标数量</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.textInput}
+                value={totalTarget}
+                onChangeText={setTotalTarget}
+                placeholder="例如: 400000"
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputUnit}>{practiceUnit}</Text>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={styles.inputLabel}>每日目标</Text>
+            <View style={styles.inputRow}>
+              <Text style={styles.inputPrefix}>每日持诵</Text>
+              <TextInput
+                style={styles.textInput}
+                value={dailyTarget}
+                onChangeText={setDailyTarget}
+                placeholder="例如: 1000"
+                keyboardType="numeric"
+              />
+              <Text style={styles.inputUnit}>{practiceUnit}</Text>
+            </View>
+          </>
+        )}
+      </View>
+    </View>
+  );
+
   const renderTimeBasedConfig = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>设置目标类型</Text>
-
-      <View style={styles.goalTypeSelector}>
-        <TouchableOpacity
-          style={[
-            styles.goalTypeButton,
-            goalType === 'topic_progress' && styles.selectedGoalTypeButton
-          ]}
-          onPress={() => setGoalType('topic_progress')}
-        >
-          <Text style={[
-            styles.goalTypeButtonText,
-            goalType === 'topic_progress' && styles.selectedGoalTypeButtonText
-          ]}>
-            法门进度
-          </Text>
-          <Text style={styles.goalTypeDescription}>
-            每个法门每周至少x座
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.goalTypeButton,
-            goalType === 'fixed_duration' && styles.selectedGoalTypeButton
-          ]}
-          onPress={() => setGoalType('fixed_duration')}
-        >
-          <Text style={[
-            styles.goalTypeButtonText,
-            goalType === 'fixed_duration' && styles.selectedGoalTypeButtonText
-          ]}>
-            固定时长
-          </Text>
-          <Text style={styles.goalTypeDescription}>
-            设定每日/每周座数
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {goalType === 'topic_progress' ? (
-        <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>每个修法每周至少座数</Text>
-          <TextInput
-            style={styles.input}
-            value={dailyTarget}
-            onChangeText={setDailyTarget}
-            keyboardType="numeric"
-            placeholder="例如：2"
-          />
-          <Text style={styles.inputHint}>
-            共92个修法，每个修法每周至少完成设定的座数
-          </Text>
-        </View>
-      ) : (
-        <>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>修行频率</Text>
-            <View style={styles.periodSelector}>
-              <TouchableOpacity
-                style={[
-                  styles.periodButton,
-                  targetPeriod === 'daily' && styles.selectedPeriodButton
-                ]}
-                onPress={() => setTargetPeriod('daily')}
-              >
-                <Text style={[
-                  styles.periodButtonText,
-                  targetPeriod === 'daily' && styles.selectedPeriodButtonText
-                ]}>
-                  每日
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.periodButton,
-                  targetPeriod === 'weekly' && styles.selectedPeriodButton
-                ]}
-                onPress={() => setTargetPeriod('weekly')}
-              >
-                <Text style={[
-                  styles.periodButtonText,
-                  targetPeriod === 'weekly' && styles.selectedPeriodButtonText
-                ]}>
-                  每周
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>
-              {targetPeriod === 'daily' ? '每日' : '每周'}目标座数
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={dailyTarget}
-              onChangeText={setDailyTarget}
-              keyboardType="numeric"
-              placeholder={targetPeriod === 'daily' ? '例如：1' : '例如：4'}
-            />
-          </View>
-        </>
-      )}
-    </View>
-  );
-
-  const renderCountBasedConfig = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>设置目标</Text>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>总目标数量</Text>
-        <TextInput
-          style={styles.input}
-          value={targetCount}
-          onChangeText={setTargetCount}
-          keyboardType="numeric"
-          placeholder="例如：100000"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>每日目标（可选）</Text>
-        <TextInput
-          style={styles.input}
-          value={dailyTarget}
-          onChangeText={setDailyTarget}
-          keyboardType="numeric"
-          placeholder="例如：1000"
-        />
-      </View>
-    </View>
-  );
-
-  const renderDurationConfig = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>时间规划</Text>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>开始时间</Text>
-        <Text style={styles.input}>今天 ({new Date().toLocaleDateString('zh-CN')})</Text>
-      </View>
-
-      {practiceType === 'time' && goalType === 'topic_progress' ? (
-        <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>结束时间</Text>
-          <Text style={styles.inputHint}>直到修完所有92个法门为止</Text>
-        </View>
-      ) : (
-        <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>持续时间</Text>
-          <View style={styles.durationSelector}>
-            {['30', '60', '100', '365'].map((days) => (
-              <TouchableOpacity
-                key={days}
-                style={[
-                  styles.durationButton,
-                  duration === days && styles.selectedDurationButton
-                ]}
-                onPress={() => setDuration(days)}
-              >
-                <Text style={[
-                  styles.durationButtonText,
-                  duration === days && styles.selectedDurationButtonText
-                ]}>
-                  {days === '365' ? '1年' : `${days}天`}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          
+      <Text style={styles.sectionTitle}>2. 目标详情</Text>
+      
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>修行频率</Text>
+        <View style={styles.segmentedControl}>
           <TouchableOpacity
             style={[
-              styles.customDurationButton,
-              !['30', '60', '100', '365'].includes(duration) && styles.selectedDurationButton
+              styles.segmentButton,
+              targetPeriod === 'weekly' && styles.segmentButtonActive,
             ]}
-            onPress={() => setDuration('')}
+            onPress={() => setTargetPeriod('weekly')}
           >
-            <Text style={[
-              styles.durationButtonText,
-              !['30', '60', '100', '365'].includes(duration) && styles.selectedDurationButtonText
-            ]}>
-              自定义
+            <Text
+              style={[
+                styles.segmentButtonText,
+                targetPeriod === 'weekly' && styles.segmentButtonTextActive,
+              ]}
+            >
+              每周
             </Text>
           </TouchableOpacity>
-
-          {!['30', '60', '100', '365'].includes(duration) && (
-            <TextInput
-              style={[styles.input, { marginTop: 8 }]}
-              value={duration}
-              onChangeText={setDuration}
-              keyboardType="numeric"
-              placeholder="请输入天数"
-            />
-          )}
+          <TouchableOpacity
+            style={[
+              styles.segmentButton,
+              targetPeriod === 'daily' && styles.segmentButtonActive,
+            ]}
+            onPress={() => setTargetPeriod('daily')}
+          >
+            <Text
+              style={[
+                styles.segmentButtonText,
+                targetPeriod === 'daily' && styles.segmentButtonTextActive,
+              ]}
+            >
+              每日
+            </Text>
+          </TouchableOpacity>
         </View>
-      )}
+        
+        <View style={styles.inputRow}>
+          <Text style={styles.inputPrefix}>{targetPeriod === 'weekly' ? '每周' : '每日'}完成</Text>
+          <TextInput
+            style={styles.textInput}
+            value={sessionTarget}
+            onChangeText={setSessionTarget}
+            placeholder="例如: 4"
+            keyboardType="numeric"
+          />
+          <Text style={styles.inputUnit}>座</Text>
+        </View>
+      </View>
     </View>
   );
 
-  const renderSummary = () => (
-    <View style={styles.summarySection}>
-      <Text style={styles.summaryTitle}>📝 智能总结</Text>
+  const renderTimePlanning = () => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>3. 时间规划</Text>
+      
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>开始时间</Text>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowStartDatePicker(true)}
+        >
+          <Text style={styles.dateButtonText}>{formatDate(startDate)}</Text>
+          <Text style={styles.dateButtonIcon}>📅</Text>
+        </TouchableOpacity>
+        
+        {showStartDatePicker && (
+          <DateTimePicker
+            value={startDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(event, selectedDate) => {
+              setShowStartDatePicker(Platform.OS === 'ios');
+              if (selectedDate) {
+                setStartDate(selectedDate);
+              }
+            }}
+          />
+        )}
+      </View>
 
-      <View style={styles.summaryContent}>
-        {practiceType === 'time' ? (
-          goalType === 'topic_progress' ? (
-            <View>
-              <Text style={styles.summaryText}>
-                您选择了法门进度模式，将逐步完成92个观修法门。
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>持续时间</Text>
+        <View style={styles.durationOptions}>
+          {['30天', '60天', '100天', '1年'].map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                styles.durationButton,
+                durationMode === option && styles.durationButtonActive,
+              ]}
+              onPress={() => setDurationMode(option as any)}
+            >
+              <Text
+                style={[
+                  styles.durationButtonText,
+                  durationMode === option && styles.durationButtonTextActive,
+                ]}
+              >
+                {option}
               </Text>
-              <Text style={styles.summaryText}>
-                • 总共92个法门需要完成
-              </Text>
-              <Text style={styles.summaryText}>
-                • 每个法门每周至少 {dailyTarget || 1} 座
-              </Text>
-              <Text style={styles.summaryText}>
-                • 从今天开始，直到修完所有法门为止
-              </Text>
-              <Text style={styles.summaryHighlight}>
-                👉 每周总计至少 {92 * (parseInt(dailyTarget) || 1)} 座观修（92个法门 × {dailyTarget || 1}座）
-              </Text>
-            </View>
-          ) : (
-            <View>
-              <Text style={styles.summaryText}>
-                您需要在 {calculatedSummary.totalDays} 天内完成观修。
-              </Text>
-              <Text style={styles.summaryText}>
-                • {targetPeriod === 'daily' ? '每日' : '每周'}目标：{dailyTarget || 0} 座
-              </Text>
-              <Text style={styles.summaryText}>
-                • 计划持续：{calculatedSummary.totalDays} 天（约 {calculatedSummary.totalWeeks} 周）
-              </Text>
-              <Text style={styles.summaryHighlight}>
-                👉 预计总共完成约 {calculatedSummary.projectedTotal || 0} 座观修
-              </Text>
-            </View>
-          )
-        ) : (
-          <View>
-            <Text style={styles.summaryText}>
-              您需要在 {calculatedSummary.totalDays} 天内完成修行。
-            </Text>
-            {calculatedSummary.suggestedDaily && (
-              <Text style={styles.summaryHighlight}>
-                👉 建议每日修行约 {calculatedSummary.suggestedDaily} {practiceUnit}
-              </Text>
-            )}
-            {calculatedSummary.projectedTotal && (
-              <Text style={styles.summaryHighlight}>
-                👉 预计总共完成 {calculatedSummary.projectedTotal} {practiceUnit}
-              </Text>
-            )}
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        <TouchableOpacity
+          style={[
+            styles.customButton,
+            durationMode === '自定义' && styles.customButtonActive,
+          ]}
+          onPress={() => setDurationMode('自定义')}
+        >
+          <Text
+            style={[
+              styles.customButtonText,
+              durationMode === '自定义' && styles.customButtonTextActive,
+            ]}
+          >
+            自定义
+          </Text>
+        </TouchableOpacity>
+
+        {durationMode === '自定义' && (
+          <View style={styles.customInputContainer}>
+            <Text style={styles.customInputLabel}>请输入天数</Text>
+            <TextInput
+              style={styles.customInput}
+              value={customDays}
+              onChangeText={setCustomDays}
+              placeholder="例如: 90"
+              keyboardType="numeric"
+            />
           </View>
         )}
       </View>
     </View>
   );
 
+  const renderSmartSummary = () => {
+    const days = calculatedDays;
+    
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>4. 智能总结</Text>
+        <View style={styles.summaryContainer}>
+          <Text style={styles.summaryTitle}>📝 根据您的设置：</Text>
+          
+          <Text style={styles.summaryText}>
+            您需要在约 {days} 天内完成，
+          </Text>
+          
+          {practiceType === 'count' ? (
+            <>
+              {targetMode === 'total' && totalTarget ? (
+                <>
+                  <Text style={styles.summaryText}>
+                    总计 {parseInt(totalTarget).toLocaleString()} {practiceUnit}。
+                  </Text>
+                  <Text style={styles.summaryHighlight}>
+                    👉 建议每日持诵约 {suggestedDaily.toLocaleString()} {practiceUnit}。
+                  </Text>
+                </>
+              ) : targetMode === 'daily' && dailyTarget ? (
+                <>
+                  <Text style={styles.summaryText}>
+                    每日 {parseInt(dailyTarget).toLocaleString()} {practiceUnit}。
+                  </Text>
+                  <Text style={styles.summaryHighlight}>
+                    👉 预计总计完成 {projectedTotal.toLocaleString()} {practiceUnit}。
+                  </Text>
+                </>
+              ) : (
+                <Text style={styles.summaryText}>请设置目标数量以查看建议。</Text>
+              )}
+            </>
+          ) : (
+            sessionTarget && (
+              <>
+                <Text style={styles.summaryText}>
+                  {targetPeriod === 'weekly' ? '每周' : '每日'} {sessionTarget} 座观修。
+                </Text>
+                <Text style={styles.summaryHighlight}>
+                  👉 预计总计完成约 {Math.ceil(days / (targetPeriod === 'weekly' ? 7 : 1)) * parseInt(sessionTarget)} 座观修。
+                </Text>
+              </>
+            )
+          )}
+        </View>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ 
-        title: `配置"${practiceName}"`,
-        headerShown: true 
-      }} />
+      <Stack.Screen options={{ headerShown: false }} />
+
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>配置"{practiceName}"</Text>
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.practiceTitle}>{practiceName}</Text>
-          <Text style={styles.practiceType}>
-            {practiceType === 'count' ? '计数类' : '计时类'} • {practiceUnit}
-          </Text>
-        </View>
-
-        {practiceType === 'time' ? renderTimeBasedConfig() : renderCountBasedConfig()}
-        {renderDurationConfig()}
-        {renderSummary()}
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.cancelButtonText}>取消</Text>
-        </TouchableOpacity>
+        {practiceType === 'count' ? (
+          <>
+            {renderTargetModeSelector()}
+            {renderTargetDetails()}
+          </>
+        ) : (
+          renderTimeBasedConfig()
+        )}
+        
+        {renderTimePlanning()}
+        {renderSmartSummary()}
 
         <TouchableOpacity
-          style={[styles.saveButton, loading && styles.disabledButton]}
+          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
           onPress={handleSave}
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>确认添加</Text>
+            <Text style={styles.saveButtonText}>确认添加项目</Text>
           )}
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -503,216 +510,236 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
+  header: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+  },
   content: {
     flex: 1,
     padding: 16,
   },
-  header: {
-    marginBottom: 24,
-  },
-  practiceTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  practiceType: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-  },
   section: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.text,
+    color: '#333',
     marginBottom: 16,
   },
-  goalTypeSelector: {
+  segmentedControl: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  goalTypeButton: {
-    flex: 1,
-    padding: 16,
+    backgroundColor: '#f1f3f4',
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    backgroundColor: 'white',
-    alignItems: 'center',
+    padding: 4,
   },
-  selectedGoalTypeButton: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  goalTypeButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  selectedGoalTypeButtonText: {
-    color: 'white',
-  },
-  goalTypeDescription: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  inputGroup: {
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-  },
-  inputHint: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 4,
-  },
-  periodSelector: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  periodButton: {
+  segmentButton: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    backgroundColor: 'white',
+    borderRadius: 6,
     alignItems: 'center',
   },
-  selectedPeriodButton: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+  segmentButtonActive: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  periodButtonText: {
+  segmentButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.text,
+    color: '#666',
   },
-  selectedPeriodButtonText: {
-    color: 'white',
+  segmentButtonTextActive: {
+    color: '#333',
   },
-  summarySection: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
+  inputContainer: {
+    marginTop: 16,
   },
-  summaryTitle: {
+  inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 12,
-  },
-  summaryContent: {
-    gap: 8,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: Colors.text,
-    lineHeight: 20,
-  },
-  summaryHighlight: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '600',
-    lineHeight: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-    backgroundColor: 'white',
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
-  durationSelector: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    color: '#333',
     marginBottom: 8,
   },
-  durationButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#e9ecef',
-    backgroundColor: 'white',
-    minWidth: 60,
-    alignItems: 'center',
   },
-  selectedDurationButton: {
+  inputPrefix: {
+    fontSize: 16,
+    color: '#666',
+    marginRight: 8,
+  },
+  textInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  inputUnit: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dateButtonIcon: {
+    fontSize: 16,
+  },
+  durationOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 12,
+  },
+  durationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f1f3f4',
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  durationButtonActive: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
   },
   durationButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: Colors.text,
+    color: '#666',
   },
-  selectedDurationButtonText: {
+  durationButtonTextActive: {
     color: 'white',
   },
-  customDurationButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  customButton: {
+    backgroundColor: '#d4af37',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  customButtonActive: {
+    backgroundColor: '#b8941f',
+  },
+  customButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+  },
+  customButtonTextActive: {
+    color: 'white',
+  },
+  customInputContainer: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#007AFF',
+  },
+  customInputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 8,
+  },
+  customInput: {
+    backgroundColor: 'white',
     borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: '#333',
     borderWidth: 1,
     borderColor: '#e9ecef',
-    backgroundColor: 'white',
+  },
+  summaryContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
+  summaryTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+  summaryText: {
+    fontSize: 15,
+    color: '#555',
+    lineHeight: 22,
+    marginBottom: 4,
+  },
+  summaryHighlight: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.primary,
+    lineHeight: 22,
+    marginTop: 8,
+  },
+  saveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
-    flex: 1,
+    marginTop: 24,
+    marginBottom: 32,
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
