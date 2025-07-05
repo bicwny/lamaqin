@@ -534,13 +534,7 @@ export default function StudyScreen() {
             </>
           )}
 
-          {/* Course Summary Footer */}
-          <View style={styles.courseSummary}>
-            <Text style={styles.courseSummaryText}>
-              {userCourses.length}门课程已加入，{userCourses.filter(uc => uc.status === 'paused').length}门课程已隐藏
-            </Text>
-          </View>
-        </ScrollView>
+          </ScrollView>
       </SafeAreaView>
     );
   }
@@ -596,13 +590,7 @@ export default function StudyScreen() {
             );
           })}
 
-          {/* Course Summary Footer */}
-          <View style={styles.courseSummary}>
-            <Text style={styles.courseSummaryText}>
-              {userCourses.length}门课程已加入，{userCourses.filter(uc => uc.status === 'paused').length}门课程已隐藏
-            </Text>
-          </View>
-        </ScrollView>
+          </ScrollView>
       </SafeAreaView>
     );
   }
