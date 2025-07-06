@@ -162,7 +162,7 @@ export default function PracticeConfigScreen() {
         // Time-based practices - unified approach
         finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
         targetPeriod = 'weekly';
-        
+
         if (durationMode === '持续进行') {
           // Ongoing practice - no end date
           endDate = null;
@@ -440,8 +440,71 @@ export default function PracticeConfigScreen() {
     </View>
   );
 
+  const calculateSummary = () => {
+    if (practiceType === 'time') {
+      // Time-based practice summary
+      if (configMode === 'topic_progress') {
+        const weeks = durationMode === '持续进行' ? null : calculateWeeks();
+        const totalSessions = weeks ? parseInt(sessionsTarget) * weeks : null;
+
+        return {
+          duration: weeks ? `约 ${weeks} 周` : '持续进行',
+          weeklyTarget: `每周 ${sessionsTarget} 座`,
+          totalSessions: totalSessions ? `预计总计完成约 ${totalSessions} 座观修` : '无固定总数，持续进行',
+        };
+      } else {
+        // Fixed duration mode for time practices
+        const weeks = calculateWeeks();
+        const totalSessions = parseInt(sessionsTarget) * weeks;
+        return {
+          duration: `约 ${weeks} 周`,
+          weeklyTarget: `每周 ${sessionsTarget} 座`,
+          totalSessions: `预计总计完成约 ${totalSessions} 座观修`,
+        };
+      }
+    } else {
+      // Count-based practice summary
+      if (durationMode === '持续进行') {
+        // For ongoing count practices
+        if (configMode === 'total') {
+          return {
+            duration: '持续进行',
+            target: `目标总数：${parseInt(totalTarget).toLocaleString()} ${practiceUnit}`,
+            daily: `建议每日持诵约 ${Math.ceil(parseInt(totalTarget) / 365).toLocaleString()} ${practiceUnit}`,
+          };
+        } else {
+          return {
+            duration: '持续进行',
+            target: '无固定总数，持续进行',
+            daily: `每日 ${parseInt(dailyTarget).toLocaleString()} ${practiceUnit}`,
+          };
+        }
+      } else {
+        // For fixed duration count practices
+        if (configMode === 'total') {
+          const days = calculateDays();
+          const dailyAmount = Math.ceil(parseInt(totalTarget) / days);
+          return {
+            duration: `约 ${days} 天`,
+            target: `总计 ${parseInt(totalTarget).toLocaleString()} ${practiceUnit}`,
+            daily: `建议每日持诵约 ${dailyAmount.toLocaleString()} ${practiceUnit}`,
+          };
+        } else {
+          const days = calculateDays();
+          const totalAmount = parseInt(dailyTarget) * days;
+          return {
+            duration: `约 ${days} 天`,
+            target: `总计 ${totalAmount.toLocaleString()} ${practiceUnit}`,
+            daily: `每日 ${parseInt(dailyTarget).toLocaleString()} ${practiceUnit}`,
+          };
+        }
+      }
+    }
+  };
+
   const renderSmartSummary = () => {
     const days = calculatedDays;
+    const summary = calculateSummary();
 
     return (
       <View style={styles.section}>
@@ -514,6 +577,157 @@ export default function PracticeConfigScreen() {
     );
   };
 
+  const calculateDays = () => {
+    const start = startDate;
+    let end: Date;
+
+    switch (durationMode) {
+      case '30天':
+        end = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '60天':
+        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
+        break;
+      case '100天':
+        end = new Date(start.getTime() + 100 * 24 * 60 * 60 * 1000);
+        break;
+      case '1年':
+        end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
+        break;
+      case '自定义':
+        end = customEndDate;
+        break;
+        case '持续进行':
+          return 36500;
+      default:
+        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
+    }
+
+    return Math.ceil((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+  };
+
+  const calculateWeeks = () => {
+    return Math.ceil(calculateDays() / 7);
+  };
+
+  const handleConfirm = async () => {
+    if (!user) return;
+
+    // Validation
+    if (practiceType === 'time') {
+      if (!sessionsTarget || parseInt(sessionsTarget) <= 0) {
+        Alert.alert('错误', '请输入有效的座数');
+        return;
+      }
+    } else {
+      if (configMode === 'total') {
+        if (!totalTarget || parseInt(totalTarget) <= 0) {
+          Alert.alert('错误', '请输入有效的总目标数量');
+          return;
+        }
+      } else {
+        if (!dailyTarget || parseInt(dailyTarget) <= 0) {
+          Alert.alert('错误', '请输入有效的每日目标数量');
+          return;
+        }
+      }
+    }
+
+    setLoading(true);
+
+    try {
+      let projectData;
+
+      if (practiceType === 'time') {
+        // Time-based practice configuration
+        const startDateObj = new Date(startDate);
+        let endDate = null;
+        let targetCount = 0;
+
+        if (durationMode !== '持续进行') {
+          const weeks = calculateWeeks();
+          endDate = new Date(startDateObj);
+          endDate.setDate(startDateObj.getDate() + (weeks * 7));
+          targetCount = parseInt(sessionsTarget) * weeks;
+        }
+
+        projectData = {
+          user_id: user.id,
+          practice_id: practiceId,
+          target_period: 'weekly',
+          daily_target: parseInt(sessionsTarget),
+          start_date: startDateObj.toISOString().split('T')[0],
+          target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
+          target_count: targetCount,
+          current_count: 0,
+          status: 'active',
+          goal_type: configMode,
+        };
+      } else {
+        // Count-based practice configuration
+        const startDateObj = new Date(startDate);
+        let endDate = null;
+        let finalTargetCount, finalDailyTarget;
+
+        if (durationMode === '持续进行') {
+          // For ongoing count practices
+          endDate = null;
+          if (configMode === 'total') {
+            finalTargetCount = parseInt(totalTarget);
+            finalDailyTarget = Math.ceil(finalTargetCount / 365); // Rough daily estimate
+          } else {
+            finalDailyTarget = parseInt(dailyTarget);
+            finalTargetCount = 0; // No fixed total for ongoing practices
+          }
+        } else {
+          // For fixed duration count practices
+          const days = calculateDays();
+          endDate = new Date(startDateObj);
+          endDate.setDate(startDateObj.getDate() + days);
+
+          if (configMode === 'total') {
+            finalTargetCount = parseInt(totalTarget);
+            finalDailyTarget = Math.ceil(finalTargetCount / days);
+          } else {
+            finalDailyTarget = parseInt(dailyTarget);
+            finalTargetCount = finalDailyTarget * days;
+          }
+        }
+
+        projectData = {
+          user_id: user.id,
+          practice_id: practiceId,
+          target_count: finalTargetCount,
+          daily_target: finalDailyTarget,
+          start_date: startDateObj.toISOString().split('T')[0],
+          target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
+          current_count: 0,
+          status: 'active',
+          target_period: 'daily',
+          goal_type: configMode,
+        };
+      }
+
+      const { data, error } = await supabase
+        .from('user_practice_projects')
+        .insert([projectData])
+        .select();
+
+      if (error) throw error;
+
+      console.log('✅ Practice project created:', data);
+      Alert.alert('成功', '修行项目已添加！', [
+        { text: '确定', onPress: () => router.push('/(tabs)/practice') }
+      ]);
+
+    } catch (error) {
+      console.error('❌ Error creating practice project:', error);
+      Alert.alert('错误', '创建修行项目失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -532,7 +746,7 @@ export default function PracticeConfigScreen() {
 
         <TouchableOpacity
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-          onPress={handleSave}
+          onPress={handleConfirm}
           disabled={loading}
         >
           {loading ? (
