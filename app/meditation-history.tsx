@@ -119,8 +119,8 @@ export default function MeditationHistoryScreen() {
         };
       });
 
-      // Sort alphabetically by title
-      topicCounts.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+      // Sort by topic_number in ascending order
+      topicCounts.sort((a, b) => a.topic_number - b.topic_number);
       setTopicStats(topicCounts);
 
       console.log('📚 Loaded topic stats:', topicCounts.length);
