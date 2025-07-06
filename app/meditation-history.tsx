@@ -36,24 +36,27 @@ export default function MeditationHistoryScreen() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [viewMode, setViewMode] = useState<'chronological' | 'by_topic'>('chronological');
+  const [topicStats, setTopicStats] = useState<any[]>([]);
+  const [topics, setTopics] = useState<any[]>([]);
 
   const RECORDS_PER_PAGE = 12;
 
   useEffect(() => {
     if (user && practiceId) {
-      loadRecords(true);
+      loadData(true);
     }
   }, [user, practiceId]);
 
   useFocusEffect(
     React.useCallback(() => {
       if (user && practiceId) {
-        loadRecords(true);
+        loadData(true);
       }
     }, [user, practiceId])
   );
 
-  const loadRecords = async (reset = false) => {
+  const loadData = async (reset = false) => {
     if (!user || !practiceId) return;
 
     try {
@@ -65,6 +68,7 @@ export default function MeditationHistoryScreen() {
         setLoadingMore(true);
       }
 
+      // Load meditation records
       const allRecords = await meditationService.getMeditationRecords(user.id, practiceId);
       const startIndex = reset ? 0 : (page + 1) * RECORDS_PER_PAGE;
       const endIndex = startIndex + RECORDS_PER_PAGE;
@@ -72,6 +76,9 @@ export default function MeditationHistoryScreen() {
 
       if (reset) {
         setRecords(pageRecords);
+        
+        // Load topics and calculate stats
+        await loadTopicsAndStats(allRecords);
       } else {
         setRecords(prev => [...prev, ...pageRecords]);
       }
@@ -83,8 +90,8 @@ export default function MeditationHistoryScreen() {
 
       console.log('📅 Loaded records:', pageRecords.length);
     } catch (error) {
-      console.error('❌ Error loading records:', error);
-      Alert.alert('错误', '加载记录失败');
+      console.error('❌ Error loading data:', error);
+      Alert.alert('错误', '加载数据失败');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -92,14 +99,46 @@ export default function MeditationHistoryScreen() {
     }
   };
 
+  const loadTopicsAndStats = async (allRecords: any[]) => {
+    try {
+      // Load meditation topics
+      const topicsData = await meditationService.getMeditationTopics(practiceId);
+      setTopics(topicsData);
+
+      // Calculate topic statistics
+      const topicCounts = topicsData.map(topic => {
+        const recordsForTopic = allRecords.filter(record => 
+          record.method && record.method.includes(topic.title)
+        );
+        
+        return {
+          ...topic,
+          count: recordsForTopic.length,
+          totalDuration: recordsForTopic.reduce((sum, record) => sum + record.duration_minutes, 0),
+          latestRecord: recordsForTopic.length > 0 ? recordsForTopic[0] : null
+        };
+      });
+
+      // Sort alphabetically by title
+      topicCounts.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+      setTopicStats(topicCounts);
+
+      console.log('📚 Loaded topic stats:', topicCounts.length);
+    } catch (error) {
+      console.error('❌ Error loading topics:', error);
+    }
+  };
+
+  const loadRecords = loadData;
+
   const handleRefresh = () => {
     setRefreshing(true);
-    loadRecords(true);
+    loadData(true);
   };
 
   const handleLoadMore = () => {
-    if (hasMore && !loadingMore) {
-      loadRecords(false);
+    if (hasMore && !loadingMore && viewMode === 'chronological') {
+      loadData(false);
     }
   };
 
@@ -247,6 +286,34 @@ export default function MeditationHistoryScreen() {
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
+        
+        {/* View Mode Toggle */}
+        <View style={styles.viewToggle}>
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
+              viewMode === 'chronological' && styles.toggleButtonActive
+            ]}
+            onPress={() => setViewMode('chronological')}
+          >
+            <Text style={[
+              styles.toggleButtonText,
+              viewMode === 'chronological' && styles.toggleButtonTextActive
+            ]}>时间</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
+              viewMode === 'by_topic' && styles.toggleButtonActive
+            ]}
+            onPress={() => setViewMode('by_topic')}
+          >
+            <Text style={[
+              styles.toggleButtonText,
+              viewMode === 'by_topic' && styles.toggleButtonTextActive
+            ]}>主题</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Records List */}
@@ -264,107 +331,151 @@ export default function MeditationHistoryScreen() {
         }}
         scrollEventThrottle={400}
       >
-        {records.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>📭 暂无观修记录</Text>
-            <Text style={styles.emptySubtext}>开始您的第一次观修吧！</Text>
-          </View>
-        ) : (
-          <View style={styles.recordsList}>
-            {records.map((record) => {
-              const isDeleting = deletingRecords.has(record.id);
-              return (
-                <View 
-                  key={record.id} 
-                  style={[
-                    styles.recordCard,
-                    isDeleting && styles.recordCardDeleting
-                  ]}
-                >
-                  {isDeleting && (
-                    <View style={styles.deletingOverlay}>
-                      <ActivityIndicator color="#dc3545" size="small" />
-                      <Text style={styles.deletingText}>删除中...</Text>
-                    </View>
-                  )}
-
-                  <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
-                    <Text style={styles.recordDate}>
-                      {formatDate(record.record_date)}
-                    </Text>
-                    <Text style={styles.recordTime}>
-                      {formatTime(record.created_at)}
-                    </Text>
-                  </View>
-
-                  <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
-                    <Text style={styles.recordDuration}>
-                      时长: {record.duration_minutes} 分钟
-                    </Text>
-
-                    {record.session_number && (
-                      <Text style={styles.recordSession}>
-                        第 {record.session_number} 座
-                      </Text>
-                    )}
-
-                    {record.method && (
-                      <Text style={styles.recordMethod}>
-                        方法: {record.method}
-                      </Text>
-                    )}
-
-                    {record.reflection && (
-                      <View style={styles.reflectionContainer}>
-                        <Text style={styles.reflectionLabel}>观后感:</Text>
-                        <Text style={styles.reflectionText} numberOfLines={3}>
-                          {record.reflection}
-                        </Text>
+        {viewMode === 'chronological' ? (
+          // Chronological View
+          records.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>📭 暂无观修记录</Text>
+              <Text style={styles.emptySubtext}>开始您的第一次观修吧！</Text>
+            </View>
+          ) : (
+            <View style={styles.recordsList}>
+              {records.map((record) => {
+                const isDeleting = deletingRecords.has(record.id);
+                return (
+                  <View 
+                    key={record.id} 
+                    style={[
+                      styles.recordCard,
+                      isDeleting && styles.recordCardDeleting
+                    ]}
+                  >
+                    {isDeleting && (
+                      <View style={styles.deletingOverlay}>
+                        <ActivityIndicator color="#dc3545" size="small" />
+                        <Text style={styles.deletingText}>删除中...</Text>
                       </View>
                     )}
+
+                    <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
+                      <Text style={styles.recordDate}>
+                        {formatDate(record.record_date)}
+                      </Text>
+                      <Text style={styles.recordTime}>
+                        {formatTime(record.created_at)}
+                      </Text>
+                    </View>
+
+                    <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
+                      <Text style={styles.recordDuration}>
+                        时长: {record.duration_minutes} 分钟
+                      </Text>
+
+                      {record.session_number && (
+                        <Text style={styles.recordSession}>
+                          第 {record.session_number} 座
+                        </Text>
+                      )}
+
+                      {record.method && (
+                        <Text style={styles.recordMethod}>
+                          方法: {record.method}
+                        </Text>
+                      )}
+
+                      {record.reflection && (
+                        <View style={styles.reflectionContainer}>
+                          <Text style={styles.reflectionLabel}>观后感:</Text>
+                          <Text style={styles.reflectionText} numberOfLines={3}>
+                            {record.reflection}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={styles.recordActions}>
+                      <TouchableOpacity
+                        style={[styles.editButton, isDeleting && styles.disabledButton]}
+                        onPress={() => handleEdit(record)}
+                        disabled={isDeleting}
+                      >
+                        <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
+                          编辑
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.deleteButton, isDeleting && styles.disabledButton]}
+                        onPress={() => {
+                          console.warn('🔴 DELETE BUTTON PHYSICAL PRESS DETECTED - Record:', record.id);
+                          handleDelete(record);
+                        }}
+                        disabled={isDeleting}
+                      >
+                        <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
+                          删除
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              })}
+
+              {hasMore && (
+                <TouchableOpacity
+                  style={styles.loadMoreButton}
+                  onPress={handleLoadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? (
+                    <ActivityIndicator color={Colors.primary} />
+                  ) : (
+                    <Text style={styles.loadMoreText}>加载更多</Text>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
+          )
+        ) : (
+          // By Topic View
+          topicStats.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>📚 暂无主题记录</Text>
+              <Text style={styles.emptySubtext}>开始选择观修主题吧！</Text>
+            </View>
+          ) : (
+            <View style={styles.recordsList}>
+              {topicStats.map((topic) => (
+                <View key={topic.id} style={styles.topicCard}>
+                  <View style={styles.topicHeader}>
+                    <Text style={styles.topicTitle}>{topic.title}</Text>
+                    <Text style={styles.topicNumber}>第{topic.topic_number}修法</Text>
+                  </View>
+                  
+                  <View style={styles.topicStats}>
+                    <Text style={styles.topicCount}>
+                      🧘 {topic.count} 次观修
+                    </Text>
+                    {topic.totalDuration > 0 && (
+                      <Text style={styles.topicDuration}>
+                        ⏱️ 总时长: {topic.totalDuration} 分钟
+                      </Text>
+                    )}
+                    {topic.latestRecord && (
+                      <Text style={styles.topicLatest}>
+                        📅 最近: {formatDate(topic.latestRecord.record_date)}
+                      </Text>
+                    )}
                   </View>
 
-                  <View style={styles.recordActions}>
-                    <TouchableOpacity
-                      style={[styles.editButton, isDeleting && styles.disabledButton]}
-                      onPress={() => handleEdit(record)}
-                      disabled={isDeleting}
-                    >
-                      <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
-                        编辑
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.deleteButton, isDeleting && styles.disabledButton]}
-                      onPress={() => {
-                        console.warn('🔴 DELETE BUTTON PHYSICAL PRESS DETECTED - Record:', record.id);
-                        handleDelete(record);
-                      }}
-                      disabled={isDeleting}
-                    >
-                      <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
-                        删除
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  {topic.description && (
+                    <Text style={styles.topicDescription} numberOfLines={2}>
+                      {topic.description}
+                    </Text>
+                  )}
                 </View>
-              );
-            })}
-
-            {hasMore && (
-              <TouchableOpacity
-                style={styles.loadMoreButton}
-                onPress={handleLoadMore}
-                disabled={loadingMore}
-              >
-                {loadingMore ? (
-                  <ActivityIndicator color={Colors.primary} />
-                ) : (
-                  <Text style={styles.loadMoreText}>加载更多</Text>
-                )}
-              </TouchableOpacity>
-            )}
-          </View>
+              ))}
+            </View>
+          )
         )}
       </ScrollView>
     </SafeAreaView>
@@ -576,5 +687,87 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     opacity: 0.5,
+  },
+  viewToggle: {
+    flexDirection: 'row',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 2,
+    marginTop: 12,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  toggleButtonText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  toggleButtonTextActive: {
+    color: 'white',
+  },
+  topicCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  topicHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  topicTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+    marginRight: 8,
+  },
+  topicNumber: {
+    fontSize: 12,
+    color: '#666',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  topicStats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 8,
+  },
+  topicCount: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  topicDuration: {
+    fontSize: 14,
+    color: '#666',
+  },
+  topicLatest: {
+    fontSize: 14,
+    color: '#666',
+  },
+  topicDescription: {
+    fontSize: 14,
+    color: '#888',
+    lineHeight: 20,
+    marginTop: 4,
   },
 });
