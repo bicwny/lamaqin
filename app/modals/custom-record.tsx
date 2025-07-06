@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   View,
@@ -60,7 +59,7 @@ export default function CustomRecordScreen() {
     setLoading(true);
     try {
       const countNum = parseInt(count);
-      
+
       // First, get the project details to find the practice_id
       const { data: project, error: projectError } = await supabase
         .from('user_practice_projects')
@@ -115,7 +114,7 @@ export default function CustomRecordScreen() {
       console.log('✅ Project updated with new count:', newCurrentCount);
       console.log('✅ Count record saved successfully');
       showToast(`已记录 ${countNum} 次`);
-      
+
       // Navigate back to practice page
       router.back();
     } catch (error) {
@@ -182,12 +181,8 @@ export default function CustomRecordScreen() {
               {notes.length} 字
             </Text>
           </View>
-        </View>
-      </ScrollView>
 
-      {/* Save Button */}
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity 
+          <TouchableOpacity 
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}
           onPress={handleSave}
           disabled={loading}
@@ -195,10 +190,10 @@ export default function CustomRecordScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>💾 保存记录</Text>
+            <Text style={styles.saveButtonText}>保存记录</Text>
           )}
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -295,28 +290,14 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginTop: 4
   },
-  bottomContainer: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
   saveButton: {
     backgroundColor: Colors.primary,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    marginTop: 24,
+    marginBottom: 32,
+    marginHorizontal: 16,
   },
   saveButtonDisabled: {
     opacity: 0.6
