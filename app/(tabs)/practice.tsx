@@ -284,7 +284,7 @@ export default function PracticeScreen() {
                   <View>
                     {project.target_period === 'weekly' ? (
                       <Text style={styles.practiceInfo}>
-                        本周目标：{project.target_count}座 (每日{project.daily_target}座)
+                        本周目标：{project.daily_target}座 (每周{project.daily_target}座)
                       </Text>
                     ) : (
                       <Text style={styles.practiceInfo}>
