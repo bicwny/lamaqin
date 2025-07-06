@@ -398,7 +398,7 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
 
   if (isWeekly) {
     const weeklyCount = weeklyRecords.length;
-    const weeklyTarget = project.target_count;
+    const weeklyTarget = project.daily_target; // Use daily_target which represents weekly sessions for weekly projects
 
     return (
       <View style={styles.weeklyProgress}>
