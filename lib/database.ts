@@ -591,7 +591,11 @@ export const meditationService = {
       .eq('practice_id', practiceId)
       .order('topic_number');
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Error loading meditation topics:', error);
+      // Return empty array if topics don't exist rather than throwing
+      return [];
+    }
     return data || [];
   },
 

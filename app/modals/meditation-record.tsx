@@ -196,40 +196,34 @@ export default function MeditationRecordScreen() {
             />
           </View>
 
-          {/* Topic Selection */}
-          <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>选择观修内容</Text>
-            {loadingTopics ? (
-              <ActivityIndicator style={styles.loadingIndicator} />
-            ) : meditationTopics.length > 0 ? (
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={parseInt(sessionNumber)}
-                  onValueChange={(value) => setSessionNumber(value.toString())}
-                  style={styles.picker}
-                >
-                  {meditationTopics.map((topic) => (
-                    <Picker.Item 
-                      key={topic.topic_number} 
-                      label={`第${topic.topic_number}座 - ${topic.title}`} 
-                      value={topic.topic_number} 
-                    />
-                  ))}
-                </Picker>
-              </View>
-            ) : (
-              <TextInput
-                style={styles.textInput}
-                value={sessionNumber}
-                onChangeText={setSessionNumber}
-                keyboardType="numeric"
-                placeholder="座数编号"
-              />
-            )}
-          </View>
+          {/* Topic Selection - only show if there are topics or still loading */}
+          {(loadingTopics || meditationTopics.length > 0) && (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>选择观修内容</Text>
+              {loadingTopics ? (
+                <ActivityIndicator style={styles.loadingIndicator} />
+              ) : meditationTopics.length > 0 ? (
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={parseInt(sessionNumber)}
+                    onValueChange={(value) => setSessionNumber(value.toString())}
+                    style={styles.picker}
+                  >
+                    {meditationTopics.map((topic) => (
+                      <Picker.Item 
+                        key={topic.topic_number} 
+                        label={`第${topic.topic_number}座 - ${topic.title}`} 
+                        value={topic.topic_number} 
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              ) : null}
+            </View>
+          )}
 
-          {/* Topic Description */}
-          {selectedTopic?.description && (
+          {/* Topic Description - only show if topics exist and there's a selected topic */}
+          {meditationTopics.length > 0 && selectedTopic?.description && (
             <View style={styles.topicDescription}>
               <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
               <Text style={styles.topicDescriptionText}>
