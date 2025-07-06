@@ -85,7 +85,7 @@ export default function ProfileScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="bg-profile rounded-b-3xl mx-4 mt-4 px-6 py-8">
+        <View className="bg-purple-500 rounded-b-3xl mx-4 mt-4 px-6 py-8">
           <View className="items-center">
             <View className="bg-white rounded-full w-20 h-20 items-center justify-center mb-4">
               <Text className="text-3xl">🧘‍♂️</Text>
@@ -105,14 +105,14 @@ export default function ProfileScreen() {
               {achievements.map((achievement, index) => (
                 <View key={index} className="w-[22%] items-center mb-4">
                   <View className={`w-12 h-12 rounded-full items-center justify-center mb-2 ${
-                    achievement.earned ? 'bg-buddhist-golden/20' : 'bg-gray-100'
+                    achievement.earned ? 'bg-yellow-100' : 'bg-gray-100'
                   }`}>
                     <Text className={`text-lg ${achievement.earned ? '' : 'opacity-30'}`}>
                       {achievement.icon}
                     </Text>
                   </View>
                   <Text className={`text-xs text-center font-medium ${
-                    achievement.earned ? 'text-buddhist-golden' : 'text-gray-400'
+                    achievement.earned ? 'text-yellow-600' : 'text-gray-400'
                   }`}>
                     {achievement.name}
                   </Text>
@@ -165,8 +165,8 @@ export default function ProfileScreen() {
 
         {/* App Info */}
         <View className="px-4 mb-8">
-          <View className="bg-buddhist-golden/10 rounded-xl p-4 border-l-4 border-buddhist-golden">
-            <Text className="text-sm font-medium text-buddhist-golden mb-1">佛法修行应用</Text>
+          <View className="bg-yellow-50 rounded-xl p-4 border-l-4 border-yellow-600">
+            <Text className="text-sm font-medium text-yellow-600 mb-1">佛法修行应用</Text>
             <Text className="text-gray-700 text-sm">
               版本 1.0.0 | 愿一切众生离苦得乐
             </Text>

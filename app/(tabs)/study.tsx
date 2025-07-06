@@ -69,7 +69,7 @@ export default function StudyScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="bg-study rounded-b-3xl mx-4 mt-4 px-6 py-8">
+        <View className="bg-blue-500 rounded-b-3xl mx-4 mt-4 px-6 py-8">
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-white text-2xl font-bold">闻思修行</Text>
@@ -88,19 +88,19 @@ export default function StudyScreen() {
             <View className="flex-row justify-between items-center">
               <View className="flex-1">
                 <Text className="text-sm text-gray-600">已完成主题</Text>
-                <Text className="text-2xl font-bold text-study">
+                <Text className="text-2xl font-bold text-blue-500">
                   {topicProgress.filter(p => p.completed).length}
                 </Text>
               </View>
               <View className="flex-1">
                 <Text className="text-sm text-gray-600">总体进度</Text>
-                <Text className="text-2xl font-bold text-study">
+                <Text className="text-2xl font-bold text-blue-500">
                   {courses.length > 0 ? calculateProgress(courses[0]?.total_topics || 0).toFixed(1) : '0'}%
                 </Text>
               </View>
               <View className="flex-1">
                 <Text className="text-sm text-gray-600">课程数</Text>
-                <Text className="text-2xl font-bold text-study">{courses.length}</Text>
+                <Text className="text-2xl font-bold text-blue-500">{courses.length}</Text>
               </View>
             </View>
           </View>
@@ -117,7 +117,7 @@ export default function StudyScreen() {
               <Text className="text-gray-600 text-center mb-4">
                 开始您的闻思之旅，选择适合的课程深入学习佛法
               </Text>
-              <TouchableOpacity className="bg-study rounded-lg px-6 py-3">
+              <TouchableOpacity className="bg-blue-500 rounded-lg px-6 py-3">
                 <Text className="text-white font-medium">浏览课程</Text>
               </TouchableOpacity>
             </View>
@@ -144,8 +144,8 @@ export default function StudyScreen() {
                         {course.description}
                       </Text>
                     </View>
-                    <View className="bg-study/10 rounded-full p-2 ml-3">
-                      <Text className="text-study text-sm font-medium">
+                    <View className="bg-blue-100 rounded-full p-2 ml-3">
+                      <Text className="text-blue-500 text-sm font-medium">
                         {completedTopics}/{course.total_topics}
                       </Text>
                     </View>
@@ -154,13 +154,13 @@ export default function StudyScreen() {
                   <View className="mb-2">
                     <View className="flex-row justify-between items-center mb-1">
                       <Text className="text-xs text-gray-500">学习进度</Text>
-                      <Text className="text-xs text-study font-medium">
+                      <Text className="text-xs text-blue-500 font-medium">
                         {progressPercent.toFixed(1)}%
                       </Text>
                     </View>
                     <View className="bg-gray-100 rounded-full h-2">
                       <View 
-                        className="bg-study rounded-full h-2" 
+                        className="bg-blue-500 rounded-full h-2" 
                         style={{ width: `${progressPercent}%` }} 
                       />
                     </View>
@@ -173,8 +173,8 @@ export default function StudyScreen() {
 
         {/* Daily Quote */}
         <View className="px-4 mt-6 mb-8">
-          <View className="bg-buddhist-golden/10 rounded-xl p-4 border-l-4 border-buddhist-golden">
-            <Text className="text-sm font-medium text-buddhist-golden mb-1">今日法语</Text>
+          <View className="bg-yellow-50 rounded-xl p-4 border-l-4 border-yellow-600">
+            <Text className="text-sm font-medium text-yellow-600 mb-1">今日法语</Text>
             <Text className="text-gray-700 italic">
               "诸恶莫作，众善奉行，自净其意，是诸佛教。"
             </Text>
