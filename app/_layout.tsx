@@ -27,7 +27,7 @@ function RootLayoutNav() {
       user: user?.email || null,
       timestamp: new Date().toISOString()
     });
-    
+
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {

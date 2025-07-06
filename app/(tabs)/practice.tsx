@@ -234,21 +234,22 @@ export default function PracticeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50" style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       <ScrollView 
         className="flex-1"
+        style={{ flex: 1 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View className="flex-row justify-between items-center p-4 bg-white">
-          <Text className="text-2xl font-semibold text-gray-800">🧘 修行</Text>
+        <View className="flex-row justify-between items-center p-4 bg-white" style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: 'white' }}>
+          <Text className="text-2xl font-semibold text-gray-800" style={{ fontSize: 24, fontWeight: '600', color: '#1f2937' }}>🧘 修行</Text>
           <TouchableOpacity onPress={handleAddPractice}>
-            <Text className="text-blue-500 text-base font-medium">添加</Text>
+            <Text className="text-blue-500 text-base font-medium" style={{ color: '#3b82f6', fontSize: 16, fontWeight: '500' }}>添加</Text>
           </TouchableOpacity>
         </View>
 
-        <Text className="text-lg font-semibold text-gray-800 mx-4 mt-4 mb-2">我的修行项目：</Text>
+        <Text className="text-lg font-semibold text-gray-800 mx-4 mt-4 mb-2" style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginHorizontal: 16, marginTop: 16, marginBottom: 8 }}>我的修行项目：</Text>
 
         {projects.map((project) => {
           const progress = calculateProgress(project);
@@ -261,7 +262,7 @@ export default function PracticeScreen() {
             : null;
 
           return (
-            <View key={project.id} className="bg-white rounded-xl p-4 mx-4 my-2 shadow-sm">
+            <View key={project.id} className="bg-white rounded-xl p-4 mx-4 my-2 shadow-sm" style={{ backgroundColor: 'white', borderRadius: 12, padding: 16, marginHorizontal: 16, marginVertical: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
               <View className="mb-2">
                 <Text className="text-sm text-gray-600 mb-2">
                   {project.practices.type === 'count' ? '计数类' : '计时类'}
