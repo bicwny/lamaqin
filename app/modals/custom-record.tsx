@@ -230,7 +230,7 @@ export default function CustomRecordScreen() {
             <Text className="mt-3 text-base text-gray-600">正在加载记录...</Text>
           </View>
         ) : (
-        <View className="bg-white rounded-xl p-5 mb-5 shadow-sm border border-gray-100")
+        <View className="bg-white rounded-xl p-5 mb-5 shadow-sm border border-gray-100">
           <Text className="text-2xl font-semibold text-gray-800 text-center mb-6 pb-4 border-b border-gray-200">
             📿 {practiceName}
           </Text>
