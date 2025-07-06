@@ -898,6 +898,31 @@ export const studyService = {
   }
 };
 
+// Legacy function exports for study screen compatibility
+export async function getUserCourses(userId: string) {
+  return await studyService.getUserCourses(userId);
+}
+
+export async function getUserTopicProgress(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('topic_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .order('topic_number');
+
+    if (error) {
+      console.error('❌ Error fetching topic progress:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('❌ getUserTopicProgress failed:', error);
+    return [];
+  }
+}
+
 // Mindfulness Records
 export const mindfulnessService = {
   async getTodayRecords(userId: string, date: string): Promise<MindfulnessRecord[]> {
