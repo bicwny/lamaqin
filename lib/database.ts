@@ -906,7 +906,7 @@ export async function getUserCourses(userId: string) {
 export async function getUserTopicProgress(userId: string) {
   try {
     const { data, error } = await supabase
-      .from('topic_progress')
+      .from('user_practice_topic_progress')
       .select('*')
       .eq('user_id', userId)
       .order('topic_number');
