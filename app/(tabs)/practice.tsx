@@ -466,4 +466,3 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
 
   return <Text className="text-sm text-blue-500 font-medium mb-3">🧘 {totalSessions} 次观修</Text>;
 }
-
