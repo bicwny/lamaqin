@@ -50,19 +50,7 @@ export default function PracticeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      loadPracticeData();
-    }
-  }, [user]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadPracticeData();
-    }, [user])
-  );
-
-  const loadPracticeData = async () => {
+  const loadPracticeData = React.useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -96,14 +84,30 @@ export default function PracticeScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [user?.id]);
 
-  const onRefresh = () => {
+  useEffect(() => {
+    if (user) {
+      loadPracticeData();
+    }
+  }, [user, loadPracticeData]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        loadPracticeData();
+      }
+    }, [user, loadPracticeData])
+  );
+
+  
+
+  const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     loadPracticeData();
-  };
+  }, [loadPracticeData]);
 
-  const calculateProgress = (project: PracticeProject) => {
+  const calculateProgress = React.useCallback((project: PracticeProject) => {
     if (project.practices.type === 'count') {
       const percentage = Math.min((project.current_count / project.target_count) * 100, 100);
       return {
@@ -121,11 +125,11 @@ export default function PracticeScreen() {
         isCompleted: project.current_count >= project.target_count,
       };
     }
-  };
+  }, []);
 
-  const handleAddPractice = () => {
+  const handleAddPractice = React.useCallback(() => {
     router.push('/add-practice');
-  };
+  }, []);
 
   const handleCustomRecord = async (projectId: string, practiceName: string) => {
     console.log('🔄 handleCustomRecord called with project:', projectId, practiceName);
