@@ -440,7 +440,7 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
       try {
         const { data, error } = await supabase
           .from('meditation_records')
-          .select('*', { count: 'exact' })
+          .select('*, topic_number', { count: 'exact' })
           .eq('user_id', userId)
           .eq('practice_id', practiceId);
 
