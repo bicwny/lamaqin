@@ -249,9 +249,11 @@ export default function PracticeScreen() {
           const progress = calculateProgress(project);
           const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
+          // Unified display logic based on target_end_date
+          const practiceDisplayType = project.target_end_date ? '固定时长' : '持续进行';
           const totalWeeks = project.target_end_date 
-                ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
-                : '持续进行';
+            ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
+            : null;
 
           return (
             <View key={project.id} style={styles.practiceCard}>
@@ -262,7 +264,11 @@ export default function PracticeScreen() {
                 </Text>
               </View>
 
-              <Text style={styles.practiceName}>{project.practices.name}</Text>
+              <Text style={styles.practiceName}>
+                {project.practices.name}
+                {project.practices.type === 'time' && ` (${practiceDisplayType})`}
+                {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
+              </Text>
 
               <View style={styles.progressContainer}>
                 {project.practices.type === 'count' ? (
