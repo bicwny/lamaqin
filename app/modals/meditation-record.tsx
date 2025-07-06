@@ -363,11 +363,18 @@ const styles = StyleSheet.create({
     borderColor: '#ced4da',
     borderRadius: 8,
     backgroundColor: 'white',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    ...(Platform.OS === 'ios' && {
+      minHeight: 200,
+      paddingHorizontal: 0,
+    }),
   },
   picker: {
     height: 50,
-    color: '#333'
+    color: '#333',
+    ...(Platform.OS === 'android' && {
+      backgroundColor: 'white',
+    }),
   },
   topicDescription: {
     backgroundColor: '#fff3cd',
