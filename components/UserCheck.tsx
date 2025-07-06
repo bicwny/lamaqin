@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -51,22 +51,24 @@ export function UserCheck() {
   }
 
   return (
-    <View className="p-6 bg-gray-100 m-3 rounded-lg">
-      <Text className="text-lg font-bold mb-3 text-buddhist-slate">用户检查</Text>
-      <Text className="text-sm text-buddhist-gray mb-1">Auth User: {user?.email || 'None'}</Text>
-      <Text className="text-sm text-buddhist-gray mb-3">DB User: {dbUser ? `${dbUser.dharma_name} (${dbUser.email})` : 'Not found'}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>用户检查</Text>
+      <Text>Auth User: {user?.email || 'None'}</Text>
+      <Text>DB User: {dbUser ? `${dbUser.dharma_name} (${dbUser.email})` : 'Not found'}</Text>
 
       {dbUser && (
-        <View className="mt-3 p-3 bg-white rounded-lg">
-          <Text className="text-sm text-buddhist-gray mb-1">ID: {dbUser.id}</Text>
-          <Text className="text-sm text-buddhist-gray mb-1">法名: {dbUser.dharma_name}</Text>
-          <Text className="text-sm text-buddhist-gray mb-1">修行年数: {dbUser.practice_years || 'N/A'}</Text>
-          <Text className="text-sm text-buddhist-gray">地区: {dbUser.location || 'N/A'}</Text>
+        <View style={styles.userDetails}>
+          <Text>ID: {dbUser.id}</Text>
+          <Text>法名: {dbUser.dharma_name}</Text>
+          <Text>修行年数: {dbUser.practice_years || 'N/A'}</Text>
+          <Text>地区: {dbUser.location || 'N/A'}</Text>
         </View>
       )}
     </View>
   );
-}Size: 16,
+}
+
+const styles = StyleSheet.create({});Size: 16,
     fontWeight: '600',
   },
 });

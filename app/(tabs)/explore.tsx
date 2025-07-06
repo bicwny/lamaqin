@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, View, Text } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -17,32 +17,32 @@ export default function TabTwoScreen() {
           size={310}
           color="#808080"
           name="chevron.left.forwardslash.chevron.right"
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
+          style={styles.headerImage}
         />
       }>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1f2937' }}>探索</Text>
-      </View>
-      <Text style={{ fontSize: 16, color: '#4b5563', lineHeight: 24 }}>此应用包含示例代码以帮助您入门。</Text>
-      <Collapsible title="基于文件的路由">
-        <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20 }}>
-          此应用有多个屏幕：{' '}
-          <Text style={{ fontWeight: '600' }}>app/(tabs)/index.tsx</Text> 和{' '}
-          <Text style={{ fontWeight: '600' }}>app/(tabs)/explore.tsx</Text>
-        </Text>
-        <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20, marginTop: 8 }}>
-          布局文件在 <Text style={{ fontWeight: '600' }}>app/(tabs)/_layout.tsx</Text>{' '}
-          中设置选项卡导航器。
-        </Text>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Explore</ThemedText>
+      </ThemedView>
+      <ThemedText>This app includes example code to help you get started.</ThemedText>
+      <Collapsible title="File-based routing">
+        <ThemedText>
+          This app has two screens:{' '}
+          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
+          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
+        </ThemedText>
+        <ThemedText>
+          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
+          sets up the tab navigator.
+        </ThemedText>
         <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <Text style={{ color: '#3b82f6', fontSize: 14, textDecorationLine: 'underline' }}>了解更多</Text>
+          <ThemedText type="link">Learn more</ThemedText>
         </ExternalLink>
       </Collapsible>
-      <Collapsible title="Android、iOS 和 Web 支持">
-        <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20 }}>
-          您可以在 Android、iOS 和 Web 上打开此项目。要打开 Web 版本，请在运行此项目的终端中按{' '}
-          <Text style={{ fontWeight: '600' }}>w</Text>。
-        </Text>
+      <Collapsible title="Android, iOS, and web support">
+        <ThemedText>
+          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
+          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
+        </ThemedText>
       </Collapsible>
       <Collapsible title="Images">
         <ThemedText>

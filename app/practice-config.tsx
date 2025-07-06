@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -233,33 +234,37 @@ export default function PracticeConfigScreen() {
 
   const renderCountBasedConfig = () => (
     <>
-      <View className="mb-6">
-        <Text className="text-lg font-semibold text-gray-800 mb-4">1. 您想如何设定目标？</Text>
-        <View className="flex-row bg-gray-100 rounded-lg p-1">
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>1. 您想如何设定目标？</Text>
+        <View style={styles.segmentedControl}>
           <TouchableOpacity
-            className={`flex-1 py-3 px-4 rounded-md items-center ${
-              configMode === 'total' ? 'bg-white shadow-sm' : ''
-            }`}
+            style={[
+              styles.segmentButton,
+              configMode === 'total' && styles.segmentButtonActive,
+            ]}
             onPress={() => setConfigMode('total')}
           >
             <Text
-              className={`text-base font-medium ${
-                configMode === 'total' ? 'text-gray-800' : 'text-gray-600'
-              }`}
+              style={[
+                styles.segmentButtonText,
+                configMode === 'total' && styles.segmentButtonTextActive,
+              ]}
             >
               按总数目标
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`flex-1 py-3 px-4 rounded-md items-center ${
-              configMode === 'daily' ? 'bg-white shadow-sm' : ''
-            }`}
+            style={[
+              styles.segmentButton,
+              configMode === 'daily' && styles.segmentButtonActive,
+            ]}
             onPress={() => setConfigMode('daily')}
           >
             <Text
-              className={`text-base font-medium ${
-                configMode === 'daily' ? 'text-gray-800' : 'text-gray-600'
-              }`}
+              style={[
+                styles.segmentButtonText,
+                configMode === 'daily' && styles.segmentButtonTextActive,
+              ]}
             >
               按每日目标
             </Text>
@@ -267,36 +272,36 @@ export default function PracticeConfigScreen() {
         </View>
       </View>
 
-      <View className="mb-6">
-        <Text className="text-lg font-semibold text-gray-800 mb-4">2. 目标详情</Text>
-        <View className="mt-4">
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>2. 目标详情</Text>
+        <View style={styles.inputContainer}>
           {configMode === 'total' ? (
             <>
-              <Text className="text-base font-semibold text-gray-800 mb-2">总目标数量</Text>
-              <View className="flex-row items-center bg-gray-50 rounded-lg px-3 border border-gray-200">
+              <Text style={styles.inputLabel}>总目标数量</Text>
+              <View style={styles.inputRow}>
                 <TextInput
-                  className="flex-1 py-3 text-base text-gray-800"
+                  style={styles.textInput}
                   value={totalTarget}
                   onChangeText={setTotalTarget}
                   placeholder="例如: 400000"
                   keyboardType="numeric"
                 />
-                <Text className="text-base text-gray-600 ml-2">{practiceUnit}</Text>
+                <Text style={styles.inputUnit}>{practiceUnit}</Text>
               </View>
             </>
           ) : (
             <>
-              <Text className="text-base font-semibold text-gray-800 mb-2">每日目标</Text>
-              <View className="flex-row items-center bg-gray-50 rounded-lg px-3 border border-gray-200">
-                <Text className="text-base text-gray-600 mr-2">每日持诵</Text>
+              <Text style={styles.inputLabel}>每日目标</Text>
+              <View style={styles.inputRow}>
+                <Text style={styles.inputPrefix}>每日持诵</Text>
                 <TextInput
-                  className="flex-1 py-3 text-base text-gray-800"
+                  style={styles.textInput}
                   value={dailyTarget}
                   onChangeText={setDailyTarget}
                   placeholder="例如: 1000"
                   keyboardType="numeric"
                 />
-                <Text className="text-base text-gray-600 ml-2">{practiceUnit}</Text>
+                <Text style={styles.inputUnit}>{practiceUnit}</Text>
               </View>
             </>
           )}
@@ -307,35 +312,35 @@ export default function PracticeConfigScreen() {
 
   const renderTimeBasedConfig = () => (
     <>
-      <View className="mb-6">
-        <Text className="text-lg font-semibold text-gray-800 mb-4">1. 设定您的每周目标</Text>
-        <View className="flex-row items-center bg-gray-50 rounded-lg px-3 border border-gray-200">
-          <Text className="text-base text-gray-600 mr-2">每周完成</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>1. 设定您的每周目标</Text>
+        <View style={styles.inputRow}>
+          <Text style={styles.inputPrefix}>每周完成</Text>
           <TextInput
-            className="flex-1 py-3 text-base text-gray-800"
+            style={styles.textInput}
             value={sessionsTarget}
             onChangeText={setSessionsTarget}
             placeholder="例如: 4"
             keyboardType="numeric"
           />
-          <Text className="text-base text-gray-600 ml-2">座</Text>
+          <Text style={styles.inputUnit}>座</Text>
         </View>
       </View>
     </>
   );
 
   const renderTimePlanning = () => (
-    <View className="mb-6">
-      <Text className="text-lg font-semibold text-gray-800 mb-4">2. 时间规划</Text>
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>2. 时间规划</Text>
 
-      <View className="mt-4 mb-4">
-        <Text className="text-base font-semibold text-gray-800 mb-2">开始时间</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>开始时间</Text>
         <TouchableOpacity
-          className="flex-row justify-between items-center bg-gray-50 rounded-lg px-3 py-3 border border-gray-200"
+          style={styles.dateButton}
           onPress={() => setShowStartDatePicker(true)}
         >
-          <Text className="text-base text-gray-800">{formatDate(startDate)}</Text>
-          <Text className="text-base">📅</Text>
+          <Text style={styles.dateButtonText}>{formatDate(startDate)}</Text>
+          <Text style={styles.dateButtonIcon}>📅</Text>
         </TouchableOpacity>
 
         {showStartDatePicker && (
@@ -353,21 +358,23 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      <View className="mt-4">
-        <Text className="text-base font-semibold text-gray-800 mb-2">持续时间</Text>
-        <View className="flex-row flex-wrap mb-3">
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>持续时间</Text>
+        <View style={styles.durationOptions}>
           {['30天', '60天', '100天', '1年'].map((option) => (
             <TouchableOpacity
               key={option}
-              className={`px-4 py-2 rounded-full mr-2 mb-2 ${
-                durationMode === option ? 'bg-primary' : 'bg-gray-100'
-              }`}
+              style={[
+                styles.durationButton,
+                durationMode === option && styles.durationButtonActive,
+              ]}
               onPress={() => setDurationMode(option as any)}
             >
               <Text
-                className={`text-sm font-medium ${
-                  durationMode === option ? 'text-white' : 'text-gray-600'
-                }`}
+                style={[
+                  styles.durationButtonText,
+                  durationMode === option && styles.durationButtonTextActive,
+                ]}
               >
                 {option}
               </Text>
@@ -376,26 +383,29 @@ export default function PracticeConfigScreen() {
         </View>
 
         <TouchableOpacity
-          className={`py-3 rounded-lg items-center mb-3 ${
-            durationMode === '自定义' ? 'bg-yellow-600' : 'bg-yellow-500'
-          }`}
+          style={[
+            styles.customButton,
+            durationMode === '自定义' && styles.customButtonActive,
+          ]}
           onPress={() => setDurationMode('自定义')}
         >
           <Text
-            className={`text-base font-semibold ${
-              durationMode === '自定义' ? 'text-white' : 'text-white'
-            }`}
+            style={[
+              styles.customButtonText,
+              durationMode === '自定义' && styles.customButtonTextActive,
+            ]}
           >
             自定义
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          className={`py-3 rounded-lg items-center mt-2 border-2 ${
-            durationMode === '持续进行' ? 'bg-green-500 border-green-500' : 'bg-green-100 border-green-500'
-          } ${
-            (practiceType === 'count' && configMode === 'total') ? 'opacity-50' : ''
-          }`}
+          style={[
+            styles.ongoingButton,
+            durationMode === '持续进行' && styles.ongoingButtonActive,
+            // Disable for count-based practices with total target mode
+            (practiceType === 'count' && configMode === 'total') && styles.ongoingButtonDisabled,
+          ]}
           onPress={() => {
             // Only allow ongoing for time-based practices or count-based daily target mode
             if (practiceType === 'time' || configMode === 'daily') {
@@ -405,25 +415,26 @@ export default function PracticeConfigScreen() {
           disabled={practiceType === 'count' && configMode === 'total'}
         >
           <Text
-            className={`text-base font-semibold ${
-              durationMode === '持续进行' ? 'text-white' : 'text-green-600'
-            } ${
-              (practiceType === 'count' && configMode === 'total') ? 'text-gray-400' : ''
-            }`}
+            style={[
+              styles.ongoingButtonText,
+              durationMode === '持续进行' && styles.ongoingButtonTextActive,
+              // Disabled text style
+              (practiceType === 'count' && configMode === 'total') && styles.ongoingButtonTextDisabled,
+            ]}
           >
             持续进行 (直到我停止)
           </Text>
         </TouchableOpacity>
 
         {durationMode === '自定义' && (
-          <View className="mt-3 p-4 bg-gray-50 rounded-lg border-2 border-blue-500">
-            <Text className="text-sm font-medium text-gray-800 mb-2">选择结束日期</Text>
+          <View style={styles.customInputContainer}>
+            <Text style={styles.customInputLabel}>选择结束日期</Text>
             <TouchableOpacity
-              className="flex-row justify-between items-center bg-white rounded-md px-3 py-3 border border-gray-200"
+              style={styles.customDateButton}
               onPress={() => setShowCustomDatePicker(true)}
             >
-              <Text className="text-base text-gray-800">{formatDate(customEndDate)}</Text>
-              <Text className="text-base">📅</Text>
+              <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
+              <Text style={styles.dateButtonIcon}>📅</Text>
             </TouchableOpacity>
 
             {showCustomDatePicker && (
@@ -513,68 +524,68 @@ export default function PracticeConfigScreen() {
     const summary = calculateSummary();
 
     return (
-      <View className="mb-6">
-        <Text className="text-lg font-semibold text-gray-800 mb-4">4. 智能总结</Text>
-        <View className="bg-gray-50 rounded-lg p-4 border-l-4 border-primary">
-          <Text className="text-base font-semibold text-gray-800 mb-3">📝 根据您的设置：</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>4. 智能总结</Text>
+        <View style={styles.summaryContainer}>
+          <Text style={styles.summaryTitle}>📝 根据您的设置：</Text>
           {practiceType === 'count' ? (
             <View>
-              <Text className="text-sm text-gray-600 leading-5 mb-1">
+              <Text style={styles.summaryText}>
                 您需要在约 {days} 天内完成，
               </Text>
               {configMode === 'total' && totalTarget ? (
                 <View>
-                  <Text className="text-sm text-gray-600 leading-5 mb-1">
+                  <Text style={styles.summaryText}>
                     总计 {parseInt(totalTarget).toLocaleString()} {practiceUnit}。
                   </Text>
-                  <Text className="text-sm font-semibold text-primary leading-5 mt-2">
+                  <Text style={styles.summaryHighlight}>
                     👉 建议每日持诵约 {suggestedDaily.toLocaleString()} {practiceUnit}。
                   </Text>
                 </View>
               ) : configMode === 'daily' && dailyTarget ? (
                 <View>
-                  <Text className="text-sm text-gray-600 leading-5 mb-1">
+                  <Text style={styles.summaryText}>
                     每日 {parseInt(dailyTarget).toLocaleString()} {practiceUnit}。
                   </Text>
-                  <Text className="text-sm font-semibold text-primary leading-5 mt-2">
+                  <Text style={styles.summaryHighlight}>
                     👉 预计总计完成 {projectedTotal.toLocaleString()} {practiceUnit}。
                   </Text>
                 </View>
               ) : (
-                <Text className="text-sm text-gray-600 leading-5">请设置目标数量以查看建议。</Text>
+                <Text style={styles.summaryText}>请设置目标数量以查看建议。</Text>
               )}
             </View>
           ) : (
             <View>
               {durationMode === '持续进行' ? (
                 <View>
-                  <Text className="text-sm text-gray-600 leading-5 mb-1">
+                  <Text style={styles.summaryText}>
                     🎯 持续进行模式：每周目标 {sessionsTarget || 4} 座观修
                   </Text>
-                  <Text className="text-sm text-gray-600 leading-5 mb-1">
+                  <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始
                   </Text>
-                  <Text className="text-sm font-semibold text-primary leading-5 mb-1">
+                  <Text style={styles.summaryHighlight}>
                     👉 记录时需选择具体修法主题和观修时长
                   </Text>
-                  <Text className="text-sm font-semibold text-primary leading-5">
+                  <Text style={styles.summaryHighlight}>
                     🏁 将持续进行直到您手动停止
                   </Text>
                 </View>
               ) : sessionsTarget ? (
                 <View>
-                  <Text className="text-sm text-gray-600 leading-5 mb-1">
+                  <Text style={styles.summaryText}>
                     🎯 固定时长模式：在约 {days} 天内完成
                   </Text>
-                  <Text className="text-sm text-gray-600 leading-5 mb-1">
+                  <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始，每周 {sessionsTarget} 座观修
                   </Text>
-                  <Text className="text-sm font-semibold text-primary leading-5 mt-2">
+                  <Text style={styles.summaryHighlight}>
                     👉 预计总计完成约 {Math.ceil(days / 7) * parseInt(sessionsTarget)} 座观修
                   </Text>
                 </View>
               ) : (
-                <Text className="text-sm text-gray-600 leading-5">请设置座数目标以查看建议。</Text>
+                <Text style={styles.summaryText}>请设置座数目标以查看建议。</Text>
               )}
             </View>
           )}
@@ -735,33 +746,366 @@ export default function PracticeConfigScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View className="bg-white px-4 py-3 border-b border-gray-200">
-        <TouchableOpacity onPress={() => router.back()} className="py-2 mb-2">
-          <Text className="text-primary text-base font-medium">← 返回</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
-        <Text className="text-xl font-semibold text-gray-800 text-center">配置"{practiceName}"</Text>
+        <Text style={styles.headerTitle}>配置"{practiceName}"</Text>
       </View>
 
-      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {practiceType === 'count' ? renderCountBasedConfig() : renderTimeBasedConfig()}
         {renderTimePlanning()}
         {renderSmartSummary()}
 
         <TouchableOpacity
-          className={`bg-primary py-4 rounded-xl items-center mt-6 mb-8 ${loading ? 'opacity-60' : ''}`}
+          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
           onPress={handleConfirm}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white text-lg font-semibold">确认添加项目</Text>
+            <Text style={styles.saveButtonText}>确认添加项目</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    backgroundColor: '#f1f3f4',
+    borderRadius: 8,
+    padding: 4,
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  segmentButtonActive: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  segmentButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#666',
+  },
+  segmentButtonTextActive: {
+    color: '#333',
+  },
+  inputContainer: {
+    marginTop: 16,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  inputPrefix: {
+    fontSize: 16,
+    color: '#666',
+    marginRight: 8,
+  },
+  textInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  inputUnit: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dateButtonIcon: {
+    fontSize: 16,
+  },
+  durationOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 12,
+  },
+  durationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f1f3f4',
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  durationButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  durationButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+  },
+  durationButtonTextActive: {
+    color: 'white',
+  },
+  customButton: {
+    backgroundColor: '#d4af37',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  customButtonActive: {
+    backgroundColor: '#b8941f',
+  },
+  customButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+  },
+  customButtonTextActive: {
+    color: 'white',
+  },
+  customInputContainer: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#007AFF',
+  },
+  customInputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 8,
+  },
+  customDateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  customDateButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  ongoingButton: {
+    backgroundColor: '#e8f5e8',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  ongoingButtonActive: {
+    backgroundColor: '#4CAF50',
+  },
+  ongoingButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4CAF50',
+  },
+  ongoingButtonTextActive: {
+    color: 'white',
+  },
+  ongoingButtonDisabled: {
+    backgroundColor: '#f1f1f1',
+    borderColor: '#ddd',
+    opacity: 0.5,
+  },
+  ongoingButtonTextDisabled: {
+    color: '#999',
+  },
+  summaryContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
+  summaryTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+  summaryText: {
+    fontSize: 15,
+    color: '#555',
+    lineHeight: 22,
+    marginBottom: 4,
+  },
+  summaryHighlight: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.primary,
+    lineHeight: 22,
+    marginTop: 8,
+  },
+  topicProgressInfo: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4a90e2',
+    marginTop: 8,
+  },
+  topicProgressText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  topicProgressSubtext: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    lineHeight: 20,
+  },
+  saveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 32,
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  specialSection: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+  },
+  topicProgressConfig: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  configLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  configDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    textAlign: 'center',
+    minWidth: 60,
+    backgroundColor: '#fff',
+  },
+  helpText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+});

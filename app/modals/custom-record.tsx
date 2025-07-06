@@ -1,137 +1,411 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  SafeAreaView,
+  ToastAndroid,
+  Platform,
+} from 'react-native';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Colors } from '@/constants/Colors';
 
-export default function CustomRecordModal() {
+export default function CustomRecordScreen() {
   const { user } = useAuth();
-  const { projectId } = useLocalSearchParams();
-  const [duration, setDuration] = useState('');
+  const { 
+    projectId, 
+    practiceName,
+    practiceType,
+    editRecordId 
+  } = useLocalSearchParams<{
+    projectId: string;
+    practiceName: string;
+    practiceType: string;
+    editRecordId?: string;
+  }>();
+
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingRecord, setLoadingRecord] = useState(false);
+  const isEditing = !!editRecordId;
 
-  const handleSave = async () => {
-    if (!user || !projectId) return;
-
-    if (!duration && !count) {
-      Alert.alert('错误', '请输入持续时间或次数');
-      return;
+  // Toast function for cross-platform support
+  const showToast = (message: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      Alert.alert('提示', message);
     }
+  };
 
-    setLoading(true);
+  // Load existing record data when editing
+  useEffect(() => {
+    if (isEditing && editRecordId && user) {
+      loadExistingRecord();
+    }
+  }, [isEditing, editRecordId, user]);
+
+  const loadExistingRecord = async () => {
+    if (!user || !editRecordId) return;
+
+    setLoadingRecord(true);
     try {
-      const recordData: any = {
-        user_id: user.id,
-        practice_project_id: projectId,
-        practice_date: new Date().toISOString().split('T')[0],
-        notes: notes.trim() || null,
-      };
-
-      if (duration) {
-        recordData.duration_minutes = parseInt(duration);
-      }
-
-      if (count) {
-        recordData.repetitions = parseInt(count);
-      }
-
-      const { error } = await supabase
-        .from('practice_records')
-        .insert(recordData);
+      const { data: record, error } = await supabase
+        .from('daily_records')
+        .select('*')
+        .eq('id', editRecordId)
+        .eq('user_id', user.id)
+        .single();
 
       if (error) throw error;
 
-      Alert.alert(
-        '记录成功',
-        '修行记录已保存',
-        [
-          {
-            text: '确定',
-            onPress: () => router.back()
-          }
-        ]
-      );
+      if (record) {
+        setCount(record.count.toString());
+        setNotes(record.notes || '');
+      }
     } catch (error) {
-      console.error('Error saving record:', error);
-      Alert.alert('错误', '保存记录失败');
+      console.error('❌ Error loading existing record:', error);
+      Alert.alert('错误', '加载记录失败');
+    } finally {
+      setLoadingRecord(false);
+    }
+  };
+
+  const validateForm = () => {
+    const countNum = parseInt(count);
+    if (isNaN(countNum) || countNum <= 0) {
+      Alert.alert('提示', '请输入有效的数量（大于0）');
+      return false;
+    }
+
+    console.log('✅ Form validation passed:', { count: countNum });
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!user || !validateForm()) return;
+
+    setLoading(true);
+    try {
+      const countNum = parseInt(count);
+
+      if (isEditing && editRecordId) {
+        // Edit existing record
+        await handleEditRecord(countNum);
+      } else {
+        // Create new record
+        await handleCreateRecord(countNum);
+      }
+
+      showToast(isEditing ? '记录已更新' : `已记录 ${countNum} 次`);
+      router.back();
+    } catch (error) {
+      console.error('❌ Error saving count record:', error);
+      Alert.alert('错误', `保存失败，请重试: ${error.message || '未知错误'}`);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCreateRecord = async (countNum: number) => {
+    // Get the project details
+    const { data: project, error: projectError } = await supabase
+      .from('user_practice_projects')
+      .select('practice_id, current_count')
+      .eq('id', projectId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (projectError) throw projectError;
+
+    // Insert new record
+    const { data: record, error: recordError } = await supabase
+      .from('daily_records')
+      .insert({
+        user_id: user.id,
+        practice_project_id: projectId,
+        record_date: new Date().toISOString().split('T')[0],
+        count: countNum,
+        notes: notes.trim() || null
+      })
+      .select()
+      .single();
+
+    if (recordError) throw recordError;
+
+    // Update project's current count
+    const newCurrentCount = project.current_count + countNum;
+    const { error: updateError } = await supabase
+      .from('user_practice_projects')
+      .update({ 
+        current_count: newCurrentCount,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', projectId)
+      .eq('user_id', user.id);
+
+    if (updateError) throw updateError;
+  };
+
+  const handleEditRecord = async (countNum: number) => {
+    // Get the current record to calculate difference
+    const { data: currentRecord, error: currentError } = await supabase
+      .from('daily_records')
+      .select('count')
+      .eq('id', editRecordId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (currentError) throw currentError;
+
+    // Update the record
+    const { error: updateRecordError } = await supabase
+      .from('daily_records')
+      .update({
+        count: countNum,
+        notes: notes.trim() || null
+      })
+      .eq('id', editRecordId)
+      .eq('user_id', user.id);
+
+    if (updateRecordError) throw updateRecordError;
+
+    // Update project's current count (adjust by difference)
+    const countDifference = countNum - currentRecord.count;
+    if (countDifference !== 0) {
+      const { data: project, error: projectError } = await supabase
+        .from('user_practice_projects')
+        .select('current_count')
+        .eq('id', projectId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (projectError) throw projectError;
+
+      const newCurrentCount = project.current_count + countDifference;
+      const { error: updateProjectError } = await supabase
+        .from('user_practice_projects')
+        .update({ 
+          current_count: Math.max(0, newCurrentCount),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId)
+        .eq('user_id', user.id);
+
+      if (updateProjectError) throw updateProjectError;
+    }
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1 p-4">
-        {/* Header */}
-        <View className="flex-row justify-between items-center mb-6">
-          <Text className="text-xl font-bold text-gray-800">
-            记录修行
-          </Text>
-          <TouchableOpacity
-            className="p-2"
-            onPress={() => router.back()}
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/practice');
+          }
+        }} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          📝 {isEditing ? '编辑修行记录' : '记录修行数量'}
+        </Text>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {loadingRecord ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>正在加载记录...</Text>
+          </View>
+        ) : (
+        <View style={styles.formContainer}>
+          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+
+          {/* Count Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>本次修行数量</Text>
+            <Text style={styles.inputHint}>请输入本次修行的数量，如：108</Text>
+            <TextInput
+              style={styles.textInput}
+              value={count}
+              onChangeText={setCount}
+              keyboardType="numeric"
+              placeholder="108"
+            />
+          </View>
+
+          {/* Notes Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>备注（可选）</Text>
+            <Text style={styles.inputHint}>
+              记录您在这次修行中的体验、感悟...
+            </Text>
+            <TextInput
+              style={[styles.textInput, styles.multilineInput]}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              numberOfLines={4}
+              placeholder="例如：今日顶礼时心境平静，体会到三宝的加持..."
+              textAlignVertical="top"
+            />
+            <Text style={styles.characterCount}>
+              {notes.length} 字
+            </Text>
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={loading}
           >
-            <Text className="text-lg text-gray-600">✕</Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>
+                {isEditing ? '更新记录' : '保存记录'}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
-
-        {/* Duration Input */}
-        <View className="mb-5">
-          <Text className="text-base font-semibold text-gray-700 mb-2">
-            持续时间 (分钟)
-          </Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3 text-base bg-white"
-            placeholder="例如: 30"
-            value={duration}
-            onChangeText={setDuration}
-            keyboardType="numeric"
-          />
-        </View>
-
-        {/* Count Input */}
-        <View className="mb-5">
-          <Text className="text-base font-semibold text-gray-700 mb-2">
-            次数
-          </Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3 text-base bg-white"
-            placeholder="例如: 108"
-            value={count}
-            onChangeText={setCount}
-            keyboardType="numeric"
-          />
-        </View>
-
-        {/* Notes Input */}
-        <View className="mb-8">
-          <Text className="text-base font-semibold text-gray-700 mb-2">
-            修行心得 (可选)
-          </Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3 text-base bg-white h-24"
-            placeholder="分享您的修行体验..."
-            value={notes}
-            onChangeText={setNotes}
-            multiline
-            textAlignVertical="top"
-          />
-        </View>
-
-        {/* Save Button */}
-        <TouchableOpacity
-          className={`bg-primary rounded-lg p-4 items-center ${loading ? 'opacity-60' : ''}`}
-          onPress={handleSave}
-          disabled={loading}
-        >
-          <Text className="text-white text-base font-bold">
-            {loading ? '保存中...' : '保存记录'}
-          </Text>
-        </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa'
+  },
+  header: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 4
+  },
+  content: {
+    flex: 1,
+    padding: 16
+  },
+  formContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  practiceTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef'
+  },
+  inputSection: {
+    marginBottom: 24
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6
+  },
+  inputHint: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 8,
+    lineHeight: 20
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+    color: '#333'
+  },
+  multilineInput: {
+    height: 100,
+    textAlignVertical: 'top'
+  },
+  characterCount: {
+    fontSize: 12,
+    color: '#6c757d',
+    textAlign: 'right',
+    marginTop: 4
+  },
+  saveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 32,
+    marginHorizontal: 16,
+  },
+  saveButtonDisabled: {
+    opacity: 0.6
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600'
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    minHeight: 200,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  }
+});

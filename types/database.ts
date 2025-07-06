@@ -90,7 +90,6 @@ export interface MeditationRecord {
   method?: string;
   reflection?: string;
   reflection_created_at?: string;
-  topic_number?: number;
   created_at: string;
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Alert,
@@ -269,46 +270,50 @@ export default function MeditationHistoryScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-surface">
-        <View className="flex-1 justify-center items-center">
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
-          <Text className="mt-3 text-base text-gray-600">正在加载记录...</Text>
+          <Text style={styles.loadingText}>正在加载记录...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-surface">
+    <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View className="bg-white px-4 py-3 border-b border-gray-200 shadow-sm">
-        <TouchableOpacity onPress={() => router.back()} className="py-2 mb-2">
-          <Text className="text-primary text-base font-medium">← 返回</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
-        <Text className="text-lg font-semibold text-gray-800 text-center">📿 {practiceName} - 历史记录</Text>
+        <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
 
         {/* View Mode Toggle - only show if there are records with topics */}
         {topicStats.some(topic => topic.count > 0) && (
-          <View className="flex-row bg-gray-100 rounded-lg p-0.5 mt-3">
+          <View style={styles.viewToggle}>
             <TouchableOpacity
-              className={`flex-1 py-2 px-4 rounded-md items-center ${
-                viewMode === 'chronological' ? 'bg-primary' : ''
-              }`}
+              style={[
+                styles.toggleButton,
+                viewMode === 'chronological' && styles.toggleButtonActive
+              ]}
               onPress={() => setViewMode('chronological')}
             >
-              <Text className={`text-sm font-medium ${
-                viewMode === 'chronological' ? 'text-white' : 'text-gray-600'
-              }`}>时间</Text>
+              <Text style={[
+                styles.toggleButtonText,
+                viewMode === 'chronological' && styles.toggleButtonTextActive
+              ]}>时间</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 py-2 px-4 rounded-md items-center ${
-                viewMode === 'by_topic' ? 'bg-primary' : ''
-              }`}
+              style={[
+                styles.toggleButton,
+                viewMode === 'by_topic' && styles.toggleButtonActive
+              ]}
               onPress={() => setViewMode('by_topic')}
             >
-              <Text className={`text-sm font-medium ${
-                viewMode === 'by_topic' ? 'text-white' : 'text-gray-600'
-              }`}>主题</Text>
+              <Text style={[
+                styles.toggleButtonText,
+                viewMode === 'by_topic' && styles.toggleButtonTextActive
+              ]}>主题</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -316,7 +321,7 @@ export default function MeditationHistoryScreen() {
 
       {/* Records List */}
       <ScrollView
-        className="flex-1"
+        style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
@@ -332,93 +337,84 @@ export default function MeditationHistoryScreen() {
         {viewMode === 'chronological' ? (
           // Chronological View
           records.length === 0 ? (
-            <View className="flex-1 justify-center items-center py-20">
-              <Text className="text-lg text-gray-600 mb-2">📭 暂无观修记录</Text>
-              <Text className="text-sm text-gray-400">开始您的第一次观修吧！</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>📭 暂无观修记录</Text>
+              <Text style={styles.emptySubtext}>开始您的第一次观修吧！</Text>
             </View>
           ) : (
-            <View className="p-4">
+            <View style={styles.recordsList}>
               {records.map((record) => {
                 const isDeleting = deletingRecords.has(record.id);
                 return (
                   <View 
                     key={record.id} 
-                    className={`bg-white rounded-xl p-4 mb-3 shadow-sm ${
-                      isDeleting ? 'opacity-60 relative' : ''
-                    }`}
+                    style={[
+                      styles.recordCard,
+                      isDeleting && styles.recordCardDeleting
+                    ]}
                   >
                     {isDeleting && (
-                      <View className="absolute inset-0 bg-white/80 z-10 justify-center items-center rounded-xl flex-row gap-2">
+                      <View style={styles.deletingOverlay}>
                         <ActivityIndicator color="#dc3545" size="small" />
-                        <Text className="text-red-600 text-sm font-medium">删除中...</Text>
+                        <Text style={styles.deletingText}>删除中...</Text>
                       </View>
                     )}
 
-                    <View className={`flex-row justify-between items-center mb-3 pb-2 border-b border-gray-200 ${
-                      isDeleting ? 'opacity-50' : ''
-                    }`}>
-                      <Text className="text-base font-semibold text-gray-800">
+                    <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
+                      <Text style={styles.recordDate}>
                         {formatDate(record.record_date)}
                       </Text>
-                      <Text className="text-sm text-gray-600">
+                      <Text style={styles.recordTime}>
                         {formatTime(record.created_at)}
                       </Text>
                     </View>
 
-                    <View className={`mb-3 ${isDeleting ? 'opacity-50' : ''}`}>
-                      <Text className="text-base font-medium text-gray-800 mb-1">
+                    <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
+                      <Text style={styles.recordDuration}>
                         时长: {record.duration_minutes} 分钟
                       </Text>
 
                       {record.session_number && (
-                        <Text className="text-sm text-gray-600 mb-1">
+                        <Text style={styles.recordSession}>
                           第 {record.session_number} 座
                         </Text>
                       )}
 
                       {record.method && (
-                        <Text className="text-sm text-gray-600 mb-2">
+                        <Text style={styles.recordMethod}>
                           方法: {record.method}
                         </Text>
                       )}
 
                       {record.reflection && (
-                        <View className="mt-2 p-3 bg-gray-50 rounded-lg border-l-3 border-primary">
-                          <Text className="text-sm font-semibold text-gray-800 mb-1">观后感:</Text>
-                          <Text className="text-sm text-gray-600 leading-5" numberOfLines={3}>
+                        <View style={styles.reflectionContainer}>
+                          <Text style={styles.reflectionLabel}>观后感:</Text>
+                          <Text style={styles.reflectionText} numberOfLines={3}>
                             {record.reflection}
                           </Text>
                         </View>
                       )}
                     </View>
 
-                    <View className="flex-row justify-end gap-3">
+                    <View style={styles.recordActions}>
                       <TouchableOpacity
-                        className={`bg-blue-500 px-4 py-2 rounded-md ${
-                          isDeleting ? 'opacity-30' : ''
-                        }`}
+                        style={[styles.editButton, isDeleting && styles.disabledButton]}
                         onPress={() => handleEdit(record)}
                         disabled={isDeleting}
                       >
-                        <Text className={`text-white text-sm font-medium ${
-                          isDeleting ? 'opacity-50' : ''
-                        }`}>
+                        <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
                           编辑
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        className={`bg-red-500 px-4 py-2 rounded-md ${
-                          isDeleting ? 'opacity-30' : ''
-                        }`}
+                        style={[styles.deleteButton, isDeleting && styles.disabledButton]}
                         onPress={() => {
                           console.warn('🔴 DELETE BUTTON PHYSICAL PRESS DETECTED - Record:', record.id);
                           handleDelete(record);
                         }}
                         disabled={isDeleting}
                       >
-                        <Text className={`text-white text-sm font-medium ${
-                          isDeleting ? 'opacity-50' : ''
-                        }`}>
+                        <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
                           删除
                         </Text>
                       </TouchableOpacity>
@@ -429,14 +425,14 @@ export default function MeditationHistoryScreen() {
 
               {hasMore && (
                 <TouchableOpacity
-                  className="bg-white py-3 rounded-lg items-center mt-2 shadow-sm"
+                  style={styles.loadMoreButton}
                   onPress={handleLoadMore}
                   disabled={loadingMore}
                 >
                   {loadingMore ? (
                     <ActivityIndicator color={Colors.primary} />
                   ) : (
-                    <Text className="text-primary text-base font-medium">加载更多</Text>
+                    <Text style={styles.loadMoreText}>加载更多</Text>
                   )}
                 </TouchableOpacity>
               )}
@@ -445,49 +441,47 @@ export default function MeditationHistoryScreen() {
         ) : (
           // By Topic View
           topicStats.length === 0 ? (
-            <View className="flex-1 justify-center items-center py-20">
-              <Text className="text-lg text-gray-600 mb-2">📚 暂无主题记录</Text>
-              <Text className="text-sm text-gray-400">开始选择观修主题吧！</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>📚 暂无主题记录</Text>
+              <Text style={styles.emptySubtext}>开始选择观修主题吧！</Text>
             </View>
           ) : (
-            <View className="p-4">
+            <View style={styles.recordsList}>
               {/* Topic Coverage Summary */}
-              <View className="bg-gray-50 p-3 rounded-lg mb-4 border-l-3 border-primary">
-                <Text className="text-sm font-semibold text-gray-800 mb-1">
+              <View style={styles.topicSummary}>
+                <Text style={styles.topicSummaryText}>
                   📊 已观修 {topicStats.filter(t => t.count > 0).length} / {topicStats.length} 个主题
                 </Text>
-                <Text className="text-xs text-gray-600 italic">
+                <Text style={styles.topicSummarySubtext}>
                   * 此视图仅显示有主题标记的观修记录
                 </Text>
               </View>
 
               {topicStats.map((topic) => (
-                <View key={topic.id} className="bg-white rounded-xl p-4 mb-3 shadow-sm">
-                  <View className="flex-row justify-between items-center mb-2">
-                    <Text className="text-base font-semibold text-gray-800 flex-1 mr-2">{topic.title}</Text>
-                    <Text className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                      第{topic.topic_number}修法
-                    </Text>
+                <View key={topic.id} style={styles.topicCard}>
+                  <View style={styles.topicHeader}>
+                    <Text style={styles.topicTitle}>{topic.title}</Text>
+                    <Text style={styles.topicNumber}>第{topic.topic_number}修法</Text>
                   </View>
 
-                  <View className="flex-row flex-wrap gap-3 mb-2">
-                    <Text className="text-sm text-primary font-semibold">
+                  <View style={styles.topicStats}>
+                    <Text style={styles.topicCount}>
                       🧘 {topic.count} 次观修
                     </Text>
                     {topic.totalDuration > 0 && (
-                      <Text className="text-sm text-gray-600">
+                      <Text style={styles.topicDuration}>
                         ⏱️ 总时长: {topic.totalDuration} 分钟
                       </Text>
                     )}
                     {topic.latestRecord && (
-                      <Text className="text-sm text-gray-600">
+                      <Text style={styles.topicLatest}>
                         📅 最近: {formatDate(topic.latestRecord.record_date)}
                       </Text>
                     )}
                   </View>
 
                   {topic.description && (
-                    <Text className="text-sm text-gray-500 leading-5 mt-1" numberOfLines={2}>
+                    <Text style={styles.topicDescription} numberOfLines={2}>
                       {topic.description}
                     </Text>
                   )}
@@ -500,3 +494,312 @@ export default function MeditationHistoryScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 80,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999',
+  },
+  recordsList: {
+    padding: 16,
+  },
+  recordCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  recordDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  recordTime: {
+    fontSize: 14,
+    color: '#666',
+  },
+  recordContent: {
+    marginBottom: 12,
+  },
+  recordDuration: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
+  recordSession: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  recordMethod: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  reflectionContainer: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  reflectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  reflectionText: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  recordActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  loadMoreButton: {
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  loadMoreText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  recordCardDeleting: {
+    opacity: 0.6,
+    position: 'relative',
+  },
+  deletingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deletingText: {
+    color: '#dc3545',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  disabledContent: {
+    opacity: 0.5,
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  disabledButtonText: {
+    opacity: 0.5,
+  },
+  viewToggle: {
+    flexDirection: 'row',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 2,
+    marginTop: 12,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  toggleButtonText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  toggleButtonTextActive: {
+    color: 'white',
+  },
+  topicCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  topicHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  topicTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+    marginRight: 8,
+  },
+  topicNumber: {
+    fontSize: 12,
+    color: '#666',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  topicStats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 8,
+  },
+  topicCount: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  topicDuration: {
+    fontSize: 14,
+    color: '#666',
+  },
+  topicLatest: {
+    fontSize: 14,
+    color: '#666',
+  },
+  topicDescription: {
+    fontSize: 14,
+    color: '#888',
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  topicSummary: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  topicSummaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  topicSummarySubtext: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
+  },
+});

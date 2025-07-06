@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  StyleSheet,
   ScrollView,
   TouchableOpacity,
   Alert,
@@ -50,7 +51,19 @@ export default function PracticeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadPracticeData = React.useCallback(async () => {
+  useEffect(() => {
+    if (user) {
+      loadPracticeData();
+    }
+  }, [user]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadPracticeData();
+    }, [user])
+  );
+
+  const loadPracticeData = async () => {
     if (!user?.id) return;
 
     try {
@@ -84,30 +97,14 @@ export default function PracticeScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [user?.id]);
+  };
 
-  useEffect(() => {
-    if (user) {
-      loadPracticeData();
-    }
-  }, [user, loadPracticeData]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user) {
-        loadPracticeData();
-      }
-    }, [user, loadPracticeData])
-  );
-
-
-
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = () => {
     setRefreshing(true);
     loadPracticeData();
-  }, [loadPracticeData]);
+  };
 
-  const calculateProgress = React.useCallback((project: PracticeProject) => {
+  const calculateProgress = (project: PracticeProject) => {
     if (project.practices.type === 'count') {
       const percentage = Math.min((project.current_count / project.target_count) * 100, 100);
       return {
@@ -125,11 +122,11 @@ export default function PracticeScreen() {
         isCompleted: project.current_count >= project.target_count,
       };
     }
-  }, []);
+  };
 
-  const handleAddPractice = React.useCallback(() => {
+  const handleAddPractice = () => {
     router.push('/add-practice');
-  }, []);
+  };
 
   const handleCustomRecord = async (projectId: string, practiceName: string) => {
     console.log('🔄 handleCustomRecord called with project:', projectId, practiceName);
@@ -190,10 +187,10 @@ export default function PracticeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50">
-        <View className="flex-1 justify-center items-center p-5">
-          <Text className="text-2xl font-semibold text-gray-800 mb-4">🧘 修行</Text>
-          <Text className="text-base text-gray-600">加载中...</Text>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.title}>🧘 修行</Text>
+          <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </SafeAreaView>
     );
@@ -201,31 +198,29 @@ export default function PracticeScreen() {
 
   if (projects.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50">
-        <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-          <View className="flex-row justify-between items-center p-4 bg-white">
-            <View>
-              <Text className="text-2xl font-semibold text-gray-800">🧘 修行</Text>
-              <Text className="text-base text-gray-600 text-center mt-2">记录你的修行历程</Text>
-            </View>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>🧘 修行</Text>
+            <Text style={styles.subtitle}>记录你的修行历程</Text>
           </View>
 
-          <View className="flex-1 justify-center items-center p-10" style={{ minHeight: 500 }}>
-            <View className="mb-6">
+          <View style={styles.emptyState}>
+            <View style={styles.iconContainer}>
               <Ionicons name="flower-outline" size={80} color="#9CA3AF" />
             </View>
 
-            <Text className="text-2xl font-semibold text-gray-700 mb-3 text-center">开始你的修行之旅</Text>
-            <Text className="text-base text-gray-600 text-center leading-6 mb-8 max-w-xs">
+            <Text style={styles.emptyTitle}>开始你的修行之旅</Text>
+            <Text style={styles.emptyDescription}>
               添加你的第一个修行项目，开始记录你的精神成长历程
             </Text>
 
             <TouchableOpacity 
-              className="flex-row items-center bg-blue-500 px-6 py-3 rounded-3xl"
+              style={styles.browseButton} 
               onPress={handleAddPractice}
             >
               <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-              <Text className="text-white text-base font-semibold ml-2">添加修行项目</Text>
+              <Text style={styles.browseButtonText}>添加修行项目</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -234,22 +229,21 @@ export default function PracticeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+    <SafeAreaView style={styles.container}>
       <ScrollView 
-        className="flex-1"
-        style={{ flex: 1 }}
+        style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View className="flex-row justify-between items-center p-4 bg-white" style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: 'white' }}>
-          <Text className="text-2xl font-semibold text-gray-800" style={{ fontSize: 24, fontWeight: '600', color: '#1f2937' }}>🧘 修行</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>🧘 修行</Text>
           <TouchableOpacity onPress={handleAddPractice}>
-            <Text className="text-blue-500 text-base font-medium" style={{ color: '#3b82f6', fontSize: 16, fontWeight: '500' }}>添加</Text>
+            <Text style={styles.manageButton}>添加</Text>
           </TouchableOpacity>
         </View>
 
-        <Text className="text-lg font-semibold text-gray-800 mx-4 mt-4 mb-2" style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginHorizontal: 16, marginTop: 16, marginBottom: 8 }}>我的修行项目：</Text>
+        <Text style={styles.sectionTitle}>我的修行项目：</Text>
 
         {projects.map((project) => {
           const progress = calculateProgress(project);
@@ -262,38 +256,38 @@ export default function PracticeScreen() {
             : null;
 
           return (
-            <View key={project.id} className="bg-white rounded-xl p-4 mx-4 my-2 shadow-sm" style={{ backgroundColor: 'white', borderRadius: 12, padding: 16, marginHorizontal: 16, marginVertical: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
-              <View className="mb-2">
-                <Text className="text-sm text-gray-600 mb-2">
+            <View key={project.id} style={styles.practiceCard}>
+              <View style={styles.practiceHeader}>
+                <Text style={styles.practiceType}>
                   {project.practices.type === 'count' ? '计数类' : '计时类'}
                   {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
                 </Text>
               </View>
 
-              <Text className="text-lg font-semibold text-gray-800 mb-2">
+              <Text style={styles.practiceName}>
                 {project.practices.name}
                 {project.practices.type === 'time' && ` (${practiceDisplayType})`}
                 {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
               </Text>
 
-              <View className="mb-4">
+              <View style={styles.progressContainer}>
                 {project.practices.type === 'count' ? (
                   <View>
-                    <Text className="text-sm text-gray-600 mb-1">
+                    <Text style={styles.practiceInfo}>
                       {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
                     </Text>
-                    <Text className="text-sm text-gray-600">
+                    <Text style={styles.practiceDetails}>
                       每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
                     </Text>
                   </View>
                 ) : (
                   <View>
                     {project.target_period === 'weekly' ? (
-                      <Text className="text-sm text-gray-600">
+                      <Text style={styles.practiceInfo}>
                         本周目标：{project.daily_target}座 (每周{project.daily_target}座)
                       </Text>
                     ) : (
-                      <Text className="text-sm text-gray-600">
+                      <Text style={styles.practiceInfo}>
                         总进度：{progress.current}/{progress.target}天
                       </Text>
                     )}
@@ -306,47 +300,21 @@ export default function PracticeScreen() {
                 )}
               </View>
 
-              <View className="flex-row gap-3">
+              <View style={styles.buttonRow}>
                 <TouchableOpacity
-                  className="flex-1 bg-gray-100 p-3 rounded-lg items-center"
+                  style={styles.secondaryButton}
                   onPress={() => handleViewDetails(project.id, project.practices.name)}
                 >
-                  <Text className="text-blue-500 font-semibold">查看详情</Text>
+                  <Text style={styles.secondaryButtonText}>查看详情</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className="flex-1 bg-blue-500 p-3 rounded-lg items-center"
+                  style={styles.primaryButton}
                   onPress={() => handleCustomRecord(project.id, project.practices.name)}
                 >
-                  <Text className="text-white font-semibold">
+                  <Text style={styles.buttonText}>
                     {project.practices.type === 'time' ? '记录观修' : '记录'}
                   </Text>
                 </TouchableOpacity>
-              </View>
-              <View className="mt-2 flex-row space-x-2">
-                <TouchableOpacity
-                  onPress={() => router.push({
-                    pathname: '/meditation-history',
-                    params: { practiceId: project.practice_id }
-                  })}
-                  className="flex-1 bg-blue-500 px-4 py-2 rounded-lg"
-                >
-                  <Text className="text-white font-semibold text-center">
-                    查看记录
-                  </Text>
-                </TouchableOpacity>
-                {project.goal_type === 'topic_progress' && (
-                  <TouchableOpacity
-                    onPress={() => router.push({
-                      pathname: '/topic-progress-dashboard',
-                      params: { projectId: project.id }
-                    })}
-                    className="flex-1 bg-green-500 px-4 py-2 rounded-lg"
-                  >
-                    <Text className="text-white font-semibold text-center">
-                      方法进度
-                    </Text>
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
           );
@@ -357,7 +325,7 @@ export default function PracticeScreen() {
 }
 
 // Component to display weekly progress for time-based practices
-const WeeklyProgressDisplay = React.memo(function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; user: any }) {
+function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; user: any }) {
   const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -413,8 +381,8 @@ const WeeklyProgressDisplay = React.memo(function WeeklyProgressDisplay({ projec
 
   if (loading) {
     return (
-      <View className="mt-2">
-        <Text className="text-sm text-gray-800 mb-1">加载中...</Text>
+      <View style={styles.weeklyProgress}>
+        <Text style={styles.weeklyProgressText}>加载中...</Text>
       </View>
     );
   }
@@ -433,12 +401,12 @@ const WeeklyProgressDisplay = React.memo(function WeeklyProgressDisplay({ projec
     const weeklyTarget = project.daily_target; // Use daily_target which represents weekly sessions for weekly projects
 
     return (
-      <View className="mt-2">
-        <Text className="text-sm text-gray-800 mb-1">
+      <View style={styles.weeklyProgress}>
+        <Text style={styles.weeklyProgressText}>
           本周进度：{weeklyCount}/{weeklyTarget}座{weeklyCount >= weeklyTarget ? ' ✅' : ''}
         </Text>
         {todayCount > 0 && todayDetails && (
-          <Text className="text-xs text-gray-600">
+          <Text style={styles.weeklyProgressSubtext}>
             今日：{todayDetails}
           </Text>
         )}
@@ -446,22 +414,22 @@ const WeeklyProgressDisplay = React.memo(function WeeklyProgressDisplay({ projec
     );
   } else {
     return (
-      <View className="mt-2">
-        <Text className="text-sm text-gray-800 mb-1">
+      <View style={styles.weeklyProgress}>
+        <Text style={styles.weeklyProgressText}>
           今日进度：{todayCount}/{target}座{todayCount >= target ? ' ✅' : ''}
         </Text>
         {todayCount > 0 && todayDetails && (
-          <Text className="text-xs text-gray-600">
+          <Text style={styles.weeklyProgressSubtext}>
             {todayDetails}
           </Text>
         )}
       </View>
     );
   }
-});
+}
 
 // New component to display total sessions
-const TotalSessionsDisplay = React.memo(function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; userId: string }) {
+function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; userId: string }) {
   const [totalSessions, setTotalSessions] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -492,8 +460,184 @@ const TotalSessionsDisplay = React.memo(function TotalSessionsDisplay({ practice
   }, [practiceId, userId]);
 
   if (loading) {
-    return <Text className="text-sm text-blue-500 font-medium mb-3">总数: 加载中...</Text>;
+    return <Text style={styles.totalSessions}>总数: 加载中...</Text>;
   }
 
-  return <Text className="text-sm text-blue-500 font-medium mb-3">🧘 {totalSessions} 次观修</Text>;
+  return <Text style={styles.totalSessions}>🧘 {totalSessions} 次观修</Text>;
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: 'white',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 16,
+  },
+  manageButton: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  practiceCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  practiceHeader: {
+    marginBottom: 8,
+  },
+  practiceType: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  totalSessions: {
+    fontSize: 14,
+    color: '#007bff',
+    fontWeight: '500',
+    marginBottom: 12,
+  },
+  practiceName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  practiceInfo: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  practiceDetails: {
+    fontSize: 14,
+    color: '#666',
+  },
+  progressContainer: {
+    marginBottom: 16,
+  },
+  weeklyProgress: {
+    marginTop: 8,
+  },
+  weeklyProgressText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  weeklyProgressSubtext: {
+    fontSize: 12,
+    color: '#666',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  primaryButton: {
+    flex: 1,
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  secondaryButton: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+    minHeight: 500,
+  },
+  iconContainer: {
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+    maxWidth: 280,
+  },
+  browseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  browseButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
 });

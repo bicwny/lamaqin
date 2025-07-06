@@ -1,208 +1,432 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  ToastAndroid,
+  Platform,
+  SafeAreaView,
+  KeyboardAvoidingView,
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLocalSearchParams, router } from 'expo-router';
 import { meditationService } from '@/lib/database';
-import { recordTopicSession, getTopicProgress } from '@/lib/topic-progress';
+import { Colors } from '@/constants/Colors';
 
-export default function MeditationRecord() {
+export default function MeditationRecordScreen() {
   const { user } = useAuth();
-  const { practiceId, projectId } = useLocalSearchParams<{
+  const { 
+    practiceId, 
+    practiceProjectId, 
+    practiceName,
+    editRecordId 
+  } = useLocalSearchParams<{
     practiceId: string;
-    projectId: string;
+    practiceProjectId: string;
+    practiceName: string;
+    editRecordId?: string;
   }>();
 
   const [duration, setDuration] = useState('');
-  const [sessionNumber, setSessionNumber] = useState('');
+  const [sessionNumber, setSessionNumber] = useState('1');
   const [reflection, setReflection] = useState('');
-  const [selectedTopicNumber, setSelectedTopicNumber] = useState<number | null>(null);
-  const [availableTopics, setAvailableTopics] = useState<any[]>([]);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [loadingTopics, setLoadingTopics] = useState(true);
+  const [meditationTopics, setMeditationTopics] = useState<Array<{
+    topic_number: number;
+    title: string;
+    description?: string;
+  }>>([]);
+
+  const isEditing = !!editRecordId;
+
+  // Toast function for cross-platform support
+  const showToast = (message: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+    } else {
+      Alert.alert('提示', message);
+    }
+  };
 
   useEffect(() => {
-    loadAvailableTopics();
-  }, [user, projectId]);
+    loadMeditationTopics();
+    if (isEditing) {
+      loadExistingRecord();
+    }
+  }, []);
 
-  const loadAvailableTopics = async () => {
-    if (!user || !projectId) return;
-
+  const loadMeditationTopics = async () => {
     try {
-      const topicProgress = await getTopicProgress(user.id, projectId);
-      setAvailableTopics(topicProgress);
+      console.log('🔄 Loading meditation topics for practice:', practiceId);
+      const topics = await meditationService.getMeditationTopics(practiceId);
+      setMeditationTopics(topics);
+      console.log('📚 Loaded meditation topics:', topics.length);
     } catch (error) {
-      console.error('Error loading topic progress:', error);
+      console.error('❌ Error loading meditation topics:', error);
     } finally {
       setLoadingTopics(false);
     }
   };
 
-  const saveMeditationRecord = async () => {
-    if (!user || !practiceId || !duration) {
-      Alert.alert('提示', '请填写完整信息');
-      return;
-    }
+  const loadExistingRecord = async () => {
+    if (!user || !editRecordId) return;
 
-    setSaving(true);
     try {
-      const durationMinutes = parseInt(duration, 10);
-
-      if (isNaN(durationMinutes) || durationMinutes <= 0) {
-        Alert.alert('错误', '请输入有效的冥想时长');
-        return;
+      const record = await meditationService.getMeditationRecordWithReflection(editRecordId, user.id);
+      if (record) {
+        setDuration(record.duration_minutes.toString());
+        setSessionNumber(record.session_number?.toString() || '1');
+        setReflection(record.reflection || '');
       }
-
-      const record = {
-        user_id: user.id,
-        practice_id: practiceId,
-        record_date: new Date().toISOString().split('T')[0],
-        duration_minutes: durationMinutes,
-        session_number: sessionNumber ? parseInt(sessionNumber) : undefined,
-        reflection: reflection.trim() || undefined,
-        topic_number: selectedTopicNumber,
-      };
-
-      await meditationService.recordMeditationWithReflection(record);
-
-      // If topic is selected, also update topic progress
-      if (selectedTopicNumber && projectId) {
-        await recordTopicSession(
-          user.id,
-          projectId,
-          practiceId,
-          selectedTopicNumber,
-          durationMinutes,
-          reflection.trim() || undefined
-        );
-      }
-
-      Alert.alert('成功', '观修记录已保存！', [
-        { text: '确定', onPress: () => router.back() }
-      ]);
     } catch (error) {
-      console.error('保存观修记录失败:', error);
-      Alert.alert('错误', '保存记录失败，请重试');
-    } finally {
-      setSaving(false);
+      console.error('❌ Error loading existing record:', error);
+      Alert.alert('错误', '加载记录失败');
     }
   };
 
+  const validateForm = () => {
+    const durationNum = parseInt(duration);
+    if (isNaN(durationNum) || durationNum <= 0) {
+      Alert.alert('提示', '请输入有效的观修时长（大于0分钟）');
+      return false;
+    }
+
+    const sessionNum = parseInt(sessionNumber);
+    if (isNaN(sessionNum) || sessionNum < 1) {
+      Alert.alert('提示', '请选择有效的观修内容');
+      return false;
+    }
+
+    console.log('✅ Form validation passed:', { duration: durationNum, sessionNumber: sessionNum });
+    return true;
+  };
+
+  const handleSave = async () => {
+    if (!user || !validateForm()) return;
+
+    setLoading(true);
+    try {
+      const recordData = {
+        user_id: user.id,
+        practice_id: practiceId,
+        record_date: new Date().toISOString().split('T')[0],
+        duration_minutes: parseInt(duration),
+        session_number: parseInt(sessionNumber),
+        reflection: reflection.trim() || undefined
+      };
+
+      if (isEditing) {
+        await meditationService.updateMeditationRecord(editRecordId, user.id, {
+          duration_minutes: recordData.duration_minutes,
+          session_number: recordData.session_number,
+          reflection: recordData.reflection
+        });
+        console.log('✅ Meditation record updated successfully');
+        showToast('观修记录已更新');
+        // Navigate back with a small delay to ensure toast shows
+        setTimeout(() => {
+          router.back();
+        }, 500);
+      } else {
+        const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
+        console.log('✅ Record saved successfully');
+
+        // Show success toast
+        showToast('观修记录已保存成功');
+
+        // Navigate back to practice page
+        router.back();
+      }
+    } catch (error) {
+      console.error('❌ Error saving meditation record:', error);
+      Alert.alert('错误', '保存失败，请重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectedTopic = meditationTopics.find(t => t.topic_number === parseInt(sessionNumber));
+
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <ScrollView className="p-4">
-        <Text className="text-2xl font-semibold mb-4">记录观修</Text>
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
 
-        <View className="mb-4">
-          <Text className="text-lg font-medium text-gray-800 mb-2">
-            观修时长 (分钟)
-          </Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3 text-base"
-            placeholder="例如：30"
-            value={duration}
-            onChangeText={setDuration}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <View className="mb-4">
-          <Text className="text-lg font-medium text-gray-800 mb-2">座数 (可选)</Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3 text-base"
-            placeholder="例如：第1座"
-            value={sessionNumber}
-            onChangeText={setSessionNumber}
-            keyboardType="numeric"
-          />
-        </View>
-
-        {/* Topic Selection */}
-        {availableTopics.length > 0 && (
-          <View className="mb-4">
-            <Text className="text-lg font-semibold text-gray-800 mb-2">
-              选择观修方法 (可选)
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View className="flex-row space-x-2">
-                <TouchableOpacity
-                  onPress={() => setSelectedTopicNumber(null)}
-                  className={`px-4 py-2 rounded-full ${
-                    selectedTopicNumber === null
-                      ? 'bg-gray-500'
-                      : 'bg-gray-200'
-                  }`}
-                >
-                  <Text className={`font-medium ${
-                    selectedTopicNumber === null
-                      ? 'text-white'
-                      : 'text-gray-700'
-                  }`}>
-                    不选择
-                  </Text>
-                </TouchableOpacity>
-                {availableTopics.map(topic => (
-                  <TouchableOpacity
-                    key={topic.topic_number}
-                    onPress={() => setSelectedTopicNumber(topic.topic_number)}
-                    className={`px-4 py-2 rounded-full ${
-                      selectedTopicNumber === topic.topic_number
-                        ? 'bg-blue-500'
-                        : 'bg-gray-200'
-                    }`}
-                  >
-                    <Text className={`font-medium ${
-                      selectedTopicNumber === topic.topic_number
-                        ? 'text-white'
-                        : 'text-gray-700'
-                    }`}>
-                      第{topic.topic_number}法
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
-            {selectedTopicNumber && (
-              <View className="mt-2 p-3 bg-blue-50 rounded-lg">
-                <Text className="text-sm text-blue-800">
-                  本周进度: {availableTopics.find(t => t.topic_number === selectedTopicNumber)?.current_week_sessions || 0}/
-                  {availableTopics.find(t => t.topic_number === selectedTopicNumber)?.weekly_target_sessions || 0} 座
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {loadingTopics && (
-          <View className="mb-4 p-4 bg-gray-50 rounded-lg">
-            <Text className="text-center text-gray-600">加载观修方法...</Text>
-          </View>
-        )}
-
-        <View className="mb-4">
-          <Text className="text-lg font-medium text-gray-800 mb-2">
-            心得体会 (可选)
-          </Text>
-          <TextInput
-            className="border border-gray-300 rounded-lg p-3 text-base h-24"
-            placeholder="分享您的观修体验..."
-            value={reflection}
-            onChangeText={setReflection}
-            multiline
-            textAlignVertical="top"
-          />
-        </View>
-
-        <TouchableOpacity
-          className={`bg-blue-500 rounded-lg py-3 px-6 ${saving ? 'opacity-50' : ''}`}
-          onPress={saveMeditationRecord}
-          disabled={saving}
-        >
-          <Text className="text-white text-lg font-semibold text-center">
-            {saving ? '保存中...' : '保存记录'}
-          </Text>
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/practice');
+          }
+        }} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
-      </ScrollView>
+        <Text style={styles.headerTitle}>
+          📝 {isEditing ? '编辑观修记录' : '记录新的观修'}
+        </Text>
+      </View>
+
+      <KeyboardAvoidingView 
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.formContainer}>
+          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+
+          {/* Duration Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+            <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
+            <TextInput
+              style={styles.textInput}
+              value={duration}
+              onChangeText={setDuration}
+              keyboardType="numeric"
+              placeholder="30"
+            />
+          </View>
+
+          {/* Topic Selection - only show if there are topics or still loading */}
+          {(loadingTopics || meditationTopics.length > 0) && (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>选择观修内容</Text>
+              {loadingTopics ? (
+                <ActivityIndicator style={styles.loadingIndicator} />
+              ) : meditationTopics.length > 0 ? (
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={parseInt(sessionNumber)}
+                    onValueChange={(value) => setSessionNumber(value.toString())}
+                    style={styles.picker}
+                  >
+                    {meditationTopics.map((topic) => (
+                      <Picker.Item 
+                        key={topic.topic_number} 
+                        label={`第${topic.topic_number}座 - ${topic.title}`} 
+                        value={topic.topic_number} 
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              ) : null}
+            </View>
+          )}
+
+          {/* Topic Description - only show if topics exist and there's a selected topic */}
+          {meditationTopics.length > 0 && selectedTopic?.description && (
+            <View style={styles.topicDescription}>
+              <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
+              <Text style={styles.topicDescriptionText}>
+                {selectedTopic.description}
+              </Text>
+            </View>
+          )}
+
+          {/* Reflection Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>观后感（可选）</Text>
+            <Text style={styles.inputHint}>
+              记录您在这次观修中的体验、感悟和思考...
+            </Text>
+            <TextInput
+              style={[styles.textInput, styles.multilineInput]}
+              value={reflection}
+              onChangeText={setReflection}
+              multiline
+              numberOfLines={6}
+              placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
+              textAlignVertical="top"
+            />
+            <Text style={styles.characterCount}>
+              {reflection.length} 字
+            </Text>
+          </View>
+
+          {/* Save Button - now inside scroll content */}
+          <TouchableOpacity 
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>💾 保存记录</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa'
+  },
+  keyboardAvoidingView: {
+    flex: 1
+  },
+  header: {
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 4
+  },
+  content: {
+    flex: 1,
+    padding: 16
+  },
+  formContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  practiceTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef'
+  },
+  inputSection: {
+    marginBottom: 24
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6
+  },
+  inputHint: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 8,
+    lineHeight: 20
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+    color: '#333'
+  },
+  multilineInput: {
+    height: 120,
+    textAlignVertical: 'top',
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    overflow: 'hidden',
+    ...(Platform.OS === 'ios' && {
+      minHeight: 200,
+      paddingHorizontal: 0,
+    }),
+  },
+  picker: {
+    height: 50,
+    color: '#333',
+    ...(Platform.OS === 'android' && {
+      backgroundColor: 'white',
+    }),
+  },
+  topicDescription: {
+    backgroundColor: '#fff3cd',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#ffc107'
+  },
+  topicDescriptionLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#856404',
+    marginBottom: 6
+  },
+  topicDescriptionText: {
+    fontSize: 14,
+    color: '#856404',
+    lineHeight: 20
+  },
+  characterCount: {
+    fontSize: 12,
+    color: '#6c757d',
+    textAlign: 'right',
+    marginTop: 4
+  },
+  loadingIndicator: {
+    padding: 20
+  },
+  saveButton: {
+    backgroundColor: '#ffc107',
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
+  },
+  saveButtonDisabled: {
+    opacity: 0.6
+  },
+  saveButtonText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '600'
+  }
+});

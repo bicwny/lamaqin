@@ -4,6 +4,7 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
+  StyleSheet, 
   Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -46,21 +47,21 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView 
-      className="flex-1"
+      style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}>
-        <View className="items-center mb-10">
-          <Text className="text-5xl mb-2">🙏</Text>
-          <Text className="text-3xl font-bold text-primary mb-2">修行追踪</Text>
-          <Text className="text-base text-gray-600 text-center leading-6">欢迎回来，继续您的修行之路</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.logo}>🙏</Text>
+          <Text style={styles.title}>修行追踪</Text>
+          <Text style={styles.subtitle}>欢迎回来，继续您的修行之路</Text>
         </View>
 
-        <View className="w-full">
-          <View className="mb-5">
-            <Text className="text-base text-gray-800 mb-2 font-medium">📧 邮箱地址</Text>
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>📧 邮箱地址</Text>
             <TextInput
-              className="border border-gray-300 rounded-xl p-4 text-base bg-white text-gray-800"
+              style={styles.input}
               placeholder="请输入您的邮箱"
               value={email}
               onChangeText={setEmail}
@@ -70,10 +71,10 @@ export default function LoginScreen() {
             />
           </View>
 
-          <View className="mb-5">
-            <Text className="text-base text-gray-800 mb-2 font-medium">🔒 密码</Text>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>🔒 密码</Text>
             <TextInput
-              className="border border-gray-300 rounded-xl p-4 text-base bg-white text-gray-800"
+              style={styles.input}
               placeholder="请输入密码"
               value={password}
               onChangeText={setPassword}
@@ -83,29 +84,26 @@ export default function LoginScreen() {
           </View>
 
           <TouchableOpacity 
-            className={`bg-primary py-4 rounded-xl items-center mt-2 shadow-lg ${loading ? 'opacity-60' : ''}`}
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
             onPress={handleLogin}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="white" />
+              <ActivityIndicator color={Colors.surface} />
             ) : (
-              <Text className="text-white text-lg font-bold">登录</Text>
+              <Text style={styles.loginButtonText}>登录</Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            className="items-center mt-5" 
-            onPress={() => router.push('/auth/forgot-password')}
-          >
-            <Text className="text-primary text-base">忘记密码？</Text>
+          <TouchableOpacity style={styles.forgotPassword} onPress={() => router.push('/auth/forgot-password')}>
+            <Text style={styles.forgotPasswordText}>忘记密码？</Text>
           </TouchableOpacity>
 
-          <View className="flex-row justify-center items-center mt-8">
-            <Text className="text-gray-600 text-base mr-1">还没有账户？</Text>
+          <View style={styles.registerPrompt}>
+            <Text style={styles.registerPromptText}>还没有账户？</Text>
             <Link href="/auth/register" asChild>
               <TouchableOpacity>
-                <Text className="text-primary text-base font-bold">立即注册</Text>
+                <Text style={styles.registerLink}>立即注册</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -114,3 +112,100 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  logo: {
+    fontSize: 48,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  form: {
+    width: '100%',
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 16,
+    backgroundColor: Colors.surface,
+    color: Colors.text,
+  },
+  loginButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
+  },
+  loginButtonText: {
+    color: Colors.surface,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  forgotPassword: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  forgotPasswordText: {
+    color: Colors.primary,
+    fontSize: 16,
+  },
+  registerPrompt: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  registerPromptText: {
+    color: Colors.textSecondary,
+    fontSize: 16,
+    marginRight: 5,
+  },
+  registerLink: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});

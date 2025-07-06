@@ -374,7 +374,7 @@ export const meditationService = {
   async getMeditationRecords(userId: string, practiceId?: string): Promise<MeditationRecord[]> {
     let query = supabase
       .from('meditation_records')
-      .select('id, user_id, practice_id, record_date, duration_minutes, session_number, method, reflection, reflection_created_at, created_at, topic_number')
+      .select('*')
       .eq('user_id', userId)
       .order('record_date', { ascending: false })
       .order('created_at', { ascending: false });
@@ -390,6 +390,7 @@ export const meditationService = {
       throw error;
     }
 
+    console.log(`📊 Loaded ${data?.length || 0} meditation records for practice ${practiceId}`);
     return data || [];
   },
 
@@ -405,7 +406,6 @@ export const meditationService = {
     // Add optional fields
     if (record.session_number) recordData.session_number = record.session_number;
     if (record.method) recordData.method = record.method;
-    if (record.topic_number) recordData.topic_number = record.topic_number;
     if (record.reflection && record.reflection.trim()) {
       recordData.reflection = record.reflection;
       recordData.reflection_created_at = new Date().toISOString();
@@ -449,7 +449,6 @@ export const meditationService = {
     duration_minutes: number;
     session_number?: number;
     reflection?: string;
-    topic_number?: number;
   }): Promise<MeditationRecord> {
     console.log('💾 Saving meditation record to Supabase:', record);
 
@@ -463,7 +462,6 @@ export const meditationService = {
 
     // Add optional fields
     if (record.session_number) recordData.session_number = record.session_number;
-    if (record.topic_number) recordData.topic_number = record.topic_number;
     if (record.reflection && record.reflection.trim()) {
       recordData.reflection = record.reflection;
       recordData.reflection_created_at = new Date().toISOString();
@@ -897,31 +895,6 @@ export const studyService = {
     return progress;
   }
 };
-
-// Legacy function exports for study screen compatibility
-export async function getUserCourses(userId: string) {
-  return await studyService.getUserCourses(userId);
-}
-
-export async function getUserTopicProgress(userId: string) {
-  try {
-    const { data, error } = await supabase
-      .from('user_practice_topic_progress')
-      .select('*')
-      .eq('user_id', userId)
-      .order('topic_number');
-
-    if (error) {
-      console.error('❌ Error fetching topic progress:', error);
-      return [];
-    }
-
-    return data || [];
-  } catch (error) {
-    console.error('❌ getUserTopicProgress failed:', error);
-    return [];
-  }
-}
 
 // Mindfulness Records
 export const mindfulnessService = {
