@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-
 export default function HomeScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -106,87 +105,4 @@ export default function HomeScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-}️ 下午好，精进不懈';
-    return '🌆 晚上好，回顾今日收获';
-  };
-
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <ThemedView style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-        {/* Header */}
-        <ThemedView style={styles.header}>
-          <View style={styles.headerContent}>
-            <View style={styles.headerLeft}>
-              <ThemedText type="title" style={styles.title}>
-                🏠 修行主页
-              </ThemedText>
-              <ThemedText style={styles.greeting}>
-                {getGreeting()}
-              </ThemedText>
-              <ThemedText style={styles.userName}>
-                善缘居士 · 修行第365天 🔥
-              </ThemedText>
-            </View>
-            <TouchableOpacity 
-              style={styles.profileIcon}
-              onPress={navigateToProfile}
-            >
-              <Ionicons name="person-circle-outline" size={32} color={Colors.surface} />
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-      </ScrollView>
-      </ThemedView>
-    </SafeAreaView>
-  );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: Colors.primary,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  headerLeft: {
-    flex: 1,
-  },
-  profileIcon: {
-    padding: 5,
-    marginLeft: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.surface,
-    marginBottom: 5,
-  },
-  greeting: {
-    fontSize: 16,
-    color: Colors.surface,
-    opacity: 0.9,
-    marginBottom: 5,
-  },
-  userName: {
-    fontSize: 14,
-    color: Colors.surface,
-    opacity: 0.8,
-  },
-});
