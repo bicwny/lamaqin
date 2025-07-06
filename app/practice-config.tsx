@@ -207,8 +207,6 @@ export default function PracticeConfigScreen() {
         }
       }
 
-      if (error) throw error;
-
       Alert.alert('成功', '修行项目已添加', [
         {
           text: '确定',
