@@ -1,123 +1,13 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { View, Text } from 'react-native';
-import 'react-native-reanimated';
+import { AuthProvider } from '@/contexts/AuthContext';
 import '../global.css';
-
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-function RootLayoutNav() {
-  const { user, loading } = useAuth();
-
-  console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
-  console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');
-  console.log('🕐 RootLayoutNav timestamp:', new Date().toISOString());
-
-  // Handle navigation based on auth state
-  useEffect(() => {
-    console.log('🔄 RootLayoutNav useEffect triggered:', {
-      loading,
-      user: user?.email || null,
-      timestamp: new Date().toISOString()
-    });
-
-    if (!loading) {
-      console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
-      if (user) {
-        console.log('✅ User authenticated, should show tabs');
-        router.replace('/(tabs)');
-      } else {
-        console.log('❌ No user, should show auth');
-        router.replace('/auth');
-      }
-    } else {
-      console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
-    }
-  }, [user, loading]);
-
-  if (loading) {
-    console.log('⏳ Showing loading screen...');
-    return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="(tabs)" 
-          options={{ headerShown: false }}
-        />
-      </Stack>
-    );
-  }
-
-  console.log('✅ Auth state resolved, user:', user ? 'logged in' : 'not logged in');
-  console.log('📱 About to render Stack with screens');
-
-  if (user) {
-    console.log('🎯 Will show: (tabs) screen');
-  } else {
-    console.log('🎯 Will show: auth screen');
-  }
-
-  return (
-    <Stack 
-      screenOptions={{ headerShown: false }}
-    >
-      <Stack.Screen 
-        name="auth" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="(tabs)" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
-      <Stack.Screen 
-        name="meditation-history" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="add-practice" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="practice-config" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="modals/custom-record" 
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }} 
-      />
-      <Stack.Screen 
-        name="modals/meditation-record" 
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }} 
-      />
-    </Stack>
-  );
-}
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -131,17 +21,31 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return null;
   }
 
   return (
     <AuthProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="modals/meditation-record" 
+          options={{ 
+            presentation: 'modal',
+            title: '记录禅修'
+          }} 
+        />
+        <Stack.Screen 
+          name="modals/custom-record" 
+          options={{ 
+            presentation: 'modal',
+            title: '自定义记录'
+          }} 
+        />
+        <Stack.Screen name="+not-found" />
+      </Stack>
       <StatusBar style="auto" />
-      <RootLayoutNav />
     </AuthProvider>
   );
 }
