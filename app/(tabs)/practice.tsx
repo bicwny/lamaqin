@@ -100,7 +100,7 @@ export default function PracticeScreen() {
     }, [user, loadPracticeData])
   );
 
-  
+
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -321,6 +321,32 @@ export default function PracticeScreen() {
                     {project.practices.type === 'time' ? '记录观修' : '记录'}
                   </Text>
                 </TouchableOpacity>
+              </View>
+              <View className="mt-2 flex-row space-x-2">
+                <TouchableOpacity
+                  onPress={() => router.push({
+                    pathname: '/meditation-history',
+                    params: { practiceId: project.practice_id }
+                  })}
+                  className="flex-1 bg-blue-500 px-4 py-2 rounded-lg"
+                >
+                  <Text className="text-white font-semibold text-center">
+                    查看记录
+                  </Text>
+                </TouchableOpacity>
+                {project.goal_type === 'topic_progress' && (
+                  <TouchableOpacity
+                    onPress={() => router.push({
+                      pathname: '/topic-progress-dashboard',
+                      params: { projectId: project.id }
+                    })}
+                    className="flex-1 bg-green-500 px-4 py-2 rounded-lg"
+                  >
+                    <Text className="text-white font-semibold text-center">
+                      方法进度
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           );
