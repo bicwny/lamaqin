@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View, Text } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -20,28 +20,28 @@ export default function TabTwoScreen() {
           className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
         />
       }>
-      <View className="flex-row items-center gap-2">
-        <Text className="text-2xl font-bold text-gray-800">探索</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1f2937' }}>探索</Text>
       </View>
-      <Text className="text-base text-gray-600 leading-6">此应用包含示例代码以帮助您入门。</Text>
+      <Text style={{ fontSize: 16, color: '#4b5563', lineHeight: 24 }}>此应用包含示例代码以帮助您入门。</Text>
       <Collapsible title="基于文件的路由">
-        <Text className="text-sm text-gray-700 leading-5">
+        <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20 }}>
           此应用有多个屏幕：{' '}
-          <Text className="font-semibold">app/(tabs)/index.tsx</Text> 和{' '}
-          <Text className="font-semibold">app/(tabs)/explore.tsx</Text>
+          <Text style={{ fontWeight: '600' }}>app/(tabs)/index.tsx</Text> 和{' '}
+          <Text style={{ fontWeight: '600' }}>app/(tabs)/explore.tsx</Text>
         </Text>
-        <Text className="text-sm text-gray-700 leading-5 mt-2">
-          布局文件在 <Text className="font-semibold">app/(tabs)/_layout.tsx</Text>{' '}
+        <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20, marginTop: 8 }}>
+          布局文件在 <Text style={{ fontWeight: '600' }}>app/(tabs)/_layout.tsx</Text>{' '}
           中设置选项卡导航器。
         </Text>
         <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <Text className="text-blue-500 text-sm underline">了解更多</Text>
+          <Text style={{ color: '#3b82f6', fontSize: 14, textDecorationLine: 'underline' }}>了解更多</Text>
         </ExternalLink>
       </Collapsible>
       <Collapsible title="Android、iOS 和 Web 支持">
-        <Text className="text-sm text-gray-700 leading-5">
+        <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20 }}>
           您可以在 Android、iOS 和 Web 上打开此项目。要打开 Web 版本，请在运行此项目的终端中按{' '}
-          <Text className="font-semibold">w</Text>。
+          <Text style={{ fontWeight: '600' }}>w</Text>。
         </Text>
       </Collapsible>
       <Collapsible title="Images">

@@ -11,72 +11,133 @@ export default function HomeScreen() {
   console.log('🏠 TabLayout rendering at:', new Date().toISOString());
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="bg-gradient-to-r from-primary to-secondary px-6 py-8 rounded-b-3xl mx-4 mt-4">
-          <View className="flex-row items-center justify-between">
+        <View style={{ 
+          backgroundColor: '#D4AF37', 
+          paddingHorizontal: 24, 
+          paddingVertical: 32, 
+          borderBottomLeftRadius: 24, 
+          borderBottomRightRadius: 24, 
+          marginHorizontal: 16, 
+          marginTop: 16 
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View>
-              <Text className="text-white text-2xl font-bold">佛法修行</Text>
-              <Text className="text-white/80 text-base mt-1">愿一切众生离苦得乐</Text>
+              <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold' }}>佛法修行</Text>
+              <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 16, marginTop: 4 }}>愿一切众生离苦得乐</Text>
             </View>
-            <View className="bg-white/20 rounded-full p-3">
-              <Text className="text-white text-xl">🙏</Text>
+            <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', borderRadius: 24, padding: 12 }}>
+              <Text style={{ color: 'white', fontSize: 20 }}>🙏</Text>
             </View>
           </View>
         </View>
 
         {/* Quick Actions */}
-        <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold text-gray-800 mb-4">快速开始</Text>
-          <View className="flex-row justify-between">
+        <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+          <Text style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 16 }}>快速开始</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <TouchableOpacity 
-              className="bg-white rounded-xl p-4 flex-1 mr-2 shadow-sm"
+              style={{ 
+                backgroundColor: 'white', 
+                borderRadius: 12, 
+                padding: 16, 
+                flex: 1, 
+                marginRight: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 3,
+                elevation: 2
+              }}
               onPress={() => router.push('/add-practice')}
             >
-              <View className="bg-practice/10 rounded-full w-12 h-12 items-center justify-center mb-2">
-                <Text className="text-xl">📿</Text>
+              <View style={{ 
+                backgroundColor: 'rgba(212, 175, 55, 0.1)', 
+                borderRadius: 24, 
+                width: 48, 
+                height: 48, 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                marginBottom: 8 
+              }}>
+                <Text style={{ fontSize: 20 }}>📿</Text>
               </View>
-              <Text className="font-semibold text-gray-800">新修行</Text>
-              <Text className="text-sm text-gray-600 mt-1">添加修行项目</Text>
+              <Text style={{ fontWeight: '600', color: '#1f2937' }}>新修行</Text>
+              <Text style={{ fontSize: 14, color: '#4b5563', marginTop: 4 }}>添加修行项目</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              className="bg-white rounded-xl p-4 flex-1 ml-2 shadow-sm"
+              style={{ 
+                backgroundColor: 'white', 
+                borderRadius: 12, 
+                padding: 16, 
+                flex: 1, 
+                marginLeft: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 3,
+                elevation: 2
+              }}
               onPress={() => router.push('/modals/meditation-record')}
             >
-              <View className="bg-mindfulness/10 rounded-full w-12 h-12 items-center justify-center mb-2">
-                <Text className="text-xl">🧘</Text>
+              <View style={{ 
+                backgroundColor: 'rgba(255, 105, 180, 0.1)', 
+                borderRadius: 24, 
+                width: 48, 
+                height: 48, 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                marginBottom: 8 
+              }}>
+                <Text style={{ fontSize: 20 }}>🧘</Text>
               </View>
-              <Text className="font-semibold text-gray-800">快速记录</Text>
-              <Text className="text-sm text-gray-600 mt-1">记录今日修行</Text>
+              <Text style={{ fontWeight: '600', color: '#1f2937' }}>快速记录</Text>
+              <Text style={{ fontSize: 14, color: '#4b5563', marginTop: 4 }}>记录今日修行</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Today's Progress */}
-        <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold text-gray-800 mb-4">今日进展</Text>
-          <View className="bg-white rounded-xl p-4 shadow-sm">
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="font-semibold text-gray-800">修行完成度</Text>
-              <Text className="text-sm text-gray-600">0 / 3 项目</Text>
+        <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+          <Text style={{ fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 16 }}>今日进展</Text>
+          <View style={{ 
+            backgroundColor: 'white', 
+            borderRadius: 12, 
+            padding: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+            elevation: 2
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={{ fontWeight: '600', color: '#1f2937' }}>修行完成度</Text>
+              <Text style={{ fontSize: 14, color: '#4b5563' }}>0 / 3 项目</Text>
             </View>
-            <View className="bg-gray-100 rounded-full h-2 mb-2">
-              <View className="bg-primary rounded-full h-2" style={{ width: '0%' }} />
+            <View style={{ backgroundColor: '#f3f4f6', borderRadius: 4, height: 8, marginBottom: 8 }}>
+              <View style={{ backgroundColor: '#D4AF37', borderRadius: 4, height: 8, width: '0%' }} />
             </View>
-            <Text className="text-xs text-gray-500">今日还未开始修行，愿您法喜充满 🙏</Text>
+            <Text style={{ fontSize: 12, color: '#6b7280' }}>今日还未开始修行，愿您法喜充满 🙏</Text>
           </View>
         </View>
 
         {/* Motivation */}
-        <View className="px-4 mt-6 mb-8">
-          <View className="bg-buddhist-golden/10 rounded-xl p-4 border-l-4 border-buddhist-golden">
-            <Text className="text-sm font-medium text-buddhist-golden mb-1">每日法语</Text>
-            <Text className="text-gray-700 italic">
+        <View style={{ paddingHorizontal: 16, marginTop: 24, marginBottom: 32 }}>
+          <View style={{ 
+            backgroundColor: 'rgba(212, 175, 55, 0.1)', 
+            borderRadius: 12, 
+            padding: 16, 
+            borderLeftWidth: 4, 
+            borderLeftColor: '#D4AF37' 
+          }}>
+            <Text style={{ fontSize: 14, fontWeight: '500', color: '#D4AF37', marginBottom: 4 }}>每日法语</Text>
+            <Text style={{ color: '#374151', fontStyle: 'italic' }}>
               "心如工画师，能画诸世间。五蕴悉从生，无法而不造。"
             </Text>
-            <Text className="text-xs text-gray-500 mt-2">— 《华严经》</Text>
+            <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 8 }}>— 《华严经》</Text>
           </View>
         </View>
       </ScrollView>
