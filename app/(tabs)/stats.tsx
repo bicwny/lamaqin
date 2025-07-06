@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,46 +10,49 @@ export default function StatsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>统计分析</Text>
-          <Text style={styles.subtitle}>查看您的修行进展</Text>
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
+        <View className="p-5 bg-white border-b border-gray-200">
+          <Text className="text-3xl font-bold text-gray-800 mb-2">📊 统计分析</Text>
+          <Text className="text-base text-gray-600">查看您的修行进展</Text>
         </View>
 
-        <View style={styles.emptyState}>
-          <View style={styles.iconContainer}>
+        <View className="flex-1 justify-center items-center p-10" style={{ minHeight: 500 }}>
+          <View className="mb-6">
             <Ionicons name="bar-chart-outline" size={80} color="#9CA3AF" />
           </View>
 
-          <Text style={styles.emptyTitle}>还没有统计数据</Text>
-          <Text style={styles.emptyDescription}>
+          <Text className="text-2xl font-semibold text-gray-700 mb-3 text-center">还没有统计数据</Text>
+          <Text className="text-base text-gray-600 text-center leading-6 mb-8 max-w-xs">
             开始记录修行和学习，就能看到详细的进展统计了
           </Text>
 
-          <TouchableOpacity style={styles.startButton} onPress={handleStartTracking}>
+          <TouchableOpacity 
+            className="flex-row items-center bg-purple-600 px-6 py-3 rounded-3xl mb-10"
+            onPress={handleStartTracking}
+          >
             <Ionicons name="play" size={24} color="#FFFFFF" />
-            <Text style={styles.startButtonText}>开始记录</Text>
+            <Text className="text-white text-base font-semibold ml-2">开始记录</Text>
           </TouchableOpacity>
 
-          <View style={styles.featureContainer}>
-            <Text style={styles.featureTitle}>即将看到的统计：</Text>
-            <View style={styles.features}>
-              <View style={styles.featureItem}>
+          <View className="items-center">
+            <Text className="text-base font-medium text-gray-700 mb-5">即将看到的统计：</Text>
+            <View className="items-stretch">
+              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
                 <Ionicons name="trending-up" size={20} color="#059669" />
-                <Text style={styles.featureText}>修行进度趋势</Text>
+                <Text className="text-sm text-gray-700 ml-3 font-medium">修行进度趋势</Text>
               </View>
-              <View style={styles.featureItem}>
+              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
                 <Ionicons name="calendar" size={20} color="#3B82F6" />
-                <Text style={styles.featureText}>每日完成情况</Text>
+                <Text className="text-sm text-gray-700 ml-3 font-medium">每日完成情况</Text>
               </View>
-              <View style={styles.featureItem}>
+              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
                 <Ionicons name="trophy" size={20} color="#F59E0B" />
-                <Text style={styles.featureText}>里程碑成就</Text>
+                <Text className="text-sm text-gray-700 ml-3 font-medium">里程碑成就</Text>
               </View>
-              <View style={styles.featureItem}>
+              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
                 <Ionicons name="time" size={20} color="#8B5CF6" />
-                <Text style={styles.featureText}>学习时长统计</Text>
+                <Text className="text-sm text-gray-700 ml-3 font-medium">学习时长统计</Text>
               </View>
             </View>
           </View>
@@ -58,99 +61,3 @@ export default function StatsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    minHeight: 500,
-  },
-  iconContainer: {
-    marginBottom: 24,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  emptyDescription: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-    maxWidth: 280,
-  },
-  startButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#7C3AED',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    marginBottom: 40,
-  },
-  startButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  featureContainer: {
-    alignItems: 'center',
-  },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 20,
-  },
-  features: {
-    alignItems: 'stretch',
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-    minWidth: 200,
-  },
-  featureText: {
-    fontSize: 14,
-    color: '#374151',
-    marginLeft: 12,
-    fontWeight: '500',
-  },
-});

@@ -97,10 +97,13 @@ export function Welcome() {
   );
 }
 
-export function SectionHeader({ title }) {
+export function SectionHeader({ title }: { title: string }) {
   return (
     <View className="p-4 bg-gray-200 mt-6 mb-3 rounded-lg">
-      <Text className="text-lg font-bold text-buddhist-slate">{title}</Text>
+      <Text className="text-lg font-semibold text-gray-800">{title}</Text>
+    </View>
+  );
+}Name="text-lg font-bold text-buddhist-slate">{title}</Text>
     </View>
   );
 }

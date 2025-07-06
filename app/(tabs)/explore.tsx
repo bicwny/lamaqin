@@ -17,32 +17,32 @@ export default function TabTwoScreen() {
           size={310}
           color="#808080"
           name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
         />
       }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
+      <View className="flex-row items-center gap-2">
+        <Text className="text-2xl font-bold text-gray-800">探索</Text>
+      </View>
+      <Text className="text-base text-gray-600 leading-6">此应用包含示例代码以帮助您入门。</Text>
+      <Collapsible title="基于文件的路由">
+        <Text className="text-sm text-gray-700 leading-5">
+          此应用有多个屏幕：{' '}
+          <Text className="font-semibold">app/(tabs)/index.tsx</Text> 和{' '}
+          <Text className="font-semibold">app/(tabs)/explore.tsx</Text>
+        </Text>
+        <Text className="text-sm text-gray-700 leading-5 mt-2">
+          布局文件在 <Text className="font-semibold">app/(tabs)/_layout.tsx</Text>{' '}
+          中设置选项卡导航器。
+        </Text>
         <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
+          <Text className="text-blue-500 text-sm underline">了解更多</Text>
         </ExternalLink>
       </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
+      <Collapsible title="Android、iOS 和 Web 支持">
+        <Text className="text-sm text-gray-700 leading-5">
+          您可以在 Android、iOS 和 Web 上打开此项目。要打开 Web 版本，请在运行此项目的终端中按{' '}
+          <Text className="font-semibold">w</Text>。
+        </Text>
       </Collapsible>
       <Collapsible title="Images">
         <ThemedText>

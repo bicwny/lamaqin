@@ -15,6 +15,7 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import * as Haptics from 'expo-haptics';
 
 export default function CustomRecordScreen() {
   const { user } = useAuth();

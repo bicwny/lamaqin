@@ -247,14 +247,17 @@ export default function PracticeScreen() {
         <Text className="text-lg font-semibold text-gray-800 mx-4 mt-4 mb-2">我的修行项目：</Text>
 
         {projects.map((project) => {
-          const progress = calculateProgress(project);
+          const progress = React.useMemo(() => calculateProgress(project), [project]);
           const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
           // Unified display logic based on target_end_date
           const practiceDisplayType = project.target_end_date ? '固定时长' : '持续进行';
-          const totalWeeks = project.target_end_date 
-            ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
-            : null;
+          const totalWeeks = React.useMemo(() => 
+            project.target_end_date 
+              ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
+              : null,
+            [project.target_end_date, project.start_date]
+          );
 
           return (
             <View key={project.id} className="bg-white rounded-xl p-4 mx-4 my-2 shadow-sm">
@@ -326,7 +329,7 @@ export default function PracticeScreen() {
 }
 
 // Component to display weekly progress for time-based practices
-function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; user: any }) {
+const WeeklyProgressDisplay = React.memo(function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; user: any }) {
   const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -427,10 +430,10 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
       </View>
     );
   }
-}
+});
 
 // New component to display total sessions
-function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; userId: string }) {
+const TotalSessionsDisplay = React.memo(function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; userId: string }) {
   const [totalSessions, setTotalSessions] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -465,5 +468,4 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
   }
 
   return <Text className="text-sm text-blue-500 font-medium mb-3">🧘 {totalSessions} 次观修</Text>;
-}
-
+});
