@@ -288,33 +288,35 @@ export default function MeditationHistoryScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
 
-        {/* View Mode Toggle */}
-        <View style={styles.viewToggle}>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              viewMode === 'chronological' && styles.toggleButtonActive
-            ]}
-            onPress={() => setViewMode('chronological')}
-          >
-            <Text style={[
-              styles.toggleButtonText,
-              viewMode === 'chronological' && styles.toggleButtonTextActive
-            ]}>时间</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              viewMode === 'by_topic' && styles.toggleButtonActive
-            ]}
-            onPress={() => setViewMode('by_topic')}
-          >
-            <Text style={[
-              styles.toggleButtonText,
-              viewMode === 'by_topic' && styles.toggleButtonTextActive
-            ]}>主题</Text>
-          </TouchableOpacity>
-        </View>
+        {/* View Mode Toggle - only show if there are records with topics */}
+        {topicStats.some(topic => topic.count > 0) && (
+          <View style={styles.viewToggle}>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                viewMode === 'chronological' && styles.toggleButtonActive
+              ]}
+              onPress={() => setViewMode('chronological')}
+            >
+              <Text style={[
+                styles.toggleButtonText,
+                viewMode === 'chronological' && styles.toggleButtonTextActive
+              ]}>时间</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                viewMode === 'by_topic' && styles.toggleButtonActive
+              ]}
+              onPress={() => setViewMode('by_topic')}
+            >
+              <Text style={[
+                styles.toggleButtonText,
+                viewMode === 'by_topic' && styles.toggleButtonTextActive
+              ]}>主题</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Records List */}
