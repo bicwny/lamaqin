@@ -90,7 +90,8 @@ export default function PracticeHistoryScreen() {
         .select('*')
         .eq('practice_project_id', projectId)
         .eq('user_id', user.id)
-        .order('record_date', { ascending: false });
+        .order('record_date', { ascending: false })
+        .order('created_at', { ascending: false });
 
       if (recordsError) throw recordsError;
 
