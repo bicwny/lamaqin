@@ -1,0 +1,29 @@
+Current Display Components:
+
+Practice Name & Duration: 前行实修法 (固定时长) - 9周
+
+Name: project.practices.name
+Duration type: project.target_end_date ? '固定时长' : '持续进行'
+Total weeks: Math.ceil((new Date(project.target_end_date) - new Date(project.start_date)) / (7 * 24 * 60 * 60 * 1000))
+Weekly Target: 本周目标：4座 (每周4座)
+
+Uses: project.daily_target (which represents weekly sessions for weekly projects)
+Weekly Progress: 本周进度：2/4座
+
+Current: Count of meditation_records for this week
+Target: project.daily_target
+Today's Sessions: 今日：第1座25分钟；第2座36分钟
+
+Generated from today's meditation_records with duration_minutes
+The Display Logic Code
+Here's the key logic from your current implementation:
+
+app/(tabs)/practice.tsx
+Update weekly target display logic comment for clarity
+The display logic is working correctly. The key points are:
+
+Fixed Duration Detection: project.target_end_date !== null
+Weekly Target: For weekly projects, project.daily_target represents weekly sessions
+Progress Calculation: WeeklyProgressDisplay component handles the weekly and daily progress
+Session Details: Generated from meditation_records with duration formatting
+Your display is showing exactly what the logic should produce based on your data structure.
