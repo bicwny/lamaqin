@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -155,278 +154,123 @@ export default function MeditationRecordScreen() {
   const selectedTopic = meditationTopics.find(t => t.topic_number === parseInt(sessionNumber));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-50">
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Custom Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          if (router.canGoBack()) {
-            router.back();
-          } else {
-            router.replace('/(tabs)/practice');
-          }
-        }} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
+      <View className="bg-white px-4 py-3 border-b border-gray-200 shadow-sm">
+        <TouchableOpacity 
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)/practice');
+            }
+          }} 
+          className="py-2 mb-2"
+        >
+          <Text className="text-primary text-base font-medium">← 返回</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
+        <Text className="text-xl font-semibold text-gray-800 text-center mb-1">
           📝 {isEditing ? '编辑观修记录' : '记录新的观修'}
         </Text>
       </View>
 
       <KeyboardAvoidingView 
-        style={styles.keyboardAvoidingView}
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.formContainer}>
-          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+        <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
+          <View className="bg-white rounded-xl p-5 mb-5 shadow-sm">
+            <Text className="text-2xl font-semibold text-gray-800 text-center mb-6 pb-4 border-b border-gray-200">
+              📿 {practiceName}
+            </Text>
 
-          {/* Duration Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-            <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
-            <TextInput
-              style={styles.textInput}
-              value={duration}
-              onChangeText={setDuration}
-              keyboardType="numeric"
-              placeholder="30"
-            />
-          </View>
-
-          {/* Topic Selection - only show if there are topics or still loading */}
-          {(loadingTopics || meditationTopics.length > 0) && (
-            <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>选择观修内容</Text>
-              {loadingTopics ? (
-                <ActivityIndicator style={styles.loadingIndicator} />
-              ) : meditationTopics.length > 0 ? (
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={parseInt(sessionNumber)}
-                    onValueChange={(value) => setSessionNumber(value.toString())}
-                    style={styles.picker}
-                  >
-                    {meditationTopics.map((topic) => (
-                      <Picker.Item 
-                        key={topic.topic_number} 
-                        label={`第${topic.topic_number}座 - ${topic.title}`} 
-                        value={topic.topic_number} 
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              ) : null}
+            {/* Duration Input */}
+            <View className="mb-6">
+              <Text className="text-base font-semibold text-gray-800 mb-1.5">观修时长（分钟）</Text>
+              <Text className="text-sm text-gray-600 mb-2 leading-5">请输入观修时长，如：30</Text>
+              <TextInput
+                className="border border-gray-300 rounded-lg p-3 text-base bg-white text-gray-800"
+                value={duration}
+                onChangeText={setDuration}
+                keyboardType="numeric"
+                placeholder="30"
+              />
             </View>
-          )}
 
-          {/* Topic Description - only show if topics exist and there's a selected topic */}
-          {meditationTopics.length > 0 && selectedTopic?.description && (
-            <View style={styles.topicDescription}>
-              <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
-              <Text style={styles.topicDescriptionText}>
-                {selectedTopic.description}
+            {/* Topic Selection - only show if there are topics or still loading */}
+            {(loadingTopics || meditationTopics.length > 0) && (
+              <View className="mb-6">
+                <Text className="text-base font-semibold text-gray-800 mb-1.5">选择观修内容</Text>
+                {loadingTopics ? (
+                  <ActivityIndicator className="p-5" />
+                ) : meditationTopics.length > 0 ? (
+                  <View className={`border border-gray-300 rounded-lg bg-white overflow-hidden ${Platform.OS === 'ios' ? 'min-h-[200px] px-0' : ''}`}>
+                    <Picker
+                      selectedValue={parseInt(sessionNumber)}
+                      onValueChange={(value) => setSessionNumber(value.toString())}
+                      className={`h-12 text-gray-800 ${Platform.OS === 'android' ? 'bg-white' : ''}`}
+                    >
+                      {meditationTopics.map((topic) => (
+                        <Picker.Item 
+                          key={topic.topic_number} 
+                          label={`第${topic.topic_number}座 - ${topic.title}`} 
+                          value={topic.topic_number} 
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                ) : null}
+              </View>
+            )}
+
+            {/* Topic Description - only show if topics exist and there's a selected topic */}
+            {meditationTopics.length > 0 && selectedTopic?.description && (
+              <View className="bg-yellow-50 rounded-lg p-4 mb-4 border-l-4 border-yellow-400">
+                <Text className="text-sm font-semibold text-yellow-800 mb-1.5">观修要点：</Text>
+                <Text className="text-sm text-yellow-800 leading-5">
+                  {selectedTopic.description}
+                </Text>
+              </View>
+            )}
+
+            {/* Reflection Input */}
+            <View className="mb-6">
+              <Text className="text-base font-semibold text-gray-800 mb-1.5">观后感（可选）</Text>
+              <Text className="text-sm text-gray-600 mb-2 leading-5">
+                记录您在这次观修中的体验、感悟和思考...
+              </Text>
+              <TextInput
+                className="border border-gray-300 rounded-lg p-3 text-base bg-white text-gray-800 h-30 pt-3 pb-3"
+                value={reflection}
+                onChangeText={setReflection}
+                multiline
+                numberOfLines={6}
+                placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
+                textAlignVertical="top"
+              />
+              <Text className="text-xs text-gray-600 text-right mt-1">
+                {reflection.length} 字
               </Text>
             </View>
-          )}
 
-          {/* Reflection Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>观后感（可选）</Text>
-            <Text style={styles.inputHint}>
-              记录您在这次观修中的体验、感悟和思考...
-            </Text>
-            <TextInput
-              style={[styles.textInput, styles.multilineInput]}
-              value={reflection}
-              onChangeText={setReflection}
-              multiline
-              numberOfLines={6}
-              placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
-              textAlignVertical="top"
-            />
-            <Text style={styles.characterCount}>
-              {reflection.length} 字
-            </Text>
+            {/* Save Button */}
+            <TouchableOpacity 
+              className={`bg-yellow-400 rounded-lg py-4 items-center mt-6 mb-8 shadow-sm ${loading ? 'opacity-60' : ''}`}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-gray-800 text-lg font-semibold">💾 保存记录</Text>
+              )}
+            </TouchableOpacity>
           </View>
-
-          {/* Save Button - now inside scroll content */}
-          <TouchableOpacity 
-            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-            onPress={handleSave}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.saveButtonText}>💾 保存记录</Text>
-            )}
-          </TouchableOpacity>
-        </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa'
-  },
-  keyboardAvoidingView: {
-    flex: 1
-  },
-  header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500'
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 4
-  },
-  content: {
-    flex: 1,
-    padding: 16
-  },
-  formContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  practiceTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 24,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef'
-  },
-  inputSection: {
-    marginBottom: 24
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6
-  },
-  inputHint: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 8,
-    lineHeight: 20
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-    color: '#333'
-  },
-  multilineInput: {
-    height: 120,
-    textAlignVertical: 'top',
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    backgroundColor: 'white',
-    overflow: 'hidden',
-    ...(Platform.OS === 'ios' && {
-      minHeight: 200,
-      paddingHorizontal: 0,
-    }),
-  },
-  picker: {
-    height: 50,
-    color: '#333',
-    ...(Platform.OS === 'android' && {
-      backgroundColor: 'white',
-    }),
-  },
-  topicDescription: {
-    backgroundColor: '#fff3cd',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffc107'
-  },
-  topicDescriptionLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#856404',
-    marginBottom: 6
-  },
-  topicDescriptionText: {
-    fontSize: 14,
-    color: '#856404',
-    lineHeight: 20
-  },
-  characterCount: {
-    fontSize: 12,
-    color: '#6c757d',
-    textAlign: 'right',
-    marginTop: 4
-  },
-  loadingIndicator: {
-    padding: 20
-  },
-  saveButton: {
-    backgroundColor: '#ffc107',
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  saveButtonDisabled: {
-    opacity: 0.6
-  },
-  saveButtonText: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: '600'
-  }
-});

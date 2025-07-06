@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { supabase } from '@/lib/supabase';
 
 export function DebugInfo() {
@@ -27,20 +27,25 @@ export function DebugInfo() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>调试信息</Text>
+    <View className="flex-1 p-6">
+      <Text className="text-2xl font-bold mb-6 text-buddhist-slate">调试信息</Text>
 
-      <TouchableOpacity style={styles.button} onPress={loadPractices}>
-        <Text style={styles.buttonText}>
+      <TouchableOpacity 
+        className="bg-primary rounded-lg p-4 mb-6 active:opacity-80" 
+        onPress={loadPractices}
+      >
+        <Text className="text-white text-center font-bold">
           {loading ? '加载中...' : '加载修行项目'}
         </Text>
       </TouchableOpacity>
 
-      <Text style={styles.subtitle}>可用修行项目 ({practices.length}): </Text>
+      <Text className="text-lg font-bold mt-3 mb-3 text-buddhist-slate">
+        可用修行项目 ({practices.length}): 
+      </Text>
       {practices.map((practice: any, index) => (
-        <View key={practice.id} style={styles.practiceItem}>
-          <Text style={styles.practiceName}>{practice.name}</Text>
-          <Text style={styles.practiceDetails}>
+        <View key={practice.id} className="mb-3 p-4 border border-gray-300 rounded-lg bg-surface">
+          <Text className="text-base font-bold text-buddhist-slate">{practice.name}</Text>
+          <Text className="text-sm text-buddhist-gray">
             类型: {practice.type} | 单位: {practice.unit}
           </Text>
         </View>
@@ -48,50 +53,6 @@ export function DebugInfo() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  practiceItem: {
-    marginBottom: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
-  },
-  practiceName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  practiceDetails: {
-    fontSize: 14,
-    color: 'gray',
-  },
-});
 
 export function ConnectionTest() {
   const [isConnected, setIsConnected] = useState(false);
@@ -116,75 +77,30 @@ export function ConnectionTest() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🔗 Connection Test</Text>
-      <Text style={styles.text}>
+    <View className="p-6 bg-gray-100 m-3 rounded-lg">
+      <Text className="text-base font-bold mb-3 text-buddhist-slate">🔗 Connection Test</Text>
+      <Text className="text-sm text-buddhist-gray">
         Status: {isConnected ? '✅ Connected' : '❌ Not Connected'}
       </Text>
     </View>
   );
 }
 
-const styles2 = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#f0f0f0',
-    margin: 10,
-    borderRadius: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  text: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-});
-
 export function Welcome() {
   return (
-    <View style={styles3.container}>
-      <Text style={styles3.title}>欢迎!</Text>
-      <Text style={styles3.subtitle}>
+    <View className="p-6">
+      <Text className="text-2xl font-bold mb-3 text-primary">欢迎!</Text>
+      <Text className="text-lg text-buddhist-slate">
         请选择你的修行项目
       </Text>
     </View>
   );
 }
 
-const styles3 = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-  },
-});
-
 export function SectionHeader({ title }) {
   return (
-    <View style={styles4.container}>
-      <Text style={styles4.title}>{title}</Text>
+    <View className="p-4 bg-gray-200 mt-6 mb-3 rounded-lg">
+      <Text className="text-lg font-bold text-buddhist-slate">{title}</Text>
     </View>
   );
 }
-
-const styles4 = StyleSheet.create({
-  container: {
-    padding: 10,
-    backgroundColor: '#e2e8f0',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});

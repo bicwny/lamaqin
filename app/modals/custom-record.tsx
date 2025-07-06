@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -205,41 +204,43 @@ export default function CustomRecordScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-50">
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Custom Header */}
-      <View style={styles.header}>
+      <View className="bg-white px-4 py-3 border-b border-gray-200 shadow-sm">
         <TouchableOpacity onPress={() => {
           if (router.canGoBack()) {
             router.back();
           } else {
             router.replace('/(tabs)/practice');
           }
-        }} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
+        }} className="py-2 mb-2">
+          <Text className="text-primary text-base font-medium">← 返回</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
+        <Text className="text-xl font-semibold text-gray-800 text-center mb-1">
           📝 {isEditing ? '编辑修行记录' : '记录修行数量'}
         </Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
         {loadingRecord ? (
-          <View style={styles.loadingContainer}>
+          <View className="flex-1 justify-center items-center p-10 min-h-[200px]">
             <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>正在加载记录...</Text>
+            <Text className="mt-3 text-base text-gray-600">正在加载记录...</Text>
           </View>
         ) : (
-        <View style={styles.formContainer}>
-          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+        <View className="bg-white rounded-xl p-5 mb-5 shadow-sm border border-gray-100">
+          <Text className="text-2xl font-semibold text-gray-800 text-center mb-6 pb-4 border-b border-gray-200">
+            📿 {practiceName}
+          </Text>
 
           {/* Count Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>本次修行数量</Text>
-            <Text style={styles.inputHint}>请输入本次修行的数量，如：108</Text>
+          <View className="mb-6">
+            <Text className="text-base font-semibold text-gray-800 mb-1.5">本次修行数量</Text>
+            <Text className="text-sm text-gray-600 mb-2 leading-5">请输入本次修行的数量，如：108</Text>
             <TextInput
-              style={styles.textInput}
+              className="border border-gray-300 rounded-lg p-3 text-base bg-white text-gray-800"
               value={count}
               onChangeText={setCount}
               keyboardType="numeric"
@@ -248,13 +249,13 @@ export default function CustomRecordScreen() {
           </View>
 
           {/* Notes Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>备注（可选）</Text>
-            <Text style={styles.inputHint}>
+          <View className="mb-6">
+            <Text className="text-base font-semibold text-gray-800 mb-1.5">备注（可选）</Text>
+            <Text className="text-sm text-gray-600 mb-2 leading-5">
               记录您在这次修行中的体验、感悟...
             </Text>
             <TextInput
-              style={[styles.textInput, styles.multilineInput]}
+              className="border border-gray-300 rounded-lg p-3 text-base bg-white text-gray-800 h-24"
               value={notes}
               onChangeText={setNotes}
               multiline
@@ -262,20 +263,20 @@ export default function CustomRecordScreen() {
               placeholder="例如：今日顶礼时心境平静，体会到三宝的加持..."
               textAlignVertical="top"
             />
-            <Text style={styles.characterCount}>
+            <Text className="text-xs text-gray-600 text-right mt-1">
               {notes.length} 字
             </Text>
           </View>
 
           <TouchableOpacity 
-            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            className={`bg-primary rounded-xl py-4 items-center mt-6 mb-8 mx-4 ${loading ? 'opacity-60' : ''}`}
             onPress={handleSave}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.saveButtonText}>
+              <Text className="text-white text-lg font-semibold">
                 {isEditing ? '更新记录' : '保存记录'}
               </Text>
             )}
@@ -286,126 +287,3 @@ export default function CustomRecordScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa'
-  },
-  header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500'
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 4
-  },
-  content: {
-    flex: 1,
-    padding: 16
-  },
-  formContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
-  },
-  practiceTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 24,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef'
-  },
-  inputSection: {
-    marginBottom: 24
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6
-  },
-  inputHint: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 8,
-    lineHeight: 20
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-    color: '#333'
-  },
-  multilineInput: {
-    height: 100,
-    textAlignVertical: 'top'
-  },
-  characterCount: {
-    fontSize: 12,
-    color: '#6c757d',
-    textAlign: 'right',
-    marginTop: 4
-  },
-  saveButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 32,
-    marginHorizontal: 16,
-  },
-  saveButtonDisabled: {
-    opacity: 0.6
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600'
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    minHeight: 200,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#666',
-  }
-});
