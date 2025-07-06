@@ -374,7 +374,7 @@ export const meditationService = {
   async getMeditationRecords(userId: string, practiceId?: string): Promise<MeditationRecord[]> {
     let query = supabase
       .from('meditation_records')
-      .select('id, user_id, practice_id, record_date, duration_minutes, session_number, method, reflection, reflection_created_at, created_at, topic_number')
+      .select('*')
       .eq('user_id', userId)
       .order('record_date', { ascending: false })
       .order('created_at', { ascending: false });
@@ -390,6 +390,7 @@ export const meditationService = {
       throw error;
     }
 
+    console.log(`📊 Loaded ${data?.length || 0} meditation records for practice ${practiceId}`);
     return data || [];
   },
 

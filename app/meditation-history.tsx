@@ -76,7 +76,7 @@ export default function MeditationHistoryScreen() {
 
       if (reset) {
         setRecords(pageRecords);
-        
+
         // Load topics and calculate stats
         await loadTopicsAndStats(allRecords);
       } else {
@@ -115,7 +115,7 @@ export default function MeditationHistoryScreen() {
           // Fallback to method field matching if topic_number is not available
           return record.method && record.method.includes(topic.title);
         });
-        
+
         return {
           ...topic,
           count: recordsForTopic.length,
@@ -291,7 +291,7 @@ export default function MeditationHistoryScreen() {
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
-        
+
         {/* View Mode Toggle */}
         <View style={styles.viewToggle}>
           <TouchableOpacity
@@ -455,7 +455,7 @@ export default function MeditationHistoryScreen() {
                     <Text style={styles.topicTitle}>{topic.title}</Text>
                     <Text style={styles.topicNumber}>第{topic.topic_number}修法</Text>
                   </View>
-                  
+
                   <View style={styles.topicStats}>
                     <Text style={styles.topicCount}>
                       🧘 {topic.count} 次观修
