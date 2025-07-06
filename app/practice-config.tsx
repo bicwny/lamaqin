@@ -42,6 +42,13 @@ export default function PracticeConfigScreen() {
     practiceType === 'time' ? 'topic_progress' : 'total'
   );
 
+  // Reset duration mode when switching between total and daily for count practices
+  useEffect(() => {
+    if (practiceType === 'count' && configMode === 'total' && durationMode === '持续进行') {
+      setDurationMode('60天');
+    }
+  }, [configMode, practiceType]);
+
   // Count-based configuration
   const [totalTarget, setTotalTarget] = useState('');
   const [dailyTarget, setDailyTarget] = useState('');
@@ -396,13 +403,23 @@ export default function PracticeConfigScreen() {
           style={[
             styles.ongoingButton,
             durationMode === '持续进行' && styles.ongoingButtonActive,
+            // Disable for count-based practices with total target mode
+            (practiceType === 'count' && configMode === 'total') && styles.ongoingButtonDisabled,
           ]}
-          onPress={() => setDurationMode('持续进行' as any)}
+          onPress={() => {
+            // Only allow ongoing for time-based practices or count-based daily target mode
+            if (practiceType === 'time' || configMode === 'daily') {
+              setDurationMode('持续进行' as any);
+            }
+          }}
+          disabled={practiceType === 'count' && configMode === 'total'}
         >
           <Text
             style={[
               styles.ongoingButtonText,
               durationMode === '持续进行' && styles.ongoingButtonTextActive,
+              // Disabled text style
+              (practiceType === 'count' && configMode === 'total') && styles.ongoingButtonTextDisabled,
             ]}
           >
             持续进行 (直到我停止)
@@ -979,6 +996,14 @@ const styles = StyleSheet.create({
   },
   ongoingButtonTextActive: {
     color: 'white',
+  },
+  ongoingButtonDisabled: {
+    backgroundColor: '#f1f1f1',
+    borderColor: '#ddd',
+    opacity: 0.5,
+  },
+  ongoingButtonTextDisabled: {
+    color: '#999',
   },
   summaryContainer: {
     backgroundColor: '#f8f9fa',
