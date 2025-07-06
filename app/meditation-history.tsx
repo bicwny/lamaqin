@@ -105,15 +105,11 @@ export default function MeditationHistoryScreen() {
       const topicsData = await meditationService.getMeditationTopics(practiceId);
       setTopics(topicsData);
 
-      // Calculate topic statistics
+      // Calculate topic statistics - only include records with valid topic_number
       const topicCounts = topicsData.map(topic => {
         const recordsForTopic = allRecords.filter(record => {
-          // First try to match by topic_number if it exists
-          if (record.topic_number) {
-            return record.topic_number === topic.topic_number;
-          }
-          // Fallback to method field matching if topic_number is not available
-          return record.method && record.method.includes(topic.title);
+          // Only match records that have a valid topic_number
+          return record.topic_number && record.topic_number === topic.topic_number;
         });
 
         return {
@@ -449,6 +445,16 @@ export default function MeditationHistoryScreen() {
             </View>
           ) : (
             <View style={styles.recordsList}>
+              {/* Topic Coverage Summary */}
+              <View style={styles.topicSummary}>
+                <Text style={styles.topicSummaryText}>
+                  📊 已观修 {topicStats.filter(t => t.count > 0).length} / {topicStats.length} 个主题
+                </Text>
+                <Text style={styles.topicSummarySubtext}>
+                  * 此视图仅显示有主题标记的观修记录
+                </Text>
+              </View>
+
               {topicStats.map((topic) => (
                 <View key={topic.id} style={styles.topicCard}>
                   <View style={styles.topicHeader}>
@@ -774,5 +780,24 @@ const styles = StyleSheet.create({
     color: '#888',
     lineHeight: 20,
     marginTop: 4,
+  },
+  topicSummary: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  topicSummaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  topicSummarySubtext: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic',
   },
 });
