@@ -54,7 +54,7 @@ export default function PracticeConfigScreen() {
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
+  const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义' | '持续进行'>('60天');
   const [customEndDate, setCustomEndDate] = useState(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
 
@@ -132,10 +132,10 @@ export default function PracticeConfigScreen() {
         return;
       }
     } else {
-      if (!weeklyGoal) {
-          Alert.alert('错误', '请输入每周目标座数');
-          return;
-        }
+      if (!sessionsTarget) {
+        Alert.alert('错误', '请输入每周目标座数');
+        return;
+      }
     }
 
     setLoading(true);
@@ -159,19 +159,18 @@ export default function PracticeConfigScreen() {
           finalTotalTarget = finalDailyTarget * days;
         }
       } else {
-        // Time-based practices
-        if (configMode === 'topic_progress') {
-          // For topic progress: 92 topics, user sets weekly goal
-          finalTotalTarget = 92; // 92 meditation topics
-          finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
-          targetPeriod = 'weekly';
-          // No end date for topic progress - it ends when all 92 topics are completed
+        // Time-based practices - unified approach
+        finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
+        targetPeriod = 'weekly';
+        
+        if (durationMode === '持续进行') {
+          // Ongoing practice - no end date
+          endDate = null;
+          finalTotalTarget = 0; // 0 indicates ongoing
         } else {
-          // Fixed duration mode - always weekly
+          // Fixed duration practice
           const days = getDurationInDays();
           endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-          finalDailyTarget = parseInt(sessionsTarget);
-          targetPeriod = 'weekly';
           finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
         }
       }
@@ -309,96 +308,25 @@ export default function PracticeConfigScreen() {
   const renderTimeBasedConfig = () => (
     <>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>1. 选择修行模式</Text>
-        <View style={styles.segmentedControl}>
-          <TouchableOpacity
-            style={[
-              styles.segmentButton,
-              configMode === 'topic_progress' && styles.segmentButtonActive,
-            ]}
-            onPress={() => {
-              setConfigMode('topic_progress');
-              setFrequencyMode('weekly');
-              setSessionsTarget('4');
-            }}
-          >
-            <Text
-              style={[
-                styles.segmentButtonText,
-                configMode === 'topic_progress' && styles.segmentButtonTextActive,
-              ]}
-            >
-              法门进度
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.segmentButton,
-              configMode === 'fixed_duration' && styles.segmentButtonActive,
-            ]}
-            onPress={() => {
-              setConfigMode('fixed_duration');
-              setFrequencyMode('weekly');
-            }}
-          >
-            <Text
-              style={[
-                styles.segmentButtonText,
-                configMode === 'fixed_duration' && styles.segmentButtonTextActive,
-              ]}
-            >
-              固定时长
-            </Text>
-          </TouchableOpacity>
+        <Text style={styles.sectionTitle}>1. 设定您的每周目标</Text>
+        <View style={styles.inputRow}>
+          <Text style={styles.inputPrefix}>每周完成</Text>
+          <TextInput
+            style={styles.textInput}
+            value={sessionsTarget}
+            onChangeText={setSessionsTarget}
+            placeholder="例如: 4"
+            keyboardType="numeric"
+          />
+          <Text style={styles.inputUnit}>座</Text>
         </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>2. 修行频率</Text>
-
-        {configMode === 'topic_progress' ? (
-          <View>
-            <View style={styles.topicProgressInfo}>
-              <Text style={styles.topicProgressText}>
-                🧘 92个修法进度模式
-              </Text>
-              <Text style={styles.topicProgressSubtext}>
-                记录时需要选择具体修法主题和时长分钟数
-              </Text>
-            </View>
-
-            <View style={styles.inputRow}>
-              <Text style={styles.inputPrefix}>每周目标</Text>
-              <TextInput
-                style={styles.textInput}
-                value={sessionsTarget}
-                onChangeText={setSessionsTarget}
-                placeholder="例如: 4"
-                keyboardType="numeric"
-              />
-              <Text style={styles.inputUnit}>座</Text>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.inputRow}>
-            <Text style={styles.inputPrefix}>每周完成</Text>
-            <TextInput
-              style={styles.textInput}
-              value={sessionsTarget}
-              onChangeText={setSessionsTarget}
-              placeholder="例如: 4"
-              keyboardType="numeric"
-            />
-            <Text style={styles.inputUnit}>座</Text>
-          </View>
-        )}
       </View>
     </>
   );
 
   const renderTimePlanning = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>3. 时间规划</Text>
+      <Text style={styles.sectionTitle}>2. 时间规划</Text>
 
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>开始时间</Text>
@@ -425,89 +353,92 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      {configMode === 'topic_progress' ? (
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>时间计划</Text>
-          <View style={styles.topicProgressInfo}>
-            <Text style={styles.topicProgressText}>
-              📚 开始时间为今天
-            </Text>
-            <Text style={styles.topicProgressSubtext}>
-              根据法门进度进行，92个修法完成后结束
-            </Text>
-          </View>
-        </View>
-      ) : (
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>持续时间</Text>
-          <View style={styles.durationOptions}>
-            {['30天', '60天', '100天', '1年'].map((option) => (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.durationButton,
-                  durationMode === option && styles.durationButtonActive,
-                ]}
-                onPress={() => setDurationMode(option as any)}
-              >
-                <Text
-                  style={[
-                    styles.durationButtonText,
-                    durationMode === option && styles.durationButtonTextActive,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.customButton,
-              durationMode === '自定义' && styles.customButtonActive,
-            ]}
-            onPress={() => setDurationMode('自定义')}
-          >
-            <Text
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>持续时间</Text>
+        <View style={styles.durationOptions}>
+          {['30天', '60天', '100天', '1年'].map((option) => (
+            <TouchableOpacity
+              key={option}
               style={[
-                styles.customButtonText,
-                durationMode === '自定义' && styles.customButtonTextActive,
+                styles.durationButton,
+                durationMode === option && styles.durationButtonActive,
               ]}
+              onPress={() => setDurationMode(option as any)}
             >
-              自定义
-            </Text>
-          </TouchableOpacity>
-
-          {durationMode === '自定义' && (
-            <View style={styles.customInputContainer}>
-              <Text style={styles.customInputLabel}>选择结束日期</Text>
-              <TouchableOpacity
-                style={styles.customDateButton}
-                onPress={() => setShowCustomDatePicker(true)}
+              <Text
+                style={[
+                  styles.durationButtonText,
+                  durationMode === option && styles.durationButtonTextActive,
+                ]}
               >
-                <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
-                <Text style={styles.dateButtonIcon}>📅</Text>
-              </TouchableOpacity>
-
-              {showCustomDatePicker && (
-                <DateTimePicker
-                  value={customEndDate}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)} // At least one day after start
-                  onChange={(event, selectedDate) => {
-                    setShowCustomDatePicker(Platform.OS === 'ios');
-                    if (selectedDate) {
-                      setCustomEndDate(selectedDate);
-                    }
-                  }}
-                />
-              )}
-            </View>
-          )}
+                {option}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      )}
+
+        <TouchableOpacity
+          style={[
+            styles.customButton,
+            durationMode === '自定义' && styles.customButtonActive,
+          ]}
+          onPress={() => setDurationMode('自定义')}
+        >
+          <Text
+            style={[
+              styles.customButtonText,
+              durationMode === '自定义' && styles.customButtonTextActive,
+            ]}
+          >
+            自定义
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.ongoingButton,
+            durationMode === '持续进行' && styles.ongoingButtonActive,
+          ]}
+          onPress={() => setDurationMode('持续进行' as any)}
+        >
+          <Text
+            style={[
+              styles.ongoingButtonText,
+              durationMode === '持续进行' && styles.ongoingButtonTextActive,
+            ]}
+          >
+            持续进行 (直到我停止)
+          </Text>
+        </TouchableOpacity>
+
+        {durationMode === '自定义' && (
+          <View style={styles.customInputContainer}>
+            <Text style={styles.customInputLabel}>选择结束日期</Text>
+            <TouchableOpacity
+              style={styles.customDateButton}
+              onPress={() => setShowCustomDatePicker(true)}
+            >
+              <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
+              <Text style={styles.dateButtonIcon}>📅</Text>
+            </TouchableOpacity>
+
+            {showCustomDatePicker && (
+              <DateTimePicker
+                value={customEndDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)} // At least one day after start
+                onChange={(event, selectedDate) => {
+                  setShowCustomDatePicker(Platform.OS === 'ios');
+                  if (selectedDate) {
+                    setCustomEndDate(selectedDate);
+                  }
+                }}
+              />
+            )}
+          </View>
+        )}
+      </View>
     </View>
   );
 
@@ -548,10 +479,10 @@ export default function PracticeConfigScreen() {
             </View>
           ) : (
             <View>
-              {configMode === 'topic_progress' ? (
+              {durationMode === '持续进行' ? (
                 <View>
                   <Text style={styles.summaryText}>
-                    🎯 法门进度模式：92个修法，每周目标 {sessionsTarget || 4} 座观修
+                    🎯 持续进行模式：每周目标 {sessionsTarget || 4} 座观修
                   </Text>
                   <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始
@@ -560,7 +491,7 @@ export default function PracticeConfigScreen() {
                     👉 记录时需选择具体修法主题和观修时长
                   </Text>
                   <Text style={styles.summaryHighlight}>
-                    🏁 将持续到92个修法全部完成为止
+                    🏁 将持续进行直到您手动停止
                   </Text>
                 </View>
               ) : sessionsTarget ? (
@@ -816,6 +747,26 @@ const styles = StyleSheet.create({
   customDateButtonText: {
     fontSize: 16,
     color: '#333',
+  },
+  ongoingButton: {
+    backgroundColor: '#e8f5e8',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  ongoingButtonActive: {
+    backgroundColor: '#4CAF50',
+  },
+  ongoingButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4CAF50',
+  },
+  ongoingButtonTextActive: {
+    color: 'white',
   },
   summaryContainer: {
     backgroundColor: '#f8f9fa',
