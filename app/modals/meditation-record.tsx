@@ -11,6 +11,7 @@ import {
   ToastAndroid,
   Platform,
   SafeAreaView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
@@ -173,7 +174,12 @@ export default function MeditationRecordScreen() {
         </Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView 
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.formContainer}>
           <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
 
@@ -252,10 +258,10 @@ export default function MeditationRecordScreen() {
             </Text>
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
 
-      {/* Save Button */}
-      <View style={styles.bottomContainer}>
+        {/* Save Button */}
+        <View style={styles.bottomContainer}>
         <TouchableOpacity 
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}
           onPress={handleSave}
@@ -267,7 +273,8 @@ export default function MeditationRecordScreen() {
             <Text style={styles.saveButtonText}>💾 保存记录</Text>
           )}
         </TouchableOpacity>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -276,6 +283,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa'
+  },
+  keyboardAvoidingView: {
+    flex: 1
   },
   header: {
     backgroundColor: 'white',
@@ -356,7 +366,9 @@ const styles = StyleSheet.create({
   },
   multilineInput: {
     height: 120,
-    textAlignVertical: 'top'
+    textAlignVertical: 'top',
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   pickerContainer: {
     borderWidth: 1,
