@@ -210,7 +210,7 @@ export default function PracticeConfigScreen() {
       Alert.alert('成功', '修行项目已添加', [
         {
           text: '确定',
-          onPress: () => router.back(),
+          onPress: () => router.replace('/(tabs)/practice'),
         },
       ]);
     } catch (error) {
