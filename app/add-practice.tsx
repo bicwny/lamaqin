@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   Alert,
@@ -27,7 +26,7 @@ export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
 
   useEffect(() => {
     loadPractices();
@@ -83,27 +82,23 @@ export default function AddPracticeScreen() {
   };
 
   const renderPracticeSelector = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>选择修行项目</Text>
-      <ScrollView style={styles.practiceList} showsVerticalScrollIndicator={false}>
+    <View className="mb-6">
+      <Text className="text-lg font-semibold text-gray-800 mb-3">选择修行项目</Text>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {practices.map((practice) => (
           <TouchableOpacity
             key={practice.id}
-            style={[
-              styles.practiceCard,
-            ]}
+            className="bg-white rounded-xl p-4 mb-3 border border-gray-200 shadow-sm"
             onPress={() => handlePracticeSelect(practice)}
           >
-            <Text style={[
-              styles.practiceName,
-            ]}>
+            <Text className="text-base font-semibold text-gray-800 mb-1">
               {practice.name}
             </Text>
-            <Text style={styles.practiceType}>
+            <Text className="text-sm text-gray-600 mb-1">
               {practice.type === 'count' ? '计数类' : '计时类'} • {practice.unit}
             </Text>
             {practice.description && (
-              <Text style={styles.practiceDescription}>{practice.description}</Text>
+              <Text className="text-xs text-gray-500">{practice.description}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -111,15 +106,13 @@ export default function AddPracticeScreen() {
     </View>
   );
 
-  
-
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView className="flex-1 bg-gray-50">
         <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
-        <View style={styles.loadingContainer}>
+        <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>加载修行项目中...</Text>
+          <Text className="mt-4 text-base text-gray-600">加载修行项目中...</Text>
         </View>
       </SafeAreaView>
     );
@@ -127,18 +120,18 @@ export default function AddPracticeScreen() {
 
   if (practices.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView className="flex-1 bg-gray-50">
         <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>😊 您已添加所有修行项目</Text>
-          <Text style={styles.emptyDescription}>
+        <View className="flex-1 justify-center items-center p-8">
+          <Text className="text-2xl font-semibold text-gray-800 mb-4 text-center">😊 您已添加所有修行项目</Text>
+          <Text className="text-base text-gray-600 mb-8 text-center">
             目前没有新的修行项目可以添加
           </Text>
           <TouchableOpacity
-            style={styles.backButton}
+            className="bg-primary px-6 py-3 rounded-lg"
             onPress={() => router.back()}
           >
-            <Text style={styles.backButtonText}>返回</Text>
+            <Text className="text-white text-base font-semibold">返回</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -146,183 +139,12 @@ export default function AddPracticeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-50">
       <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
         {renderPracticeSelector()}
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: Colors.text,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  emptyDescription: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  backButton: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  backButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 12,
-  },
-  practiceList: {
-    flex: 1,
-  },
-  practiceCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  practiceName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  practiceType: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 4,
-  },
-  practiceDescription: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-  configForm: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-  },
-  periodSelector: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  periodButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    backgroundColor: 'white',
-    alignItems: 'center',
-  },
-  selectedPeriodButton: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  periodButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.text,
-  },
-  selectedPeriodButtonText: {
-    color: 'white',
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-    backgroundColor: 'white',
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
-});

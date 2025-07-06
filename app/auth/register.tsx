@@ -4,7 +4,6 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
-  StyleSheet, 
   Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -68,21 +67,21 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container} 
+      className="flex-1"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.logo}>🌸</Text>
-          <Text style={styles.title}>开始修行</Text>
-          <Text style={styles.subtitle}>注册账户，开启您的修行之旅</Text>
+      <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}>
+        <View className="items-center mb-10">
+          <Text className="text-5xl mb-2">🌸</Text>
+          <Text className="text-3xl font-bold text-primary mb-2">开始修行</Text>
+          <Text className="text-base text-gray-600 text-center leading-6">注册账户，开启您的修行之旅</Text>
         </View>
 
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>👤 法名（可选）</Text>
+        <View className="w-full">
+          <View className="mb-5">
+            <Text className="text-base text-gray-800 mb-2 font-medium">👤 法名（可选）</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-xl p-4 text-base bg-white text-gray-800"
               placeholder="如：多吉、白玛等"
               value={dharmaName}
               onChangeText={setDharmaName}
@@ -90,10 +89,10 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📧 邮箱地址 *</Text>
+          <View className="mb-5">
+            <Text className="text-base text-gray-800 mb-2 font-medium">📧 邮箱地址 *</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-xl p-4 text-base bg-white text-gray-800"
               placeholder="请输入您的邮箱"
               value={email}
               onChangeText={setEmail}
@@ -103,10 +102,10 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🔒 密码 *</Text>
+          <View className="mb-5">
+            <Text className="text-base text-gray-800 mb-2 font-medium">🔒 密码 *</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-xl p-4 text-base bg-white text-gray-800"
               placeholder="至少6位密码"
               value={password}
               onChangeText={setPassword}
@@ -115,10 +114,10 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🔒 确认密码 *</Text>
+          <View className="mb-5">
+            <Text className="text-base text-gray-800 mb-2 font-medium">🔒 确认密码 *</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-xl p-4 text-base bg-white text-gray-800"
               placeholder="请再次输入密码"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -128,22 +127,22 @@ export default function RegisterScreen() {
           </View>
 
           <TouchableOpacity 
-            style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
+            className={`bg-primary py-4 rounded-xl items-center mt-2 shadow-lg ${loading ? 'opacity-60' : ''}`}
             onPress={handleRegister}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={Colors.surface} />
+              <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.registerButtonText}>注册</Text>
+              <Text className="text-white text-lg font-bold">注册</Text>
             )}
           </TouchableOpacity>
 
-          <View style={styles.loginPrompt}>
-            <Text style={styles.loginPromptText}>已有账户？</Text>
+          <View className="flex-row justify-center items-center mt-8">
+            <Text className="text-gray-600 text-base mr-1">已有账户？</Text>
             <Link href="/auth/login" asChild>
               <TouchableOpacity>
-                <Text style={styles.loginLink}>立即登录</Text>
+                <Text className="text-primary text-base font-bold">立即登录</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -152,92 +151,3 @@ export default function RegisterScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logo: {
-    fontSize: 48,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.primary,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  form: {
-    width: '100%',
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: Colors.text,
-    marginBottom: 8,
-    fontWeight: '500',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
-    padding: 15,
-    fontSize: 16,
-    backgroundColor: Colors.surface,
-    color: Colors.text,
-  },
-  registerButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  registerButtonDisabled: {
-    opacity: 0.6,
-  },
-  registerButtonText: {
-    color: Colors.surface,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  loginPrompt: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 30,
-  },
-  loginPromptText: {
-    color: Colors.textSecondary,
-    fontSize: 16,
-    marginRight: 5,
-  },
-  loginLink: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
