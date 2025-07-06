@@ -34,17 +34,33 @@ export default function StudyScreen() {
 
     try {
       setLoading(true);
-      const [coursesData, progressData] = await Promise.all([
-        getUserCourses(user.id),
-        getUserTopicProgress(user.id)
-      ]);
+      
+      // Load courses with error handling
+      let coursesData = [];
+      try {
+        coursesData = await getUserCourses(user.id);
+      } catch (courseError) {
+        console.error('❌ Error loading courses:', courseError);
+        coursesData = [];
+      }
+
+      // Load topic progress with error handling
+      let progressData = [];
+      try {
+        progressData = await getUserTopicProgress(user.id);
+      } catch (progressError) {
+        console.error('❌ Error loading topic progress:', progressError);
+        progressData = [];
+      }
 
       setCourses(coursesData || []);
       setTopicProgress(progressData || []);
       console.log('📚 Loaded topic stats:', progressData?.length || 0);
     } catch (error) {
       console.error('❌ Error loading study data:', error);
-      Alert.alert('错误', '加载学习数据失败');
+      // Set fallback empty data instead of showing alert
+      setCourses([]);
+      setTopicProgress([]);
     } finally {
       setLoading(false);
     }
