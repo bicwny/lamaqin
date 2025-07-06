@@ -6,7 +6,8 @@ const config = getDefaultConfig(__dirname);
 
 // 2. 在传递给 withNativeWind 之前，直接修改配置对象 (这是关键步骤)
 // 强制 Metro 使用更少的 worker 来降低资源消耗
-config.maxWorkers = 2;
+config.maxWorkers = 1;
+config.resetCache = true;
 
 // 3. 将修改后的配置与 NativeWind 的配置合并
 module.exports = withNativeWind(config, {
