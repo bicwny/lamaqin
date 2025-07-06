@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Alert,
@@ -270,50 +269,46 @@ export default function MeditationHistoryScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
+      <SafeAreaView className="flex-1 bg-surface">
+        <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>正在加载记录...</Text>
+          <Text className="mt-3 text-base text-gray-600">正在加载记录...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-surface">
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
+      <View className="bg-white px-4 py-3 border-b border-gray-200 shadow-sm">
+        <TouchableOpacity onPress={() => router.back()} className="py-2 mb-2">
+          <Text className="text-primary text-base font-medium">← 返回</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
+        <Text className="text-lg font-semibold text-gray-800 text-center">📿 {practiceName} - 历史记录</Text>
 
         {/* View Mode Toggle - only show if there are records with topics */}
         {topicStats.some(topic => topic.count > 0) && (
-          <View style={styles.viewToggle}>
+          <View className="flex-row bg-gray-100 rounded-lg p-0.5 mt-3">
             <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                viewMode === 'chronological' && styles.toggleButtonActive
-              ]}
+              className={`flex-1 py-2 px-4 rounded-md items-center ${
+                viewMode === 'chronological' ? 'bg-primary' : ''
+              }`}
               onPress={() => setViewMode('chronological')}
             >
-              <Text style={[
-                styles.toggleButtonText,
-                viewMode === 'chronological' && styles.toggleButtonTextActive
-              ]}>时间</Text>
+              <Text className={`text-sm font-medium ${
+                viewMode === 'chronological' ? 'text-white' : 'text-gray-600'
+              }`}>时间</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                viewMode === 'by_topic' && styles.toggleButtonActive
-              ]}
+              className={`flex-1 py-2 px-4 rounded-md items-center ${
+                viewMode === 'by_topic' ? 'bg-primary' : ''
+              }`}
               onPress={() => setViewMode('by_topic')}
             >
-              <Text style={[
-                styles.toggleButtonText,
-                viewMode === 'by_topic' && styles.toggleButtonTextActive
-              ]}>主题</Text>
+              <Text className={`text-sm font-medium ${
+                viewMode === 'by_topic' ? 'text-white' : 'text-gray-600'
+              }`}>主题</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -321,7 +316,7 @@ export default function MeditationHistoryScreen() {
 
       {/* Records List */}
       <ScrollView
-        style={styles.scrollView}
+        className="flex-1"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
@@ -337,9 +332,9 @@ export default function MeditationHistoryScreen() {
         {viewMode === 'chronological' ? (
           // Chronological View
           records.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>📭 暂无观修记录</Text>
-              <Text style={styles.emptySubtext}>开始您的第一次观修吧！</Text>
+            <View className="flex-1 justify-center items-center py-20">
+              <Text className="text-lg text-gray-600 mb-2">📭 暂无观修记录</Text>
+              <Text className="text-sm text-gray-400">开始您的第一次观修吧！</Text>
             </View>
           ) : (
             <View style={styles.recordsList}>
