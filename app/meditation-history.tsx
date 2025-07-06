@@ -107,9 +107,14 @@ export default function MeditationHistoryScreen() {
 
       // Calculate topic statistics
       const topicCounts = topicsData.map(topic => {
-        const recordsForTopic = allRecords.filter(record => 
-          record.method && record.method.includes(topic.title)
-        );
+        const recordsForTopic = allRecords.filter(record => {
+          // First try to match by topic_number if it exists
+          if (record.topic_number) {
+            return record.topic_number === topic.topic_number;
+          }
+          // Fallback to method field matching if topic_number is not available
+          return record.method && record.method.includes(topic.title);
+        });
         
         return {
           ...topic,
