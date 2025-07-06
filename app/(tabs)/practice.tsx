@@ -249,6 +249,10 @@ export default function PracticeScreen() {
           const progress = calculateProgress(project);
           const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
+          const totalWeeks = project.target_end_date 
+                ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
+                : '持续进行';
+
           return (
             <View key={project.id} style={styles.practiceCard}>
               <View style={styles.practiceHeader}>
