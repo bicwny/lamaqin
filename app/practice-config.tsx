@@ -207,15 +207,10 @@ export default function PracticeConfigScreen() {
         }
       }
 
-      console.log('✅ Practice project saved successfully');
-      
       Alert.alert('成功', '修行项目已添加', [
         {
           text: '确定',
-          onPress: () => {
-            console.log('🔄 Navigating to practice tab...');
-            router.replace('/(tabs)/practice');
-          },
+          onPress: () => router.replace('/(tabs)/practice'),
         },
       ]);
     } catch (error) {
