@@ -428,6 +428,44 @@ function WeeklyProgressDisplay({ project, user }: { project: PracticeProject; us
   }
 }
 
+// New component to display total sessions
+function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; userId: string }) {
+  const [totalSessions, setTotalSessions] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTotalSessions = async () => {
+      if (!userId) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('meditation_records')
+          .select('*, topic_number', { count: 'exact' })
+          .eq('user_id', userId)
+          .eq('practice_id', practiceId);
+
+        if (error) {
+          throw error;
+        }
+
+        setTotalSessions(data ? data.length : 0);
+      } catch (error) {
+        console.error('Error fetching total sessions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTotalSessions();
+  }, [practiceId, userId]);
+
+  if (loading) {
+    return <Text style={styles.totalSessions}>总数: 加载中...</Text>;
+  }
+
+  return <Text style={styles.totalSessions}>🧘 {totalSessions} 次观修</Text>;
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -497,13 +535,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   practiceType: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#666',
-    backgroundColor: '#f8f9fa',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  totalSessions: {
+    fontSize: 14,
+    color: '#007bff',
+    fontWeight: '500',
+    marginBottom: 12,
   },
   practiceName: {
     fontSize: 18,
