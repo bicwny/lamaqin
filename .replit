@@ -17,7 +17,7 @@ localPort = 8083
 externalPort = 3001
 
 [workflows]
-runButton = "Dev Server"
+runButton = "Optimized Dev Server"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -58,3 +58,16 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx eas build --platform android --profile preview"
+
+[[workflows.workflow]]
+name = "Optimized Dev Server"
+author = 43042942
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill -f \"expo start\" || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo start --clear --max-workers 1 --dev-client"
