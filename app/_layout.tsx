@@ -132,8 +132,8 @@ export default function RootLayout() {
 
   if (!loaded) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <Text className="text-gray-600 text-lg">Loading...</Text>
       </View>
     );
   }
