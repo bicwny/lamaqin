@@ -1,32 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  TextInput,
-  SafeAreaView,
-} from 'react-native';
-import { router, Stack } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { View, Text, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Practice {
   id: string;
   name: string;
-  type: string;
-  unit: string;
   description: string;
+  type: 'time' | 'count';
+  default_duration_minutes?: number;
 }
 
-export default function AddPracticeScreen() {
+export default function AddPractice() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [selectedPractice, setSelectedPractice] = useState<Practice | null>(null);
+  const [projectName, setProjectName] = useState('');
+  const [isCustom, setIsCustom] = useState(false);
+  const [customPracticeName, setCustomPracticeName] = useState('');
 
   useEffect(() => {
     loadPractices();
@@ -34,116 +28,188 @@ export default function AddPracticeScreen() {
 
   const loadPractices = async () => {
     try {
-      console.log('🔄 Loading available practices...');
-
-      // Get all practices that user doesn't already have
-      const { data: allPractices, error: practicesError } = await supabase
+      const { data, error } = await supabase
         .from('practices')
         .select('*')
         .order('name');
 
-      if (practicesError) throw practicesError;
-
-      // Get user's existing practice projects
-      const { data: userProjects, error: projectsError } = await supabase
-        .from('user_practice_projects')
-        .select('practice_id')
-        .eq('user_id', user?.id);
-
-      if (projectsError) throw projectsError;
-
-      // Filter out practices user already has
-      const existingPracticeIds = new Set(userProjects?.map(p => p.practice_id) || []);
-      const availablePractices = allPractices?.filter(p => !existingPracticeIds.has(p.id)) || [];
-
-      console.log('📋 Available practices:', availablePractices.length);
-      console.log('🔍 Available practice names:', availablePractices.map(p => p.name));
-      console.log('🚫 Existing practice IDs:', Array.from(existingPracticeIds));
-      setPractices(availablePractices);
+      if (error) throw error;
+      setPractices(data || []);
     } catch (error) {
       console.error('Error loading practices:', error);
-      Alert.alert('错误', '加载修行项目失败');
+      Alert.alert('错误', '加载修行方法失败');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePracticeSelect = (practice: Practice) => {
-    // Navigate to configuration page with practice details
-    router.push({
-      pathname: '/practice-config',
-      params: {
-        practiceId: practice.id,
-        practiceName: practice.name,
-        practiceType: practice.type,
-        practiceUnit: practice.unit,
-      },
-    });
-  };
+  const handleCreateProject = async () => {
+    if (!user) return;
 
-  const renderPracticeSelector = () => (
-    <View className="mb-6">
-      <Text className="text-lg font-semibold text-gray-800 mb-3">选择修行项目</Text>
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {practices.map((practice) => (
-          <TouchableOpacity
-            key={practice.id}
-            className="bg-white rounded-xl p-4 mb-3 border border-gray-200 shadow-sm"
-            onPress={() => handlePracticeSelect(practice)}
-          >
-            <Text className="text-base font-semibold text-gray-800 mb-1">
-              {practice.name}
-            </Text>
-            <Text className="text-sm text-gray-600 mb-1">
-              {practice.type === 'count' ? '计数类' : '计时类'} • {practice.unit}
-            </Text>
-            {practice.description && (
-              <Text className="text-xs text-gray-500">{practice.description}</Text>
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-  );
+    if (!projectName.trim()) {
+      Alert.alert('错误', '请输入项目名称');
+      return;
+    }
+
+    if (isCustom && !customPracticeName.trim()) {
+      Alert.alert('错误', '请输入自定义修行方法名称');
+      return;
+    }
+
+    if (!isCustom && !selectedPractice) {
+      Alert.alert('错误', '请选择修行方法');
+      return;
+    }
+
+    try {
+      let practiceId = selectedPractice?.id;
+
+      // If it's a custom practice, create it first
+      if (isCustom) {
+        const { data: newPractice, error: practiceError } = await supabase
+          .from('practices')
+          .insert({
+            name: customPracticeName.trim(),
+            description: '自定义修行方法',
+            type: 'time',
+            default_duration_minutes: 30
+          })
+          .select()
+          .single();
+
+        if (practiceError) throw practiceError;
+        practiceId = newPractice.id;
+      }
+
+      // Create the practice project
+      const { error } = await supabase
+        .from('practice_projects')
+        .insert({
+          user_id: user.id,
+          practice_id: practiceId,
+          name: projectName.trim(),
+          status: 'active'
+        });
+
+      if (error) throw error;
+
+      Alert.alert(
+        '成功',
+        '修行项目创建成功',
+        [
+          {
+            text: '确定',
+            onPress: () => router.back()
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error creating project:', error);
+      Alert.alert('错误', '创建项目失败');
+    }
+  };
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50">
-        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text className="mt-4 text-base text-gray-600">加载修行项目中...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (practices.length === 0) {
-    return (
-      <SafeAreaView className="flex-1 bg-gray-50">
-        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
-        <View className="flex-1 justify-center items-center p-8">
-          <Text className="text-2xl font-semibold text-gray-800 mb-4 text-center">😊 您已添加所有修行项目</Text>
-          <Text className="text-base text-gray-600 mb-8 text-center">
-            目前没有新的修行项目可以添加
-          </Text>
-          <TouchableOpacity
-            className="bg-primary px-6 py-3 rounded-lg"
-            onPress={() => router.back()}
-          >
-            <Text className="text-white text-base font-semibold">返回</Text>
-          </TouchableOpacity>
-        </View>
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <Text>加载中...</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
+      <ScrollView className="flex-1 p-4">
+        {/* Header */}
+        <View className="flex-row items-center mb-6">
+          <TouchableOpacity
+            className="p-2 mr-3"
+            onPress={() => router.back()}
+          >
+            <Text className="text-2xl">←</Text>
+          </TouchableOpacity>
+          <Text className="text-2xl font-bold text-gray-800">
+            添加修行项目
+          </Text>
+        </View>
 
-      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
-        {renderPracticeSelector()}
+        {/* Project Name Input */}
+        <View className="mb-6">
+          <Text className="text-base font-semibold text-gray-700 mb-2">
+            项目名称
+          </Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg p-3 text-base bg-white"
+            placeholder="为您的修行项目起个名字"
+            value={projectName}
+            onChangeText={setProjectName}
+          />
+        </View>
+
+        {/* Practice Type Toggle */}
+        <View className="mb-6">
+          <Text className="text-base font-semibold text-gray-700 mb-2">
+            修行方法
+          </Text>
+          <View className="flex-row mb-4">
+            <TouchableOpacity
+              className={`flex-1 p-3 rounded-lg mr-2 ${!isCustom ? 'bg-primary' : 'bg-gray-100'}`}
+              onPress={() => setIsCustom(false)}
+            >
+              <Text className={`text-center font-semibold ${!isCustom ? 'text-white' : 'text-gray-600'}`}>
+                选择现有方法
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`flex-1 p-3 rounded-lg ml-2 ${isCustom ? 'bg-primary' : 'bg-gray-100'}`}
+              onPress={() => setIsCustom(true)}
+            >
+              <Text className={`text-center font-semibold ${isCustom ? 'text-white' : 'text-gray-600'}`}>
+                自定义方法
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {isCustom ? (
+            <TextInput
+              className="border border-gray-300 rounded-lg p-3 text-base bg-white"
+              placeholder="输入自定义修行方法名称"
+              value={customPracticeName}
+              onChangeText={setCustomPracticeName}
+            />
+          ) : (
+            <View>
+              {practices.map((practice) => (
+                <TouchableOpacity
+                  key={practice.id}
+                  className={`p-4 rounded-lg mb-2 border ${selectedPractice?.id === practice.id ? 'bg-yellow-100 border-primary' : 'bg-white border-gray-200'}`}
+                  onPress={() => setSelectedPractice(practice)}
+                >
+                  <Text className="text-base font-semibold text-gray-800 mb-1">
+                    {practice.name}
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    {practice.description}
+                  </Text>
+                  <Text className="text-xs text-gray-500 mt-1">
+                    类型: {practice.type === 'time' ? '时间' : '次数'}
+                    {practice.default_duration_minutes && ` • 建议: ${practice.default_duration_minutes}分钟`}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Create Button */}
+        <TouchableOpacity
+          className="bg-primary rounded-lg p-4 items-center mb-8"
+          onPress={handleCreateProject}
+        >
+          <Text className="text-white text-base font-bold">
+            创建项目
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

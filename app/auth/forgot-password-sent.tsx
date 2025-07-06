@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -28,7 +27,7 @@ export default function ForgotPasswordSentScreen() {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${process.env.EXPO_PUBLIC_APP_DOMAIN || 'exp://localhost:8081'}/auth/reset-password`,
       });
-      
+
       if (error) {
         Alert.alert('发送失败', error.message);
       } else {
@@ -42,35 +41,35 @@ export default function ForgotPasswordSentScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>📧 重置邮件已发送</Text>
-      <Text style={styles.subtitle}>
-        我们已向 {email} 发送密码重置邮件
-      </Text>
-      
-      <View style={styles.instructions}>
-        <Text style={styles.stepTitle}>📝 重置步骤：</Text>
-        <Text style={styles.step}>1. 检查邮箱(包括垃圾邮件)</Text>
-        <Text style={styles.step}>2. 点击邮件中的【重置密码】链接</Text>
-        <Text style={styles.step}>3. 设置新密码后返回登录</Text>
-      </View>
-
-      <TouchableOpacity 
-        style={[styles.button, (countdown > 0 || isResending) && styles.buttonDisabled]}
-        disabled={countdown > 0 || isResending}
-        onPress={handleResend}
-      >
-        <Text style={styles.buttonText}>
-          {countdown > 0 ? `重新发送 (${countdown}s)` : "重新发送重置邮件"}
+    <View className="flex-1 bg-gray-50 justify-center p-5">
+      <View className="items-center">
+        <Text className="text-5xl mb-5">📧</Text>
+        <Text className="text-3xl font-bold text-primary mb-4 text-center">邮件已发送</Text>
+        <Text className="text-base text-gray-600 text-center leading-6 mb-8 px-5">
+          我们已向您的邮箱发送了密码重置链接。请检查您的邮箱并按照说明重置密码。
         </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.button, styles.outlineButton]}
-        onPress={() => router.push('/auth/login')}
-      >
-        <Text style={[styles.buttonText, styles.outlineButtonText]}>返回登录</Text>
-      </TouchableOpacity>
+
+        <View className="bg-yellow-50 rounded-xl p-5 mb-8 border-l-4 border-yellow-500">
+          <Text className="text-base font-semibold text-yellow-800 mb-3">📝 温馨提示：</Text>
+          <Text className="text-sm text-yellow-800 mb-1">• 请检查垃圾邮件文件夹</Text>
+          <Text className="text-sm text-yellow-800 mb-1">• 链接有效期为24小时</Text>
+          <Text className="text-sm text-yellow-800">• 如未收到邮件，可返回重新发送</Text>
+        </View>
+
+        <TouchableOpacity 
+          className="bg-primary rounded-xl py-4 px-8 items-center mb-4 w-full"
+          onPress={() => router.replace('/auth/login')}
+        >
+          <Text className="text-white text-base font-bold">返回登录</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          className="items-center py-2"
+          onPress={() => router.back()}
+        >
+          <Text className="text-primary text-base font-medium">重新发送</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
