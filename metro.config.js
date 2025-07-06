@@ -4,4 +4,7 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
+// Enable CSS support for web
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
 module.exports = withNativeWind(config, { input: './global.css' });

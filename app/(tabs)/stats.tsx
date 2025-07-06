@@ -1,58 +1,265 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { getUserPracticeProjects, getUserMeditationRecords } from '@/lib/database';
+
+interface StatsData {
+  totalProjects: number;
+  activeProjects: number;
+  totalSessions: number;
+  totalTime: number;
+  streak: number;
+  weeklyProgress: number[];
+}
 
 export default function StatsScreen() {
-  const handleStartTracking = () => {
-    // TODO: Navigate to practice tab or setup
-    console.log('Start tracking pressed');
+  const { user } = useAuth();
+  const [stats, setStats] = useState<StatsData>({
+    totalProjects: 0,
+    activeProjects: 0,
+    totalSessions: 0,
+    totalTime: 0,
+    streak: 0,
+    weeklyProgress: [0, 0, 0, 0, 0, 0, 0]
+  });
+  const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
+
+  useEffect(() => {
+    loadStats();
+  }, [user?.id]);
+
+  const loadStats = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      const [projects, records] = await Promise.all([
+        getUserPracticeProjects(user.id),
+        getUserMeditationRecords(user.id)
+      ]);
+
+      console.log('📅 Loaded records:', records?.length || 0);
+
+      const totalSessions = records?.length || 0;
+      const totalTime = records?.reduce((sum, record) => sum + (record.duration || 0), 0) || 0;
+
+      setStats({
+        totalProjects: projects?.length || 0,
+        activeProjects: projects?.filter(p => p.status === 'active').length || 0,
+        totalSessions,
+        totalTime,
+        streak: calculateStreak(records || []),
+        weeklyProgress: calculateWeeklyProgress(records || [])
+      });
+    } catch (error) {
+      console.error('❌ Error loading stats:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const calculateStreak = (records: any[]) => {
+    if (!records || records.length === 0) return 0;
+
+    const sortedRecords = records
+      .map(r => new Date(r.created_at).toDateString())
+      .sort()
+      .filter((date, index, arr) => arr.indexOf(date) === index);
+
+    let streak = 0;
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+    if (sortedRecords.includes(today) || sortedRecords.includes(yesterday)) {
+      streak = 1;
+      // Calculate consecutive days
+      for (let i = sortedRecords.length - 2; i >= 0; i--) {
+        const currentDate = new Date(sortedRecords[i + 1]);
+        const prevDate = new Date(sortedRecords[i]);
+        const diffTime = currentDate.getTime() - prevDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return streak;
+  };
+
+  const calculateWeeklyProgress = (records: any[]) => {
+    const weekData = [0, 0, 0, 0, 0, 0, 0]; // Sun to Sat
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    records?.forEach(record => {
+      const recordDate = new Date(record.created_at);
+      if (recordDate >= oneWeekAgo) {
+        const dayOfWeek = recordDate.getDay();
+        weekData[dayOfWeek] += record.duration || 0;
+      }
+    });
+
+    return weekData;
+  };
+
+  const formatTime = (minutes: number) => {
+    if (minutes < 60) return `${minutes}分钟`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}小时${mins > 0 ? mins + '分钟' : ''}`;
+  };
+
+  const statCards = [
+    {
+      title: '修行项目',
+      value: stats.activeProjects,
+      total: stats.totalProjects,
+      icon: '📿',
+      color: 'bg-practice',
+      suffix: '个'
+    },
+    {
+      title: '修行时长',
+      value: stats.totalTime,
+      icon: '⏱️',
+      color: 'bg-mindfulness',
+      formatter: formatTime
+    },
+    {
+      title: '修行次数',
+      value: stats.totalSessions,
+      icon: '🔢',
+      color: 'bg-study',
+      suffix: '次'
+    },
+    {
+      title: '连续天数',
+      value: stats.streak,
+      icon: '🔥',
+      color: 'bg-stats',
+      suffix: '天'
+    }
+  ];
+
+  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50">
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-gray-600">加载中...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="p-5 bg-white border-b border-gray-200">
-          <Text className="text-3xl font-bold text-gray-800 mb-2">📊 统计分析</Text>
-          <Text className="text-base text-gray-600">查看您的修行进展</Text>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View className="bg-stats rounded-b-3xl mx-4 mt-4 px-6 py-8">
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Text className="text-white text-2xl font-bold">修行统计</Text>
+              <Text className="text-white/80 text-base mt-1">记录您的修行历程</Text>
+            </View>
+            <View className="bg-white/20 rounded-full p-3">
+              <Text className="text-white text-xl">📊</Text>
+            </View>
+          </View>
         </View>
 
-        <View className="flex-1 justify-center items-center p-10" style={{ minHeight: 500 }}>
-          <View className="mb-6">
-            <Ionicons name="bar-chart-outline" size={80} color="#9CA3AF" />
+        {/* Period Selector */}
+        <View className="px-4 mt-6">
+          <View className="bg-white rounded-xl p-2 shadow-sm flex-row">
+            {(['week', 'month', 'year'] as const).map((period) => (
+              <TouchableOpacity
+                key={period}
+                className={`flex-1 py-2 rounded-lg ${
+                  selectedPeriod === period ? 'bg-stats' : 'bg-transparent'
+                }`}
+                onPress={() => setSelectedPeriod(period)}
+              >
+                <Text className={`text-center font-medium ${
+                  selectedPeriod === period ? 'text-white' : 'text-gray-600'
+                }`}>
+                  {period === 'week' ? '本周' : period === 'month' ? '本月' : '今年'}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
+        </View>
 
-          <Text className="text-2xl font-semibold text-gray-700 mb-3 text-center">还没有统计数据</Text>
-          <Text className="text-base text-gray-600 text-center leading-6 mb-8 max-w-xs">
-            开始记录修行和学习，就能看到详细的进展统计了
-          </Text>
+        {/* Stats Cards */}
+        <View className="px-4 mt-4">
+          <View className="flex-row flex-wrap justify-between">
+            {statCards.map((card, index) => (
+              <View key={index} className="w-[48%] bg-white rounded-xl p-4 mb-4 shadow-sm">
+                <View className="flex-row items-center justify-between mb-2">
+                  <Text className="text-gray-600 text-sm">{card.title}</Text>
+                  <View className={`${card.color} rounded-full w-8 h-8 items-center justify-center`}>
+                    <Text className="text-white text-sm">{card.icon}</Text>
+                  </View>
+                </View>
+                <Text className="text-2xl font-bold text-gray-800">
+                  {card.formatter ? card.formatter(card.value) : `${card.value}${card.suffix || ''}`}
+                </Text>
+                {card.total !== undefined && (
+                  <Text className="text-xs text-gray-500 mt-1">
+                    总共 {card.total} 个
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
 
-          <TouchableOpacity 
-            className="flex-row items-center bg-purple-600 px-6 py-3 rounded-3xl mb-10"
-            onPress={handleStartTracking}
-          >
-            <Ionicons name="play" size={24} color="#FFFFFF" />
-            <Text className="text-white text-base font-semibold ml-2">开始记录</Text>
-          </TouchableOpacity>
+        {/* Weekly Progress Chart */}
+        <View className="px-4 mt-2">
+          <View className="bg-white rounded-xl p-4 shadow-sm">
+            <Text className="font-semibold text-gray-800 mb-4">本周修行时长</Text>
+            <View className="flex-row items-end justify-between h-32">
+              {stats.weeklyProgress.map((minutes, index) => {
+                const maxHeight = Math.max(...stats.weeklyProgress);
+                const height = maxHeight > 0 ? (minutes / maxHeight) * 80 : 0;
 
-          <View className="items-center">
-            <Text className="text-base font-medium text-gray-700 mb-5">即将看到的统计：</Text>
-            <View className="items-stretch">
-              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
-                <Ionicons name="trending-up" size={20} color="#059669" />
-                <Text className="text-sm text-gray-700 ml-3 font-medium">修行进度趋势</Text>
+                return (
+                  <View key={index} className="items-center flex-1">
+                    <View className="flex-1 justify-end items-center">
+                      <View
+                        className="bg-stats rounded-t w-6"
+                        style={{ height: Math.max(height, 2) }}
+                      />
+                    </View>
+                    <Text className="text-xs text-gray-600 mt-2">{weekDays[index]}</Text>
+                    <Text className="text-xs text-gray-400">{minutes}分</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+
+        {/* Achievement */}
+        <View className="px-4 mt-6 mb-8">
+          <View className="bg-white rounded-xl p-4 shadow-sm">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <Text className="font-semibold text-gray-800 mb-1">修行成就</Text>
+                <Text className="text-gray-600 text-sm">
+                  {stats.streak > 0 
+                    ? `连续修行 ${stats.streak} 天，功德无量！` 
+                    : '开始您的修行之旅吧！'
+                  }
+                </Text>
               </View>
-              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
-                <Ionicons name="calendar" size={20} color="#3B82F6" />
-                <Text className="text-sm text-gray-700 ml-3 font-medium">每日完成情况</Text>
-              </View>
-              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
-                <Ionicons name="trophy" size={20} color="#F59E0B" />
-                <Text className="text-sm text-gray-700 ml-3 font-medium">里程碑成就</Text>
-              </View>
-              <View className="flex-row items-center bg-gray-50 p-3 rounded-lg mb-2 min-w-[200px]">
-                <Ionicons name="time" size={20} color="#8B5CF6" />
-                <Text className="text-sm text-gray-700 ml-3 font-medium">学习时长统计</Text>
+              <View className="bg-buddhist-golden/10 rounded-full p-3">
+                <Text className="text-2xl">🏆</Text>
               </View>
             </View>
           </View>
