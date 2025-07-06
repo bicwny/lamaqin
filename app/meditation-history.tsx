@@ -350,7 +350,7 @@ export default function MeditationHistoryScreen() {
                     {isDeleting && (
                       <View className="absolute inset-0 bg-white/80 z-10 justify-center items-center rounded-xl flex-row gap-2">
                         <ActivityIndicator color="#dc3545" size="small" />
-                        <Text className="text-red-500 text-sm font-medium">删除中...</Text>
+                        <Text className="text-red-600 text-sm font-medium">删除中...</Text>
                       </View>
                     )}
 
@@ -465,7 +465,9 @@ export default function MeditationHistoryScreen() {
                 <View key={topic.id} className="bg-white rounded-xl p-4 mb-3 shadow-sm">
                   <View className="flex-row justify-between items-center mb-2">
                     <Text className="text-base font-semibold text-gray-800 flex-1 mr-2">{topic.title}</Text>
-                    <Text className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">第{topic.topic_number}修法</Text>
+                    <Text className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                      第{topic.topic_number}修法
+                    </Text>
                   </View>
 
                   <View className="flex-row flex-wrap gap-3 mb-2">
