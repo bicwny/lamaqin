@@ -251,17 +251,14 @@ export default function PracticeScreen() {
         <Text className="text-lg font-semibold text-gray-800 mx-4 mt-4 mb-2">我的修行项目：</Text>
 
         {projects.map((project) => {
-          const progress = React.useMemo(() => calculateProgress(project), [project]);
+          const progress = calculateProgress(project);
           const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
           // Unified display logic based on target_end_date
           const practiceDisplayType = project.target_end_date ? '固定时长' : '持续进行';
-          const totalWeeks = React.useMemo(() => 
-            project.target_end_date 
-              ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
-              : null,
-            [project.target_end_date, project.start_date]
-          );
+          const totalWeeks = project.target_end_date 
+            ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
+            : null;
 
           return (
             <View key={project.id} className="bg-white rounded-xl p-4 mx-4 my-2 shadow-sm">
