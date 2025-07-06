@@ -257,23 +257,21 @@ export default function MeditationRecordScreen() {
               {reflection.length} 字
             </Text>
           </View>
+
+          {/* Save Button - now inside scroll content */}
+          <TouchableOpacity 
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>💾 保存记录</Text>
+            )}
+          </TouchableOpacity>
         </View>
         </ScrollView>
-
-        {/* Save Button */}
-        <View style={styles.bottomContainer}>
-        <TouchableOpacity 
-          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-          onPress={handleSave}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>💾 保存记录</Text>
-          )}
-        </TouchableOpacity>
-        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -416,23 +414,13 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     padding: 20
   },
-  bottomContainer: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
   saveButton: {
     backgroundColor: '#ffc107',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 32,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
