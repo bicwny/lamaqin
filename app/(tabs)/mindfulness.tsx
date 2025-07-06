@@ -66,13 +66,13 @@ export default function MindfulnessScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="bg-mindfulness rounded-b-3xl mx-4 mt-4 px-6 py-8">
+        <View className="bg-pink-500 rounded-b-3xl mx-4 mt-4 px-6 py-8">
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-white text-2xl font-bold">心性觉察</Text>
-              <Text className="text-white/80 text-base mt-1">觉知当下，安住内心</Text>
+              <Text className="text-white opacity-80 text-base mt-1">觉知当下，安住内心</Text>
             </View>
-            <View className="bg-white/20 rounded-full p-3">
+            <View className="bg-white opacity-20 rounded-full p-3">
               <Text className="text-white text-xl">💝</Text>
             </View>
           </View>
@@ -87,10 +87,9 @@ export default function MindfulnessScreen() {
               {moods.map((mood) => (
                 <TouchableOpacity
                   key={mood.value}
-                  className={`rounded-xl p-3 mb-2 items-center ${
-                    currentMood === mood.value ? 'bg-mindfulness/20 border-2 border-mindfulness' : 'bg-gray-50'
+                  className={`rounded-xl p-3 mb-2 items-center w-1/3 ${
+                    currentMood === mood.value ? 'bg-pink-100 border-2 border-pink-500' : 'bg-gray-50'
                   }`}
-                  style={{ width: '30%' }}
                   onPress={() => setCurrentMood(mood.value)}
                 >
                   <Text className="text-2xl mb-1">{mood.emoji}</Text>
@@ -143,7 +142,7 @@ export default function MindfulnessScreen() {
                 <Text className="font-semibold text-gray-800 mb-1">记录内心感悟</Text>
                 <Text className="text-gray-600 text-sm">写下今天的体验和感受</Text>
               </View>
-              <View className="bg-mindfulness/10 rounded-full p-3">
+              <View className="bg-pink-100 rounded-full p-3">
                 <Text className="text-xl">📝</Text>
               </View>
             </View>
@@ -152,8 +151,8 @@ export default function MindfulnessScreen() {
 
         {/* Mindfulness Quote */}
         <View className="px-4 mt-6 mb-8">
-          <View className="bg-buddhist-golden/10 rounded-xl p-4 border-l-4 border-buddhist-golden">
-            <Text className="text-sm font-medium text-buddhist-golden mb-1">正念箴言</Text>
+          <View className="bg-yellow-50 rounded-xl p-4 border-l-4 border-yellow-600">
+            <Text className="text-sm font-medium text-yellow-600 mb-1">正念箴言</Text>
             <Text className="text-gray-700 italic text-center text-lg">
               {todayQuote}
             </Text>

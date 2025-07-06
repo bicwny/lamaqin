@@ -162,7 +162,7 @@ export default function StatsScreen() {
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="bg-stats rounded-b-3xl mx-4 mt-4 px-6 py-8">
+        <View className="bg-green-500 rounded-b-3xl mx-4 mt-4 px-6 py-8">
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-white text-2xl font-bold">修行统计</Text>
@@ -181,7 +181,7 @@ export default function StatsScreen() {
               <TouchableOpacity
                 key={period}
                 className={`flex-1 py-2 rounded-lg ${
-                  selectedPeriod === period ? 'bg-stats' : 'bg-transparent'
+                  selectedPeriod === period ? 'bg-green-500' : 'bg-transparent'
                 }`}
                 onPress={() => setSelectedPeriod(period)}
               >
@@ -232,7 +232,7 @@ export default function StatsScreen() {
                   <View key={index} className="items-center flex-1">
                     <View className="flex-1 justify-end items-center">
                       <View
-                        className="bg-stats rounded-t w-6"
+                        className="bg-green-500 rounded-t w-6"
                         style={{ height: Math.max(height, 2) }}
                       />
                     </View>
@@ -258,7 +258,7 @@ export default function StatsScreen() {
                   }
                 </Text>
               </View>
-              <View className="bg-buddhist-golden/10 rounded-full p-3">
+              <View className="bg-yellow-100 rounded-full p-3">
                 <Text className="text-2xl">🏆</Text>
               </View>
             </View>
