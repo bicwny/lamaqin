@@ -795,87 +795,101 @@ export default function PracticeConfigScreen() {
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>为这个修行项目起个名字</Text>
-            <TextInput
-              style={styles.projectNameInput}
-              placeholder="例如：2025金刚萨埵法会、请水晶念珠等"
-              value={projectName}
-              onChangeText={setProjectName}
-              multiline={false}
-            />
+            
+            {/* Tab Interface */}
+            <View style={styles.tabContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  usePresetName && styles.tabButtonActive,
+                ]}
+                onPress={() => {
+                  setUsePresetName(true);
+                  setProjectName('');
+                  setSelectedPreset('');
+                }}
+              >
+                <Text style={[
+                  styles.tabButtonText,
+                  usePresetName && styles.tabButtonTextActive,
+                ]}>
+                  预设
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  !usePresetName && styles.tabButtonActive,
+                ]}
+                onPress={() => {
+                  setUsePresetName(false);
+                  setProjectName('');
+                  setSelectedPreset('');
+                }}
+              >
+                <Text style={[
+                  styles.tabButtonText,
+                  !usePresetName && styles.tabButtonTextActive,
+                ]}>
+                  自定义
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Tab Content */}
+            <View style={styles.tabContent}>
+              {usePresetName ? (
+                <View style={styles.presetContainer}>
+                  {loadingPresets ? (
+                    <Text style={styles.loadingText}>加载中...</Text>
+                  ) : (
+                    <ScrollView 
+                      style={styles.presetScrollView}
+                      showsVerticalScrollIndicator={false}
+                    >
+                      <View style={styles.presetGrid}>
+                        {presetProjectNames.map((preset) => (
+                          <TouchableOpacity
+                            key={preset.id}
+                            style={[
+                              styles.presetButton,
+                              selectedPreset === preset.name && styles.presetButtonActive,
+                            ]}
+                            onPress={() => {
+                              setSelectedPreset(preset.name);
+                              setProjectName(preset.name);
+                            }}
+                          >
+                            <Text style={[
+                              styles.presetButtonText,
+                              selectedPreset === preset.name && styles.presetButtonTextActive,
+                            ]}>
+                              {preset.name}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  )}
+                </View>
+              ) : (
+                <View style={styles.customContainer}>
+                  <Text style={styles.customLabel}>输入项目名称</Text>
+                  <TextInput
+                    style={styles.customInput}
+                    placeholder="例如：2025金刚萨埵法会、请水晶念珠等"
+                    value={projectName}
+                    onChangeText={setProjectName}
+                    multiline={false}
+                  />
+                </View>
+              )}
+            </View>
+            
             <Text style={styles.helpText}>
               项目名称可以帮助您区分同一种修行的不同发愿或阶段
             </Text>
           </View>
-        </View>
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              usePresetName && styles.toggleButtonActive,
-            ]}
-            onPress={() => setUsePresetName(!usePresetName)}
-          >
-            <Text
-              style={[
-                styles.toggleButtonText,
-                usePresetName && styles.toggleButtonTextActive,
-              ]}
-            >
-              {usePresetName ? '使用自定义名称' : '从预设选择'}
-            </Text>
-          </TouchableOpacity>
-
-          {usePresetName ? (
-              <View style={styles.presetContainer}>
-                <Text style={styles.presetLabel}>选择一个预设项目名称：</Text>
-                {loadingPresets ? (
-                  <Text style={styles.loadingText}>加载中...</Text>
-                ) : (
-                  <ScrollView 
-                    style={styles.presetScrollView}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    <View style={styles.presetGrid}>
-                      {presetProjectNames.map((preset) => (
-                        <TouchableOpacity
-                          key={preset.id}
-                          style={[
-                            styles.presetButton,
-                            selectedPreset === preset.name && styles.presetButtonActive,
-                          ]}
-                          onPress={() => {
-                            setSelectedPreset(preset.name);
-                            setProjectName(preset.name);
-                          }}
-                        >
-                          <Text style={[
-                            styles.presetButtonText,
-                            selectedPreset === preset.name && styles.presetButtonTextActive,
-                          ]}>
-                            {preset.name}
-                          </Text>
-                          {preset.category && (
-                            <Text style={styles.presetCategoryText}>
-                              {preset.category}
-                            </Text>
-                          )}
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </ScrollView>
-                )}
-              </View>
-          ) : (
-            <View style={styles.customNameContainer}>
-              <Text style={styles.customNameLabel}>自定义项目名称</Text>
-              <TextInput
-                style={styles.customNameInput}
-                placeholder="输入项目名称"
-                value={projectName}
-                onChangeText={setProjectName}
-              />
-            </View>
-          )}
         </View>
 
         {practiceType === 'count' ? renderCountBasedConfig() : renderTimeBasedConfig()}
@@ -1239,33 +1253,42 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e9ecef',
   },
-  toggleButton: {
-    backgroundColor: '#f0f0f0',
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f1f3f4',
     borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
+    padding: 2,
     marginBottom: 16,
   },
-  toggleButtonActive: {
-    backgroundColor: Colors.primary,
+  tabButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
   },
-  toggleButtonText: {
+  tabButtonActive: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '500',
+    color: '#666',
   },
-  toggleButtonTextActive: {
-    color: 'white',
+  tabButtonTextActive: {
+    color: '#333',
+    fontWeight: '600',
+  },
+  tabContent: {
+    minHeight: 120,
   },
   presetContainer: {
-    marginTop: 16,
-  },
-  presetLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
+    marginTop: 8,
   },
   presetScrollView: {
     maxHeight: 200,
@@ -1273,18 +1296,22 @@ const styles = StyleSheet.create({
   presetGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    gap: 8,
   },
   presetButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f8f9fa',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    margin: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    minWidth: 100,
     alignItems: 'center',
   },
   presetButtonActive: {
     backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   presetButtonText: {
     fontSize: 14,
@@ -1300,22 +1327,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     padding: 20,
   },
-  presetCategoryText: {
-    fontSize: 11,
-    color: '#999',
-    marginTop: 2,
+  customContainer: {
+    marginTop: 8,
   },
-  customNameContainer: {
-    marginTop: 16,
+  customLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+    marginBottom: 12,
   },
-  customNameLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  customNameInput: {
+  customInput: {
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
     paddingHorizontal: 12,
@@ -1324,6 +1345,5 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: '#e9ecef',
-    textAlign: 'center',
   },
 });
