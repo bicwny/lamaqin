@@ -6,6 +6,7 @@ import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import PageHeader from '@/components/PageHeader';
 
 
 export default function HomeScreen() {
@@ -27,30 +28,17 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
+        <PageHeader 
+          title="🏠 修行主页"
+          subtitle={`${getGreeting()} • 善缘居士 · 修行第365天 🔥`}
+          rightAction={{
+            text: "👤",
+            onPress: navigateToProfile
+          }}
+        />
         <ScrollView style={styles.scrollView}>
-        {/* Header */}
-        <ThemedView style={styles.header}>
-          <View style={styles.headerContent}>
-            <View style={styles.headerLeft}>
-              <ThemedText type="title" style={styles.title}>
-                🏠 修行主页
-              </ThemedText>
-              <ThemedText style={styles.greeting}>
-                {getGreeting()}
-              </ThemedText>
-              <ThemedText style={styles.userName}>
-                善缘居士 · 修行第365天 🔥
-              </ThemedText>
-            </View>
-            <TouchableOpacity 
-              style={styles.profileIcon}
-              onPress={navigateToProfile}
-            >
-              <Ionicons name="person-circle-outline" size={32} color={Colors.surface} />
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-      </ScrollView>
+          {/* Main content can be added here */}
+        </ScrollView>
       </ThemedView>
     </SafeAreaView>
   );
@@ -67,40 +55,5 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: Colors.primary,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  headerLeft: {
-    flex: 1,
-  },
-  profileIcon: {
-    padding: 5,
-    marginLeft: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.surface,
-    marginBottom: 5,
-  },
-  greeting: {
-    fontSize: 16,
-    color: Colors.surface,
-    opacity: 0.9,
-    marginBottom: 5,
-  },
-  userName: {
-    fontSize: 14,
-    color: Colors.surface,
-    opacity: 0.8,
   },
 });

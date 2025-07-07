@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert 
 import { useAuth } from '@/contexts/AuthContext';
 import { mindfulnessService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
+import PageHeader from '@/components/PageHeader';
 
 interface MindfulnessRecord {
   id: string;
@@ -87,15 +88,24 @@ export default function MindfulnessScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>💝 心性观察</Text>
-        <Text>加载中...</Text>
+        <PageHeader 
+          title="💝 心性观察" 
+          subtitle="观察内心善恶念头"
+        />
+        <View style={styles.loadingContainer}>
+          <Text>加载中...</Text>
+        </View>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>💝 心性观察</Text>
+    <View style={styles.container}>
+      <PageHeader 
+        title="💝 心性观察" 
+        subtitle="观察内心善恶念头"
+      />
+      <ScrollView style={styles.scrollView}>
 
       <View style={styles.statsCard}>
         <Text style={styles.statsTitle}>今日统计</Text>
@@ -157,6 +167,7 @@ export default function MindfulnessScreen() {
 
 
     </ScrollView>
+    </View>
   );
 }
 
@@ -164,13 +175,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollView: {
+    flex: 1,
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
   },
   statsCard: {
     backgroundColor: '#fff',

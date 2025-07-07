@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import PageHeader from '@/components/PageHeader';
 
 export default function StatsScreen() {
   const handleStartTracking = () => {
@@ -12,11 +13,11 @@ export default function StatsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <PageHeader 
+        title="📊 统计分析" 
+        subtitle="查看您的修行进展"
+      />
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>统计分析</Text>
-          <Text style={styles.subtitle}>查看您的修行进展</Text>
-        </View>
 
         <View style={styles.emptyState}>
           <View style={styles.iconContainer}>
@@ -70,22 +71,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
   },
   emptyState: {
     flex: 1,

@@ -5,6 +5,7 @@ import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import PageHeader from '@/components/PageHeader';
 
 interface Course {
   id: string;
@@ -307,8 +308,11 @@ export default function StudyScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="📚 闻思学习" 
+          subtitle="系统学习佛法课程"
+        />
         <View style={styles.loadingContainer}>
-          <Text style={styles.title}>📚 闻思学习</Text>
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </SafeAreaView>
@@ -320,11 +324,11 @@ export default function StudyScreen() {
     if (userCourses.length === 0) {
       return (
         <SafeAreaView style={styles.container}>
+          <PageHeader 
+            title="📚 闻思学习" 
+            subtitle="系统学习佛法课程"
+          />
           <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-            <View style={styles.header}>
-              <Text style={styles.title}>📚 闻思学习</Text>
-              <Text style={styles.subtitle}>系统学习佛法课程</Text>
-            </View>
 
             <View style={styles.emptyState}>
               <View style={styles.iconContainer}>
@@ -351,13 +355,15 @@ export default function StudyScreen() {
 
     return (
       <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="📚 闻思学习" 
+          subtitle="系统学习佛法课程"
+          rightAction={{
+            text: "管理课程",
+            onPress: () => setViewMode('manage')
+          }}
+        />
         <ScrollView style={styles.scrollView}>
-          <View style={styles.header}>
-            <Text style={styles.title}>📚 闻思学习</Text>
-            <TouchableOpacity onPress={() => setViewMode('manage')}>
-              <Text style={styles.manageButton}>管理课程</Text>
-            </TouchableOpacity>
-          </View>
 
           <Text style={styles.sectionTitle}>我的课程：</Text>
 
@@ -412,14 +418,13 @@ export default function StudyScreen() {
   if (viewMode === 'manage') {
     return (
       <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="📚 课程管理" 
+          subtitle="管理您的学习课程"
+          showBackButton={true}
+          onBackPress={() => setViewMode('home')}
+        />
         <ScrollView style={styles.scrollView}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-            </TouchableOpacity>
-            <Text style={styles.title}>📚 课程管理</Text>
-            <View style={{width: 24}} />
-          </View>
 
           {userCourses.length > 0 && (
             <>
@@ -514,14 +519,13 @@ export default function StudyScreen() {
 
     return (
       <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title={`📚 ${selectedCourse.course.name}`}
+          subtitle="课程详情与学习记录"
+          showBackButton={true}
+          onBackPress={() => setViewMode('home')}
+        />
         <ScrollView style={styles.scrollView}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-            </TouchableOpacity>
-            <Text style={styles.title}>📚 {selectedCourse.course.name}</Text>
-            <View style={{width: 24}} />
-          </View>
 
           <View style={styles.courseInfoCard}>
             <Text style={styles.courseInfoTitle}>课程信息：</Text>
@@ -583,33 +587,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'white',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 8,
-  },
   loadingText: {
     fontSize: 16,
     color: '#666',
     marginTop: 16,
-  },
-  manageButton: {
-    color: '#da4347',
-    fontSize: 16,
-    fontWeight: '500',
   },
   sectionTitle: {
     fontSize: 18,
