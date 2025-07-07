@@ -74,6 +74,7 @@ export default function PracticeConfigScreen() {
   const [goalType, setGoalType] = useState<'fixed_duration' | 'topic_progress'>('fixed_duration');
   const [weeklyTopicTarget, setWeeklyTopicTarget] = useState(2);
 
+  const [projectName, setProjectName] = useState('');
   useEffect(() => {
     calculateSuggestions();
   }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, configMode]);
@@ -192,6 +193,7 @@ export default function PracticeConfigScreen() {
         target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
         status: 'active',
         current_count: 0,
+        project_name: projectName,
       };
 
       // Try to include goal_type, but handle cases where column doesn't exist yet
@@ -679,6 +681,7 @@ export default function PracticeConfigScreen() {
           current_count: 0,
           status: 'active',
           goal_type: configMode,
+          project_name: projectName,
         };
       } else {
         // Count-based practice configuration
@@ -722,6 +725,7 @@ export default function PracticeConfigScreen() {
           status: 'active',
           target_period: 'daily',
           goal_type: configMode,
+          project_name: projectName,
         };
       }
 
@@ -757,6 +761,20 @@ export default function PracticeConfigScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        
+
+        <Text className="text-base font-medium text-gray-900 mb-3">选择修行项目</Text>
+        <View className="border border-gray-300 rounded-lg">
+          
+        </View>
+
+        <Text className="text-base font-medium text-gray-900 mb-3 mt-4">项目名称 (可选)</Text>
+        <TextInput
+          className="border border-gray-300 rounded-lg px-4 py-3 text-base"
+          placeholder="例如：2025金刚萨埵法会、请水晶念珠等"
+          value={projectName}
+          onChangeText={setProjectName}
+        />
         {practiceType === 'count' ? renderCountBasedConfig() : renderTimeBasedConfig()}
         {renderTimePlanning()}
         {renderSmartSummary()}
@@ -934,7 +952,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4af37',
     borderRadius: 8,
     paddingVertical: 12,
-    alignItems: 'center',
+    alignItems: '```python
+'center',
     marginBottom: 12,
   },
   customButtonActive: {

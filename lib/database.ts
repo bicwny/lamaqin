@@ -142,34 +142,25 @@ export const practiceService = {
     const createdProjects = [];
 
     for (const themePractice of themePractices) {
-      // Check if user already has this practice
-      const { data: existingProject } = await supabase
+      // Allow multiple projects for the same practice with different goals
+      const { data: newProject, error } = await supabase
         .from('user_practice_projects')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('practice_id', themePractice.practice_id)
+        .insert({
+          user_id: userId,
+          theme_id: themeId,
+          practice_id: themePractice.practice_id,
+          target_count: themePractice.target_count,
+          daily_target: Math.ceil(themePractice.target_count / 365), // Default daily target
+          status: 'not_started'
+        })
+        .select(`
+          *,
+          practices(*)
+        `)
         .single();
 
-      if (!existingProject) {
-        const { data: newProject, error } = await supabase
-          .from('user_practice_projects')
-          .insert({
-            user_id: userId,
-            theme_id: themeId,
-            practice_id: themePractice.practice_id,
-            target_count: themePractice.target_count,
-            daily_target: Math.ceil(themePractice.target_count / 365), // Default daily target
-            status: 'not_started'
-          })
-          .select(`
-            *,
-            practices(*)
-          `)
-          .single();
-
-        if (!error && newProject) {
-          createdProjects.push(newProject);
-        }
+      if (!error && newProject) {
+        createdProjects.push(newProject);
       }
     }
 
