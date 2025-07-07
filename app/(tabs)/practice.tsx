@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import { presetProjectNameService } from '@/lib/database';
 
 interface PracticeProject {
   id: string;
@@ -49,6 +50,7 @@ interface MeditationRecord {
 export default function PracticeScreen() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<PracticeProject[]>([]);
+  const [presetProjectNames, setPresetProjectNames] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -89,6 +91,21 @@ export default function PracticeScreen() {
 
       console.log('📋 User practice projects:', practiceProjects);
       console.log('📋 Loaded practice projects:', practiceProjects?.length || 0);
+
+      // Load preset project names for projects that use presets
+      const presetIds = practiceProjects?.filter(p => p.preset_project_id).map(p => p.preset_project_id) || [];
+      if (presetIds.length > 0) {
+        try {
+          const presets = await presetProjectNameService.getPresetProjectNames();
+          const presetMap: {[key: string]: string} = {};
+          presets.forEach(preset => {
+            presetMap[preset.id] = preset.name;
+          });
+          setPresetProjectNames(presetMap);
+        } catch (presetError) {
+          console.error('Error loading preset project names:', presetError);
+        }
+      }
 
       setProjects(practiceProjects || []);
     } catch (error) {
@@ -270,6 +287,13 @@ export default function PracticeScreen() {
                 {project.practices.type === 'time' && ` (${practiceDisplayType})`}
                 {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
               </Text>
+
+              {/* Project Name Display */}
+              {(project.project_name || project.preset_project_id) && (
+                <Text style={styles.projectName}>
+                  项目: {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
+                </Text>
+              )}
 
               <View style={styles.progressContainer}>
                 {project.practices.type === 'count' ? (
@@ -550,6 +574,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 8,
+  },
+  projectName: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
     marginBottom: 8,
   },
   practiceInfo: {
