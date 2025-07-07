@@ -4,8 +4,8 @@ import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, Platform } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
@@ -121,52 +121,33 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [fontLoaded, setFontLoaded] = useState(false);
+  
+  // Only use useFonts on web platform
+  const [loaded, error] = useFonts(
+    Platform.OS === 'web' ? {
+      SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    } : {}
+  );
 
-  // Add font loading error handling (web only)
   useEffect(() => {
     if (error) {
       console.warn('Font loading error:', error);
     }
-    
-    // Only add window event listeners on web platform
-    if (typeof window !== 'undefined') {
-      const handleFontError = (event: ErrorEvent) => {
-        if (event.message?.includes('timeout exceeded') || event.message?.includes('fonts')) {
-          console.warn('Font loading timeout - using fallback fonts');
-          // Suppress the error to prevent app crashes
-          event.preventDefault();
-          return true;
-        }
-      };
-
-      const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-        if (event.reason?.message?.includes('timeout exceeded') || event.reason?.message?.includes('fonts')) {
-          console.warn('Font loading promise rejected - using fallback fonts');
-          // Suppress the error to prevent app crashes
-          event.preventDefault();
-        }
-      };
-
-      window.addEventListener('error', handleFontError);
-      window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-      return () => {
-        window.removeEventListener('error', handleFontError);
-        window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-      };
-    }
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    // For native platforms, skip font loading and proceed immediately
+    if (Platform.OS !== 'web') {
+      setFontLoaded(true);
+      SplashScreen.hideAsync();
+    } else if (loaded) {
+      setFontLoaded(true);
       SplashScreen.hideAsync();
     }
   }, [loaded]);
 
-  if (!loaded) {
+  if (!fontLoaded && Platform.OS === 'web') {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading...</Text>
