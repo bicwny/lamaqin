@@ -16,6 +16,7 @@ import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
+import PageHeader from '@/components/PageHeader';
 
 interface PracticeProject {
   id: string;
@@ -206,8 +207,11 @@ export default function PracticeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="📿 修行记录" 
+          subtitle="系统记录修行进度"
+        />
         <View style={styles.loadingContainer}>
-          <Text style={styles.title}>🧘 修行</Text>
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </SafeAreaView>
@@ -217,11 +221,12 @@ export default function PracticeScreen() {
   if (projects.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="📿 修行记录" 
+          subtitle="开始您的修行之旅"
+        />
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.header}>
-            <Text style={styles.title}>🧘 修行</Text>
-            <Text style={styles.subtitle}>记录你的修行历程</Text>
-          </View>
+          
 
           <View style={styles.emptyState}>
             <View style={styles.iconContainer}>
@@ -247,19 +252,18 @@ export default function PracticeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView 
+      <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="📿 修行记录" 
+          subtitle="系统记录修行进度"
+        />
+        <ScrollView 
         style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>🧘 修行</Text>
-          <TouchableOpacity onPress={handleAddPractice}>
-            <Text style={styles.manageButton}>添加</Text>
-          </TouchableOpacity>
-        </View>
+        
 
         <Text style={styles.sectionTitle}>我的修行项目：</Text>
 
@@ -508,24 +512,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'white',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 8,
-  },
+  
   loadingText: {
     fontSize: 16,
     color: '#666',

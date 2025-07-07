@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -18,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
+import PageHeader from '@/components/PageHeader';
 
 interface DailyRecord {
   id: string;
@@ -186,7 +186,7 @@ export default function PracticeHistoryScreen() {
 
     } catch (error) {
       console.error('❌ Delete operation failed:', error);
-      
+
       // Revert optimistic update
       setDeletingRecords(prev => {
         const newSet = new Set(prev);
@@ -228,12 +228,16 @@ export default function PracticeHistoryScreen() {
 
   const calculateProgress = () => {
     if (!projectInfo) return { percentage: 0, current: 0, target: 0 };
-    
+
     const current = projectInfo.current_count || 0;
     const target = projectInfo.target_count || 1;
     const percentage = Math.min((current / target) * 100, 100);
-    
+
     return { percentage, current, target };
+  };
+
+  const getDisplayProjectName = (projectInfo: any) => {
+    return projectInfo.project_name || presetProjectName || '预设项目';
   };
 
   if (loading) {
@@ -251,18 +255,13 @@ export default function PracticeHistoryScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>📿 {practiceName} - 详情</Text>
-        {projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) && (
-          <Text style={styles.projectNameHeader}>
-            项目: {projectInfo.project_name || presetProjectName || '预设项目'}
-          </Text>
-        )}
-      </View>
+      <PageHeader 
+        title={`📿 ${practiceName} - 详情`}
+        subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
+          `项目：${getDisplayProjectName(projectInfo)}` : undefined}
+        showBackButton={true}
+        onBackPress={() => router.back()}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -273,7 +272,7 @@ export default function PracticeHistoryScreen() {
         {/* Progress Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>总体进度</Text>
-          
+
           <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
               {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {projectInfo?.practices?.unit || '次'}
@@ -302,7 +301,7 @@ export default function PracticeHistoryScreen() {
         {/* Records List */}
         <View style={styles.recordsSection}>
           <Text style={styles.sectionTitle}>修行记录</Text>
-          
+
           {records.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>📭 暂无记录</Text>
@@ -386,40 +385,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
-  },
-  header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-  },
-  projectNameHeader: {
-    fontSize: 14,
-    color: '#666',
-    fontStyle: 'italic',
-    textAlign: 'center',
-    marginTop: 4,
   },
   loadingContainer: {
     flex: 1,
