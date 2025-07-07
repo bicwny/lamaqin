@@ -209,7 +209,6 @@ export default function PracticeScreen() {
       <SafeAreaView style={styles.container}>
         <PageHeader 
           title="📿 修行记录" 
-          subtitle="系统记录修行进度"
           rightAction={{
             text: "添加",
             onPress: handleAddPractice
@@ -227,7 +226,6 @@ export default function PracticeScreen() {
       <SafeAreaView style={styles.container}>
         <PageHeader 
           title="📿 修行记录" 
-          subtitle="开始您的修行之旅"
           rightAction={{
             text: "添加",
             onPress: handleAddPractice
@@ -263,7 +261,6 @@ export default function PracticeScreen() {
       <SafeAreaView style={styles.container}>
         <PageHeader 
           title="📿 修行记录" 
-          subtitle="系统记录修行进度"
           rightAction={{
             text: "添加",
             onPress: handleAddPractice
