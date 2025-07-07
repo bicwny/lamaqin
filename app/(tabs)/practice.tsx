@@ -14,6 +14,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/Colors';
 
 interface PracticeProject {
   id: string;
@@ -507,7 +508,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   manageButton: {
-    color: '#007AFF',
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -541,7 +542,7 @@ const styles = StyleSheet.create({
   },
   totalSessions: {
     fontSize: 14,
-    color: '#007bff',
+    color: Colors.primary,
     fontWeight: '500',
     marginBottom: 12,
   },
@@ -581,7 +582,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.primary,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -598,7 +599,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   secondaryButtonText: {
-    color: '#007AFF',
+    color: Colors.primary,
     fontWeight: '600',
   },
   emptyState: {
@@ -629,7 +630,7 @@ const styles = StyleSheet.create({
   browseButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
