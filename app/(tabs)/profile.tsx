@@ -88,8 +88,8 @@ export default function ProfileScreen() {
     };
   }, []);
 
-  const goBackToIndex = () => {
-    router.push('/(tabs)/index');
+  const goBackToPrevious = () => {
+    router.back();
   };
 
   const handleSignOut = () => {
@@ -233,7 +233,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         title="👤 个人中心"
         subtitle="管理您的账户信息和设置"
         showBackButton={true}
-        onBackPress={goBackToIndex}
+        onBackPress={goBackToPrevious}
       />
       <ScrollView style={styles.scrollView}>
 
