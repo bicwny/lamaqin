@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/colors';
 
 interface Course {
   id: string;
@@ -414,7 +415,7 @@ export default function StudyScreen() {
         <ScrollView style={styles.scrollView}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Ionicons name="arrow-back" size={24} color="#da4347" />
+              <Ionicons name="arrow-back" size={24} color={Colors.primary} />
             </TouchableOpacity>
             <Text style={styles.title}>📚 课程管理</Text>
             <View style={{width: 24}} />
@@ -516,7 +517,7 @@ export default function StudyScreen() {
         <ScrollView style={styles.scrollView}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Ionicons name="arrow-back" size={24} color="#da4347" />
+              <Ionicons name="arrow-back" size={24} color={Colors.primary} />
             </TouchableOpacity>
             <Text style={styles.title}>📚 {selectedCourse.course.name}</Text>
             <View style={{width: 24}} />
