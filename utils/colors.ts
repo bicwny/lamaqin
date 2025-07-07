@@ -46,6 +46,11 @@ export const COLOR_COMBINATIONS = {
     text: '#FFFFFF',
     border: Colors.primaryDark,
   },
+  primaryLight: {
+    background: Colors.primaryLight,
+    text: '#FFFFFF',
+    border: Colors.primary,
+  },
   secondary: {
     background: Colors.surface,
     text: Colors.textPrimary,
@@ -65,5 +70,34 @@ export const COLOR_COMBINATIONS = {
     background: Colors.error,
     text: '#FFFFFF',
     border: '#DC2626',
+  },
+  dharma: {
+    background: Colors.dharmaRed,
+    text: '#FFFFFF',
+    border: Colors.primaryDark,
+  },
+};
+
+// Color manipulation utilities
+export const ColorUtils = {
+  // Get appropriate text color for background
+  getContrastText: (backgroundColor: string): string => {
+    // Simple contrast calculation - in real app you might want a more sophisticated method
+    const isLight = backgroundColor === '#FFFFFF' || backgroundColor.includes('F8F9FA');
+    return isLight ? Colors.textPrimary : '#FFFFFF';
+  },
+  
+  // Get hover state color
+  getHoverColor: (baseColor: string): string => {
+    if (baseColor === Colors.primary) return Colors.primaryLight;
+    if (baseColor === Colors.primaryLight) return Colors.primary;
+    return baseColor;
+  },
+  
+  // Get pressed state color
+  getPressedColor: (baseColor: string): string => {
+    if (baseColor === Colors.primary) return Colors.primaryDark;
+    if (baseColor === Colors.primaryLight) return Colors.primary;
+    return baseColor;
   },
 };

@@ -115,10 +115,31 @@ const DARK_THEME = {
   border: '#374151',
 };
 
+// Semantic color aliases for specific use cases
+const SEMANTIC_COLORS = {
+  // Interactive elements
+  buttonPrimary: BRAND_COLORS.primary,
+  buttonSecondary: BRAND_COLORS.surface,
+  buttonDanger: BRAND_COLORS.error,
+  
+  // Status indicators
+  statusActive: BRAND_COLORS.success,
+  statusPending: BRAND_COLORS.warning,
+  statusInactive: BRAND_COLORS.textTertiary,
+  
+  // Buddhist practice specific
+  dharmaRed: BRAND_COLORS.primary,      // Main practice color
+  wisdomGold: '#D4AF37',                // Optional accent for special elements
+  compassionOrange: BRAND_COLORS.accent, // Secondary accent
+};
+
 // Export unified color system
 export const Colors = {
   // Brand colors for direct access
   ...BRAND_COLORS,
+  
+  // Semantic colors
+  ...SEMANTIC_COLORS,
   
   // Theme-specific colors
   light: LIGHT_THEME,
