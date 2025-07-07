@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   manageButton: {
-    color: '#007AFF',
+    color: '#da4347',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -674,11 +674,11 @@ const styles = StyleSheet.create({
   },
   lastStudied: {
     fontSize: 14,
-    color: '#007AFF',
+    color: '#da4347',
     marginBottom: 12,
   },
   continueButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#da4347',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#da4347',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -718,11 +718,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   secondaryButtonText: {
-    color: '#007AFF',
+    color: '#da4347',
     fontWeight: '600',
   },
   joinButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#da4347',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -775,7 +775,7 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   recordButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#da4347',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
   browseButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#da4347',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
