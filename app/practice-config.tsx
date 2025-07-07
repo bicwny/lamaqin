@@ -763,18 +763,22 @@ export default function PracticeConfigScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         
 
-        <Text className="text-base font-medium text-gray-900 mb-3">选择修行项目</Text>
-        <View className="border border-gray-300 rounded-lg">
-          
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>为这个修行项目起个名字</Text>
+            <TextInput
+              style={styles.projectNameInput}
+              placeholder="例如：2025金刚萨埵法会、请水晶念珠等"
+              value={projectName}
+              onChangeText={setProjectName}
+              multiline={false}
+            />
+            <Text style={styles.helpText}>
+              项目名称可以帮助您区分同一种修行的不同发愿或阶段
+            </Text>
+          </View>
         </View>
-
-        <Text className="text-base font-medium text-gray-900 mb-3 mt-4">项目名称 (可选)</Text>
-        <TextInput
-          className="border border-gray-300 rounded-lg px-4 py-3 text-base"
-          placeholder="例如：2025金刚萨埵法会、请水晶念珠等"
-          value={projectName}
-          onChangeText={setProjectName}
-        />
         {practiceType === 'count' ? renderCountBasedConfig() : renderTimeBasedConfig()}
         {renderTimePlanning()}
         {renderSmartSummary()}
@@ -1125,5 +1129,15 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  projectNameInput: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
 });
