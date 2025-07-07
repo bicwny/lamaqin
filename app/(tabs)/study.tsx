@@ -275,7 +275,7 @@ export default function StudyScreen() {
     }
   };
 
-  
+
 
   const getCourseProgress = (courseId: string) => {
     return progress.find(p => p.courseId === courseId);
@@ -414,7 +414,7 @@ export default function StudyScreen() {
         <ScrollView style={styles.scrollView}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Ionicons name="arrow-back" size={24} color="#007AFF" />
+              <Ionicons name="arrow-back" size={24} color="#da4347" />
             </TouchableOpacity>
             <Text style={styles.title}>📚 课程管理</Text>
             <View style={{width: 24}} />
@@ -516,7 +516,7 @@ export default function StudyScreen() {
         <ScrollView style={styles.scrollView}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Ionicons name="arrow-back" size={24} color="#007AFF" />
+              <Ionicons name="arrow-back" size={24} color="#da4347" />
             </TouchableOpacity>
             <Text style={styles.title}>📚 {selectedCourse.course.name}</Text>
             <View style={{width: 24}} />
