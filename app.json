@@ -44,12 +44,6 @@
         "projectId": "943c08b8-8051-4c2d-9c99-ece545b667be"
       }
     },
-    "owner": "bicwny",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "owner": "bicwny"
   }
 }
