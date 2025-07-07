@@ -70,6 +70,23 @@ export default function ProfileScreen() {
     }
   }, [user, loading, router, isSigningOut]);
 
+  // Load data effect - moved before conditional return
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadDataSafely = async () => {
+      if (isMounted) {
+        await loadData();
+      }
+    };
+
+    loadDataSafely();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const goBackToIndex = () => {
     router.push('/(tabs)/study');
   };
@@ -111,22 +128,6 @@ export default function ProfileScreen() {
   if (loading || (!user && !isSigningOut)) {
     return null;
   }
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadDataSafely = async () => {
-      if (isMounted) {
-        await loadData();
-      }
-    };
-
-    loadDataSafely();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const loadData = async () => {
     // Mock today's summary data
