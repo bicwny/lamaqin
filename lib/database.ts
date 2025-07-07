@@ -907,11 +907,13 @@ export const studyService = {
     };
 
     records.forEach(record => {
-      summary[record.study_type] += record.study_count_for_lesson;
+      // Each record represents one instance of study
+      const studyType = record.study_type as '听传承' | '看法本';
+      summary[studyType] += 1; // Count each record as one instance
       summary.details.push({
         date: record.study_date,
-        type: record.study_type,
-        count: record.study_count_for_lesson
+        type: studyType,
+        count: 1
       });
     });
 

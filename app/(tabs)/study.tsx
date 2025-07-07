@@ -7,6 +7,41 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
 
+// Component to display lesson progress with real-time counts
+const LessonProgressDisplay = ({ userId, courseId, lessonId }: {
+  userId: string;
+  courseId: string;
+  lessonId: string;
+}) => {
+  const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadCounts();
+  }, [userId, courseId, lessonId]);
+
+  const loadCounts = async () => {
+    try {
+      const summary = await studyService.getLessonStudySummary(userId, courseId, lessonId);
+      setCounts({ 听传承: summary.听传承, 看法本: summary.看法本 });
+    } catch (error) {
+      console.error('Error loading lesson counts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <Text style={styles.lessonProgress}>加载中...</Text>;
+  }
+
+  return (
+    <Text style={styles.lessonProgress}>
+      听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
+    </Text>
+  );
+};
+
 interface Course {
   id: string;
   name: string;
@@ -174,6 +209,9 @@ export default function StudyScreen() {
       });
 
       Alert.alert('成功', `${studyType}记录已保存`);
+      
+      // Force a re-render to update lesson counts
+      setSelectedCourse(prev => prev ? { ...prev } : null);
       loadStudyData(); // Refresh data
     } catch (error) {
       console.error('Error recording study:', error);
@@ -550,9 +588,11 @@ export default function StudyScreen() {
                   <Text style={styles.lessonTitle}>
                     第{lesson.lesson_number}课：{lesson.title}
                   </Text>
-                  <Text style={styles.lessonProgress}>
-                    听传承: 0次 | 看法本: 0次
-                  </Text>
+                  <LessonProgressDisplay 
+                    userId={user.id}
+                    courseId={selectedCourse.course_id}
+                    lessonId={lesson.id}
+                  />
                 </View>
 
                 <View style={styles.recordButtons}>
