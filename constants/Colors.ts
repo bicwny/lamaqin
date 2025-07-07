@@ -3,12 +3,12 @@
  * Colors inspired by Buddhist symbolism and peaceful design
  */
 
-const tintColorLight = '#D4AF37'; // Golden color for Buddhist theme
+const tintColorLight = '#da4347'; // Red color for Buddhist theme
 const tintColorDark = '#F5F5DC';  // Beige
 
 export const Colors = {
   // Primary color scheme
-  primary: '#D4AF37',      // Golden - enlightenment
+  primary: '#da4347',      // Red - passion/energy
   secondary: '#8B4513',    // Brown - earth/stability
   accent: '#FF6B35',       // Orange - energy/compassion
   background: '#FFFFFF',   // White - purity and peace
@@ -34,14 +34,14 @@ export const Colors = {
     tabIconDefault: '#696969',
     tabIconSelected: tintColorLight,
     surface: '#FFFFFF',
-    primary: '#D4AF37',
+    primary: '#da4347',
     secondary: '#2F4F4F',
     textSecondary: '#696969',
-    practice: '#D4AF37',
+    practice: '#da4347',
     study: '#4682B4',
     mindfulness: '#FF69B4',
     stats: '#32CD32',
-    profile: '#D4AF37',
+    profile: '#da4347',
   },
   dark: {
     text: '#F5F5DC',
