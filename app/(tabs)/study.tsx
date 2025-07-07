@@ -211,7 +211,7 @@ export default function StudyScreen() {
       });
 
       Alert.alert('成功', `${studyType}记录已保存`);
-      
+
       // Trigger refresh of lesson counts
       setRefreshTrigger(prev => prev + 1);
       loadStudyData(); // Refresh overall data
@@ -582,7 +582,8 @@ export default function StudyScreen() {
 
           {lessons.map(lesson => {
             const listenCount = courseProgress?.listenCount[lesson.lesson_number] || 0;
-            const isCompleted = listenCount > 0;
+            const kanfabenCount = courseProgress?.listenCount[lesson.lesson_number] || 0;
+            const isCompleted = listenCount > 0 && kanfabenCount > 0;
 
             return (
               <View key={lesson.id} style={styles.lessonItem}>
@@ -605,7 +606,7 @@ export default function StudyScreen() {
                   >
                     <Text style={styles.recordButtonText}>听传承</Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity 
                     style={[styles.recordButton, styles.readButton]}
                     onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number, '看法本')}
@@ -812,6 +813,11 @@ const styles = StyleSheet.create({
   lessonProgress: {
     fontSize: 12,
     color: '#666',
+    marginTop: 2,
+  },
+  completedLesson: {
+    color: '#4CAF50',
+    fontWeight: '600',
   },
   recordButtons: {
     flexDirection: 'row',

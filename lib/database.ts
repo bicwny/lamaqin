@@ -865,15 +865,48 @@ export const studyService = {
 
     if (!course) return 0;
 
-    // Get unique lessons studied by user
-    const { data: studiedLessons } = await supabase
+    // Get all study records for this course
+    const { data: studyRecords } = await supabase
       .from('study_records')
-      .select('lesson_id')
+      .select('lesson_id, study_type')
       .eq('user_id', userId)
       .eq('course_id', courseId);
 
-    const uniqueLessons = new Set(studiedLessons?.map(r => r.lesson_id) || []);
-    const progress = (uniqueLessons.size / course.total_lessons) * 100;
+    if (!studyRecords || studyRecords.length === 0) {
+      // Update progress in user_courses
+      await supabase
+        .from('user_courses')
+        .update({
+          progress_percentage: 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .eq('course_id', courseId);
+      return 0;
+    }
+
+    // Group records by lesson and check if both types are completed
+    const lessonCompletionMap = new Map<string, { 听传承: boolean, 看法本: boolean }>();
+    
+    studyRecords.forEach(record => {
+      if (!lessonCompletionMap.has(record.lesson_id)) {
+        lessonCompletionMap.set(record.lesson_id, { 听传承: false, 看法本: false });
+      }
+      
+      const lessonData = lessonCompletionMap.get(record.lesson_id)!;
+      if (record.study_type === '听传承') {
+        lessonData.听传承 = true;
+      } else if (record.study_type === '看法本') {
+        lessonData.看法本 = true;
+      }
+    });
+
+    // Count lessons that have both types completed
+    const completedLessons = Array.from(lessonCompletionMap.values()).filter(
+      lesson => lesson.听传承 && lesson.看法本
+    ).length;
+
+    const progress = (completedLessons / course.total_lessons) * 100;
 
     // Update progress in user_courses
     await supabase
