@@ -922,6 +922,8 @@ export const studyService = {
 
     const progress = (completedLessons.length / course.total_lessons) * 100;
 
+    console.log(`   Calculated progress: ${progress}% (${completedLessons.length}/${course.total_lessons})`);
+
     // Update progress in user_courses
     await supabase
       .from('user_courses')
