@@ -89,7 +89,7 @@ export default function ProfileScreen() {
   }, []);
 
   const goBackToIndex = () => {
-    router.push('/(tabs)/study');
+    router.push('/(tabs)/index');
   };
 
   const handleSignOut = () => {
