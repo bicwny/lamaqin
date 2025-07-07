@@ -925,6 +925,57 @@ export const mindfulnessService = {
   }
 };
 
+// Preset Project Names
+export const presetProjectNameService = {
+  async getPresetProjectNames(): Promise<Array<{
+    id: string;
+    name: string;
+    category?: string;
+    display_order: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('preset_project_names')
+        .select('id, name, category, display_order')
+        .eq('is_active', true)
+        .order('display_order')
+        .order('name');
+
+      if (error) {
+        console.error('❌ Error fetching preset project names:', error);
+        // Return fallback data if database query fails
+        return [
+          { id: 'fallback-1', name: '前行班', category: '基础修行', display_order: 1 },
+          { id: 'fallback-2', name: '金刚萨埵法会', category: '法会共修', display_order: 2 },
+          { id: 'fallback-3', name: '地藏法会', category: '法会共修', display_order: 3 }
+        ];
+      }
+
+      return data || [];
+    } catch (err) {
+      console.error('❌ Exception fetching preset project names:', err);
+      return [];
+    }
+  },
+
+  async addPresetProjectName(name: string, category?: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('preset_project_names')
+        .insert({
+          name,
+          category: category || '自定义',
+          display_order: 999
+        });
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('❌ Error adding preset project name:', err);
+      throw err;
+    }
+  }
+};
+
 // Statistics
 export const statsService = {
   async getDashboardStats(userId: string) {

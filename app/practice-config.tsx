@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCurrentWeekStart } from '@/lib/topic-progress';
+import { practiceService, presetProjectNameService } from '@/lib/database';
 
 interface Practice {
   id: string;
@@ -36,6 +37,16 @@ export default function PracticeConfigScreen() {
 
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [projectName, setProjectName] = useState('');
+  const [usePresetName, setUsePresetName] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState('');
+  const [presetProjectNames, setPresetProjectNames] = useState<Array<{
+    id: string;
+    name: string;
+    category?: string;
+    display_order: number;
+  }>>([]);
+  const [loadingPresets, setLoadingPresets] = useState(true);
 
   // Main configuration mode
   const [configMode, setConfigMode] = useState<'total' | 'daily' | 'topic_progress' | 'fixed_duration'>(
@@ -74,10 +85,27 @@ export default function PracticeConfigScreen() {
   const [goalType, setGoalType] = useState<'fixed_duration' | 'topic_progress'>('fixed_duration');
   const [weeklyTopicTarget, setWeeklyTopicTarget] = useState(2);
 
-  const [projectName, setProjectName] = useState('');
+
   useEffect(() => {
     calculateSuggestions();
   }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, configMode]);
+
+  useEffect(() => {
+    const fetchPresets = async () => {
+      setLoadingPresets(true);
+      try {
+        const presets = await presetProjectNameService.getPresetProjectNames();
+        setPresetProjectNames(presets);
+      } catch (error) {
+        console.error('Failed to fetch preset project names:', error);
+        Alert.alert('错误', 'Failed to load preset project names.');
+      } finally {
+        setLoadingPresets(false);
+      }
+    };
+
+    fetchPresets();
+  }, []);
 
   const getDurationInDays = () => {
     const start = startDate;
@@ -761,7 +789,7 @@ export default function PracticeConfigScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        
+
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
@@ -779,6 +807,77 @@ export default function PracticeConfigScreen() {
             </Text>
           </View>
         </View>
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
+              usePresetName && styles.toggleButtonActive,
+            ]}
+            onPress={() => setUsePresetName(!usePresetName)}
+          >
+            <Text
+              style={[
+                styles.toggleButtonText,
+                usePresetName && styles.toggleButtonTextActive,
+              ]}
+            >
+              {usePresetName ? '使用自定义名称' : '从预设选择'}
+            </Text>
+          </TouchableOpacity>
+
+          {usePresetName ? (
+              <View style={styles.presetContainer}>
+                <Text style={styles.presetLabel}>选择一个预设项目名称：</Text>
+                {loadingPresets ? (
+                  <Text style={styles.loadingText}>加载中...</Text>
+                ) : (
+                  <ScrollView 
+                    style={styles.presetScrollView}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    <View style={styles.presetGrid}>
+                      {presetProjectNames.map((preset) => (
+                        <TouchableOpacity
+                          key={preset.id}
+                          style={[
+                            styles.presetButton,
+                            selectedPreset === preset.name && styles.presetButtonActive,
+                          ]}
+                          onPress={() => {
+                            setSelectedPreset(preset.name);
+                            setProjectName(preset.name);
+                          }}
+                        >
+                          <Text style={[
+                            styles.presetButtonText,
+                            selectedPreset === preset.name && styles.presetButtonTextActive,
+                          ]}>
+                            {preset.name}
+                          </Text>
+                          {preset.category && (
+                            <Text style={styles.presetCategoryText}>
+                              {preset.category}
+                            </Text>
+                          )}
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </ScrollView>
+                )}
+              </View>
+          ) : (
+            <View style={styles.customNameContainer}>
+              <Text style={styles.customNameLabel}>自定义项目名称</Text>
+              <TextInput
+                style={styles.customNameInput}
+                placeholder="输入项目名称"
+                value={projectName}
+                onChangeText={setProjectName}
+              />
+            </View>
+          )}
+        </View>
+
         {practiceType === 'count' ? renderCountBasedConfig() : renderTimeBasedConfig()}
         {renderTimePlanning()}
         {renderSmartSummary()}
@@ -1139,5 +1238,92 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: '#e9ecef',
+  },
+  toggleButton: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  toggleButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  toggleButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  toggleButtonTextActive: {
+    color: 'white',
+  },
+  presetContainer: {
+    marginTop: 16,
+  },
+  presetLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  presetScrollView: {
+    maxHeight: 200,
+  },
+  presetGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  presetButton: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    margin: 4,
+    alignItems: 'center',
+  },
+  presetButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  presetButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  presetButtonTextActive: {
+    color: 'white',
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: '#666',
+    fontSize: 14,
+    padding: 20,
+  },
+  presetCategoryText: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+  },
+  customNameContainer: {
+    marginTop: 16,
+  },
+  customNameLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  customNameInput: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    textAlign: 'center',
   },
 });
