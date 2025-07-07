@@ -32,9 +32,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '🏠 首页',
+          title: '问题',
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol size={28} name={focused ? 'house.fill' : 'house'} color={color} />
+            <IconSymbol size={28} name={focused ? 'book.fill' : 'book'} color={color} />
           ),
         }}
       />
@@ -50,7 +50,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mindfulness"
         options={{
-          title: '💝 心性',
+          title: '心性',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'heart.fill' : 'heart'} color={color} />
           ),
@@ -59,7 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="practice"
         options={{
-          title: '📿 修行',
+          title: '修行',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'hands.and.sparkles.fill' : 'hands.and.sparkles'} color={color} />
           ),
@@ -68,7 +68,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="stats"
         options={{
-          title: '📊 统计',
+          title: '统计',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'chart.bar.fill' : 'chart.bar'} color={color} />
           ),
@@ -77,7 +77,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: '👤 个人',
+          title: '个人',
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol size={28} name={focused ? 'person.fill' : 'person'} color={color} />
           ),
