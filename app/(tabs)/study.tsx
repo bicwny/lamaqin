@@ -8,17 +8,18 @@ import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
 
 // Component to display lesson progress with real-time counts
-const LessonProgressDisplay = ({ userId, courseId, lessonId }: {
+const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
   userId: string;
   courseId: string;
   lessonId: string;
+  refreshTrigger?: number;
 }) => {
   const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadCounts();
-  }, [userId, courseId, lessonId]);
+  }, [userId, courseId, lessonId, refreshTrigger]);
 
   const loadCounts = async () => {
     try {
@@ -88,6 +89,7 @@ export default function StudyScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [selectedCourse, setSelectedCourse] = useState<UserCourse | null>(null);
   const [joiningCourse, setJoiningCourse] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     loadStudyData();
@@ -210,9 +212,9 @@ export default function StudyScreen() {
 
       Alert.alert('成功', `${studyType}记录已保存`);
       
-      // Force a re-render to update lesson counts
-      setSelectedCourse(prev => prev ? { ...prev } : null);
-      loadStudyData(); // Refresh data
+      // Trigger refresh of lesson counts
+      setRefreshTrigger(prev => prev + 1);
+      loadStudyData(); // Refresh overall data
     } catch (error) {
       console.error('Error recording study:', error);
       Alert.alert('错误', '保存失败，请重试');
@@ -592,6 +594,7 @@ export default function StudyScreen() {
                     userId={user.id}
                     courseId={selectedCourse.course_id}
                     lessonId={lesson.id}
+                    refreshTrigger={refreshTrigger}
                   />
                 </View>
 
