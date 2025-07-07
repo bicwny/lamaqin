@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -38,8 +39,8 @@ export default function PracticeConfigScreen() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [projectName, setProjectName] = useState('');
+  const [selectedPresetId, setSelectedPresetId] = useState(''); // Store UUID instead of name
   const [usePresetName, setUsePresetName] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState('');
   const [presetProjectNames, setPresetProjectNames] = useState<Array<{
     id: string;
     name: string;
@@ -221,7 +222,8 @@ export default function PracticeConfigScreen() {
         target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
         status: 'active',
         current_count: 0,
-        project_name: projectName,
+        preset_project_id: usePresetName ? selectedPresetId : null, // Store UUID
+        project_name: !usePresetName ? projectName : null, // Only store custom names
       };
 
       // Try to include goal_type, but handle cases where column doesn't exist yet
@@ -709,7 +711,8 @@ export default function PracticeConfigScreen() {
           current_count: 0,
           status: 'active',
           goal_type: configMode,
-          project_name: projectName,
+          preset_project_id: usePresetName ? selectedPresetId : null,
+          project_name: !usePresetName ? projectName : null,
         };
       } else {
         // Count-based practice configuration
@@ -753,7 +756,8 @@ export default function PracticeConfigScreen() {
           status: 'active',
           target_period: 'daily',
           goal_type: configMode,
-          project_name: projectName,
+          preset_project_id: usePresetName ? selectedPresetId : null,
+          project_name: !usePresetName ? projectName : null,
         };
       }
 
@@ -806,7 +810,7 @@ export default function PracticeConfigScreen() {
                 onPress={() => {
                   setUsePresetName(true);
                   setProjectName('');
-                  setSelectedPreset('');
+                  setSelectedPresetId('');
                 }}
               >
                 <Text style={[
@@ -824,7 +828,7 @@ export default function PracticeConfigScreen() {
                 onPress={() => {
                   setUsePresetName(false);
                   setProjectName('');
-                  setSelectedPreset('');
+                  setSelectedPresetId('');
                 }}
               >
                 <Text style={[
@@ -853,16 +857,15 @@ export default function PracticeConfigScreen() {
                             key={preset.id}
                             style={[
                               styles.presetButton,
-                              selectedPreset === preset.name && styles.presetButtonActive,
+                              selectedPresetId === preset.id && styles.presetButtonActive,
                             ]}
                             onPress={() => {
-                              setSelectedPreset(preset.name);
-                              setProjectName(preset.name);
+                              setSelectedPresetId(preset.id);
                             }}
                           >
                             <Text style={[
                               styles.presetButtonText,
-                              selectedPreset === preset.name && styles.presetButtonTextActive,
+                              selectedPresetId === preset.id && styles.presetButtonTextActive,
                             ]}>
                               {preset.name}
                             </Text>
