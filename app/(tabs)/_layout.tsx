@@ -33,7 +33,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "问题",
+          title: "当日",
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol
               size={28}
@@ -85,7 +85,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="stats"
         options={{
-          title: "统计",
+          title: "回向",
           tabBarIcon: ({ color, focused }) => (
             <IconSymbol
               size={28}
