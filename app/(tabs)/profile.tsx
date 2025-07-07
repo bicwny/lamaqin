@@ -6,6 +6,7 @@ import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import PageHeader from '@/components/PageHeader';
 
 interface UserProfile {
   dharmaName: string;
@@ -228,21 +229,13 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
 
   return (
     <ThemedView style={styles.container}>
+      <PageHeader 
+        title="👤 个人中心"
+        subtitle="管理您的账户信息和设置"
+        showBackButton={true}
+        onBackPress={goBackToIndex}
+      />
       <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.header}>
-          <View style={styles.headerContent}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={goBackToIndex}
-            >
-              <Ionicons name="arrow-back" size={24} color={Colors.surface} />
-            </TouchableOpacity>
-            <ThemedText type="title" style={styles.title}>
-              👤 个人中心
-            </ThemedText>
-            <View style={styles.spacer} />
-          </View>
-        </ThemedView>
 
         {/* User Profile */}
         <ThemedView style={styles.section}>
@@ -395,35 +388,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  header: {
-    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    paddingTop: 60,
-    paddingBottom: 40,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  },
-  backButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: 'white',
-  },
-  spacer: {
-    width: 40,
-  },
+  
   section: {
     backgroundColor: 'white',
     marginTop: 16,
