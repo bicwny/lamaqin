@@ -122,6 +122,15 @@ export default function StudyScreen() {
       const organizedProgress = processProgressData(progressData, userCoursesData);
       setProgress(organizedProgress);
 
+      // Recalculate progress for all enrolled courses to ensure accuracy
+      for (const userCourse of userCoursesData) {
+        await studyService.calculateProgress(user.id, userCourse.course_id);
+      }
+
+      // Reload user courses to get updated progress percentages
+      const updatedUserCoursesData = await getUserCourses(user.id);
+      setUserCourses(updatedUserCoursesData);
+
       // Load lessons for enrolled courses
       const lessonsData: Record<string, CourseLesson[]> = {};
       for (const userCourse of userCoursesData) {
