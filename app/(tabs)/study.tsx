@@ -158,7 +158,7 @@ export default function StudyScreen() {
     return Object.values(progressMap);
   };
 
-  const recordStudy = async (courseId: string, lessonNumber: number) => {
+  const recordStudy = async (courseId: string, lessonNumber: number, studyType: '听传承' | '看法本') => {
     if (!user) return;
 
     try {
@@ -169,10 +169,11 @@ export default function StudyScreen() {
         course_id: courseId,
         lesson_number: lessonNumber,
         study_date: today,
+        study_type: studyType,
         study_count_for_lesson: 1
       });
 
-      Alert.alert('成功', '闻思记录已保存');
+      Alert.alert('成功', `${studyType}记录已保存`);
       loadStudyData(); // Refresh data
     } catch (error) {
       console.error('Error recording study:', error);
@@ -547,17 +548,28 @@ export default function StudyScreen() {
               <View key={lesson.id} style={styles.lessonItem}>
                 <View style={styles.lessonHeader}>
                   <Text style={styles.lessonTitle}>
-                    ├ 第{lesson.lesson_number}课：{lesson.title} {isCompleted ? '✅' : '☐'} 
-                    {listenCount > 0 && `✅ (${listenCount}次)`}
+                    第{lesson.lesson_number}课：{lesson.title}
+                  </Text>
+                  <Text style={styles.lessonProgress}>
+                    听传承: 0次 | 看法本: 0次
                   </Text>
                 </View>
 
-                <TouchableOpacity 
-                  style={styles.recordButton}
-                  onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number)}
-                >
-                  <Text style={styles.recordButtonText}>记录</Text>
-                </TouchableOpacity>
+                <View style={styles.recordButtons}>
+                  <TouchableOpacity 
+                    style={[styles.recordButton, styles.listenButton]}
+                    onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number, '听传承')}
+                  >
+                    <Text style={styles.recordButtonText}>听传承</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.recordButton, styles.readButton]}
+                    onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number, '看法本')}
+                  >
+                    <Text style={styles.recordButtonText}>看法本</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             );
           })}
@@ -741,26 +753,39 @@ const styles = StyleSheet.create({
   },
   lessonItem: {
     backgroundColor: '#fff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 12,
     marginHorizontal: 16,
     marginVertical: 2,
     borderRadius: 8,
   },
   lessonHeader: {
-    flex: 1,
+    marginBottom: 8,
   },
   lessonTitle: {
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  lessonProgress: {
+    fontSize: 12,
+    color: '#666',
+  },
+  recordButtons: {
+    flexDirection: 'row',
+    gap: 8,
   },
   recordButton: {
-    backgroundColor: '#da4347',
+    flex: 1,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 6,
+    alignItems: 'center',
+  },
+  listenButton: {
+    backgroundColor: '#28a745',
+  },
+  readButton: {
+    backgroundColor: '#007bff',
   },
   recordButtonText: {
     color: '#fff',

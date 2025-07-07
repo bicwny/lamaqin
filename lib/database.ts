@@ -699,6 +699,7 @@ export const studyService = {
     course_id: string;
     lesson_number: number;
     study_date: string;
+    study_type: '听传承' | '看法本';
     study_count_for_lesson: number;
   }) {
     try {
@@ -726,6 +727,7 @@ export const studyService = {
         course_id: record.course_id,
         lesson_id: lesson.id,
         study_date: record.study_date,
+        study_type: record.study_type,
         study_count_for_lesson: record.study_count_for_lesson
       };
 
@@ -884,6 +886,36 @@ export const studyService = {
       .eq('course_id', courseId);
 
     return progress;
+  },
+
+  async getLessonStudySummary(userId: string, courseId: string, lessonId: string) {
+    const { data, error } = await supabase
+      .from('study_records')
+      .select('study_type, study_count_for_lesson, study_date')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .eq('lesson_id', lessonId)
+      .order('study_date');
+
+    if (error) throw error;
+
+    const records = data || [];
+    const summary = {
+      听传承: 0,
+      看法本: 0,
+      details: [] as Array<{ date: string; type: '听传承' | '看法本'; count: number }>
+    };
+
+    records.forEach(record => {
+      summary[record.study_type] += record.study_count_for_lesson;
+      summary.details.push({
+        date: record.study_date,
+        type: record.study_type,
+        count: record.study_count_for_lesson
+      });
+    });
+
+    return summary;
   }
 };
 

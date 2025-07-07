@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS study_records (
   course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
   lesson_id UUID REFERENCES course_lessons(id) ON DELETE CASCADE,
   study_date DATE NOT NULL,
+  study_type VARCHAR(20) NOT NULL DEFAULT '听传承', -- '听传承' or '看法本'
   study_count_for_lesson INTEGER DEFAULT 1,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
