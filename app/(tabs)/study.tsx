@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { Colors } from '@/constants/Colors';
 
 interface Course {
   id: string;
