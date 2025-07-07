@@ -1,6 +1,6 @@
+
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * Enhanced theme color hook with better TypeScript support
  */
 
 import { Colors } from '@/constants/Colors';
@@ -18,4 +18,25 @@ export function useThemeColor(
   } else {
     return Colors[theme][colorName];
   }
+}
+
+// New hook for getting primary color variants
+export function usePrimaryColor() {
+  const theme = useColorScheme() ?? 'light';
+  return {
+    primary: Colors[theme].primary,
+    light: Colors.primaryLight,
+    dark: Colors.primaryDark,
+  };
+}
+
+// Hook for getting status colors
+export function useStatusColors() {
+  const theme = useColorScheme() ?? 'light';
+  return {
+    success: Colors[theme].success,
+    warning: Colors[theme].warning,
+    error: Colors[theme].error,
+    info: Colors[theme].info,
+  };
 }

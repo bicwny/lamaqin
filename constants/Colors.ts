@@ -1,54 +1,133 @@
+
 /**
- * Buddhist Practice Tracking App Color Scheme
- * Colors inspired by Buddhist symbolism and peaceful design
+ * Buddhist Practice Tracking App - Unified Color System
+ * Primary: #da4347 (Red) - Energy, passion, determination
  */
 
-const tintColorLight = '#da4347'; // Red color for Buddhist theme
-const tintColorDark = '#F5F5DC';  // Beige
-
-export const Colors = {
-  // Primary color scheme
-  primary: '#da4347',      // Red - passion/energy
-  secondary: '#8B4513',    // Brown - earth/stability
-  accent: '#FF6B35',       // Orange - energy/compassion
-  background: '#FFFFFF',   // White - purity and peace
-  surface: '#FFFFFF',      // White - purity
-  text: '#2F4F4F',         // Dark slate gray
-  textSecondary: '#696969', // Dim gray
-  success: '#228B22',      // Forest green
-  warning: '#FF8C00',      // Dark orange
-  error: '#DC143C',        // Crimson
-
-  // Tab-specific colors
-  study: '#4169E1',        // Royal blue - wisdom
-  practice: '#D4AF37',     // Golden - practice
-  mindfulness: '#FF69B4',  // Hot pink - heart
-  stats: '#32CD32',        // Lime green - growth/progress
-  profile: '#8A2BE2',      // Blue violet - personal
-
-  light: {
-    text: '#2F4F4F',
-    background: '#FFFFFF',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#696969',
-    tabIconSelected: tintColorLight,
-    surface: '#FFFFFF',
-    primary: '#da4347',
-    secondary: '#2F4F4F',
-    textSecondary: '#696969',
-    practice: '#da4347',
-    study: '#4682B4',
-    mindfulness: '#FF69B4',
-    stats: '#32CD32',
-    profile: '#da4347',
-  },
-  dark: {
-    text: '#F5F5DC',
-    background: '#2F4F4F',
-    tint: tintColorDark,
-    icon: '#D4AF37',
-    tabIconDefault: '#8B4513',
-    tabIconSelected: tintColorDark,
-  },
+// Core brand colors
+const BRAND_COLORS = {
+  primary: '#da4347',      // Main red
+  primaryLight: '#e66a6d',  // Lighter red for hover states
+  primaryDark: '#b8353a',   // Darker red for pressed states
+  
+  // Supporting colors
+  secondary: '#2F4F4F',     // Dark slate gray - stability
+  accent: '#FF6B35',        // Orange - energy/compassion
+  
+  // Neutral colors
+  background: '#FFFFFF',
+  surface: '#F8F9FA',       // Light gray for cards/surfaces
+  border: '#E5E7EB',        // Light border color
+  
+  // Text colors
+  textPrimary: '#1F2937',   // Almost black
+  textSecondary: '#6B7280', // Medium gray
+  textTertiary: '#9CA3AF',  // Light gray
+  
+  // Status colors
+  success: '#10B981',       // Green
+  warning: '#F59E0B',       // Amber
+  error: '#EF4444',         // Red (different from primary)
+  info: '#3B82F6',          // Blue
+  
+  // Buddhist theme colors (using primary red as base)
+  practice: '#da4347',      // Primary red
+  study: '#da4347',         // Use primary instead of blue
+  mindfulness: '#da4347',   // Use primary instead of pink
+  stats: '#32CD32',         // Keep green for growth
+  profile: '#da4347',       // Use primary instead of purple
 };
+
+// Light and dark theme configurations
+const LIGHT_THEME = {
+  // Background colors
+  background: BRAND_COLORS.background,
+  surface: BRAND_COLORS.surface,
+  
+  // Text colors
+  text: BRAND_COLORS.textPrimary,
+  textSecondary: BRAND_COLORS.textSecondary,
+  
+  // Interactive colors
+  tint: BRAND_COLORS.primary,
+  primary: BRAND_COLORS.primary,
+  secondary: BRAND_COLORS.secondary,
+  
+  // Tab colors
+  tabIconDefault: BRAND_COLORS.textTertiary,
+  tabIconSelected: BRAND_COLORS.primary,
+  
+  // Icon colors
+  icon: BRAND_COLORS.textSecondary,
+  
+  // Feature colors (all using primary for consistency)
+  practice: BRAND_COLORS.practice,
+  study: BRAND_COLORS.study,
+  mindfulness: BRAND_COLORS.mindfulness,
+  stats: BRAND_COLORS.stats,
+  profile: BRAND_COLORS.profile,
+  
+  // Status colors
+  success: BRAND_COLORS.success,
+  warning: BRAND_COLORS.warning,
+  error: BRAND_COLORS.error,
+  info: BRAND_COLORS.info,
+  
+  // Border colors
+  border: BRAND_COLORS.border,
+};
+
+const DARK_THEME = {
+  // Background colors
+  background: '#111827',    // Very dark gray
+  surface: '#1F2937',       // Dark gray
+  
+  // Text colors
+  text: '#F9FAFB',          // Almost white
+  textSecondary: '#D1D5DB', // Light gray
+  
+  // Interactive colors
+  tint: BRAND_COLORS.primaryLight,
+  primary: BRAND_COLORS.primaryLight,
+  secondary: '#9CA3AF',
+  
+  // Tab colors
+  tabIconDefault: '#6B7280',
+  tabIconSelected: BRAND_COLORS.primaryLight,
+  
+  // Icon colors
+  icon: '#D1D5DB',
+  
+  // Feature colors (using lighter primary for dark mode)
+  practice: BRAND_COLORS.primaryLight,
+  study: BRAND_COLORS.primaryLight,
+  mindfulness: BRAND_COLORS.primaryLight,
+  stats: '#34D399', // Lighter green for dark mode
+  profile: BRAND_COLORS.primaryLight,
+  
+  // Status colors (adjusted for dark mode)
+  success: '#34D399',
+  warning: '#FBBF24',
+  error: '#F87171',
+  info: '#60A5FA',
+  
+  // Border colors
+  border: '#374151',
+};
+
+// Export unified color system
+export const Colors = {
+  // Brand colors for direct access
+  ...BRAND_COLORS,
+  
+  // Theme-specific colors
+  light: LIGHT_THEME,
+  dark: DARK_THEME,
+  
+  // Utility functions
+  opacity: (color: string, opacity: number) => `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`,
+};
+
+// Type definitions for better TypeScript support
+export type ColorName = keyof typeof BRAND_COLORS;
+export type ThemeColorName = keyof typeof LIGHT_THEME;
