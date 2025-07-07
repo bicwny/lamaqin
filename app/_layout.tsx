@@ -125,36 +125,39 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // Add font loading error handling
+  // Add font loading error handling (web only)
   useEffect(() => {
     if (error) {
       console.warn('Font loading error:', error);
     }
     
-    const handleFontError = (event: ErrorEvent) => {
-      if (event.message?.includes('timeout exceeded') || event.message?.includes('fonts')) {
-        console.warn('Font loading timeout - using fallback fonts');
-        // Suppress the error to prevent app crashes
-        event.preventDefault();
-        return true;
-      }
-    };
+    // Only add window event listeners on web platform
+    if (typeof window !== 'undefined') {
+      const handleFontError = (event: ErrorEvent) => {
+        if (event.message?.includes('timeout exceeded') || event.message?.includes('fonts')) {
+          console.warn('Font loading timeout - using fallback fonts');
+          // Suppress the error to prevent app crashes
+          event.preventDefault();
+          return true;
+        }
+      };
 
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      if (event.reason?.message?.includes('timeout exceeded') || event.reason?.message?.includes('fonts')) {
-        console.warn('Font loading promise rejected - using fallback fonts');
-        // Suppress the error to prevent app crashes
-        event.preventDefault();
-      }
-    };
+      const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+        if (event.reason?.message?.includes('timeout exceeded') || event.reason?.message?.includes('fonts')) {
+          console.warn('Font loading promise rejected - using fallback fonts');
+          // Suppress the error to prevent app crashes
+          event.preventDefault();
+        }
+      };
 
-    window.addEventListener('error', handleFontError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+      window.addEventListener('error', handleFontError);
+      window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
-    return () => {
-      window.removeEventListener('error', handleFontError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
+      return () => {
+        window.removeEventListener('error', handleFontError);
+        window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      };
+    }
   }, [error]);
 
   useEffect(() => {
