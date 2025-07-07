@@ -30,6 +30,23 @@ export default function ProfileScreen() {
 
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    dharmaName: '多吉丹',
+    practiceYears: 3,
+    location: '纽约',
+    className: '入行班',
+    email: user?.email || '', // Use optional chaining for safety
+    registrationDate: '2025-01-01'
+  });
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [todaySummary, setTodaySummary] = useState<TodaySummary | null>(null);
+
+  // Update userProfile email when user changes
+  useEffect(() => {
+    if (user?.email) {
+      setUserProfile(prev => ({ ...prev, email: user.email }));
+    }
+  }, [user?.email]);
 
   // Only redirect if explicitly logged out (not during loading)
   useEffect(() => {
@@ -94,18 +111,6 @@ export default function ProfileScreen() {
   if (loading || (!user && !isSigningOut)) {
     return null;
   }
-
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    dharmaName: '多吉丹',
-    practiceYears: 3,
-    location: '纽约',
-    className: '入行班',
-    email: user.email, // user is guaranteed to exist due to early return
-    registrationDate: '2025-01-01'
-  });
-
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [todaySummary, setTodaySummary] = useState<TodaySummary | null>(null);
 
   useEffect(() => {
     let isMounted = true;
