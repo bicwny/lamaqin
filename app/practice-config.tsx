@@ -952,8 +952,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4af37',
     borderRadius: 8,
     paddingVertical: 12,
-    alignItems: '```python
-'center',
+    alignItems: 'center',
     marginBottom: 12,
   },
   customButtonActive: {
