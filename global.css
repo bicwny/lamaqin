@@ -3,71 +3,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Custom Properties for consistent color usage */
+/* Only keeping essential CSS custom properties for web-specific needs */
 :root {
-  /* Primary colors */
   --color-primary: #da4347;
-  --color-primary-light: #e66a6d;
-  --color-primary-dark: #b8353a;
-  
-  /* Secondary colors */
-  --color-secondary: #2F4F4F;
-  --color-accent: #FF6B35;
-  
-  /* Background colors */
-  --color-background: #FFFFFF;
-  --color-surface: #F8F9FA;
-  --color-border: #E5E7EB;
-  
-  /* Text colors */
-  --color-text-primary: #1F2937;
-  --color-text-secondary: #6B7280;
-  --color-text-tertiary: #9CA3AF;
-  
-  /* Status colors */
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #3B82F6;
-  
-  /* Buddhist theme colors */
-  --color-practice: #da4347;
-  --color-study: #da4347;
-  --color-mindfulness: #da4347;
-  --color-stats: #32CD32;
-  --color-profile: #da4347;
 }
 
-/* Dark theme overrides */
+/* Dark theme override for web */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: #111827;
-    --color-surface: #1F2937;
-    --color-text-primary: #F9FAFB;
-    --color-text-secondary: #D1D5DB;
-    --color-border: #374151;
     --color-primary: #e66a6d;
   }
 }
 
-/* Utility classes for consistent styling */
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.text-primary {
-  color: var(--color-primary);
-}
-
-.border-primary {
-  border-color: var(--color-primary);
-}
-
-/* Remove deprecated style warnings */
-.pointer-events-none {
-  pointer-events: none;
-}
-
-.pointer-events-auto {
-  pointer-events: auto;
-}
+/* Utility classes are handled by Tailwind - keeping only essential overrides */
