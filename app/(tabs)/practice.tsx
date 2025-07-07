@@ -65,7 +65,7 @@ export default function PracticeScreen() {
   );
 
   const loadPracticeData = async () => {
-    if (!user?.id) return;
+    if (!user) return;
 
     try {
       console.log('🔄 Loading practice data for user:', user.id);

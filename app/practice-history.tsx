@@ -17,6 +17,7 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { presetProjectNameService } from '@/lib/database';
 
 interface DailyRecord {
   id: string;
@@ -43,6 +44,7 @@ export default function PracticeHistoryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [deletingRecords, setDeletingRecords] = useState<Set<string>>(new Set());
   const [projectInfo, setProjectInfo] = useState<any>(null);
+  const [presetProjectName, setPresetProjectName] = useState<string>('');
 
   useEffect(() => {
     if (user && projectId) {
@@ -83,6 +85,19 @@ export default function PracticeHistoryScreen() {
 
       if (projectError) throw projectError;
       setProjectInfo(project);
+
+      // Load preset project name if needed
+      if (project.preset_project_id) {
+        try {
+          const presets = await presetProjectNameService.getPresetProjectNames();
+          const preset = presets.find(p => p.id === project.preset_project_id);
+          if (preset) {
+            setPresetProjectName(preset.name);
+          }
+        } catch (presetError) {
+          console.error('Error loading preset project name:', presetError);
+        }
+      }
 
       // Load daily records
       const { data: recordsData, error: recordsError } = await supabase
@@ -242,6 +257,11 @@ export default function PracticeHistoryScreen() {
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>📿 {practiceName} - 详情</Text>
+        {projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) && (
+          <Text style={styles.projectNameHeader}>
+            项目: {projectInfo.project_name || presetProjectName || '预设项目'}
+          </Text>
+        )}
       </View>
 
       <ScrollView
@@ -393,6 +413,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     textAlign: 'center',
+  },
+  projectNameHeader: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 4,
   },
   loadingContainer: {
     flex: 1,
