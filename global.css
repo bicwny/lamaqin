@@ -3,6 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font loading optimization */
+@font-face {
+  font-family: 'SpaceMono';
+  src: url('./assets/fonts/SpaceMono-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Prevent font loading timeouts */
+* {
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Only keeping essential CSS custom properties for web-specific needs */
 :root {
   --color-primary: #da4347;
