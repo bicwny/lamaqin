@@ -210,6 +210,10 @@ export default function PracticeScreen() {
         <PageHeader 
           title="📿 修行记录" 
           subtitle="系统记录修行进度"
+          rightAction={{
+            text: "添加",
+            onPress: handleAddPractice
+          }}
         />
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
@@ -224,9 +228,13 @@ export default function PracticeScreen() {
         <PageHeader 
           title="📿 修行记录" 
           subtitle="开始您的修行之旅"
+          rightAction={{
+            text: "添加",
+            onPress: handleAddPractice
+          }}
         />
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-          
+
 
           <View style={styles.emptyState}>
             <View style={styles.iconContainer}>
@@ -256,6 +264,10 @@ export default function PracticeScreen() {
         <PageHeader 
           title="📿 修行记录" 
           subtitle="系统记录修行进度"
+          rightAction={{
+            text: "添加",
+            onPress: handleAddPractice
+          }}
         />
         <ScrollView 
         style={styles.scrollView}
@@ -263,7 +275,7 @@ export default function PracticeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        
+
 
         <Text style={styles.sectionTitle}>我的修行项目：</Text>
 
@@ -512,7 +524,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  
+
   loadingText: {
     fontSize: 16,
     color: '#666',
