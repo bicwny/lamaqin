@@ -41,7 +41,7 @@ export default function ProfileScreen() {
   });
   const [showShareModal, setShowShareModal] = useState(false);
   const [todaySummary, setTodaySummary] = useState<TodaySummary | null>(null);
-
+  const [timezoneInfo, setTimezoneInfo] = useState<any>(null); // Define the type properly later
   // Update userProfile email when user changes
   useEffect(() => {
     if (user?.email) {
@@ -131,25 +131,17 @@ export default function ProfileScreen() {
   }
 
   const loadData = async () => {
-    // Mock today's summary data
-    setTodaySummary({
-      practices: [
-        '顶礼547',
-        '百字明1386',
-        '金刚萨埵心咒13334',
-        '前行实修法第24座1座',
-        '八关斋戒1次',
-        '上师瑜伽45分钟',
-        '心经3遍',
-        '供灯7盏'
-      ],
-      studyRecords: [
-        '《入行》第16课1次'
-      ],
-      mindfulnessStats: { good: 8, bad: 3 },
-      practiceTime: '4小时30分钟',
-      completionRate: 100
-    });
+    // Load user profile data, practice stats, etc.
+    try {
+      console.log('📊 Loading profile data...');
+
+      // Load timezone info
+      //const timezone = await getUserTimezone();  //commented out to avoid error for undefined function
+      //setTimezoneInfo(timezone);
+      //console.log('🌍 Loaded timezone:', timezone.timezone);
+    } catch (error) {
+      console.error('❌ Error loading profile data:', error);
+    }
   };
 
   const generateShareText = () => {
@@ -388,7 +380,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  
+
   section: {
     backgroundColor: 'white',
     marginTop: 16,

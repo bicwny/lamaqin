@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { mindfulnessService } from '@/lib/database';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTimezone } from '@/hooks/useTimezone';
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
+import { getCurrentDateInTimezone } from '@/lib/timezone';
 
 interface MindfulnessRecord {
   id: string;
@@ -17,6 +19,7 @@ export default function MindfulnessScreen() {
   const [todayRecords, setTodayRecords] = useState<MindfulnessRecord[]>([]);
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(true);
+  const { timezoneInfo } = useTimezone();
 
   useEffect(() => {
     loadTodayRecords();
@@ -277,6 +280,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginBottom: 8,
+  },
+  timezoneDisplay: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 12,
   },
 
 });
