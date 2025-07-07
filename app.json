@@ -48,8 +48,8 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "fonts": [
-      "./assets/fonts/SpaceMono-Regular.ttf"
+    "assetBundlePatterns": [
+      "**/*"
     ]
   }
 }
