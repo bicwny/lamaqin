@@ -121,14 +121,18 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [loaded] = useFonts({
+  const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   // Add font loading error handling
   useEffect(() => {
+    if (error) {
+      console.warn('Font loading error:', error);
+    }
+    
     const handleFontError = (event: ErrorEvent) => {
-      if (event.message?.includes('timeout exceeded')) {
+      if (event.message?.includes('timeout exceeded') || event.message?.includes('fonts')) {
         console.warn('Font loading timeout - using fallback fonts');
         // Suppress the error to prevent app crashes
         event.preventDefault();
@@ -137,7 +141,7 @@ export default function RootLayout() {
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      if (event.reason?.message?.includes('timeout exceeded')) {
+      if (event.reason?.message?.includes('timeout exceeded') || event.reason?.message?.includes('fonts')) {
         console.warn('Font loading promise rejected - using fallback fonts');
         // Suppress the error to prevent app crashes
         event.preventDefault();
@@ -151,7 +155,7 @@ export default function RootLayout() {
       window.removeEventListener('error', handleFontError);
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
-  }, []);
+  }, [error]);
 
   useEffect(() => {
     if (loaded) {
