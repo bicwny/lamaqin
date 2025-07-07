@@ -36,10 +36,15 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
     return <Text style={styles.lessonProgress}>加载中...</Text>;
   }
 
+  const isCompleted = counts.听传承 > 0 && counts.看法本 > 0;
+
   return (
-    <Text style={styles.lessonProgress}>
-      听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
-    </Text>
+    <View style={styles.lessonProgressContainer}>
+      <Text style={styles.lessonProgress}>
+        听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
+      </Text>
+      {isCompleted && <Text style={styles.completionCheck}>✅</Text>}
+    </View>
   );
 };
 
@@ -588,9 +593,11 @@ export default function StudyScreen() {
             return (
               <View key={lesson.id} style={styles.lessonItem}>
                 <View style={styles.lessonHeader}>
-                  <Text style={styles.lessonTitle}>
-                    第{lesson.lesson_number}课：{lesson.title}
-                  </Text>
+                  <View style={styles.lessonTitleRow}>
+                    <Text style={styles.lessonTitle}>
+                      第{lesson.lesson_number}课：{lesson.title}
+                    </Text>
+                  </View>
                   <LessonProgressDisplay 
                     userId={user.id}
                     courseId={selectedCourse.course_id}
@@ -810,10 +817,25 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
+  lessonProgressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
+  },
   lessonProgress: {
     fontSize: 12,
     color: '#666',
-    marginTop: 2,
+    flex: 1,
+  },
+  completionCheck: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  lessonTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   completedLesson: {
     color: '#4CAF50',
