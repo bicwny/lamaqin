@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { mindfulnessService } from '@/lib/database';
+import { Colors } from '@/constants/Colors';
 
 interface MindfulnessRecord {
   id: string;
@@ -29,10 +29,10 @@ export default function MindfulnessScreen() {
 
     try {
       console.log('🔄 Loading mindfulness records for user:', user.id);
-      
+
       const today = new Date().toISOString().split('T')[0];
       const records = await mindfulnessService.getTodayRecords(user.id, today);
-      
+
       console.log('💝 Loaded mindfulness records:', records.length);
       setTodayRecords(records);
     } catch (error) {
@@ -155,7 +155,7 @@ export default function MindfulnessScreen() {
         </View>
       </View>
 
-      
+
     </ScrollView>
   );
 }
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: Colors.primary,
   },
   statLabel: {
     fontSize: 14,
@@ -264,5 +264,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  
+
 });

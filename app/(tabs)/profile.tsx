@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   shareButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.primary,
   },
   logoutModalContent: {
     alignItems: 'center',
@@ -625,6 +625,15 @@ const styles = StyleSheet.create({
   logoutConfirmButtonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  menuItemActive: {
+    backgroundColor: '#e3f2fd',
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  menuItemTextActive: {
+    color: Colors.primary,
     fontWeight: '600',
   },
 });
