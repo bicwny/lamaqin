@@ -3,16 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Font loading optimization */
-@font-face {
-  font-family: 'SpaceMono';
-  src: url('./assets/fonts/SpaceMono-Regular.ttf') format('truetype');
-  font-display: swap;
-}
-
-/* Prevent font loading timeouts */
+/* Font smoothing for web */
 * {
-  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
