@@ -587,8 +587,8 @@ export default function StudyScreen() {
             <Text style={styles.courseInfoText}>👨‍🏫 {selectedCourse.course.teacher}</Text>
             <Text style={styles.courseInfoText}>📖 总课数：{selectedCourse.course.total_lessons}课</Text>
             <Text style={styles.courseInfoText}>
-              📊 完成进度：{(courseProgress?.progressPercentage || 0).toFixed(1)}% 
-              ({courseProgress?.totalLessonsStudied || 0}/{selectedCourse.course.total_lessons}课)
+              📊 完成进度：{(selectedCourse.progress_percentage || 0).toFixed(1)}% 
+              ({Math.round((selectedCourse.progress_percentage || 0) * selectedCourse.course.total_lessons / 100)}/{selectedCourse.course.total_lessons}课)
             </Text>
           </View>
 
