@@ -8,13 +8,74 @@ export default function ResetPasswordScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [hasValidSession, setHasValidSession] = useState(false);
   const params = useLocalSearchParams();
 
   useEffect(() => {
     console.log('Reset password screen params:', params);
+    
+    // Check if we have a valid session for password reset
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Reset password session check:', { session: !!session, error });
+        
+        if (session) {
+          setHasValidSession(true);
+          console.log('✅ Valid session found for password reset');
+        } else {
+          console.log('❌ No valid session for password reset');
+          // If no session, try to handle the reset code from URL
+          handleResetCodeFromUrl();
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+        handleResetCodeFromUrl();
+      }
+    };
+
+    checkSession();
   }, [params]);
 
+  const handleResetCodeFromUrl = async () => {
+    // Check if we have a code in the URL parameters
+    const code = params.code as string;
+    if (code) {
+      console.log('🔐 Found reset code in URL:', code);
+      try {
+        // Exchange the code for a session
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error('❌ Error exchanging code for session:', error);
+          Alert.alert('链接无效', '密码重置链接已失效或无效，请重新申请重置密码', [
+            { text: '确定', onPress: () => router.replace('/auth/forgot-password') }
+          ]);
+        } else {
+          console.log('✅ Successfully exchanged code for session');
+          setHasValidSession(true);
+        }
+      } catch (error) {
+        console.error('❌ Code exchange error:', error);
+        Alert.alert('重置失败', '无法处理密码重置请求，请重新尝试', [
+          { text: '确定', onPress: () => router.replace('/auth/forgot-password') }
+        ]);
+      }
+    } else {
+      console.log('❌ No reset code found in URL');
+      Alert.alert('链接无效', '缺少密码重置代码，请重新申请重置密码', [
+        { text: '确定', onPress: () => router.replace('/auth/forgot-password') }
+      ]);
+    }
+  };
+
   const handleUpdatePassword = async () => {
+    if (!hasValidSession) {
+      Alert.alert('会话无效', '密码重置会话已失效，请重新申请重置密码', [
+        { text: '确定', onPress: () => router.replace('/auth/forgot-password') }
+      ]);
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('密码不匹配', '两次输入的密码不一致');
       return;
@@ -27,20 +88,34 @@ export default function ResetPasswordScreen() {
 
     setLoading(true);
     try {
+      console.log('🔐 Updating password...');
       const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
+        console.error('❌ Password update error:', error);
         Alert.alert('重置失败', error.message);
       } else {
+        console.log('✅ Password updated successfully');
         Alert.alert('重置成功', '密码已更新，请使用新密码登录', [
           { text: '确定', onPress: () => router.replace('/auth/login') }
         ]);
       }
     } catch (error) {
+      console.error('❌ Password update error:', error);
       Alert.alert('重置失败', '网络错误，请稍后重试');
     }
     setLoading(false);
   };
+
+  // Show loading while checking session
+  if (!hasValidSession) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>🔐 验证重置链接</Text>
+        <Text style={styles.subtitle}>正在验证密码重置链接...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

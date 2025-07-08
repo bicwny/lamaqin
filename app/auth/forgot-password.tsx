@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `dharmapractice://auth/reset-password`,
+        redirectTo: `https://88214788-b967-45f6-92f8-6b3fba08318e-00-355385dlz9km1.picard.replit.dev/auth/reset-password`,
       });
 
       if (error) {

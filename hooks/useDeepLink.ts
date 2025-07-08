@@ -17,6 +17,22 @@ export function useDeepLink() {
         return;
       }
       
+      // Handle web URLs with reset password code
+      if (url.includes('code=') && (url.includes('reset-password') || url.includes('auth'))) {
+        console.log('🌐 Handling web reset password URL:', url);
+        try {
+          const urlObj = new URL(url);
+          const code = urlObj.searchParams.get('code');
+          if (code) {
+            console.log('🔐 Extracting reset code from web URL:', code);
+            router.push(`/auth/reset-password?code=${code}`);
+            return;
+          }
+        } catch (error) {
+          console.error('❌ Error parsing web URL:', error);
+        }
+      }
+      
       // Remove the scheme prefix and leading slash
       const route = url.replace(/dharmapractice:\/\//, '').replace(/^\//, '');
       
@@ -25,6 +41,17 @@ export function useDeepLink() {
       // Handle auth routes (accessible without login)
       if (route.startsWith('auth/') || route === 'auth') {
         try {
+          // Special handling for reset password with code parameter
+          if (route.includes('reset-password') && url.includes('code=')) {
+            const urlObj = new URL(url);
+            const code = urlObj.searchParams.get('code');
+            if (code) {
+              console.log('🔐 Handling reset password with code:', code);
+              router.push(`/auth/reset-password?code=${code}`);
+              return;
+            }
+          }
+          
           router.push(`/${route}`);
           return;
         } catch (error) {
