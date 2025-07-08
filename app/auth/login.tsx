@@ -68,10 +68,7 @@ export default function LoginScreen() {
         const { error } = await supabase.auth.signInWithOtp({
           email: email.trim(),
           options: {
-            shouldCreateUser: false,
-            data: { 
-              verification_type: 'code' 
-            }
+            shouldCreateUser: false
           }
         });
 

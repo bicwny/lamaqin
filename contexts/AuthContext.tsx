@@ -255,10 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          shouldCreateUser: false,
-          data: { 
-            verification_type: 'code' 
-          }
+          shouldCreateUser: false
         }
       });
 
@@ -337,10 +334,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           shouldCreateUser: true,
           data: {
-            dharma_name: dharmaName,
-            verification_type: 'code'
-          },
-        },
+            dharma_name: dharmaName
+          }
+        }
       });
 
       if (error) {

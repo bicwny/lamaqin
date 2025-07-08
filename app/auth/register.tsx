@@ -90,10 +90,9 @@ export default function RegisterScreen() {
           options: {
             shouldCreateUser: true,
             data: {
-              dharma_name: dharmaName.trim(),
-              verification_type: 'code'
-            },
-          },
+              dharma_name: dharmaName.trim()
+            }
+          }
         });
 
         if (error) {
