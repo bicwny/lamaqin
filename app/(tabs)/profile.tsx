@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PageHeader from '@/components/PageHeader';
+import { DeepLinkTester } from '@/components/DeepLinkTester';
 
 interface UserProfile {
   dharmaName: string;
@@ -299,6 +300,16 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
               {isSigningOut ? '正在退出...' : '退出登录'}
             </Text>
           </TouchableOpacity>
+        </ThemedView>
+              {/* Deep Link Testing */}
+        <ThemedView style={styles.section}>
+        <Collapsible title="Deep Link Testing">
+          <ThemedText>
+            Use the buttons below to test deep link navigation:
+          </ThemedText>
+          <DeepLinkTester />
+        </Collapsible>
+
         </ThemedView>
       </ScrollView>
 
