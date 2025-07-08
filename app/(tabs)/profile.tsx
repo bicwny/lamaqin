@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PageHeader from '@/components/PageHeader';
 import { DeepLinkTester } from '@/components/DeepLinkTester';
+import { Collapsible } from '@/components/Collapsible';
 
 interface UserProfile {
   dharmaName: string;
