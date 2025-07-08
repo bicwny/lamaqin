@@ -87,6 +87,13 @@ export default function RegisterScreen() {
       try {
         const { error } = await supabase.auth.signInWithOtp({
           email: email.trim(),
+          options: {
+            shouldCreateUser: true,
+            data: {
+              dharma_name: dharmaName.trim(),
+              verification_type: 'code'
+            },
+          },
         });
 
         if (error) {

@@ -22,7 +22,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [useOTP, setUseOTP] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const [useNumericCode, setUseNumericCode] = useState(false);
+  
 
   const handleLogin = async () => {
     if (useOTP) {
@@ -62,18 +62,16 @@ export default function LoginScreen() {
 
   const handleOTPLogin = async () => {
     if (!otpSent) {
-      // Send OTP or Magic Link
+      // Send OTP code
       setLoading(true);
       try {
         const { error } = await supabase.auth.signInWithOtp({
           email: email.trim(),
           options: {
             shouldCreateUser: false,
-            ...(useNumericCode && { 
-              data: { 
-                verification_type: 'code' 
-              }
-            })
+            data: { 
+              verification_type: 'code' 
+            }
           }
         });
 
@@ -81,11 +79,7 @@ export default function LoginScreen() {
           Alert.alert('发送失败', error.message);
         } else {
           setOtpSent(true);
-          if (useNumericCode) {
-            Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
-          } else {
-            Alert.alert('登录链接已发送', '请检查您的邮箱并点击"Log In"链接完成登录');
-          }
+          Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
         }
       } catch (error) {
         Alert.alert('发送失败', '网络错误，请稍后重试');
@@ -93,12 +87,7 @@ export default function LoginScreen() {
         setLoading(false);
       }
     } else {
-      // Verify OTP (only for numeric codes)
-      if (!useNumericCode) {
-        Alert.alert('提示', '请前往邮箱点击登录链接');
-        return;
-      }
-
+      // Verify OTP
       if (!otp) {
         Alert.alert('提示', '请输入验证码');
         return;
@@ -187,49 +176,18 @@ export default function LoginScreen() {
               />
             </View>
           ) : otpSent ? (
-            useNumericCode ? (
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>🔢 验证码</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="请输入邮箱验证码"
-                  value={otp}
-                  onChangeText={setOtp}
-                  keyboardType="number-pad"
-                  autoCapitalize="none"
-                />
-              </View>
-            ) : (
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>📧 请检查邮箱</Text>
-                <Text style={styles.magicLinkText}>
-                  已发送登录链接到您的邮箱，请点击邮件中的"Log In"按钮完成登录
-                </Text>
-              </View>
-            )
-          ) : (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>验证方式</Text>
-              <View style={styles.codeToggle}>
-                <TouchableOpacity 
-                  style={[styles.codeToggleButton, !useNumericCode && styles.codeToggleButtonActive]}
-                  onPress={() => setUseNumericCode(false)}
-                >
-                  <Text style={[styles.codeToggleText, !useNumericCode && styles.codeToggleTextActive]}>
-                    魔法链接
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.codeToggleButton, useNumericCode && styles.codeToggleButtonActive]}
-                  onPress={() => setUseNumericCode(true)}
-                >
-                  <Text style={[styles.codeToggleText, useNumericCode && styles.codeToggleTextActive]}>
-                    数字验证码
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.inputLabel}>🔢 验证码</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="请输入邮箱验证码"
+                value={otp}
+                onChangeText={setOtp}
+                keyboardType="number-pad"
+                autoCapitalize="none"
+              />
             </View>
-          )}
+          ) : null}
 
           <TouchableOpacity 
             style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
@@ -240,7 +198,7 @@ export default function LoginScreen() {
               <ActivityIndicator color={Colors.surface} />
             ) : (
               <Text style={styles.loginButtonText}>
-                {useOTP ? (otpSent ? (useNumericCode ? '验证登录' : '重新发送链接') : (useNumericCode ? '发送验证码' : '发送登录链接')) : '登录'}
+                {useOTP ? (otpSent ? '验证登录' : '发送验证码') : '登录'}
               </Text>
             )}
           </TouchableOpacity>
