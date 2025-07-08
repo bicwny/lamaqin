@@ -20,24 +20,38 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [useOTP, setUseOTP] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
 
   const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
-      Alert.alert('提示', '请填写必填项目');
-      return;
-    }
+    if (useOTP) {
+      if (!email) {
+        Alert.alert('提示', '请填写邮箱地址');
+        return;
+      }
+      await handleOTPRegister();
+    } else {
+      if (!email || !password || !confirmPassword) {
+        Alert.alert('提示', '请填写必填项目');
+        return;
+      }
 
-    if (password !== confirmPassword) {
-      Alert.alert('提示', '两次输入的密码不一致');
-      return;
-    }
+      if (password !== confirmPassword) {
+        Alert.alert('提示', '两次输入的密码不一致');
+        return;
+      }
 
-    if (password.length < 6) {
-      Alert.alert('提示', '密码至少需要6位字符');
-      return;
+      if (password.length < 6) {
+        Alert.alert('提示', '密码至少需要6位字符');
+        return;
+      }
+      await handlePasswordRegister();
     }
+  };
 
+  const handlePasswordRegister = async () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signUp({
@@ -63,6 +77,60 @@ export default function RegisterScreen() {
       Alert.alert('注册失败', '网络错误，请稍后重试');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOTPRegister = async () => {
+    if (!otpSent) {
+      // Send OTP for registration
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: email.trim(),
+        });
+
+        if (error) {
+          Alert.alert('发送失败', error.message);
+        } else {
+          setOtpSent(true);
+          Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
+        }
+      } catch (error) {
+        Alert.alert('发送失败', '网络错误，请稍后重试');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Verify OTP and complete registration
+      if (!otp) {
+        Alert.alert('提示', '请输入验证码');
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: otp,
+          type: 'email',
+        });
+
+        if (error) {
+          Alert.alert('验证失败', error.message);
+        } else if (data.user) {
+          // Update user metadata with dharma name if provided
+          if (dharmaName.trim()) {
+            await supabase.auth.updateUser({
+              data: { dharma_name: dharmaName.trim() }
+            });
+          }
+          router.replace('/(tabs)/index');
+        }
+      } catch (error) {
+        Alert.alert('验证失败', '网络错误，请稍后重试');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -103,29 +171,69 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🔒 密码 *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="至少6位密码"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-            />
+          {/* Registration Method Toggle */}
+          <View style={styles.authToggle}>
+            <TouchableOpacity 
+              style={[styles.toggleButton, !useOTP && styles.toggleButtonActive]}
+              onPress={() => {
+                setUseOTP(false);
+                setOtpSent(false);
+                setOtp('');
+              }}
+            >
+              <Text style={[styles.toggleText, !useOTP && styles.toggleTextActive]}>密码注册</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.toggleButton, useOTP && styles.toggleButtonActive]}
+              onPress={() => {
+                setUseOTP(true);
+                setPassword('');
+                setConfirmPassword('');
+              }}
+            >
+              <Text style={[styles.toggleText, useOTP && styles.toggleTextActive]}>验证码注册</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🔒 确认密码 *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="请再次输入密码"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              autoCapitalize="none"
-            />
-          </View>
+          {!useOTP ? (
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>🔒 密码 *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="至少6位密码"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>🔒 确认密码 *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="请再次输入密码"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+              </View>
+            </>
+          ) : otpSent ? (
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>🔢 验证码</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="请输入邮箱验证码"
+                value={otp}
+                onChangeText={setOtp}
+                keyboardType="number-pad"
+                autoCapitalize="none"
+              />
+            </View>
+          ) : null}
 
           <TouchableOpacity 
             style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
@@ -135,7 +243,9 @@ export default function RegisterScreen() {
             {loading ? (
               <ActivityIndicator color={Colors.surface} />
             ) : (
-              <Text style={styles.registerButtonText}>注册</Text>
+              <Text style={styles.registerButtonText}>
+                {useOTP ? (otpSent ? '验证注册' : '发送验证码') : '注册'}
+              </Text>
             )}
           </TouchableOpacity>
 
@@ -238,6 +348,31 @@ const styles = StyleSheet.create({
   loginLink: {
     color: Colors.primary,
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  authToggle: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 20,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  toggleButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  toggleText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  toggleTextActive: {
+    color: Colors.surface,
     fontWeight: 'bold',
   },
 });

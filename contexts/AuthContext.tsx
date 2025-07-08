@@ -13,7 +13,10 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signInWithOTP: (email: string) => Promise<{ error?: string }>;
+  verifyOTP: (email: string, token: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string, dharmaName?: string) => Promise<{ error?: string }>;
+  signUpWithOTP: (email: string, dharmaName?: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   forceLogoutAll: () => Promise<void>;
   clearAllCache: () => Promise<void>;
@@ -247,6 +250,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithOTP = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      return {};
+    } catch (error) {
+      console.error('OTP sign in error:', error);
+      return { error: 'An unexpected error occurred' };
+    }
+  };
+
+  const verifyOTP = async (email: string, token: string) => {
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'email',
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      if (data.user) {
+        // Create user in database if doesn't exist
+        await ensureUserInDatabase(data.user);
+        setUser({
+          id: data.user.id,
+          email: data.user.email!,
+          dharma_name: data.user.user_metadata?.dharma_name,
+        });
+      }
+
+      return {};
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      return { error: 'An unexpected error occurred' };
+    }
+  };
+
   const signUp = async (email: string, password: string, dharmaName?: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -271,6 +320,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return {};
     } catch (error) {
       console.error('Sign up error:', error);
+      return { error: 'An unexpected error occurred' };
+    }
+  };
+
+  const signUpWithOTP = async (email: string, dharmaName?: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          data: {
+            dharma_name: dharmaName,
+          },
+        },
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      return {};
+    } catch (error) {
+      console.error('OTP sign up error:', error);
       return { error: 'An unexpected error occurred' };
     }
   };
@@ -566,7 +637,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, forceLogoutAll, clearAllCache }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signInWithOTP, verifyOTP, signUp, signUpWithOTP, signOut, forceLogoutAll, clearAllCache }}>
       {children}
     </AuthContext.Provider>
   );

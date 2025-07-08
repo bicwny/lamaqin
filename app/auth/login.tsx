@@ -18,14 +18,28 @@ import { Colors } from '@/constants/Colors';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [useOTP, setUseOTP] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('提示', '请填写邮箱和密码');
-      return;
+    if (useOTP) {
+      if (!email) {
+        Alert.alert('提示', '请填写邮箱地址');
+        return;
+      }
+      await handleOTPLogin();
+    } else {
+      if (!email || !password) {
+        Alert.alert('提示', '请填写邮箱和密码');
+        return;
+      }
+      await handlePasswordLogin();
     }
+  };
 
+  const handlePasswordLogin = async () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -42,6 +56,54 @@ export default function LoginScreen() {
       Alert.alert('登录失败', '网络错误，请稍后重试');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOTPLogin = async () => {
+    if (!otpSent) {
+      // Send OTP
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: email.trim(),
+        });
+
+        if (error) {
+          Alert.alert('发送失败', error.message);
+        } else {
+          setOtpSent(true);
+          Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
+        }
+      } catch (error) {
+        Alert.alert('发送失败', '网络错误，请稍后重试');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Verify OTP
+      if (!otp) {
+        Alert.alert('提示', '请输入验证码');
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: otp,
+          type: 'email',
+        });
+
+        if (error) {
+          Alert.alert('验证失败', error.message);
+        } else {
+          router.replace('/(tabs)/index');
+        }
+      } catch (error) {
+        Alert.alert('验证失败', '网络错误，请稍后重试');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -71,17 +133,54 @@ export default function LoginScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🔒 密码</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="请输入密码"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-            />
+          {/* Auth Method Toggle */}
+          <View style={styles.authToggle}>
+            <TouchableOpacity 
+              style={[styles.toggleButton, !useOTP && styles.toggleButtonActive]}
+              onPress={() => {
+                setUseOTP(false);
+                setOtpSent(false);
+                setOtp('');
+              }}
+            >
+              <Text style={[styles.toggleText, !useOTP && styles.toggleTextActive]}>密码登录</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.toggleButton, useOTP && styles.toggleButtonActive]}
+              onPress={() => {
+                setUseOTP(true);
+                setPassword('');
+              }}
+            >
+              <Text style={[styles.toggleText, useOTP && styles.toggleTextActive]}>验证码登录</Text>
+            </TouchableOpacity>
           </View>
+
+          {!useOTP ? (
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>🔒 密码</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="请输入密码"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+            </View>
+          ) : otpSent ? (
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>🔢 验证码</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="请输入邮箱验证码"
+                value={otp}
+                onChangeText={setOtp}
+                keyboardType="number-pad"
+                autoCapitalize="none"
+              />
+            </View>
+          ) : null}
 
           <TouchableOpacity 
             style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
@@ -91,7 +190,9 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color={Colors.surface} />
             ) : (
-              <Text style={styles.loginButtonText}>登录</Text>
+              <Text style={styles.loginButtonText}>
+                {useOTP ? (otpSent ? '验证登录' : '发送验证码') : '登录'}
+              </Text>
             )}
           </TouchableOpacity>
 
@@ -206,6 +307,31 @@ const styles = StyleSheet.create({
   registerLink: {
     color: Colors.primary,
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  authToggle: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 20,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  toggleButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  toggleText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  toggleTextActive: {
+    color: Colors.surface,
     fontWeight: 'bold',
   },
 });
