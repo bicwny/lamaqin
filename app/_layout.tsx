@@ -80,13 +80,6 @@ function RootLayoutNav() {
         }} 
       />
       <Stack.Screen 
-        name="auth/reset-password" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
         name="(tabs)" 
         options={{ 
           headerShown: false
