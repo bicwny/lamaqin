@@ -130,6 +130,11 @@ export default function StudyScreen() {
       // Reload user courses to get updated progress percentages
       const updatedUserCoursesData = await getUserCourses(user.id);
       setUserCourses(updatedUserCoursesData);
+      
+      console.log('📊 Updated user courses after progress calculation:', updatedUserCoursesData.map(uc => ({
+        name: uc.course.name,
+        progress: uc.progress_percentage
+      })));
 
       // Load lessons for enrolled courses
       const lessonsData: Record<string, CourseLesson[]> = {};
@@ -425,7 +430,7 @@ export default function StudyScreen() {
           {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
             const courseProgress = getCourseProgress(userCourse.course_id);
             const currentLesson = courseProgress?.currentLesson || 1;
-            const progressPercentage = courseProgress?.progressPercentage || 0;
+            const progressPercentage = userCourse.progress_percentage || 0;
 
             return (
               <TouchableOpacity 
@@ -486,7 +491,7 @@ export default function StudyScreen() {
               <Text style={styles.sectionTitle}>我的课程：</Text>
               {userCourses.map(userCourse => {
                 const courseProgress = getCourseProgress(userCourse.course_id);
-                const progressPercentage = courseProgress?.progressPercentage || 0;
+                const progressPercentage = userCourse.progress_percentage || 0;
 
                 return (
                   <View key={userCourse.id} style={styles.manageCourseCard}>
