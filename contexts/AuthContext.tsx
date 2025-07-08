@@ -13,10 +13,10 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signInWithOTP: (email: string) => Promise<{ error?: string }>;
+  signInWithOTP: (email: string, useNumericCode?: boolean) => Promise<{ error?: string }>;
   verifyOTP: (email: string, token: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string, dharmaName?: string) => Promise<{ error?: string }>;
-  signUpWithOTP: (email: string, dharmaName?: string) => Promise<{ error?: string }>;
+  signUpWithOTP: (email: string, dharmaName?: string, useNumericCode?: boolean) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   forceLogoutAll: () => Promise<void>;
   clearAllCache: () => Promise<void>;
@@ -250,10 +250,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithOTP = async (email: string) => {
+  const signInWithOTP = async (email: string, useNumericCode: boolean = false) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
+        options: {
+          shouldCreateUser: false,
+          // Force numeric code if requested
+          ...(useNumericCode && { 
+            data: { 
+              verification_type: 'code' 
+            }
+          })
+        }
       });
 
       if (error) {
@@ -324,13 +333,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUpWithOTP = async (email: string, dharmaName?: string) => {
+  const signUpWithOTP = async (email: string, dharmaName?: string, useNumericCode: boolean = false) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
+          shouldCreateUser: true,
           data: {
             dharma_name: dharmaName,
+            ...(useNumericCode && { 
+              verification_type: 'code' 
+            })
           },
         },
       });
