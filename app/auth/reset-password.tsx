@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 
 export default function ResetPasswordScreen() {
@@ -8,6 +8,11 @@ export default function ResetPasswordScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const params = useLocalSearchParams();
+
+  useEffect(() => {
+    console.log('Reset password screen params:', params);
+  }, [params]);
 
   const handleUpdatePassword = async () => {
     if (password !== confirmPassword) {
@@ -83,6 +88,13 @@ export default function ResetPasswordScreen() {
           {loading ? '更新中...' : '更新密码'}
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.outlineButton]}
+        onPress={() => router.push('/auth/login')}
+      >
+        <Text style={[styles.buttonText, styles.outlineButtonText]}>返回登录</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -139,157 +151,6 @@ const styles = StyleSheet.create({
   },
   eyeText: {
     fontSize: 18,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { supabase } from '@/lib/supabase';
-
-export default function ResetPasswordScreen() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const params = useLocalSearchParams();
-
-  useEffect(() => {
-    console.log('Reset password screen params:', params);
-  }, [params]);
-
-  const validatePassword = (password: string) => {
-    return password.length >= 6;
-  };
-
-  const handleResetPassword = async () => {
-    if (!password) {
-      Alert.alert('请输入密码', '请输入新密码');
-      return;
-    }
-
-    if (!validatePassword(password)) {
-      Alert.alert('密码太短', '密码至少需要6个字符');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('密码不匹配', '两次输入的密码不一致');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
-
-      if (error) {
-        Alert.alert('密码重置失败', error.message);
-      } else {
-        Alert.alert(
-          '密码重置成功', 
-          '您的密码已成功重置',
-          [
-            {
-              text: '确定',
-              onPress: () => router.replace('/auth/login')
-            }
-          ]
-        );
-      }
-    } catch (error) {
-      Alert.alert('重置失败', '网络错误，请稍后重试');
-    }
-    setLoading(false);
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🔐 设置新密码</Text>
-      <Text style={styles.subtitle}>请输入您的新密码</Text>
-
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="新密码 (至少6个字符)"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="确认新密码"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-          autoCapitalize="none"
-        />
-
-        <TouchableOpacity 
-          style={[styles.button, loading && styles.buttonDisabled]}
-          disabled={loading}
-          onPress={handleResetPassword}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "重置中..." : "重置密码"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.button, styles.outlineButton]}
-          onPress={() => router.push('/auth/login')}
-        >
-          <Text style={[styles.buttonText, styles.outlineButtonText]}>返回登录</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: 30,
-  },
-  form: {
-    gap: 15,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 15,
-    borderRadius: 10,
-    fontSize: 16,
   },
   button: {
     backgroundColor: '#007AFF',
