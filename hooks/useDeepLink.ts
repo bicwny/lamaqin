@@ -2,44 +2,70 @@
 import { useEffect } from 'react';
 import { Linking } from 'react-native';
 import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useDeepLink() {
+  const { user, loading } = useAuth();
+
   useEffect(() => {
     const handleDeepLink = (url: string) => {
       console.log('🔗 Deep link received:', url);
       
-      // Remove the scheme prefix
-      const route = url.replace(/dharmapractice:\/\//, '');
-      
-      if (!route || route === '/') {
-        // Default route for authenticated users
-        router.replace('/(tabs)');
+      // Wait for auth to load before processing deep links
+      if (loading) {
+        console.log('⏳ Auth still loading, deferring deep link');
         return;
       }
       
-      // Handle specific routes
+      // Remove the scheme prefix and leading slash
+      const route = url.replace(/dharmapractice:\/\//, '').replace(/^\//, '');
+      
+      console.log('🎯 Processing route:', route);
+      
+      // Handle auth routes (accessible without login)
+      if (route.startsWith('auth/') || route === 'auth') {
+        try {
+          router.push(`/${route}`);
+          return;
+        } catch (error) {
+          console.error('❌ Auth route navigation error:', error);
+          router.replace('/auth');
+          return;
+        }
+      }
+      
+      // For authenticated routes, check if user is logged in
+      if (!user) {
+        console.log('🔒 User not authenticated, redirecting to auth');
+        router.replace('/auth');
+        return;
+      }
+      
+      // Handle authenticated routes
       try {
-        if (route.startsWith('/profile/')) {
-          const userId = route.split('/profile/')[1];
-          router.push(`/(tabs)/profile?userId=${userId}`);
-        } else if (route === '/settings') {
-          router.push('/(tabs)/profile'); // Assuming settings is in profile
-        } else if (route === '/practice') {
+        if (!route || route === '' || route === '/') {
+          router.replace('/(tabs)');
+        } else if (route.startsWith('(tabs)/profile')) {
+          router.push('/(tabs)/profile');
+        } else if (route === 'practice' || route === '(tabs)/practice') {
           router.push('/(tabs)/practice');
-        } else if (route === '/study') {
+        } else if (route === 'study' || route === '(tabs)/study') {
           router.push('/(tabs)/study');
-        } else if (route === '/mindfulness') {
+        } else if (route === 'mindfulness' || route === '(tabs)/mindfulness') {
           router.push('/(tabs)/mindfulness');
-        } else if (route === '/stats') {
+        } else if (route === 'stats' || route === '(tabs)/stats') {
           router.push('/(tabs)/stats');
-        } else if (route === '/meditation-history') {
+        } else if (route === 'meditation-history') {
           router.push('/meditation-history');
-        } else if (route === '/add-practice') {
+        } else if (route === 'add-practice') {
           router.push('/add-practice');
-        } else if (route === '/practice-config') {
+        } else if (route === 'practice-config') {
           router.push('/practice-config');
+        } else if (route.startsWith('modals/')) {
+          router.push(`/${route}`);
         } else {
-          // Fallback to main app
+          // Fallback to main app for unrecognized routes
+          console.log('🔄 Unrecognized route, fallback to tabs');
           router.replace('/(tabs)');
         }
       } catch (error) {
@@ -63,5 +89,5 @@ export function useDeepLink() {
     return () => {
       subscription?.remove();
     };
-  }, []);
+  }, [user, loading]); // Added dependencies for auth state
 }

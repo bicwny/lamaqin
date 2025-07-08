@@ -10,15 +10,20 @@
     "deepLinking": {
       "prefixes": ["dharmapractice://"],
       "paths": [
-        "/profile/:id",
-        "/settings",
-        "/practice",
-        "/study",
-        "/mindfulness",
-        "/stats",
+        "/(tabs)",
+        "/(tabs)/practice",
+        "/(tabs)/study", 
+        "/(tabs)/mindfulness",
+        "/(tabs)/stats",
+        "/(tabs)/profile",
         "/meditation-history",
         "/add-practice",
-        "/practice-config"
+        "/practice-config",
+        "/modals/custom-record",
+        "/modals/meditation-record",
+        "/auth",
+        "/auth/login",
+        "/auth/register"
       ]
     },
     "newArchEnabled": true,
