@@ -5,27 +5,8 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "dharmapractice",
+    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "deepLinking": {
-      "prefixes": ["dharmapractice://"],
-      "paths": [
-        "/(tabs)",
-        "/(tabs)/practice",
-        "/(tabs)/study", 
-        "/(tabs)/mindfulness",
-        "/(tabs)/stats",
-        "/(tabs)/profile",
-        "/meditation-history",
-        "/add-practice",
-        "/practice-config",
-        "/modals/custom-record",
-        "/modals/meditation-record",
-        "/auth",
-        "/auth/login",
-        "/auth/register"
-      ]
-    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true

@@ -26,7 +26,7 @@ export default function ForgotPasswordSentScreen() {
     setIsResending(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `https://88214788-b967-45f6-92f8-6b3fba08318e-00-355385dlz9km1.picard.replit.dev/auth/reset-password`,
+        redirectTo: `${process.env.EXPO_PUBLIC_APP_DOMAIN || 'exp://localhost:8081'}/auth/reset-password`,
       });
       
       if (error) {
