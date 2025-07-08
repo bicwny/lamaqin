@@ -1,0 +1,20 @@
+🔄 Session event: INITIAL_SESSION
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:114197 ⚠️ No session in refresh/initial event - checking stored session
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:114206 ❌ No stored session available, clearing user
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:114326 ℹ️ No existing session found
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:157875 Reset password session check: Object
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:157883 ❌ No valid session for password reset
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:157898 🔐 Found reset code in URL: eecaf6a8-14b0-46b2-a6a0-a6a0395ff54d
+clqjuugskotxxngownvj.supabase.co/auth/v1/token?grant_type=pkce:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:3597 ❌ Error exchanging code for session: AuthApiError: code challenge does not match previously saved code verifier
+    at handleError (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126094:11)
+    at async _handleRequest (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126144:7)
+    at async _request (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126124:18)
+    at async SupabaseAuthClient._exchangeCodeForSession (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:127656:13)
+registerError @ entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:3597Understand this error
+clqjuugskotxxngownvj.supabase.co/auth/v1/token?grant_type=pkce:1  Failed to load resource: the server responded with a status of 400 ()Understand this error
+entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:3597 ❌ Error exchanging code for session: AuthApiError: code challenge does not match previously saved code verifier
+    at handleError (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126094:11)
+    at async _handleRequest (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126144:7)
+    at async _request (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:126124:18)
+    at async SupabaseAuthClient._exchangeCodeForSession (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:127656:13)
