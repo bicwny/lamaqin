@@ -10,12 +10,16 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { useDeepLink } from '@/hooks/useDeepLink';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
+  
+  // Initialize deep link handling
+  useDeepLink();
 
   console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
   console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');

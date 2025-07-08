@@ -7,6 +7,20 @@
     "icon": "./assets/images/icon.png",
     "scheme": "dharmapractice",
     "userInterfaceStyle": "automatic",
+    "deepLinking": {
+      "prefixes": ["dharmapractice://"],
+      "paths": [
+        "/profile/:id",
+        "/settings",
+        "/practice",
+        "/study",
+        "/mindfulness",
+        "/stats",
+        "/meditation-history",
+        "/add-practice",
+        "/practice-config"
+      ]
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
