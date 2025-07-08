@@ -1,14 +1,87 @@
 
 import { useEffect } from 'react';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function useDeepLink() {
   const { user, loading } = useAuth();
 
+  // Platform detection utilities
+  const detectPlatform = () => {
+    if (Platform.OS === 'web') {
+      const userAgent = navigator.userAgent;
+      const isMobileWeb = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+      const isAndroid = /Android/.test(userAgent);
+      
+      return {
+        platform: Platform.OS,
+        isMobileWeb,
+        isIOS,
+        isAndroid,
+        isDesktop: !isMobileWeb
+      };
+    }
+    
+    return {
+      platform: Platform.OS,
+      isMobileWeb: false,
+      isIOS: Platform.OS === 'ios',
+      isAndroid: Platform.OS === 'android',
+      isDesktop: false
+    };
+  };
+
+  // Smart app redirect with timeout
+  const attemptMobileAppRedirect = async (route: string, code?: string) => {
+    const { isMobileWeb, isIOS, isAndroid } = detectPlatform();
+    
+    if (!isMobileWeb) {
+      console.log('🖥️ Desktop detected, staying in web version');
+      return false;
+    }
+
+    console.log('📱 Mobile web detected, attempting app redirect...');
+    
+    try {
+      const deepLinkUrl = code 
+        ? `dharmapractice://auth/reset-password?code=${code}`
+        : `dharmapractice://${route}`;
+      
+      console.log('🚀 Attempting redirect to:', deepLinkUrl);
+      
+      // Set a timeout to detect if app opened
+      const timeout = new Promise(resolve => setTimeout(() => resolve(false), 3000));
+      
+      // Try to open the app
+      const redirectPromise = Linking.openURL(deepLinkUrl).then(() => true).catch(() => false);
+      
+      // Race between redirect and timeout
+      const result = await Promise.race([redirectPromise, timeout]);
+      
+      if (!result) {
+        console.log('⏰ App redirect timeout, showing fallback options');
+        // Store fallback info for the component to display
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('showAppFallback', JSON.stringify({
+            isIOS,
+            isAndroid,
+            originalRoute: route,
+            code
+          }));
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ App redirect failed:', error);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    const handleDeepLink = (url: string) => {
+    const handleDeepLink = async (url: string) => {
       console.log('🔗 Deep link received:', url);
       
       // Wait for auth to load before processing deep links
@@ -25,7 +98,15 @@ export function useDeepLink() {
           const code = urlObj.searchParams.get('code');
           if (code) {
             console.log('🔐 Extracting reset code from web URL:', code);
-            router.push(`/auth/reset-password?code=${code}`);
+            
+            // Attempt smart redirect for mobile users
+            const redirected = await attemptMobileAppRedirect('auth/reset-password', code);
+            
+            if (!redirected) {
+              // Fallback to web version
+              console.log('🌐 Continuing in web version');
+              router.push(`/auth/reset-password?code=${code}`);
+            }
             return;
           }
         } catch (error) {

@@ -11,6 +11,7 @@ import '../global.css';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useDeepLink } from '@/hooks/useDeepLink';
+import { WebPlatformDetector } from '@/components/WebPlatformDetector';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

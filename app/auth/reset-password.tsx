@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { PlatformFallback } from '@/components/PlatformFallback';
 
 export default function ResetPasswordScreen() {
   const [password, setPassword] = useState('');
@@ -96,9 +97,21 @@ export default function ResetPasswordScreen() {
         Alert.alert('重置失败', error.message);
       } else {
         console.log('✅ Password updated successfully');
-        Alert.alert('重置成功', '密码已更新，请使用新密码登录', [
-          { text: '确定', onPress: () => router.replace('/auth/login') }
-        ]);
+        
+        // Check if user is now authenticated (should be auto-logged in)
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          console.log('✅ Auto-login successful, redirecting to app');
+          Alert.alert('重置成功', '密码已更新，正在进入应用...', [
+            { text: '确定', onPress: () => router.replace('/(tabs)') }
+          ]);
+        } else {
+          console.log('⚠️ Auto-login failed, redirecting to login');
+          Alert.alert('重置成功', '密码已更新，请使用新密码登录', [
+            { text: '确定', onPress: () => router.replace('/auth/login') }
+          ]);
+        }
       }
     } catch (error) {
       console.error('❌ Password update error:', error);
@@ -119,6 +132,7 @@ export default function ResetPasswordScreen() {
 
   return (
     <View style={styles.container}>
+      <PlatformFallback />
       <Text style={styles.title}>🔐 设置新密码</Text>
       <Text style={styles.subtitle}>请输入新的登录密码</Text>
 
