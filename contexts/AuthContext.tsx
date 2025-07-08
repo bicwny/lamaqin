@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
@@ -12,10 +13,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signInWithOTP: (email: string) => Promise<{ error?: string }>;
   verifyOTP: (email: string, token: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string, dharmaName?: string) => Promise<{ error?: string }>;
   signUpWithOTP: (email: string, dharmaName?: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   forceLogoutAll: () => Promise<void>;
@@ -222,34 +221,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { error: error.message };
-      }
-
-      if (data.user) {
-        // Create user in database if doesn't exist
-        await ensureUserInDatabase(data.user);
-        setUser({
-          id: data.user.id,
-          email: data.user.email!,
-          dharma_name: data.user.user_metadata?.dharma_name,
-        });
-      }
-
-      return {};
-    } catch (error) {
-      console.error('Sign in error:', error);
-      return { error: 'An unexpected error occurred' };
-    }
-  };
-
   const signInWithOTP = async (email: string) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -295,34 +266,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return {};
     } catch (error) {
       console.error('OTP verification error:', error);
-      return { error: 'An unexpected error occurred' };
-    }
-  };
-
-  const signUp = async (email: string, password: string, dharmaName?: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            dharma_name: dharmaName,
-          },
-        },
-      });
-
-      if (error) {
-        return { error: error.message };
-      }
-
-      if (data.user) {
-          // Create user in database if doesn't exist
-          await ensureUserInDatabase(data.user);
-      }
-
-      return {};
-    } catch (error) {
-      console.error('Sign up error:', error);
       return { error: 'An unexpected error occurred' };
     }
   };
@@ -641,7 +584,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signInWithOTP, verifyOTP, signUp, signUpWithOTP, signOut, forceLogoutAll, clearAllCache }}>
+    <AuthContext.Provider value={{ user, loading, signInWithOTP, verifyOTP, signUpWithOTP, signOut, forceLogoutAll, clearAllCache }}>
       {children}
     </AuthContext.Provider>
   );
