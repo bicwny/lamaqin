@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.EXPO_PUBLIC_APP_DOMAIN || 'exp://localhost:8081'}/auth/reset-password`,
+        redirectTo: `dharmapractice://auth/reset-password`,
       });
 
       if (error) {

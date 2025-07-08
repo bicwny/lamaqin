@@ -24,34 +24,6 @@ export default function AuthLayout() {
           presentation: 'card',
         }}
       />
-      <Stack.Screen 
-        name="email-verification"
-        options={{
-          headerShown: false,
-          presentation: 'card',
-        }}
-      />
-      <Stack.Screen 
-        name="forgot-password"
-        options={{
-          headerShown: false,
-          presentation: 'card',
-        }}
-      />
-      <Stack.Screen 
-        name="forgot-password-sent"
-        options={{
-          headerShown: false,
-          presentation: 'card',
-        }}
-      />
-      <Stack.Screen 
-        name="reset-password"
-        options={{
-          headerShown: false,
-          presentation: 'card',
-        }}
-      />
     </Stack>
   );
 }

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 
 export default function ResetPasswordScreen() {
@@ -8,6 +8,11 @@ export default function ResetPasswordScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const params = useLocalSearchParams();
+
+  useEffect(() => {
+    console.log('Reset password screen params:', params);
+  }, [params]);
 
   const handleUpdatePassword = async () => {
     if (password !== confirmPassword) {
@@ -83,6 +88,13 @@ export default function ResetPasswordScreen() {
           {loading ? '更新中...' : '更新密码'}
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.outlineButton]}
+        onPress={() => router.push('/auth/login')}
+      >
+        <Text style={[styles.buttonText, styles.outlineButtonText]}>返回登录</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -144,7 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonDisabled: {
     backgroundColor: '#ccc',
@@ -154,5 +166,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  outlineButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#007AFF',
+  },
+  outlineButtonText: {
+    color: '#007AFF',
   },
 });
