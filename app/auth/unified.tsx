@@ -23,6 +23,7 @@ export default function UnifiedAuthScreen() {
   const [step, setStep] = useState<'email' | 'otp' | 'loading'>('email');
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isResending, setIsResending] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -49,18 +50,57 @@ export default function UnifiedAuthScreen() {
 
     setLoading(true);
     try {
+      // First, check if user exists in our database
+      const { data: existingUser, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email.trim())
+        .maybeSingle();
+
+      if (userError && userError.code !== 'PGRST116') {
+        console.error('Error checking user:', userError);
+        // Continue anyway, will fallback to creating user
+      }
+
+      const userExists = !!existingUser;
+      setIsNewUser(!userExists);
+
+      // Send OTP with appropriate configuration
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          shouldCreateUser: true // Always allow new users
+          shouldCreateUser: !userExists, // Only create if user doesn't exist
+          data: userExists ? undefined : {
+            // Only set metadata for new users
+            email: email.trim()
+          }
         }
       });
 
       if (error) {
-        Alert.alert('发送失败', error.message);
+        // Handle specific error cases
+        if (error.message.includes('Email not confirmed') || error.message.includes('signup')) {
+          // User exists but email not confirmed - still send OTP
+          const { error: retryError } = await supabase.auth.signInWithOtp({
+            email: email.trim(),
+            options: {
+              shouldCreateUser: true
+            }
+          });
+          
+          if (retryError) {
+            Alert.alert('发送失败', retryError.message);
+          } else {
+            setStep('otp');
+            setResendCountdown(60);
+            Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
+          }
+        } else {
+          Alert.alert('发送失败', error.message);
+        }
       } else {
         setStep('otp');
-        setResendCountdown(60); // 60 second countdown
+        setResendCountdown(60);
         Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
       }
     } catch (error) {
@@ -98,7 +138,7 @@ export default function UnifiedAuthScreen() {
           Alert.alert('验证失败', error.message);
         }
       } else if (data.user) {
-        // Check if user exists in database
+        // Check if user exists in database again (in case it was created during auth)
         const { data: existingUser, error: userError } = await supabase
           .from('users')
           .select('id, dharma_name, class_name, practice_years, location')
@@ -110,7 +150,7 @@ export default function UnifiedAuthScreen() {
           // Continue anyway, will be handled by AuthContext
         }
 
-        if (!existingUser) {
+        if (!existingUser || isNewUser) {
           // New user - redirect to profile setup
           router.replace('/profile-setup');
         } else {
@@ -141,15 +181,32 @@ export default function UnifiedAuthScreen() {
 
     setIsResending(true);
     try {
+      // Use the same logic as initial send
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          shouldCreateUser: true
+          shouldCreateUser: isNewUser,
+          data: isNewUser ? {
+            email: email.trim()
+          } : undefined
         }
       });
 
       if (error) {
-        Alert.alert('发送失败', error.message);
+        // Try alternative approach if first fails
+        const { error: retryError } = await supabase.auth.signInWithOtp({
+          email: email.trim(),
+          options: {
+            shouldCreateUser: true
+          }
+        });
+        
+        if (retryError) {
+          Alert.alert('发送失败', retryError.message);
+        } else {
+          setResendCountdown(60);
+          Alert.alert('验证码已重新发送', '请检查您的邮箱');
+        }
       } else {
         setResendCountdown(60);
         Alert.alert('验证码已重新发送', '请检查您的邮箱');
@@ -165,6 +222,7 @@ export default function UnifiedAuthScreen() {
     setStep('email');
     setOtp('');
     setResendCountdown(0);
+    setIsNewUser(false);
   };
 
   return (
@@ -275,6 +333,7 @@ export default function UnifiedAuthScreen() {
             <Text style={styles.helpText}>
               • 新用户将自动创建账户{'\n'}
               • 老用户将直接登录{'\n'}
+              • 所有用户都会收到6位数字验证码{'\n'}
               • 验证码有效期为10分钟{'\n'}
               • 请检查垃圾邮件文件夹
             </Text>
