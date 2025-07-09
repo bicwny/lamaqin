@@ -72,7 +72,10 @@ export default function ProfileSetupScreen() {
       Alert.alert('保存成功', '个人资料已更新', [
         {
           text: '确定',
-          onPress: () => router.replace('/(tabs)/index')
+          onPress: () => {
+            // Navigate to tabs - AuthContext will handle proper routing
+            router.replace('/(tabs)');
+          }
         }
       ]);
     } catch (error) {
@@ -91,7 +94,7 @@ export default function ProfileSetupScreen() {
         { text: '继续设置', style: 'cancel' },
         { 
           text: '跳过', 
-          onPress: () => router.replace('/(tabs)/index') 
+          onPress: () => router.replace('/(tabs)') 
         }
       ]
     );
