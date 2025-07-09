@@ -32,10 +32,10 @@ export default function ProfileScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile>({
-    dharmaName: '多吉丹',
+    dharmaName: '圆青',
     practiceYears: 3,
     location: '纽约',
-    className: '入行班',
+    className: '23正科',
     email: user?.email || '', // Use optional chaining for safety
     registrationDate: '2025-01-01'
   });
