@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
@@ -7,14 +8,295 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import PageHeader from '@/components/PageHeader';
+import { supabase } from '@/lib/supabase';
+import { useFocusEffect } from '@react-navigation/native';
 
+interface NextLesson {
+  courseId: string;
+  courseName: string;
+  lessonNumber: number;
+  lessonTitle: string;
+  progress: string;
+}
+
+interface DailyPractice {
+  id: string;
+  name: string;
+  current: number;
+  target: number;
+  unit: string;
+  status: 'completed' | 'in_progress' | 'pending';
+  progressPercent: number;
+  type: 'count' | 'time';
+}
+
+interface WeeklyPractice {
+  id: string;
+  name: string;
+  weekSessions: number;
+  weekTarget: number;
+  todaySessions: number;
+  status: 'completed' | 'in_progress' | 'pending';
+  todayDetails?: string;
+}
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [nextLesson, setNextLesson] = useState<NextLesson | null>(null);
+  const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
+  const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user?.id) {
+        loadDashboardData();
+      }
+    }, [user?.id])
+  );
+
+  const loadDashboardData = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      await Promise.all([
+        loadNextLesson(),
+        loadDailyPractices(),
+        loadWeeklyPractices()
+      ]);
+    } catch (error) {
+      console.error('❌ Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadDashboardData();
+    setRefreshing(false);
+  };
+
+  const loadNextLesson = async () => {
+    try {
+      // Get user's active courses with progress
+      const { data: userCourses, error } = await supabase
+        .from('user_courses')
+        .select(`
+          *,
+          course:courses(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .order('progress_percentage', { ascending: false });
+
+      if (error) throw error;
+
+      if (!userCourses || userCourses.length === 0) {
+        setNextLesson(null);
+        return;
+      }
+
+      // Find the course with the most recent activity or highest progress
+      let selectedCourse = userCourses[0];
+      
+      // Get study records to find the next incomplete lesson
+      const { data: studyRecords, error: studyError } = await supabase
+        .from('study_records')
+        .select(`
+          lesson_id,
+          study_type,
+          lesson:course_lessons(lesson_number, title)
+        `)
+        .eq('user_id', user.id)
+        .eq('course_id', selectedCourse.course_id);
+
+      if (studyError) throw studyError;
+
+      // Find completed lessons (both 听传承 and 看法本)
+      const lessonCompletionMap = new Map();
+      studyRecords?.forEach(record => {
+        if (!lessonCompletionMap.has(record.lesson_id)) {
+          lessonCompletionMap.set(record.lesson_id, { 
+            听传承: false, 
+            看法本: false,
+            lessonNumber: record.lesson?.lesson_number || 0,
+            title: record.lesson?.title || ''
+          });
+        }
+        
+        const lessonData = lessonCompletionMap.get(record.lesson_id);
+        if (record.study_type === '听传承') {
+          lessonData.听传承 = true;
+        } else if (record.study_type === '看法本') {
+          lessonData.看法本 = true;
+        }
+      });
+
+      // Find the next incomplete lesson
+      let nextLessonNumber = 1;
+      for (let i = 1; i <= selectedCourse.course.total_lessons; i++) {
+        const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
+        if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
+          nextLessonNumber = i;
+          break;
+        }
+      }
+
+      const completedLessons = Array.from(lessonCompletionMap.values()).filter(
+        lesson => lesson.听传承 && lesson.看法本
+      ).length;
+
+      setNextLesson({
+        courseId: selectedCourse.course_id,
+        courseName: selectedCourse.course.name,
+        lessonNumber: nextLessonNumber,
+        lessonTitle: `第${nextLessonNumber}课`,
+        progress: `${completedLessons}/${selectedCourse.course.total_lessons}课已完成 (${Math.round((completedLessons / selectedCourse.course.total_lessons) * 100)}%)`
+      });
+
+    } catch (error) {
+      console.error('❌ Error loading next lesson:', error);
+      setNextLesson(null);
+    }
+  };
+
+  const loadDailyPractices = async () => {
+    try {
+      const { data: projects, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          *,
+          practices(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .eq('target_period', 'daily')
+        .limit(3);
+
+      if (error) throw error;
+
+      const today = new Date().toISOString().split('T')[0];
+      const practicesData: DailyPractice[] = [];
+
+      for (const project of projects || []) {
+        if (project.practices.type === 'count') {
+          // Get today's records for count-based practices
+          const { data: todayRecords, error: recordsError } = await supabase
+            .from('daily_records')
+            .select('count')
+            .eq('user_id', user.id)
+            .eq('practice_project_id', project.id)
+            .eq('record_date', today);
+
+          if (recordsError) throw recordsError;
+
+          const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
+          const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
+
+          let status: 'completed' | 'in_progress' | 'pending' = 'pending';
+          if (todayCount >= project.daily_target) status = 'completed';
+          else if (todayCount > 0) status = 'in_progress';
+
+          practicesData.push({
+            id: project.id,
+            name: project.practices.name,
+            current: todayCount,
+            target: project.daily_target,
+            unit: project.practices.unit,
+            status,
+            progressPercent,
+            type: 'count'
+          });
+        }
+      }
+
+      setDailyPractices(practicesData);
+    } catch (error) {
+      console.error('❌ Error loading daily practices:', error);
+      setDailyPractices([]);
+    }
+  };
+
+  const loadWeeklyPractices = async () => {
+    try {
+      const { data: projects, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          *,
+          practices(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .eq('target_period', 'weekly')
+        .limit(3);
+
+      if (error) throw error;
+
+      const today = new Date().toISOString().split('T')[0];
+      const startOfWeek = new Date();
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+      const weekStart = startOfWeek.toISOString().split('T')[0];
+
+      const practicesData: WeeklyPractice[] = [];
+
+      for (const project of projects || []) {
+        if (project.practices.type === 'time') {
+          // Get this week's meditation records
+          const { data: weekRecords, error: weekError } = await supabase
+            .from('meditation_records')
+            .select('duration_minutes, record_date')
+            .eq('user_id', user.id)
+            .eq('practice_id', project.practice_id)
+            .gte('record_date', weekStart)
+            .lte('record_date', today);
+
+          if (weekError) throw weekError;
+
+          const weekSessions = weekRecords?.length || 0;
+          const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
+          const todaySessions = todayRecords.length;
+
+          let status: 'completed' | 'in_progress' | 'pending' = 'pending';
+          if (weekSessions >= project.daily_target) status = 'completed';
+          else if (weekSessions > 0) status = 'in_progress';
+
+          const todayDetails = todayRecords.length > 0 
+            ? todayRecords.map((record, index) => `第${index + 1}座${record.duration_minutes}分钟`).join('；')
+            : undefined;
+
+          practicesData.push({
+            id: project.id,
+            name: project.practices.name,
+            weekSessions,
+            weekTarget: project.daily_target,
+            todaySessions,
+            status,
+            todayDetails
+          });
+        }
+      }
+
+      setWeeklyPractices(practicesData);
+    } catch (error) {
+      console.error('❌ Error loading weekly practices:', error);
+      setWeeklyPractices([]);
+    }
+  };
 
   const navigateToProfile = () => {
     router.push('/(tabs)/profile');
+  };
+
+  const navigateToStudy = () => {
+    router.push('/(tabs)/study');
+  };
+
+  const navigateToPractice = () => {
+    router.push('/(tabs)/practice');
   };
 
   const getGreeting = () => {
@@ -25,19 +307,149 @@ export default function HomeScreen() {
     return '🌆 晚上好，回顾今日收获';
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed': return '✅';
+      case 'in_progress': return '🔄';
+      default: return '⏳';
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ThemedView style={styles.container}>
+          <PageHeader 
+            title="🏠 修行主页"
+            subtitle={getGreeting()}
+            rightAction={{
+              text: "👤",
+              onPress: navigateToProfile
+            }}
+          />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>加载中...</Text>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
         <PageHeader 
           title="🏠 修行主页"
-          subtitle={`${getGreeting()} • 善缘居士 · 修行第365天 🔥`}
+          subtitle={`${getGreeting()} • 圆青居士 · 修行第365天 🔥`}
           rightAction={{
             text: "👤",
             onPress: navigateToProfile
           }}
         />
-        <ScrollView style={styles.scrollView}>
-          {/* Main content can be added here */}
+        <ScrollView 
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {/* Study Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>📚 今日学习</Text>
+              <TouchableOpacity onPress={navigateToStudy}>
+                <Text style={styles.viewMoreText}>查看更多</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {nextLesson ? (
+              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
+                <View style={styles.studyCardHeader}>
+                  <Text style={styles.studyCardTitle}>下一课</Text>
+                  <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+                </View>
+                <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                <Text style={styles.lessonTitle}>{nextLesson.lessonTitle}</Text>
+                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                <View style={styles.continueButton}>
+                  <Text style={styles.continueButtonText}>继续学习</Text>
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
+                <Text style={styles.noStudyText}>📖 暂无学习课程，点击添加</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Practice Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>📿 今日修行</Text>
+              <TouchableOpacity onPress={navigateToPractice}>
+                <Text style={styles.viewMoreText}>查看更多</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Daily Practices */}
+            {dailyPractices.map((practice) => (
+              <View key={practice.id} style={styles.practiceCard}>
+                <View style={styles.practiceHeader}>
+                  <View style={styles.practiceNameRow}>
+                    <Text style={styles.practiceStatusIcon}>
+                      {getStatusIcon(practice.status)}
+                    </Text>
+                    <Text style={styles.practiceName}>{practice.name}</Text>
+                  </View>
+                  <Text style={styles.practiceCount}>
+                    {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
+                  </Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View style={styles.progressBarBg}>
+                    <View 
+                      style={[
+                        styles.progressBarFill, 
+                        { width: `${Math.min(practice.progressPercent, 100)}%` }
+                      ]} 
+                    />
+                  </View>
+                  <Text style={styles.progressPercent}>
+                    {Math.round(practice.progressPercent)}%
+                  </Text>
+                </View>
+              </View>
+            ))}
+
+            {/* Weekly Practices */}
+            {weeklyPractices.map((practice) => (
+              <View key={practice.id} style={styles.practiceCard}>
+                <View style={styles.practiceHeader}>
+                  <View style={styles.practiceNameRow}>
+                    <Text style={styles.practiceStatusIcon}>
+                      {getStatusIcon(practice.status)}
+                    </Text>
+                    <Text style={styles.practiceName}>{practice.name}</Text>
+                  </View>
+                </View>
+                <Text style={styles.weeklyProgress}>
+                  本周 {practice.weekSessions}/{practice.weekTarget}座
+                  {practice.status === 'completed' && ' ✅'}
+                </Text>
+                {practice.todaySessions > 0 && practice.todayDetails && (
+                  <Text style={styles.todayDetails}>
+                    今日：{practice.todayDetails}
+                  </Text>
+                )}
+              </View>
+            ))}
+
+            {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
+              <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
+                <Text style={styles.noPracticeText}>🙏 暂无修行项目，点击添加</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </ScrollView>
       </ThemedView>
     </SafeAreaView>
@@ -55,5 +467,164 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textSecondary,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  viewMoreText: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  studyCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  studyCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  studyCardTitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  courseName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  lessonTitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 12,
+  },
+  continueButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignSelf: 'flex-start',
+  },
+  continueButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  noStudyText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
+  practiceCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  practiceHeader: {
+    marginBottom: 8,
+  },
+  practiceNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  practiceStatusIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  practiceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    flex: 1,
+  },
+  practiceCount: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  progressBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  progressBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 3,
+    marginRight: 8,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
+  },
+  progressPercent: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+    minWidth: 32,
+    textAlign: 'right',
+  },
+  weeklyProgress: {
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  todayDetails: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
+  },
+  noPracticeText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 20,
   },
 });
