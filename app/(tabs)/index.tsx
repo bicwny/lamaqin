@@ -1,14 +1,23 @@
-
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  ScrollView,
+  RefreshControl,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Colors } from '@/constants/Colors';
+import PageHeader from '@/components/PageHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
-import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import PageHeader from '@/components/PageHeader';
-import { supabase } from '@/lib/supabase';
 import { useFocusEffect } from '@react-navigation/native';
 
 interface NextLesson {
@@ -102,7 +111,7 @@ export default function HomeScreen() {
 
       // Find the course with the most recent activity or highest progress
       let selectedCourse = userCourses[0];
-      
+
       // Get study records to find the next incomplete lesson
       const { data: studyRecords, error: studyError } = await supabase
         .from('study_records')
@@ -127,7 +136,7 @@ export default function HomeScreen() {
             title: record.lesson?.title || ''
           });
         }
-        
+
         const lessonData = lessonCompletionMap.get(record.lesson_id);
         if (record.study_type === '听传承') {
           lessonData.听传承 = true;
@@ -292,11 +301,146 @@ export default function HomeScreen() {
   };
 
   const navigateToStudy = () => {
-    router.push('/(tabs)/study');
+    router.push('/study');
   };
 
   const navigateToPractice = () => {
     router.push('/(tabs)/practice');
+  };
+
+  // Handle tapping the whole practice card to view history
+  const handlePracticeCardTap = (practice: any) => {
+    if (practice.type === 'time') {
+      // For meditation practices, show meditation history
+      router.push({
+        pathname: '/meditation-history',
+        params: {
+          practiceId: practice.practiceId,
+          practiceName: practice.name,
+        },
+      });
+    } else {
+      // For count-based practices, show regular history
+      router.push({
+        pathname: '/practice-history',
+        params: {
+          projectId: practice.id,
+          practiceName: practice.name,
+        },
+      });
+    }
+  };
+
+  // Handle quick complete button (check mark)
+  const handleQuickComplete = async (e: any, practice: any) => {
+    e.stopPropagation(); // Prevent card tap
+
+    if (practice.status === 'completed') {
+      // Already completed, just show message
+      Alert.alert('已完成', '今日目标已达成！');
+      return;
+    }
+
+    // Calculate remaining amount to complete daily target
+    const remaining = practice.target - practice.current;
+
+    Alert.alert(
+      '快速完成',
+      `需要记录 ${remaining.toLocaleString()} ${practice.unit} 来完成今日目标，确认记录？`,
+      [
+        { text: '取消', style: 'cancel' },
+        { 
+          text: '确认', 
+          onPress: () => recordQuickComplete(practice, remaining)
+        }
+      ]
+    );
+  };
+
+  // Handle add record button (plus)
+  const handleAddRecord = (e: any, practice: any) => {
+    e.stopPropagation(); // Prevent card tap
+
+    if (practice.type === 'time') {
+      // For meditation practices, navigate to meditation record modal
+      router.push({
+        pathname: '/modals/meditation-record',
+        params: {
+          projectId: practice.id,
+          practiceId: practice.practiceId,
+          practiceName: practice.name,
+        },
+      });
+    } else {
+      // For count-based practices, show custom record modal
+      router.push({
+        pathname: '/modals/custom-record',
+        params: {
+          projectId: practice.id,
+          practiceName: practice.name,
+          practiceType: practice.type,
+        },
+      });
+    }
+  };
+
+  // Record quick complete amount
+  const recordQuickComplete = async (practice: any, amount: number) => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      if (practice.type === 'time') {
+        // For time-based practices, create a meditation record with target duration
+        const { error } = await supabase
+          .from('meditation_records')
+          .insert({
+            user_id: user.id,
+            practice_id: practice.practiceId,
+            record_date: new Date().toISOString().split('T')[0],
+            duration_minutes: amount, // Use remaining amount as duration
+            session_number: 1,
+          });
+
+        if (error) throw error;
+      } else {
+        // For count-based practices, create a daily record
+        const { error: recordError } = await supabase
+          .from('daily_records')
+          .insert({
+            user_id: user.id,
+            practice_project_id: practice.id,
+            record_date: new Date().toISOString().split('T')[0],
+            count: amount,
+            notes: '快速完成今日目标'
+          });
+
+        if (recordError) throw recordError;
+
+        // Update project's current count
+        const { error: updateError } = await supabase
+          .from('user_practice_projects')
+          .update({ 
+            current_count: practice.current + amount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', practice.id)
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Reload data to reflect changes
+      loadData();
+
+      Alert.alert('成功', '已完成今日目标！');
+    } catch (error) {
+      console.error('❌ Error recording quick complete:', error);
+      Alert.alert('错误', '记录失败，请重试');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getGreeting = () => {
@@ -361,7 +505,7 @@ export default function HomeScreen() {
                 <Text style={styles.viewMoreText}>查看更多</Text>
               </TouchableOpacity>
             </View>
-            
+
             {nextLesson ? (
               <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
                 <View style={styles.studyCardHeader}>
@@ -393,7 +537,12 @@ export default function HomeScreen() {
 
             {/* Daily Practices */}
             {dailyPractices.map((practice) => (
-              <View key={practice.id} style={styles.practiceCard}>
+              <TouchableOpacity 
+                key={practice.id} 
+                style={styles.practiceCard}
+                onPress={() => handlePracticeCardTap(practice)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.practiceHeader}>
                   <View style={styles.practiceNameRow}>
                     <Text style={styles.practiceStatusIcon}>
@@ -405,6 +554,7 @@ export default function HomeScreen() {
                     {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
                   </Text>
                 </View>
+
                 <View style={styles.progressBarContainer}>
                   <View style={styles.progressBarBg}>
                     <View 
@@ -418,7 +568,33 @@ export default function HomeScreen() {
                     {Math.round(practice.progressPercent)}%
                   </Text>
                 </View>
-              </View>
+
+                {/* Action Buttons */}
+                <View style={styles.practiceActions}>
+                  <TouchableOpacity 
+                    style={[
+                      styles.actionButton, 
+                      styles.checkButton,
+                      practice.status === 'completed' && styles.checkButtonCompleted
+                    ]}
+                    onPress={(e) => handleQuickComplete(e, practice)}
+                  >
+                    <Text style={[
+                      styles.actionButtonText,
+                      practice.status === 'completed' && styles.checkButtonCompletedText
+                    ]}>
+                      {practice.status === 'completed' ? '✓' : '✓'}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.actionButton, styles.addButton]}
+                    onPress={(e) => handleAddRecord(e, practice)}
+                  >
+                    <Text style={styles.actionButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
             ))}
 
             {/* Weekly Practices */}
@@ -607,9 +783,42 @@ const styles = StyleSheet.create({
   progressPercent: {
     fontSize: 12,
     color: Colors.textSecondary,
-    fontWeight: '500',
-    minWidth: 32,
-    textAlign: 'right',
+    marginLeft: 8,
+    minWidth: 35,
+  },
+  practiceActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginTop: 12,
+  },
+  actionButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  checkButton: {
+    backgroundColor: '#f8f9fa',
+    borderColor: '#28a745',
+  },
+  checkButtonCompleted: {
+    backgroundColor: '#28a745',
+    borderColor: '#28a745',
+  },
+  addButton: {
+    backgroundColor: '#f8f9fa',
+    borderColor: Colors.primary,
+  },
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#28a745',
+  },
+  checkButtonCompletedText: {
+    color: 'white',
   },
   weeklyProgress: {
     fontSize: 14,
