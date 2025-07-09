@@ -1,4 +1,3 @@
-
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
@@ -28,7 +27,7 @@ function RootLayoutNav() {
       user: user?.email || null,
       timestamp: new Date().toISOString()
     });
-    
+
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
@@ -65,64 +64,32 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack 
-      screenOptions={{ headerShown: false }}
-    >
-      <Stack.Screen 
-        name="auth" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="(tabs)" 
-        options={{ 
-          headerShown: false
-        }} 
-      />
-      <Stack.Screen 
-        name="meditation-history" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="add-practice" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="practice-config" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      />
-      <Stack.Screen 
-        name="modals/custom-record" 
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }} 
-      />
-      <Stack.Screen 
-        name="modals/meditation-record" 
-        options={{ 
-          headerShown: false,
-          presentation: 'modal'
-        }} 
-      />
-    </Stack>
+    
+      {user ? (
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+            <Stack.Screen name="add-practice" options={{ title: "添加修行", presentation: 'modal' }} />
+            <Stack.Screen name="practice-config" options={{ title: "修行配置" }} />
+            <Stack.Screen name="practice-history" options={{ title: "修行历史" }} />
+            <Stack.Screen name="meditation-history" options={{ title: "禅修历史" }} />
+            <Stack.Screen name="modals/meditation-record" options={{ title: "禅修记录", presentation: 'modal' }} />
+            <Stack.Screen name="modals/custom-record" options={{ title: "自定义记录", presentation: 'modal' }} />
+            <Stack.Screen name="+not-found" options={{ title: "页面不存在" }} />
+          </Stack>
+        ) : (
+          <Stack>
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" options={{ title: "页面不存在" }} />
+          </Stack>
+        )}
+    
   );
 }
 
 export default function RootLayout() {
   const [fontLoaded, setFontLoaded] = useState(false);
-  
+
   // Only use useFonts on web platform
   const [loaded, error] = useFonts(
     Platform.OS === 'web' ? {
