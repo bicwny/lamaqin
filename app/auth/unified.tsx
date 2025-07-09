@@ -18,6 +18,7 @@ import { Colors } from '@/constants/Colors';
 // Error types for better categorization
 enum ErrorType {
   NETWORK = 'network',
+  EMAIL_EMPTY = 'email_empty',
   EMAIL_FORMAT = 'email_format',
   EMAIL_DELIVERY = 'email_delivery',
   OTP_INVALID = 'otp_invalid',
@@ -104,6 +105,13 @@ export default function UnifiedAuthScreen() {
           title: '网络连接失败',
           message: '请检查您的网络连接后重试，或尝试切换到移动网络',
           action: '检查网络设置'
+        };
+
+      case ErrorType.EMAIL_EMPTY:
+        return {
+          title: '请输入邮箱地址',
+          message: '邮箱地址不能为空，请输入您的邮箱后重试',
+          action: '输入邮箱'
         };
 
       case ErrorType.EMAIL_FORMAT:
@@ -210,7 +218,7 @@ export default function UnifiedAuthScreen() {
     
     // Check if email is empty or just whitespace
     if (!trimmedEmail) {
-      showError(ErrorType.EMAIL_FORMAT);
+      showError(ErrorType.EMAIL_EMPTY);
       return;
     }
 
@@ -533,12 +541,14 @@ export default function UnifiedAuthScreen() {
               <View style={styles.errorStatus}>
                 <Text style={styles.errorStatusIcon}>
                   {lastError === ErrorType.NETWORK ? '📶' : 
+                   lastError === ErrorType.EMAIL_EMPTY ? '📧' :
                    lastError === ErrorType.OTP_INVALID ? '🔢' : 
                    lastError === ErrorType.OTP_EXPIRED ? '⏰' : 
                    lastError === ErrorType.RATE_LIMITED ? '⏳' : '⚠️'}
                 </Text>
                 <Text style={styles.errorStatusText}>
                   {lastError === ErrorType.NETWORK ? '网络连接异常' : 
+                   lastError === ErrorType.EMAIL_EMPTY ? '请输入邮箱地址' :
                    lastError === ErrorType.OTP_INVALID ? '验证码错误' : 
                    lastError === ErrorType.OTP_EXPIRED ? '验证码已过期' : 
                    lastError === ErrorType.RATE_LIMITED ? '操作过于频繁' : '遇到问题'}
