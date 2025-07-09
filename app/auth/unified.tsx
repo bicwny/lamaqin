@@ -50,7 +50,7 @@ export default function UnifiedAuthScreen() {
 
     setLoading(true);
     try {
-      // First, check if user exists in our database
+      // Check if user exists in our database
       const { data: existingUser, error: userError } = await supabase
         .from('users')
         .select('id')
@@ -59,49 +59,29 @@ export default function UnifiedAuthScreen() {
 
       if (userError && userError.code !== 'PGRST116') {
         console.error('Error checking user:', userError);
-        // Continue anyway, will fallback to creating user
       }
 
-      const userExists = !!existingUser;
-      setIsNewUser(!userExists);
+      setIsNewUser(!existingUser);
 
-      // Send OTP with appropriate configuration
+      // Always use signInWithOtp with shouldCreateUser: true
+      // This ensures we get consistent OTP behavior
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          shouldCreateUser: !userExists, // Only create if user doesn't exist
-          data: userExists ? undefined : {
-            // Only set metadata for new users
+          shouldCreateUser: true,
+          emailRedirectTo: undefined, // Prevent email link redirects
+          data: {
             email: email.trim()
           }
         }
       });
 
       if (error) {
-        // Handle specific error cases
-        if (error.message.includes('Email not confirmed') || error.message.includes('signup')) {
-          // User exists but email not confirmed - still send OTP
-          const { error: retryError } = await supabase.auth.signInWithOtp({
-            email: email.trim(),
-            options: {
-              shouldCreateUser: true
-            }
-          });
-          
-          if (retryError) {
-            Alert.alert('发送失败', retryError.message);
-          } else {
-            setStep('otp');
-            setResendCountdown(60);
-            Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
-          }
-        } else {
-          Alert.alert('发送失败', error.message);
-        }
+        Alert.alert('发送失败', error.message);
       } else {
         setStep('otp');
         setResendCountdown(60);
-        Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
+        Alert.alert('验证码已发送', '请检查您的邮箱并输入6位数字验证码');
       }
     } catch (error) {
       Alert.alert('发送失败', '网络错误，请稍后重试');
@@ -181,35 +161,23 @@ export default function UnifiedAuthScreen() {
 
     setIsResending(true);
     try {
-      // Use the same logic as initial send
+      // Use the same consistent approach as initial send
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          shouldCreateUser: isNewUser,
-          data: isNewUser ? {
+          shouldCreateUser: true,
+          emailRedirectTo: undefined,
+          data: {
             email: email.trim()
-          } : undefined
+          }
         }
       });
 
       if (error) {
-        // Try alternative approach if first fails
-        const { error: retryError } = await supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: {
-            shouldCreateUser: true
-          }
-        });
-        
-        if (retryError) {
-          Alert.alert('发送失败', retryError.message);
-        } else {
-          setResendCountdown(60);
-          Alert.alert('验证码已重新发送', '请检查您的邮箱');
-        }
+        Alert.alert('发送失败', error.message);
       } else {
         setResendCountdown(60);
-        Alert.alert('验证码已重新发送', '请检查您的邮箱');
+        Alert.alert('验证码已重新发送', '请检查您的邮箱并输入6位数字验证码');
       }
     } catch (error) {
       Alert.alert('发送失败', '网络错误，请稍后重试');
