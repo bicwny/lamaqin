@@ -27,15 +27,63 @@ export default function LoginScreen() {
   const [isRetrying, setIsRetrying] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [otpExpired, setOtpExpired] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [hasEmailInteracted, setHasEmailInteracted] = useState(false);
   const maxRetries = 3;
   const otpValidityDuration = 300; // 5 minutes in seconds
   
   const emailInputRef = useRef<TextInput>(null);
   const otpInputRef = useRef<TextInput>(null);
 
+  // Email validation helper functions
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  };
+
+  const validateEmail = (emailValue: string): string | null => {
+    const trimmedEmail = emailValue.trim();
+    
+    if (!trimmedEmail) {
+      return '请输入邮箱地址';
+    }
+    
+    if (!isValidEmail(trimmedEmail)) {
+      return '请输入有效的邮箱地址';
+    }
+    
+    return null;
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    setHasEmailInteracted(true);
+    
+    // Real-time validation
+    const error = validateEmail(text);
+    setEmailError(error);
+    
+    // Clear general errors when user starts typing
+    if (lastError) {
+      setLastError(null);
+    }
+  };
+
+  const handleEmailBlur = () => {
+    setHasEmailInteracted(true);
+    const error = validateEmail(email);
+    setEmailError(error);
+  };
+
   const handleLogin = async () => {
-    if (!email.trim()) {
-      Alert.alert('输入错误', '请填写邮箱地址');
+    // Force validation display
+    setHasEmailInteracted(true);
+    
+    // Validate email first
+    const emailValidationError = validateEmail(email);
+    setEmailError(emailValidationError);
+    
+    if (emailValidationError) {
       emailInputRef.current?.focus();
       return;
     }
@@ -223,6 +271,8 @@ export default function LoginScreen() {
     setOtpExpired(false);
     setRetryCount(0);
     setLastError(null);
+    setEmailError(null);
+    setHasEmailInteracted(false);
     setTimeout(() => {
       emailInputRef.current?.focus();
     }, 100);
@@ -244,15 +294,24 @@ export default function LoginScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📧 邮箱地址</Text>
             <TextInput
-              style={[styles.input, otpSent && styles.inputDisabled]}
+              ref={emailInputRef}
+              style={[
+                styles.input, 
+                otpSent && styles.inputDisabled,
+                hasEmailInteracted && emailError && styles.inputError
+              ]}
               placeholder="请输入您的邮箱"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={handleEmailChange}
+              onBlur={handleEmailBlur}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
               editable={!otpSent}
             />
+            {hasEmailInteracted && emailError && (
+              <Text style={styles.errorText}>⚠️ {emailError}</Text>
+            )}
           </View>
 
           {otpSent && (
@@ -291,7 +350,7 @@ export default function LoginScreen() {
 
           {lastError && (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>❌ {lastError}</Text>
+              <Text style={styles.generalErrorText}>❌ {lastError}</Text>
             </View>
           )}
 
@@ -400,6 +459,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     color: Colors.textSecondary,
   },
+  inputError: {
+    borderColor: '#FF4444',
+    backgroundColor: '#FFF5F5',
+  },
   loginButton: {
     backgroundColor: Colors.primary,
     paddingVertical: 15,
@@ -455,6 +518,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
+  errorText: {
+    color: '#FF4444',
+    fontSize: 12,
+    marginTop: 5,
+    lineHeight: 16,
+  },
   errorContainer: {
     backgroundColor: '#FFF5F5',
     padding: 10,
@@ -463,7 +532,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#FF4444',
   },
-  errorText: {
+  generalErrorText: {
     color: '#FF4444',
     fontSize: 14,
     lineHeight: 20,
