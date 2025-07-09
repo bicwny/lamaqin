@@ -3,6 +3,7 @@
 export interface User {
   id: string;
   dharma_name?: string;
+  lay_name?: string;
   email: string;
   location?: string;
   practice_years?: number;
