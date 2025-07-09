@@ -19,6 +19,7 @@ import { Colors } from '@/constants/Colors';
 enum ErrorType {
   NETWORK = 'network',
   EMAIL_EMPTY = 'email_empty',
+  EMAIL_INVALID = 'email_invalid',
   EMAIL_FORMAT = 'email_format',
   EMAIL_DELIVERY = 'email_delivery',
   OTP_INVALID = 'otp_invalid',
@@ -112,6 +113,13 @@ export default function UnifiedAuthScreen() {
           title: '请输入邮箱地址',
           message: '邮箱地址不能为空，请输入您的邮箱后重试',
           action: '输入邮箱'
+        };
+
+      case ErrorType.EMAIL_INVALID:
+        return {
+          title: '请输入有效的邮箱地址',
+          message: '您输入的内容不是邮箱格式，请输入类似 "用户名@邮箱.com" 的格式',
+          action: '重新输入邮箱'
         };
 
       case ErrorType.EMAIL_FORMAT:
@@ -223,6 +231,13 @@ export default function UnifiedAuthScreen() {
     }
 
     // Enhanced email validation
+    // First check if it contains @ symbol at all
+    if (!trimmedEmail.includes('@')) {
+      showError(ErrorType.EMAIL_INVALID);
+      return;
+    }
+
+    // Then check proper email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
       showError(ErrorType.EMAIL_FORMAT);
@@ -542,6 +557,7 @@ export default function UnifiedAuthScreen() {
                 <Text style={styles.errorStatusIcon}>
                   {lastError === ErrorType.NETWORK ? '📶' : 
                    lastError === ErrorType.EMAIL_EMPTY ? '📧' :
+                   lastError === ErrorType.EMAIL_INVALID ? '❌' :
                    lastError === ErrorType.OTP_INVALID ? '🔢' : 
                    lastError === ErrorType.OTP_EXPIRED ? '⏰' : 
                    lastError === ErrorType.RATE_LIMITED ? '⏳' : '⚠️'}
@@ -549,6 +565,7 @@ export default function UnifiedAuthScreen() {
                 <Text style={styles.errorStatusText}>
                   {lastError === ErrorType.NETWORK ? '网络连接异常' : 
                    lastError === ErrorType.EMAIL_EMPTY ? '请输入邮箱地址' :
+                   lastError === ErrorType.EMAIL_INVALID ? '邮箱格式无效' :
                    lastError === ErrorType.OTP_INVALID ? '验证码错误' : 
                    lastError === ErrorType.OTP_EXPIRED ? '验证码已过期' : 
                    lastError === ErrorType.RATE_LIMITED ? '操作过于频繁' : '遇到问题'}
