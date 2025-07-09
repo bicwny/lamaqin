@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PageHeader from '@/components/PageHeader';
+import { supabase } from '@/lib/supabase';
 
 interface UserProfile {
   dharmaName: string;
@@ -37,7 +38,7 @@ export default function ProfileScreen() {
     location: '纽约',
     className: '23正科',
     email: user?.email || '', // Use optional chaining for safety
-    registrationDate: '2025-01-01'
+    registrationDate: '加载中...'
   });
   const [showShareModal, setShowShareModal] = useState(false);
   const [todaySummary, setTodaySummary] = useState<TodaySummary | null>(null);
@@ -134,6 +135,36 @@ export default function ProfileScreen() {
     // Load user profile data, practice stats, etc.
     try {
       console.log('📊 Loading profile data...');
+
+      if (user?.id) {
+        // Fetch user data from database
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('dharma_name, lay_name, location, practice_years, class_name, created_at')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('❌ Error fetching user data:', error);
+        } else if (userData) {
+          console.log('✅ Loaded user data from database:', userData);
+          
+          // Format the registration date
+          const registrationDate = userData.created_at 
+            ? new Date(userData.created_at).toLocaleDateString('zh-CN')
+            : '未知';
+
+          // Update profile with real data from database
+          setUserProfile(prev => ({
+            ...prev,
+            dharmaName: userData.dharma_name || '未设置',
+            practiceYears: userData.practice_years || 0,
+            location: userData.location || '未设置',
+            className: userData.class_name || '未设置',
+            registrationDate: registrationDate
+          }));
+        }
+      }
 
       // Load timezone info
       //const timezone = await getUserTimezone();  //commented out to avoid error for undefined function
