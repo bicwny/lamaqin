@@ -1,87 +1,107 @@
 
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Alert, 
-  ActivityIndicator,
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Alert,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { useAuth } from '@/contexts/AuthContext';
 
-export default function OnboardingScreen() {
+interface ProfileData {
+  dharmaName: string;
+  layName: string;
+  currentClass: string;
+  practiceYears: string;
+  location: string;
+}
+
+const classOptions = [
+  { label: '入行班', value: '入行班' },
+  { label: '加行班', value: '加行班' },
+  { label: '净土班', value: '净土班' },
+  { label: '密法班', value: '密法班' },
+  { label: '其他', value: '其他' },
+];
+
+export default function Onboarding() {
   const { user } = useAuth();
-  const [dharmaName, setDharmaName] = useState('');
-  const [layName, setLayName] = useState('');
-  const [currentClass, setCurrentClass] = useState('入行班');
-  const [practiceYears, setPracticeYears] = useState('0');
-  const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState<ProfileData>({
+    dharmaName: '',
+    layName: '',
+    currentClass: '入行班',
+    practiceYears: '0',
+    location: '',
+  });
 
-  const classOptions = ['入行班', '加行班', '净土班', '密法班', '其他'];
+  const handleProfileUpdate = (field: keyof ProfileData, value: string) => {
+    setProfile(prev => ({ ...prev, [field]: value }));
+  };
 
-  const handleCompleteProfile = async () => {
+  const handleComplete = async () => {
     if (!user) {
-      Alert.alert('错误', '用户信息丢失，请重新登录');
-      router.replace('/auth');
+      Alert.alert('错误', '用户信息未找到，请重新登录');
       return;
     }
 
     setLoading(true);
     try {
-      // Create user record in our database
-      const { error: insertError } = await supabase
+      console.log('💾 Creating user profile for:', user.email);
+      
+      const userData = {
+        id: user.id,
+        email: user.email,
+        dharma_name: profile.dharmaName.trim() || null,
+        lay_name: profile.layName.trim() || null,
+        current_class: profile.currentClass,
+        practice_years: parseInt(profile.practiceYears) || 0,
+        location: profile.location.trim() || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
         .from('users')
-        .insert({
-          id: user.id,
-          email: user.email,
-          dharma_name: dharmaName.trim() || null,
-          lay_name: layName.trim() || null,
-          current_class: currentClass,
-          practice_years: parseInt(practiceYears) || 0,
-          location: location.trim() || null,
-          created_at: new Date().toISOString()
-        });
+        .insert([userData]);
 
-      if (insertError) {
-        console.error('Error creating user:', insertError);
-        Alert.alert('保存失败', '无法保存个人信息，请重试');
-        return;
+      if (error) {
+        console.error('❌ Error creating user profile:', error);
+        throw error;
       }
 
-      // Update Supabase auth metadata
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { 
-          dharma_name: dharmaName.trim() || null,
-          lay_name: layName.trim() || null,
-          current_class: currentClass,
-          onboarding_completed: true
-        }
-      });
-
-      if (updateError) {
-        console.warn('Failed to update auth metadata:', updateError);
-        // Continue anyway, as the main user record was created
-      }
-
+      console.log('✅ User profile created successfully');
       Alert.alert(
         '欢迎！', 
-        '个人信息设置完成，开始您的修行之旅吧！',
+        '您的档案已创建完成，开始您的修行之旅吧！',
         [
-          { text: '开始修行', onPress: () => router.replace('/(tabs)/index') }
+          {
+            text: '开始修行',
+            onPress: () => router.replace('/(tabs)'),
+          }
         ]
       );
-    } catch (error) {
-      console.error('Onboarding error:', error);
-      Alert.alert('设置失败', '发生未知错误，请重试');
+
+    } catch (error: any) {
+      console.error('❌ Error in handleComplete:', error);
+      Alert.alert(
+        '保存失败', 
+        error.message || '保存档案时出现错误，请重试',
+        [
+          { text: '重试', onPress: handleComplete },
+          { text: '跳过', onPress: () => router.replace('/(tabs)') }
+        ]
+      );
     } finally {
       setLoading(false);
     }
@@ -89,287 +109,232 @@ export default function OnboardingScreen() {
 
   const handleSkip = () => {
     Alert.alert(
-      '跳过设置？',
-      '您可以稍后在个人资料页面完善这些信息',
+      '跳过档案设置？',
+      '您可以稍后在个人档案页面完善这些信息',
       [
-        { text: '继续设置', style: 'cancel' },
-        { 
-          text: '跳过', 
-          onPress: async () => {
-            // Create minimal user record
-            try {
-              const { error } = await supabase
-                .from('users')
-                .insert({
-                  id: user?.id,
-                  email: user?.email,
-                  created_at: new Date().toISOString()
-                });
-
-              if (error) {
-                console.error('Error creating minimal user:', error);
-              }
-            } catch (err) {
-              console.error('Skip onboarding error:', err);
-            }
-            
-            router.replace('/(tabs)/index');
-          }
-        }
+        { text: '继续完善', style: 'cancel' },
+        { text: '跳过', onPress: () => router.replace('/(tabs)') }
       ]
     );
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.logo}>🌸</Text>
-          <Text style={styles.title}>欢迎加入</Text>
-          <Text style={styles.subtitle}>请完善您的个人信息</Text>
-          <View style={styles.progressContainer}>
-            <Text style={styles.progressText}>第 1 步，共 1 步</Text>
-          </View>
-        </View>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.content}>
+            <Text style={styles.title}>完善个人档案</Text>
+            <Text style={styles.subtitle}>
+              欢迎加入修行之路！请完善您的基本信息
+            </Text>
 
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>👤 法名 (Dharma Name)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="如：多吉、白玛等（可选）"
-              value={dharmaName}
-              onChangeText={setDharmaName}
-              autoCapitalize="words"
-              maxLength={20}
-            />
-          </View>
+            <View style={styles.form}>
+              {/* Dharma Name */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>法名 (可选)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="如：多吉丹"
+                  value={profile.dharmaName}
+                  onChangeText={(text) => handleProfileUpdate('dharmaName', text)}
+                  maxLength={20}
+                  editable={!loading}
+                />
+              </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🏷️ 俗名 (Lay Name)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="您的姓名（可选）"
-              value={layName}
-              onChangeText={setLayName}
-              autoCapitalize="words"
-            />
-          </View>
+              {/* Lay Name */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>俗名 (可选)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="您的姓名"
+                  value={profile.layName}
+                  onChangeText={(text) => handleProfileUpdate('layName', text)}
+                  maxLength={30}
+                  editable={!loading}
+                />
+              </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📚 当前班级 *</Text>
-            <View style={styles.classContainer}>
-              {classOptions.map((option) => (
-                <TouchableOpacity
-                  key={option}
-                  style={[
-                    styles.classOption,
-                    currentClass === option && styles.classOptionSelected
-                  ]}
-                  onPress={() => setCurrentClass(option)}
-                >
-                  <Text style={[
-                    styles.classOptionText,
-                    currentClass === option && styles.classOptionTextSelected
-                  ]}>
-                    {option}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {/* Current Class */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>当前班级</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={profile.currentClass}
+                    onValueChange={(value) => handleProfileUpdate('currentClass', value)}
+                    style={styles.picker}
+                    enabled={!loading}
+                  >
+                    {classOptions.map((option) => (
+                      <Picker.Item 
+                        key={option.value} 
+                        label={option.label} 
+                        value={option.value} 
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* Practice Years */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>修行年限</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="0"
+                  value={profile.practiceYears}
+                  onChangeText={(text) => {
+                    const numericText = text.replace(/[^0-9]/g, '');
+                    if (parseInt(numericText) <= 50 || numericText === '') {
+                      handleProfileUpdate('practiceYears', numericText);
+                    }
+                  }}
+                  keyboardType="numeric"
+                  maxLength={2}
+                  editable={!loading}
+                />
+                <Text style={styles.helperText}>年 (0-50)</Text>
+              </View>
+
+              {/* Location */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>常住地 (可选)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="如：纽约"
+                  value={profile.location}
+                  onChangeText={(text) => handleProfileUpdate('location', text)}
+                  maxLength={50}
+                  editable={!loading}
+                />
+              </View>
+            </View>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.primaryButton, loading && styles.buttonDisabled]}
+                onPress={handleComplete}
+                disabled={loading}
+              >
+                <Text style={styles.primaryButtonText}>
+                  {loading ? '保存中...' : '完成设置'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.secondaryButton]}
+                onPress={handleSkip}
+                disabled={loading}
+              >
+                <Text style={styles.secondaryButtonText}>跳过</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>⏰ 修行年限</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="修行多少年了？（默认0年）"
-              value={practiceYears}
-              onChangeText={(text) => {
-                // Only allow numbers
-                const numericText = text.replace(/[^0-9]/g, '');
-                setPracticeYears(numericText);
-              }}
-              keyboardType="numeric"
-              maxLength={2}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📍 常住地</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="如：纽约、北京等（可选）"
-              value={location}
-              onChangeText={setLocation}
-              autoCapitalize="words"
-            />
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.completeButton, loading && styles.completeButtonDisabled]} 
-            onPress={handleCompleteProfile}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={Colors.surface} />
-            ) : (
-              <Text style={styles.completeButtonText}>完成设置</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.skipButton} 
-            onPress={handleSkip}
-            disabled={loading}
-          >
-            <Text style={styles.skipButtonText}>暂时跳过</Text>
-          </TouchableOpacity>
-
-          <View style={styles.noteContainer}>
-            <Text style={styles.noteText}>
-              💡 这些信息可以帮助我们为您提供更好的修行体验，您也可以稍后在个人资料页面修改
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f8f9fa',
+  },
+  keyboardAvoid: {
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
   },
-  header: {
+  content: {
     alignItems: 'center',
-    marginBottom: 40,
-  },
-  logo: {
-    fontSize: 48,
-    marginBottom: 10,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.primary,
-    marginBottom: 10,
+    color: Colors.light.text,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: '#666',
+    marginBottom: 40,
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 10,
-  },
-  progressContainer: {
-    backgroundColor: Colors.primary + '20',
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-    borderRadius: 15,
-  },
-  progressText: {
-    color: Colors.primary,
-    fontSize: 12,
-    fontWeight: '500',
+    lineHeight: 24,
   },
   form: {
     width: '100%',
+    maxWidth: 350,
   },
   inputGroup: {
     marginBottom: 20,
   },
-  inputLabel: {
+  label: {
     fontSize: 16,
-    color: Colors.text,
+    fontWeight: '600',
+    color: Colors.light.text,
     marginBottom: 8,
-    fontWeight: '500',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
-    padding: 15,
-    fontSize: 16,
-    backgroundColor: Colors.surface,
-    color: Colors.text,
-  },
-  classContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  classOption: {
-    backgroundColor: '#F5F5F5',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  classOptionSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  classOptionText: {
-    color: Colors.text,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  classOptionTextSelected: {
-    color: Colors.surface,
-  },
-  completeButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  completeButtonDisabled: {
-    opacity: 0.6,
-  },
-  completeButtonText: {
-    color: Colors.surface,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  skipButton: {
-    alignItems: 'center',
-    marginTop: 15,
-    paddingVertical: 10,
-  },
-  skipButtonText: {
-    color: Colors.textSecondary,
-    fontSize: 16,
-    textDecorationLine: 'underline',
-  },
-  noteContainer: {
-    backgroundColor: '#F0F8FF',
-    padding: 15,
+    borderColor: '#ddd',
     borderRadius: 8,
-    marginTop: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
+    padding: 16,
+    fontSize: 16,
+    backgroundColor: 'white',
   },
-  noteText: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    lineHeight: 18,
-    textAlign: 'center',
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+  },
+  helperText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  buttonContainer: {
+    width: '100%',
+    maxWidth: 350,
+    gap: 12,
+    marginTop: 20,
+  },
+  button: {
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+  },
+  primaryButton: {
+    backgroundColor: Colors.light.tint,
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  buttonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  primaryButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

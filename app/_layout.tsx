@@ -31,8 +31,9 @@ function RootLayoutNav() {
     if (!loading) {
       console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
-        console.log('✅ User authenticated, should show tabs');
-        router.replace('/(tabs)');
+        console.log('✅ User authenticated, navigation handled by auth flow');
+        // Note: Navigation is now handled by the auth flow itself
+        // No automatic redirect here to avoid conflicts
       } else {
         console.log('❌ No user, should show auth');
         router.replace('/auth');
@@ -64,7 +65,7 @@ function RootLayoutNav() {
   }
 
   return (
-    
+    <Stack>
       {user ? (
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -83,6 +84,7 @@ function RootLayoutNav() {
             <Stack.Screen name="+not-found" options={{ title: "页面不存在" }} />
           </Stack>
         )}
+    </Stack>
     
   );
 }
