@@ -206,21 +206,24 @@ export default function UnifiedAuthScreen() {
   };
 
   const handleSendOTP = async () => {
-    if (!email) {
+    const trimmedEmail = email.trim();
+    
+    // Check if email is empty or just whitespace
+    if (!trimmedEmail) {
       showError(ErrorType.EMAIL_FORMAT);
       return;
     }
 
     // Enhanced email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(trimmedEmail)) {
       showError(ErrorType.EMAIL_FORMAT);
       return;
     }
 
     // Check for common email format issues
-    const trimmedEmail = email.trim().toLowerCase();
-    if (trimmedEmail.includes('..') || trimmedEmail.startsWith('.') || trimmedEmail.endsWith('.')) {
+    const cleanEmail = trimmedEmail.toLowerCase();
+    if (cleanEmail.includes('..') || cleanEmail.startsWith('.') || cleanEmail.endsWith('.')) {
       showError(ErrorType.EMAIL_FORMAT);
       return;
     }
@@ -232,12 +235,12 @@ export default function UnifiedAuthScreen() {
       // Always use signInWithOtp with shouldCreateUser: true
       // This ensures consistent Magic Link template for all users
       const { error } = await supabase.auth.signInWithOtp({
-        email: trimmedEmail,
+        email: cleanEmail,
         options: {
           shouldCreateUser: true,
           emailRedirectTo: undefined, // Prevent email link redirects
           data: {
-            email: trimmedEmail
+            email: cleanEmail
           }
         }
       });
