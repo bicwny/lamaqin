@@ -55,3 +55,14 @@ export class NetworkUtils {
     return networkIndicators.some(indicator => errorMessage.includes(indicator));
   }
 }
+
+// Helper function for simplified network checking
+export async function checkNetwork(): Promise<boolean> {
+  const networkState = await NetworkUtils.checkNetworkState();
+  return networkState.isConnected && networkState.isInternetReachable;
+}
+
+// Helper function for network error detection
+export function isNetworkError(error: any): boolean {
+  return NetworkUtils.isNetworkError(error);
+}
