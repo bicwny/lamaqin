@@ -16,6 +16,20 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 
+// Error types for better categorization
+enum ErrorType {
+  NETWORK = 'network',
+  EMAIL_FORMAT = 'email_format',
+  EMAIL_DELIVERY = 'email_delivery',
+  OTP_INVALID = 'otp_invalid',
+  OTP_EXPIRED = 'otp_expired',
+  OTP_FORMAT = 'otp_format',
+  RATE_LIMITED = 'rate_limited',
+  SESSION_EXPIRED = 'session_expired',
+  DATABASE_ERROR = 'database_error',
+  UNKNOWN = 'unknown'
+}
+
 export default function UnifiedAuthScreen() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -23,6 +37,8 @@ export default function UnifiedAuthScreen() {
   const [step, setStep] = useState<'email' | 'otp' | 'loading'>('email');
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isResending, setIsResending] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [lastError, setLastError] = useState<ErrorType | null>(null);
   
 
   // Countdown timer for resend
@@ -35,43 +51,214 @@ export default function UnifiedAuthScreen() {
     }
   }, [resendCountdown]);
 
+  // Smart error detection function
+  const detectErrorType = (error: any): ErrorType => {
+    const errorMessage = error?.message?.toLowerCase() || '';
+    
+    // Network errors
+    if (errorMessage.includes('network') || errorMessage.includes('fetch') || 
+        errorMessage.includes('timeout') || errorMessage.includes('connection')) {
+      return ErrorType.NETWORK;
+    }
+    
+    // Rate limiting
+    if (errorMessage.includes('rate') || errorMessage.includes('too many') || 
+        errorMessage.includes('limit') || errorMessage.includes('频繁')) {
+      return ErrorType.RATE_LIMITED;
+    }
+    
+    // Email delivery issues
+    if (errorMessage.includes('invalid email') || errorMessage.includes('email not found') ||
+        errorMessage.includes('delivery') || errorMessage.includes('bounce')) {
+      return ErrorType.EMAIL_DELIVERY;
+    }
+    
+    // OTP specific errors
+    if (errorMessage.includes('expired') || errorMessage.includes('过期')) {
+      return ErrorType.OTP_EXPIRED;
+    }
+    
+    if (errorMessage.includes('invalid') || errorMessage.includes('wrong') || 
+        errorMessage.includes('incorrect') || errorMessage.includes('无效')) {
+      return ErrorType.OTP_INVALID;
+    }
+    
+    // Session errors
+    if (errorMessage.includes('session') || errorMessage.includes('会话')) {
+      return ErrorType.SESSION_EXPIRED;
+    }
+    
+    // Database errors
+    if (errorMessage.includes('database') || errorMessage.includes('sql') || 
+        errorMessage.includes('connection')) {
+      return ErrorType.DATABASE_ERROR;
+    }
+    
+    return ErrorType.UNKNOWN;
+  };
+
+  // User-friendly error messages
+  const getErrorMessage = (errorType: ErrorType, context: 'email' | 'otp' = 'email'): { title: string; message: string; action?: string } => {
+    switch (errorType) {
+      case ErrorType.NETWORK:
+        return {
+          title: '网络连接失败',
+          message: '请检查您的网络连接后重试，或尝试切换到移动网络',
+          action: '检查网络设置'
+        };
+      
+      case ErrorType.EMAIL_FORMAT:
+        return {
+          title: '邮箱格式不正确',
+          message: '请输入完整的邮箱地址，例如：张三@163.com',
+          action: '修改邮箱地址'
+        };
+      
+      case ErrorType.EMAIL_DELIVERY:
+        return {
+          title: '邮箱发送失败',
+          message: '无法发送到该邮箱，请检查邮箱地址是否正确',
+          action: '更换邮箱地址'
+        };
+      
+      case ErrorType.OTP_INVALID:
+        const remainingAttempts = Math.max(0, 3 - attemptCount);
+        return {
+          title: '验证码错误',
+          message: remainingAttempts > 0 
+            ? `验证码错误，请检查后重试 (剩余 ${remainingAttempts} 次机会)`
+            : '验证码错误次数过多，请重新发送验证码',
+          action: remainingAttempts > 0 ? '重新输入' : '重新发送验证码'
+        };
+      
+      case ErrorType.OTP_EXPIRED:
+        return {
+          title: '验证码已过期',
+          message: '验证码有效期为10分钟，请重新获取验证码',
+          action: '重新发送验证码'
+        };
+      
+      case ErrorType.OTP_FORMAT:
+        return {
+          title: '验证码格式错误',
+          message: '验证码应为6位数字，请勿输入空格或特殊字符',
+          action: '重新输入'
+        };
+      
+      case ErrorType.RATE_LIMITED:
+        return {
+          title: '操作过于频繁',
+          message: '发送过于频繁，请等待 1 分钟后重试',
+          action: '稍后重试'
+        };
+      
+      case ErrorType.SESSION_EXPIRED:
+        return {
+          title: '登录会话已过期',
+          message: '请重新开始登录流程',
+          action: '重新开始'
+        };
+      
+      case ErrorType.DATABASE_ERROR:
+        return {
+          title: '数据同步失败',
+          message: '服务器暂时无法处理请求，但不影响正常登录',
+          action: '继续使用'
+        };
+      
+      default:
+        return {
+          title: '操作失败',
+          message: '遇到未知错误，请稍后重试或联系客服',
+          action: '重试'
+        };
+    }
+  };
+
+  // Enhanced alert with better UX
+  const showError = (errorType: ErrorType, context: 'email' | 'otp' = 'email') => {
+    const errorInfo = getErrorMessage(errorType, context);
+    setLastError(errorType);
+    
+    Alert.alert(
+      errorInfo.title,
+      errorInfo.message,
+      [
+        {
+          text: '取消',
+          style: 'cancel'
+        },
+        {
+          text: errorInfo.action || '确定',
+          onPress: () => {
+            // Auto-action based on error type
+            if (errorType === ErrorType.OTP_EXPIRED || 
+                (errorType === ErrorType.OTP_INVALID && attemptCount >= 3)) {
+              handleResendCode();
+            } else if (errorType === ErrorType.SESSION_EXPIRED) {
+              setStep('email');
+              setOtp('');
+              setAttemptCount(0);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const handleSendOTP = async () => {
     if (!email) {
-      Alert.alert('提示', '请填写邮箱地址');
+      showError(ErrorType.EMAIL_FORMAT);
       return;
     }
 
-    // Validate email format
+    // Enhanced email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('提示', '请输入有效的邮箱地址');
+      showError(ErrorType.EMAIL_FORMAT);
+      return;
+    }
+
+    // Check for common email format issues
+    const trimmedEmail = email.trim().toLowerCase();
+    if (trimmedEmail.includes('..') || trimmedEmail.startsWith('.') || trimmedEmail.endsWith('.')) {
+      showError(ErrorType.EMAIL_FORMAT);
       return;
     }
 
     setLoading(true);
+    setLastError(null);
+    
     try {
       // Always use signInWithOtp with shouldCreateUser: true
       // This ensures consistent Magic Link template for all users
       const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
+        email: trimmedEmail,
         options: {
           shouldCreateUser: true,
           emailRedirectTo: undefined, // Prevent email link redirects
           data: {
-            email: email.trim()
+            email: trimmedEmail
           }
         }
       });
 
       if (error) {
-        Alert.alert('发送失败', error.message);
+        const errorType = detectErrorType(error);
+        showError(errorType, 'email');
       } else {
         setStep('otp');
         setResendCountdown(60);
-        Alert.alert('验证码已发送', '请检查您的邮箱并输入6位数字验证码');
+        setAttemptCount(0);
+        Alert.alert(
+          '验证码已发送 ✅',
+          '请检查您的邮箱并输入6位数字验证码\n\n💡 提示：如果没有收到邮件，请检查垃圾邮件文件夹',
+          [{ text: '确定' }]
+        );
       }
     } catch (error) {
-      Alert.alert('发送失败', '网络错误，请稍后重试');
+      const errorType = detectErrorType(error);
+      showError(errorType, 'email');
     } finally {
       setLoading(false);
     }
@@ -79,30 +266,55 @@ export default function UnifiedAuthScreen() {
 
   const handleVerifyOTP = async () => {
     if (!otp) {
-      Alert.alert('提示', '请输入验证码');
+      showError(ErrorType.OTP_FORMAT);
       return;
     }
 
-    if (otp.length !== 6) {
-      Alert.alert('提示', '验证码应为6位数字');
+    // Enhanced OTP validation
+    const cleanOTP = otp.replace(/\s/g, ''); // Remove spaces
+    if (cleanOTP.length !== 6) {
+      showError(ErrorType.OTP_FORMAT);
+      return;
+    }
+
+    if (!/^\d{6}$/.test(cleanOTP)) {
+      showError(ErrorType.OTP_FORMAT);
       return;
     }
 
     setLoading(true);
+    const currentAttempt = attemptCount + 1;
+    setAttemptCount(currentAttempt);
+    
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
-        token: otp,
+        token: cleanOTP,
         type: 'email',
       });
 
       if (error) {
-        if (error.message.includes('expired')) {
-          Alert.alert('验证失败', '验证码已过期，请重新发送');
-        } else if (error.message.includes('invalid')) {
-          Alert.alert('验证失败', '验证码无效，请检查后重试');
-        } else {
-          Alert.alert('验证失败', error.message);
+        const errorType = detectErrorType(error);
+        showError(errorType, 'otp');
+        
+        // Auto-resend if too many failed attempts
+        if (currentAttempt >= 3) {
+          setTimeout(() => {
+            Alert.alert(
+              '尝试次数过多',
+              '为了您的账户安全，请重新发送验证码',
+              [
+                {
+                  text: '重新发送',
+                  onPress: () => {
+                    setOtp('');
+                    setAttemptCount(0);
+                    handleResendCode();
+                  }
+                }
+              ]
+            );
+          }, 1000);
         }
       } else if (data.user) {
         // Now check if user exists in our database (post-verification)
@@ -169,6 +381,9 @@ export default function UnifiedAuthScreen() {
     if (!email || resendCountdown > 0) return;
 
     setIsResending(true);
+    setLastError(null);
+    setAttemptCount(0); // Reset attempt count on resend
+    
     try {
       // Use the same consistent approach as initial send
       const { error } = await supabase.auth.signInWithOtp({
@@ -183,13 +398,20 @@ export default function UnifiedAuthScreen() {
       });
 
       if (error) {
-        Alert.alert('发送失败', error.message);
+        const errorType = detectErrorType(error);
+        showError(errorType, 'email');
       } else {
         setResendCountdown(60);
-        Alert.alert('验证码已重新发送', '请检查您的邮箱并输入6位数字验证码');
+        setOtp(''); // Clear previous OTP
+        Alert.alert(
+          '验证码已重新发送 ✅',
+          '新的验证码已发送到您的邮箱\n请输入最新收到的6位数字验证码',
+          [{ text: '确定' }]
+        );
       }
     } catch (error) {
-      Alert.alert('发送失败', '网络错误，请稍后重试');
+      const errorType = detectErrorType(error);
+      showError(errorType, 'email');
     } finally {
       setIsResending(false);
     }
@@ -304,16 +526,41 @@ export default function UnifiedAuthScreen() {
             </>
           )}
 
-          <View style={styles.helpSection}>
-            <Text style={styles.helpTitle}>💡 使用说明</Text>
-            <Text style={styles.helpText}>
-              • 新用户将自动创建账户{'\n'}
-              • 老用户将直接登录{'\n'}
-              • 所有用户都会收到6位数字验证码{'\n'}
-              • 验证码有效期为10分钟{'\n'}
-              • 请检查垃圾邮件文件夹
-            </Text>
-          </View>
+          {/* Error status indicator */}
+            {lastError && (
+              <View style={styles.errorStatus}>
+                <Text style={styles.errorStatusIcon}>
+                  {lastError === ErrorType.NETWORK ? '📶' : 
+                   lastError === ErrorType.OTP_INVALID ? '🔢' : 
+                   lastError === ErrorType.OTP_EXPIRED ? '⏰' : 
+                   lastError === ErrorType.RATE_LIMITED ? '⏳' : '⚠️'}
+                </Text>
+                <Text style={styles.errorStatusText}>
+                  {lastError === ErrorType.NETWORK ? '网络连接异常' : 
+                   lastError === ErrorType.OTP_INVALID ? '验证码错误' : 
+                   lastError === ErrorType.OTP_EXPIRED ? '验证码已过期' : 
+                   lastError === ErrorType.RATE_LIMITED ? '操作过于频繁' : '遇到问题'}
+                </Text>
+                <TouchableOpacity 
+                  onPress={() => setLastError(null)}
+                  style={styles.errorStatusClose}
+                >
+                  <Text style={styles.errorStatusCloseText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <View style={styles.helpSection}>
+              <Text style={styles.helpTitle}>💡 使用说明</Text>
+              <Text style={styles.helpText}>
+                • 新用户将自动创建账户{'\n'}
+                • 老用户将直接登录{'\n'}
+                • 所有用户都会收到6位数字验证码{'\n'}
+                • 验证码有效期为10分钟{'\n'}
+                • 请检查垃圾邮件文件夹{'\n'}
+                • 支持复制粘贴验证码
+              </Text>
+            </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -446,5 +693,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
+  },
+  errorStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+  },
+  errorStatusIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  errorStatusText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#DC2626',
+    fontWeight: '500',
+  },
+  errorStatusClose: {
+    padding: 4,
+  },
+  errorStatusCloseText: {
+    fontSize: 16,
+    color: '#DC2626',
+    fontWeight: 'bold',
   },
 });
