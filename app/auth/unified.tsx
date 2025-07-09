@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -39,7 +38,7 @@ export default function UnifiedAuthScreen() {
   const [isResending, setIsResending] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
   const [lastError, setLastError] = useState<ErrorType | null>(null);
-  
+
 
   // Countdown timer for resend
   useEffect(() => {
@@ -54,46 +53,46 @@ export default function UnifiedAuthScreen() {
   // Smart error detection function
   const detectErrorType = (error: any): ErrorType => {
     const errorMessage = error?.message?.toLowerCase() || '';
-    
+
     // Network errors
     if (errorMessage.includes('network') || errorMessage.includes('fetch') || 
         errorMessage.includes('timeout') || errorMessage.includes('connection')) {
       return ErrorType.NETWORK;
     }
-    
+
     // Rate limiting
     if (errorMessage.includes('rate') || errorMessage.includes('too many') || 
         errorMessage.includes('limit') || errorMessage.includes('频繁')) {
       return ErrorType.RATE_LIMITED;
     }
-    
+
     // Email delivery issues
     if (errorMessage.includes('invalid email') || errorMessage.includes('email not found') ||
         errorMessage.includes('delivery') || errorMessage.includes('bounce')) {
       return ErrorType.EMAIL_DELIVERY;
     }
-    
+
     // OTP specific errors
     if (errorMessage.includes('expired') || errorMessage.includes('过期')) {
       return ErrorType.OTP_EXPIRED;
     }
-    
+
     if (errorMessage.includes('invalid') || errorMessage.includes('wrong') || 
         errorMessage.includes('incorrect') || errorMessage.includes('无效')) {
       return ErrorType.OTP_INVALID;
     }
-    
+
     // Session errors
     if (errorMessage.includes('session') || errorMessage.includes('会话')) {
       return ErrorType.SESSION_EXPIRED;
     }
-    
+
     // Database errors
     if (errorMessage.includes('database') || errorMessage.includes('sql') || 
         errorMessage.includes('connection')) {
       return ErrorType.DATABASE_ERROR;
     }
-    
+
     return ErrorType.UNKNOWN;
   };
 
@@ -106,21 +105,21 @@ export default function UnifiedAuthScreen() {
           message: '请检查您的网络连接后重试，或尝试切换到移动网络',
           action: '检查网络设置'
         };
-      
+
       case ErrorType.EMAIL_FORMAT:
         return {
           title: '邮箱格式不正确',
           message: '请输入完整的邮箱地址，例如：张三@163.com',
           action: '修改邮箱地址'
         };
-      
+
       case ErrorType.EMAIL_DELIVERY:
         return {
           title: '邮箱发送失败',
           message: '无法发送到该邮箱，请检查邮箱地址是否正确',
           action: '更换邮箱地址'
         };
-      
+
       case ErrorType.OTP_INVALID:
         const remainingAttempts = Math.max(0, 3 - attemptCount);
         return {
@@ -130,42 +129,42 @@ export default function UnifiedAuthScreen() {
             : '验证码错误次数过多，请重新发送验证码',
           action: remainingAttempts > 0 ? '重新输入' : '重新发送验证码'
         };
-      
+
       case ErrorType.OTP_EXPIRED:
         return {
           title: '验证码已过期',
           message: '验证码有效期为10分钟，请重新获取验证码',
           action: '重新发送验证码'
         };
-      
+
       case ErrorType.OTP_FORMAT:
         return {
           title: '验证码格式错误',
           message: '验证码应为6位数字，请勿输入空格或特殊字符',
           action: '重新输入'
         };
-      
+
       case ErrorType.RATE_LIMITED:
         return {
           title: '操作过于频繁',
           message: '发送过于频繁，请等待 1 分钟后重试',
           action: '稍后重试'
         };
-      
+
       case ErrorType.SESSION_EXPIRED:
         return {
           title: '登录会话已过期',
           message: '请重新开始登录流程',
           action: '重新开始'
         };
-      
+
       case ErrorType.DATABASE_ERROR:
         return {
           title: '数据同步失败',
           message: '服务器暂时无法处理请求，但不影响正常登录',
           action: '继续使用'
         };
-      
+
       default:
         return {
           title: '操作失败',
@@ -176,10 +175,10 @@ export default function UnifiedAuthScreen() {
   };
 
   // Enhanced alert with better UX
-  const showError = (errorType: ErrorType, context: 'email' | 'otp' = 'email') => {
+  const showError = (errorType: ErrorType, context: 'email' | 'otp' = 'email', originalError?: any) => {
     const errorInfo = getErrorMessage(errorType, context);
     setLastError(errorType);
-    
+
     Alert.alert(
       errorInfo.title,
       errorInfo.message,
@@ -228,7 +227,7 @@ export default function UnifiedAuthScreen() {
 
     setLoading(true);
     setLastError(null);
-    
+
     try {
       // Always use signInWithOtp with shouldCreateUser: true
       // This ensures consistent Magic Link template for all users
@@ -245,7 +244,7 @@ export default function UnifiedAuthScreen() {
 
       if (error) {
         const errorType = detectErrorType(error);
-        showError(errorType, 'email');
+        showError(errorType, 'email', error);
       } else {
         setStep('otp');
         setResendCountdown(60);
@@ -258,7 +257,7 @@ export default function UnifiedAuthScreen() {
       }
     } catch (error) {
       const errorType = detectErrorType(error);
-      showError(errorType, 'email');
+      showError(errorType, 'email', error);
     } finally {
       setLoading(false);
     }
@@ -285,7 +284,7 @@ export default function UnifiedAuthScreen() {
     setLoading(true);
     const currentAttempt = attemptCount + 1;
     setAttemptCount(currentAttempt);
-    
+
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
@@ -295,8 +294,8 @@ export default function UnifiedAuthScreen() {
 
       if (error) {
         const errorType = detectErrorType(error);
-        showError(errorType, 'otp');
-        
+        showError(errorType, 'otp', error);
+
         // Auto-resend if too many failed attempts
         if (currentAttempt >= 3) {
           setTimeout(() => {
@@ -332,7 +331,7 @@ export default function UnifiedAuthScreen() {
         if (!existingUser) {
           // User doesn't exist in our database - create them and go to profile setup
           console.log('📝 Creating new user in database for:', email.trim());
-          
+
           try {
             const { error: insertError } = await supabase
               .from('users')
@@ -360,7 +359,7 @@ export default function UnifiedAuthScreen() {
                                   existingUser.class_name || 
                                   existingUser.practice_years || 
                                   existingUser.location;
-          
+
           if (!isProfileComplete) {
             // Profile incomplete - redirect to profile setup
             router.replace('/profile-setup');
@@ -383,7 +382,7 @@ export default function UnifiedAuthScreen() {
     setIsResending(true);
     setLastError(null);
     setAttemptCount(0); // Reset attempt count on resend
-    
+
     try {
       // Use the same consistent approach as initial send
       const { error } = await supabase.auth.signInWithOtp({
@@ -399,7 +398,7 @@ export default function UnifiedAuthScreen() {
 
       if (error) {
         const errorType = detectErrorType(error);
-        showError(errorType, 'email');
+        showError(errorType, 'email', error);
       } else {
         setResendCountdown(60);
         setOtp(''); // Clear previous OTP
@@ -411,7 +410,7 @@ export default function UnifiedAuthScreen() {
       }
     } catch (error) {
       const errorType = detectErrorType(error);
-      showError(errorType, 'email');
+      showError(errorType, 'email', error);
     } finally {
       setIsResending(false);
     }
