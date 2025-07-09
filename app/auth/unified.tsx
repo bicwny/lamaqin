@@ -23,7 +23,7 @@ export default function UnifiedAuthScreen() {
   const [step, setStep] = useState<'email' | 'otp' | 'loading'>('email');
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isResending, setIsResending] = useState(false);
-  const [isNewUser, setIsNewUser] = useState(false);
+  
 
   // Countdown timer for resend
   useEffect(() => {
@@ -50,21 +50,8 @@ export default function UnifiedAuthScreen() {
 
     setLoading(true);
     try {
-      // Check if user exists in our database
-      const { data: existingUser, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', email.trim())
-        .maybeSingle();
-
-      if (userError && userError.code !== 'PGRST116') {
-        console.error('Error checking user:', userError);
-      }
-
-      setIsNewUser(!existingUser);
-
       // Always use signInWithOtp with shouldCreateUser: true
-      // This ensures we get consistent OTP behavior
+      // This ensures consistent Magic Link template for all users
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
@@ -118,7 +105,7 @@ export default function UnifiedAuthScreen() {
           Alert.alert('验证失败', error.message);
         }
       } else if (data.user) {
-        // Check if user exists in database again (in case it was created during auth)
+        // Now check if user exists in our database (post-verification)
         const { data: existingUser, error: userError } = await supabase
           .from('users')
           .select('id, dharma_name, class_name, practice_years, location')
@@ -130,11 +117,33 @@ export default function UnifiedAuthScreen() {
           // Continue anyway, will be handled by AuthContext
         }
 
-        if (!existingUser || isNewUser) {
+        if (!existingUser) {
+          // User doesn't exist in our database - create them and go to profile setup
+          console.log('📝 Creating new user in database for:', email.trim());
+          
+          try {
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert({
+                id: data.user.id,
+                email: email.trim(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+
+            if (insertError) {
+              console.error('Error creating user:', insertError);
+              // Continue anyway, AuthContext will handle this
+            }
+          } catch (insertErr) {
+            console.error('Database insert failed:', insertErr);
+            // Continue anyway, user can still use the app
+          }
+
           // New user - redirect to profile setup
           router.replace('/profile-setup');
         } else {
-          // Check if profile is complete
+          // Existing user - check if profile is complete
           const isProfileComplete = existingUser.dharma_name || 
                                   existingUser.class_name || 
                                   existingUser.practice_years || 
@@ -190,7 +199,6 @@ export default function UnifiedAuthScreen() {
     setStep('email');
     setOtp('');
     setResendCountdown(0);
-    setIsNewUser(false);
   };
 
   return (
