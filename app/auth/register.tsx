@@ -14,6 +14,9 @@ import {
 import { Link, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { ErrorHandler, ErrorType } from '@/utils/errorHandler';
+import { NetworkUtils } from '@/utils/network';
+import { OTPTimer } from '@/components/OTPTimer';
 
 export default function RegisterScreen() {
   const [dharmaName, setDharmaName] = useState('');
