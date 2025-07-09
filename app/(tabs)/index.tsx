@@ -432,7 +432,7 @@ export default function HomeScreen() {
       }
 
       // Reload data to reflect changes
-      loadData();
+      loadDashboardData();
 
       Alert.alert('成功', '已完成今日目标！');
     } catch (error) {
