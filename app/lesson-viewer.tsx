@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, Linking, Alert } from 'react-native';
 import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -48,6 +48,23 @@ export default function LessonViewer() {
           headerLeft: () => (
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity 
+              onPress={() => {
+                Alert.alert(
+                  '打开链接',
+                  '是否在浏览器中打开此课程？',
+                  [
+                    { text: '取消', style: 'cancel' },
+                    { text: '打开', onPress: () => Linking.openURL(url) }
+                  ]
+                );
+              }} 
+              style={styles.closeButton}
+            >
+              <Ionicons name="open-outline" size={24} color="#007AFF" />
             </TouchableOpacity>
           ),
         }} 

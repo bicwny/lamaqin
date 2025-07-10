@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet, Dimensions } from 'react-native';
+import { Platform, StyleSheet, Dimensions, TouchableOpacity, Linking } from 'react-native';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 
@@ -30,6 +30,12 @@ export function LessonWebView({ url, title }: LessonWebViewProps) {
           }}
           title={title || 'Lesson Content'}
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          onError={() => {
+            console.log('iframe loading error');
+          }}
+          onLoad={(e) => {
+            console.log('iframe loaded successfully');
+          }}
         />
       </ThemedView>
     );
@@ -70,6 +76,14 @@ export function LessonWebView({ url, title }: LessonWebViewProps) {
           <ThemedText style={styles.linkText} selectable>
             {url}
           </ThemedText>
+          <TouchableOpacity 
+            style={styles.openButton} 
+            onPress={() => Linking.openURL(url)}
+          >
+            <ThemedText style={styles.openButtonText}>
+              在浏览器中打开
+            </ThemedText>
+          </TouchableOpacity>
         </ThemedView>
       </ThemedView>
     );
@@ -116,5 +130,17 @@ const styles = StyleSheet.create({
     color: '#0066cc',
     textAlign: 'center',
     textDecorationLine: 'underline',
+  },
+  openButton: {
+    backgroundColor: '#0066cc',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  openButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
