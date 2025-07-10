@@ -246,9 +246,13 @@ export default function HomeScreen() {
       if (error) throw error;
 
       const today = new Date().toISOString().split('T')[0];
-      const startOfWeek = new Date();
-      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-      const weekStart = startOfWeek.toISOString().split('T')[0];
+      
+      // Use Monday as week start for consistency with getCurrentWeekStart()
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+      const monday = new Date(now.setDate(diff));
+      const weekStart = monday.toISOString().split('T')[0];
 
       const practicesData: WeeklyPractice[] = [];
 
