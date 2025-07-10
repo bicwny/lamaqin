@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
+import { router } from 'expo-router';
 
 // Component to display lesson progress with real-time counts
 const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
@@ -634,6 +635,22 @@ export default function StudyScreen() {
                   >
                     <Text style={styles.recordButtonText}>看法本</Text>
                   </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.recordButton, styles.viewButton]}
+                    onPress={() => {
+                      // Navigate to lesson viewer with the organization's URL
+                      router.push({
+                        pathname: '/lesson-viewer',
+                        params: {
+                          lessonUrl: `https://www.bicwny.com/堪布讲堂/初级/加行全部课件/上师瑜伽速赐加持?lesson=${lesson.lesson_number}`,
+                          lessonTitle: lesson.title
+                        }
+                      });
+                    }}
+                  >
+                    <Text style={styles.recordButtonText}>在线课程</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             );
@@ -871,6 +888,9 @@ const styles = StyleSheet.create({
   },
   readButton: {
     backgroundColor: '#007bff',
+  },
+  viewButton: {
+    backgroundColor: '#da4347',
   },
   recordButtonText: {
     color: '#fff',
