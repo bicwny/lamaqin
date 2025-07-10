@@ -482,11 +482,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error(`Database connection failed: ${connectionError.message}`);
         }
 
-        // Check if user exists
+        // Check if user exists by ID (more reliable than email)
         const { data: existingUser, error: fetchError } = await supabase
           .from('users')
-          .select('id')
-          .eq('email', user.email)
+          .select('id, email')
+          .eq('id', user.id)
           .maybeSingle();
 
         if (fetchError) {
@@ -506,6 +506,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
 
           if (insertError) {
+            // Check if this is a duplicate key error (user was created by another process)
+            if (insertError.code === '23505' && insertError.message.includes('users_pkey')) {
+              console.log('✅ AuthContext: User already exists (created by another process)');
+              return;
+            }
             console.error('❌ AuthContext: Error creating user:', insertError);
             throw new Error(`User creation failed: ${insertError.message}`);
           }
