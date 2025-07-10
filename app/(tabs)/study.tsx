@@ -610,7 +610,7 @@ export default function StudyScreen() {
                 <View style={styles.lessonHeader}>
                   <View style={styles.lessonTitleRow}>
                     <Text style={styles.lessonTitle}>
-                      第{lesson.lesson_number}课：{lesson.title}
+                      {lesson.title}
                     </Text>
                   </View>
                   <LessonProgressDisplay 
