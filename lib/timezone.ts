@@ -147,6 +147,23 @@ export function getTimeUntilMidnight(timezone: string): { hours: number; minutes
 }
 
 /**
+ * Force daily reset for testing (remove after testing)
+ */
+export async function forceTestReset(
+  userId: string,
+  onReset: () => void
+): Promise<void> {
+  console.log('🧪 TESTING: Forcing daily reset...');
+  onReset();
+  
+  // Update storage to prevent immediate re-trigger
+  const testResetKey = `@daily_reset_${userId}`;
+  const currentDate = new Date().toISOString().split('T')[0];
+  await AsyncStorage.setItem(testResetKey, currentDate);
+  console.log('✅ TESTING: Forced reset completed');
+}
+
+/**
  * Reset daily counters if new day detected
  */
 export async function handleDailyReset(
