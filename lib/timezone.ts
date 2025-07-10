@@ -147,60 +147,6 @@ export function getTimeUntilMidnight(timezone: string): { hours: number; minutes
 }
 
 /**
- * Force daily reset for testing (remove after testing)
- */
-export async function forceTestReset(
-  userId: string,
-  onReset: () => void
-): Promise<void> {
-  console.log('🧪 TESTING: Forcing daily reset...');
-  
-  try {
-    // Import supabase here to avoid circular dependencies
-    const { supabase } = await import('@/lib/supabase');
-    
-    const today = new Date().toISOString().split('T')[0];
-    
-    // 1. Delete today's daily records
-    const { error: deleteRecordsError } = await supabase
-      .from('daily_records')
-      .delete()
-      .eq('user_id', userId)
-      .eq('record_date', today);
-    
-    if (deleteRecordsError) {
-      console.error('❌ Error deleting daily records:', deleteRecordsError);
-    } else {
-      console.log('✅ Deleted today\'s daily records');
-    }
-    
-    // 2. Delete today's meditation records
-    const { error: deleteMeditationError } = await supabase
-      .from('meditation_records')
-      .delete()
-      .eq('user_id', userId)
-      .eq('record_date', today);
-    
-    if (deleteMeditationError) {
-      console.error('❌ Error deleting meditation records:', deleteMeditationError);
-    } else {
-      console.log('✅ Deleted today\'s meditation records');
-    }
-    
-    // 3. Execute the callback to refresh UI
-    onReset();
-    
-    // 4. Update storage to simulate a new day reset
-    const testResetKey = `@daily_reset_${userId}`;
-    await AsyncStorage.setItem(testResetKey, today);
-    
-    console.log('✅ TESTING: Forced reset completed - all daily data cleared');
-  } catch (error) {
-    console.error('❌ Error during forced reset:', error);
-  }
-}
-
-/**
  * Reset daily counters if new day detected
  */
 export async function handleDailyReset(

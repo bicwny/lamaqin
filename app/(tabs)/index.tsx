@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { forceTestReset } from '@/lib/timezone';
+
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
 import { ThemedText } from '@/components/ThemedText';
@@ -315,28 +315,7 @@ export default function HomeScreen() {
     router.push('/(tabs)/practice');
   };
 
-  // TEMPORARY: Test daily reset function
-  const testDailyReset = async () => {
-    if (!user?.id) return;
-    
-    Alert.alert(
-      '测试日期重置',
-      '这将重置所有每日计数器，确认继续？',
-      [
-        { text: '取消', style: 'cancel' },
-        { 
-          text: '确认重置', 
-          onPress: async () => {
-            await forceTestReset(user.id, () => {
-              console.log('🧪 Reset callback executed');
-              loadDashboardData(); // Reload data after reset
-            });
-            Alert.alert('完成', '日期重置测试完成');
-          }
-        }
-      ]
-    );
-  };
+  
 
   // Handle tapping the whole practice card to view history
   const handlePracticeCardTap = (practice: any) => {
@@ -522,21 +501,7 @@ export default function HomeScreen() {
           }}
         />
         
-        {/* TEMPORARY: Test reset button - remove after testing */}
-        <TouchableOpacity 
-          style={{ 
-            backgroundColor: '#ff6b6b', 
-            padding: 8, 
-            margin: 16, 
-            borderRadius: 8, 
-            alignItems: 'center' 
-          }}
-          onPress={testDailyReset}
-        >
-          <Text style={{ color: 'white', fontWeight: '600' }}>
-            🧪 测试日期重置 (临时按钮)
-          </Text>
-        </TouchableOpacity>
+        
         <ScrollView 
           style={styles.scrollView}
           refreshControl={
