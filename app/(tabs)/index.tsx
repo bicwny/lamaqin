@@ -56,6 +56,8 @@ export default function HomeScreen() {
     lessonId: string;
     url?: string;
   }>>([]);
+  const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
+  const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
