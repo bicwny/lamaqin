@@ -280,6 +280,12 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
                 注册时间：{userProfile.registrationDate}
               </ThemedText>
             </View>
+            <TouchableOpacity 
+              style={styles.editButton}
+              onPress={() => router.push('/edit-profile')}
+            >
+              <Ionicons name="pencil" size={20} color="white" />
+            </TouchableOpacity>
           </View>
         </ThemedView>
 
@@ -427,6 +433,23 @@ const styles = StyleSheet.create({
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    position: 'relative',
+  },
+  editButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: Colors.primary,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   avatarContainer: {
     marginRight: 16,
