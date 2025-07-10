@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -640,13 +640,10 @@ export default function StudyScreen() {
                     style={[styles.recordButton, styles.viewButton]}
                     onPress={() => {
                       if (lesson.url) {
-                        // Navigate to lesson viewer with the lesson's URL from database
-                        router.push({
-                          pathname: '/lesson-viewer',
-                          params: {
-                            lessonUrl: lesson.url,
-                            lessonTitle: lesson.title
-                          }
+                        // Open URL directly in user's default browser
+                        Linking.openURL(lesson.url).catch(err => {
+                          console.error('Failed to open URL:', err);
+                          Alert.alert('错误', '无法打开链接');
                         });
                       } else {
                         Alert.alert('提示', '此课程暂无在线链接');
