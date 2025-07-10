@@ -284,7 +284,9 @@ export default function HomeScreen() {
             weekTarget: project.daily_target,
             todaySessions,
             status,
-            todayDetails
+            todayDetails,
+            practiceId: project.practice_id,
+            type: 'time'
           });
         }
       }
@@ -310,12 +312,12 @@ export default function HomeScreen() {
 
   // Handle tapping the whole practice card to view history
   const handlePracticeCardTap = (practice: any) => {
-    if (practice.type === 'time') {
-      // For meditation practices, show meditation history
+    if (practice.type === 'time' || practice.weekSessions !== undefined) {
+      // For meditation practices (both daily and weekly), show meditation history
       router.push({
         pathname: '/meditation-history',
         params: {
-          practiceId: practice.practiceId,
+          practiceId: practice.practiceId || practice.id,
           practiceName: practice.name,
         },
       });
@@ -361,13 +363,13 @@ export default function HomeScreen() {
   const handleAddRecord = (e: any, practice: any) => {
     e.stopPropagation(); // Prevent card tap
 
-    if (practice.type === 'time') {
-      // For meditation practices, navigate to meditation record modal
+    if (practice.type === 'time' || practice.weekSessions !== undefined) {
+      // For meditation practices (both daily and weekly), navigate to meditation record modal
       router.push({
         pathname: '/modals/meditation-record',
         params: {
           projectId: practice.id,
-          practiceId: practice.practiceId,
+          practiceId: practice.practiceId || practice.id,
           practiceName: practice.name,
         },
       });
@@ -599,7 +601,12 @@ export default function HomeScreen() {
 
             {/* Weekly Practices */}
             {weeklyPractices.map((practice) => (
-              <View key={practice.id} style={styles.practiceCard}>
+              <TouchableOpacity 
+                key={practice.id} 
+                style={styles.practiceCard}
+                onPress={() => handlePracticeCardTap(practice)}
+                activeOpacity={0.7}
+              >
                 <View style={styles.practiceHeader}>
                   <View style={styles.practiceNameRow}>
                     <Text style={styles.practiceStatusIcon}>
@@ -617,7 +624,17 @@ export default function HomeScreen() {
                     今日：{practice.todayDetails}
                   </Text>
                 )}
-              </View>
+
+                {/* Action Button for Weekly Practices */}
+                <View style={styles.practiceActions}>
+                  <TouchableOpacity 
+                    style={[styles.actionButton, styles.addButton]}
+                    onPress={(e) => handleAddRecord(e, practice)}
+                  >
+                    <Text style={styles.actionButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
             ))}
 
             {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
