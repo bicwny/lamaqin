@@ -16,7 +16,7 @@ const USER_ID = '954dc879-cbfe-4b5f-a7ef-113acf1f5569'; // Your user ID from log
 
 const QIANXING_COURSE = {
   name: '《前行广释》',
-  total_lessons: 144,
+  total_lessons: 146,
   teacher: '索达吉堪布',
   description: '大圆满前行广释 - 索达吉堪布讲解的前行修法详细指导'
 };
@@ -26,8 +26,8 @@ const QIANXING_LESSONS = [
   { lesson_number: 1, title: '前行之重要性', content_summary: '讲解前行修法的重要意义和必要性' }
 ];
 
-// Generate lessons 1-144
-for (let i = 1; i <= 144; i++) {
+// Generate lessons 2-145 (lesson 0 and 1 already defined above)
+for (let i = 2; i <= 145; i++) {
   QIANXING_LESSONS.push({
     lesson_number: i,
     title: `第${i}课`,
@@ -68,43 +68,43 @@ async function addQianxingCourse() {
       console.log(`✅ Created course: ${QIANXING_COURSE.name}`);
     }
 
-    // 3. Add all lessons
-    console.log('\n📚 Adding lessons...');
+    // 3. Replace all existing lessons
+    console.log('\n📚 Replacing all lessons...');
     
-    // Check existing lessons first
-    const { data: existingLessons } = await supabase
+    // Delete all existing lessons for this course
+    const { error: deleteError } = await supabase
       .from('course_lessons')
-      .select('lesson_number')
+      .delete()
       .eq('course_id', courseId);
 
-    const existingLessonNumbers = new Set(existingLessons?.map(l => l.lesson_number) || []);
+    if (deleteError) {
+      console.error('❌ Error deleting existing lessons:', deleteError);
+      return;
+    }
 
-    const lessonsToAdd = QIANXING_LESSONS
-      .filter(lesson => !existingLessonNumbers.has(lesson.lesson_number))
-      .map(lesson => ({
-        course_id: courseId,
-        ...lesson
-      }));
+    console.log('✅ Deleted all existing lessons');
 
-    if (lessonsToAdd.length > 0) {
-      // Insert lessons in batches of 100 to avoid API limits
-      const batchSize = 100;
-      for (let i = 0; i < lessonsToAdd.length; i += batchSize) {
-        const batch = lessonsToAdd.slice(i, i + batchSize);
-        
-        const { error: lessonsError } = await supabase
-          .from('course_lessons')
-          .insert(batch);
+    // Add all new lessons
+    const allLessons = QIANXING_LESSONS.map(lesson => ({
+      course_id: courseId,
+      ...lesson
+    }));
 
-        if (lessonsError) {
-          console.error('❌ Error creating lessons batch:', lessonsError);
-          return;
-        }
+    // Insert lessons in batches of 100 to avoid API limits
+    const batchSize = 100;
+    for (let i = 0; i < allLessons.length; i += batchSize) {
+      const batch = allLessons.slice(i, i + batchSize);
+      
+      const { error: lessonsError } = await supabase
+        .from('course_lessons')
+        .insert(batch);
 
-        console.log(`✅ Added lessons ${i + 1}-${Math.min(i + batchSize, lessonsToAdd.length)}`);
+      if (lessonsError) {
+        console.error('❌ Error creating lessons batch:', lessonsError);
+        return;
       }
-    } else {
-      console.log('✅ All lessons already exist');
+
+      console.log(`✅ Added lessons ${i + 1}-${Math.min(i + batchSize, allLessons.length)}`);
     }
 
     // 4. Add user to course (create user_courses record)
