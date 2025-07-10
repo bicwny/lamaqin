@@ -9,11 +9,18 @@ import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function LessonViewer() {
-  const { url, title, lessonNumber } = useLocalSearchParams<{
-    url: string;
-    title: string;
-    lessonNumber: string;
+  const params = useLocalSearchParams<{
+    url?: string;
+    lessonUrl?: string;
+    title?: string;
+    lessonTitle?: string;
+    lessonNumber?: string;
   }>();
+  
+  // Support both parameter formats
+  const url = params.url || params.lessonUrl;
+  const title = params.title || params.lessonTitle;
+  const lessonNumber = params.lessonNumber;
 
   if (!url) {
     return (
