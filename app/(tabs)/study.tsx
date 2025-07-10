@@ -639,14 +639,18 @@ export default function StudyScreen() {
                   <TouchableOpacity 
                     style={[styles.recordButton, styles.viewButton]}
                     onPress={() => {
-                      // Navigate to lesson viewer with the organization's URL
-                      router.push({
-                        pathname: '/lesson-viewer',
-                        params: {
-                          lessonUrl: `https://www.bicwny.com/堪布讲堂/初级/加行全部课件/上师瑜伽速赐加持?lesson=${lesson.lesson_number}`,
-                          lessonTitle: lesson.title
-                        }
-                      });
+                      if (lesson.url) {
+                        // Navigate to lesson viewer with the lesson's URL from database
+                        router.push({
+                          pathname: '/lesson-viewer',
+                          params: {
+                            lessonUrl: lesson.url,
+                            lessonTitle: lesson.title
+                          }
+                        });
+                      } else {
+                        Alert.alert('提示', '此课程暂无在线链接');
+                      }
                     }}
                   >
                     <Text style={styles.recordButtonText}>在线课程</Text>

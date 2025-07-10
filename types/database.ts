@@ -53,6 +53,7 @@ export interface CourseLesson {
   lesson_number: number;
   title: string;
   content_summary?: string;
+  url?: string;
   created_at: string;
 }
 
