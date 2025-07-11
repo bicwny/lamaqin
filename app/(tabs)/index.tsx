@@ -1010,20 +1010,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   weeklyProgressColumn: {
-    fontSize: 12,
+    fontSize: 11,
     color: Colors.text,
-    marginBottom: 4,
-  },
-  todayDetails: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    fontStyle: 'italic',
+    marginBottom: 2,
   },
   todayDetailsColumn: {
-    fontSize: 10,
+    fontSize: 9,
     color: Colors.textSecondary,
     fontStyle: 'italic',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   noPracticeText: {
     fontSize: 16,
