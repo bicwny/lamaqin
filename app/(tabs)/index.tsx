@@ -588,11 +588,12 @@ export default function HomeScreen() {
             {courseLessons.map((nextLesson, index) => (
               <TouchableOpacity key={index} style={styles.studyCard} onPress={navigateToStudy}>
                 <View style={styles.studyCardHeader}>
-                  <Text style={styles.studyCardTitle}>下一课</Text>
-                  <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+                  <View style={styles.studyCardTitleContainer}>
+                    <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={24} color="#666" />
                 </View>
-                <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                <Text style={styles.lessonTitle}>{nextLesson.lessonTitle}</Text>
                 <Text style={styles.progressText}>{nextLesson.progress}</Text>
                 <View style={styles.quickActionButtons}>
                   <TouchableOpacity 
@@ -615,9 +616,6 @@ export default function HomeScreen() {
                       <Text style={styles.quickActionButtonText}>在线课程</Text>
                     </TouchableOpacity>
                   ) : null}
-                </View>
-                <View style={styles.continueButton}>
-                  <Text style={styles.continueButtonText}>继续学习</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -795,79 +793,67 @@ const styles = StyleSheet.create({
   },
   studyCard: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     marginHorizontal: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   studyCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    marginBottom: 16,
   },
-  studyCardTitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+  studyCardTitleContainer: {
+    flex: 1,
   },
   courseName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 6,
+    letterSpacing: -0.3,
   },
-  lessonTitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 8,
+  continueStudyText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
   },
   progressText: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 12,
-  },
-  continueButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignSelf: 'flex-start',
-  },
-  continueButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 20,
   },
   quickActionButtons: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
+    gap: 12,
   },
   quickActionButton: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
   },
   listenButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#4CAF50',
   },
   readButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#2196F3',
   },
   onlineButton: {
-    backgroundColor: '#da4347',
+    backgroundColor: '#F44336',
   },
   quickActionButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
   },
   noStudyText: {
