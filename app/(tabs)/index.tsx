@@ -632,105 +632,112 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Daily Practices */}
-            {dailyPractices.map((practice) => (
-              <TouchableOpacity 
-                key={practice.id} 
-                style={styles.practiceCard}
-                onPress={() => handlePracticeCardTap(practice)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.practiceHeader}>
-                  <View style={styles.practiceNameRow}>
-                    <Text style={styles.practiceStatusIcon}>
-                      {getStatusIcon(practice.status)}
+            {/* Practice Cards in Two Columns */}
+            <View style={styles.practiceGrid}>
+              {/* Daily Practices */}
+              {dailyPractices.map((practice) => (
+                <TouchableOpacity 
+                  key={practice.id} 
+                  style={styles.practiceCardColumn}
+                  onPress={() => handlePracticeCardTap(practice)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.practiceHeader}>
+                    <View style={styles.practiceNameRow}>
+                      <Text style={styles.practiceStatusIcon}>
+                        {getStatusIcon(practice.status)}
+                      </Text>
+                      <Text style={styles.practiceNameColumn} numberOfLines={1}>
+                        {practice.name}
+                      </Text>
+                    </View>
+                    <Text style={styles.practiceCountColumn}>
+                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
                     </Text>
-                    <Text style={styles.practiceName}>{practice.name}</Text>
                   </View>
-                  <Text style={styles.practiceCount}>
-                    {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
-                  </Text>
-                </View>
 
-                <View style={styles.progressBarContainer}>
-                  <View style={styles.progressBarBg}>
-                    <View 
+                  <View style={styles.progressBarContainer}>
+                    <View style={styles.progressBarBg}>
+                      <View 
+                        style={[
+                          styles.progressBarFill, 
+                          { width: `${Math.min(practice.progressPercent, 100)}%` }
+                        ]} 
+                      />
+                    </View>
+                    <Text style={styles.progressPercent}>
+                      {Math.round(practice.progressPercent)}%
+                    </Text>
+                  </View>
+
+                  {/* Action Buttons */}
+                  <View style={styles.practiceActions}>
+                    <TouchableOpacity 
                       style={[
-                        styles.progressBarFill, 
-                        { width: `${Math.min(practice.progressPercent, 100)}%` }
-                      ]} 
-                    />
+                        styles.actionButton, 
+                        styles.checkButton,
+                        practice.status === 'completed' && styles.checkButtonCompleted
+                      ]}
+                      onPress={(e) => handleQuickComplete(e, practice)}
+                    >
+                      <Text style={[
+                        styles.actionButtonText,
+                        practice.status === 'completed' && styles.checkButtonCompletedText
+                      ]}>
+                        {practice.status === 'completed' ? '✓' : '✓'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.actionButton, styles.addButton]}
+                      onPress={(e) => handleAddRecord(e, practice)}
+                    >
+                      <Text style={styles.actionButtonText}>+</Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text style={styles.progressPercent}>
-                    {Math.round(practice.progressPercent)}%
-                  </Text>
-                </View>
+                </TouchableOpacity>
+              ))}
 
-                {/* Action Buttons */}
-                <View style={styles.practiceActions}>
-                  <TouchableOpacity 
-                    style={[
-                      styles.actionButton, 
-                      styles.checkButton,
-                      practice.status === 'completed' && styles.checkButtonCompleted
-                    ]}
-                    onPress={(e) => handleQuickComplete(e, practice)}
-                  >
-                    <Text style={[
-                      styles.actionButtonText,
-                      practice.status === 'completed' && styles.checkButtonCompletedText
-                    ]}>
-                      {practice.status === 'completed' ? '✓' : '✓'}
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={[styles.actionButton, styles.addButton]}
-                    onPress={(e) => handleAddRecord(e, practice)}
-                  >
-                    <Text style={styles.actionButtonText}>+</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-
-            {/* Weekly Practices */}
-            {weeklyPractices.map((practice) => (
-              <TouchableOpacity 
-                key={practice.id} 
-                style={styles.practiceCard}
-                onPress={() => handlePracticeCardTap(practice)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.practiceHeader}>
-                  <View style={styles.practiceNameRow}>
-                    <Text style={styles.practiceStatusIcon}>
-                      {getStatusIcon(practice.status)}
-                    </Text>
-                    <Text style={styles.practiceName}>{practice.name}</Text>
+              {/* Weekly Practices */}
+              {weeklyPractices.map((practice) => (
+                <TouchableOpacity 
+                  key={practice.id} 
+                  style={styles.practiceCardColumn}
+                  onPress={() => handlePracticeCardTap(practice)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.practiceHeader}>
+                    <View style={styles.practiceNameRow}>
+                      <Text style={styles.practiceStatusIcon}>
+                        {getStatusIcon(practice.status)}
+                      </Text>
+                      <Text style={styles.practiceNameColumn} numberOfLines={1}>
+                        {practice.name}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                <Text style={styles.weeklyProgress}>
-                  本周 {practice.weekSessions}/{practice.weekTarget}座
-                  {practice.status === 'completed' && ' ✅'}
-                </Text>
-                {practice.todaySessions > 0 && practice.todayDetails && (
-                  <Text style={styles.todayDetails}>
-                    今日：{practice.todayDetails}
+                  <Text style={styles.weeklyProgressColumn}>
+                    本周 {practice.weekSessions}/{practice.weekTarget}座
+                    {practice.status === 'completed' && ' ✅'}
                   </Text>
-                )}
+                  {practice.todaySessions > 0 && practice.todayDetails && (
+                    <Text style={styles.todayDetailsColumn} numberOfLines={2}>
+                      今日：{practice.todayDetails}
+                    </Text>
+                  )}
 
-                {/* Action Button for Weekly Practices */}
-                <View style={styles.practiceActions}>
-                  <TouchableOpacity 
-                    style={[styles.actionButton, styles.addButton]}
-                    onPress={(e) => handleAddRecord(e, practice)}
-                  >
-                    <Text style={styles.actionButtonText}>+</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
+                  {/* Action Button for Weekly Practices */}
+                  <View style={styles.practiceActions}>
+                    <TouchableOpacity 
+                      style={[styles.actionButton, styles.addButton]}
+                      onPress={(e) => handleAddRecord(e, practice)}
+                    >
+                      <Text style={styles.actionButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
               <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
@@ -881,6 +888,23 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  practiceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 8,
+  },
+  practiceCardColumn: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 12,
+    margin: 8,
+    flex: 0.48,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   practiceHeader: {
     marginBottom: 8,
   },
@@ -899,8 +923,18 @@ const styles = StyleSheet.create({
     color: Colors.text,
     flex: 1,
   },
+  practiceNameColumn: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    flex: 1,
+  },
   practiceCount: {
     fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  practiceCountColumn: {
+    fontSize: 12,
     color: Colors.textSecondary,
   },
   progressBarContainer: {
@@ -964,10 +998,21 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: 4,
   },
+  weeklyProgressColumn: {
+    fontSize: 12,
+    color: Colors.text,
+    marginBottom: 4,
+  },
   todayDetails: {
     fontSize: 12,
     color: Colors.textSecondary,
     fontStyle: 'italic',
+  },
+  todayDetailsColumn: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 8,
   },
   noPracticeText: {
     fontSize: 16,
