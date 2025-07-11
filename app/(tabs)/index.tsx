@@ -158,7 +158,7 @@ export default function HomeScreen() {
         // Find the next incomplete lesson
         let nextLessonNumber = 1;
         let nextLessonId = '';
-        let nextLessonTitle = '第1课';
+        let nextLessonTitle = '';
         let nextLessonUrl = '';
 
         for (let i = 1; i <= userCourse.course.total_lessons; i++) {
@@ -170,6 +170,9 @@ export default function HomeScreen() {
               nextLessonId = nextLesson.id;
               nextLessonTitle = nextLesson.title || `第${i}课`;
               nextLessonUrl = nextLesson.url || '';
+            } else {
+              // If no lesson found, use fallback title
+              nextLessonTitle = `第${i}课`;
             }
             break;
           }
