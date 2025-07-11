@@ -891,14 +891,15 @@ const styles = StyleSheet.create({
   practiceGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
   practiceCardColumn: {
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 12,
-    margin: 8,
-    flex: 0.48,
+    marginBottom: 12,
+    width: '48%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
