@@ -192,7 +192,7 @@ export default function HomeScreen() {
           lessonTitle: nextLessonTitle,
           lessonId: nextLessonId,
           url: nextLessonUrl,
-          progress: `${completedLessons}/${userCourse.course.total_lessons}课已完成 (${Math.round((completedLessons / userCourse.course.total_lessons) * 100)}%)`
+          progress: ``
         });
       }
 
