@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PageHeader from '@/components/PageHeader';
 import { supabase } from '@/lib/supabase';
+import Avatar from '@/components/Avatar';
 
 interface UserProfile {
   dharmaName: string;
@@ -148,7 +149,7 @@ export default function ProfileScreen() {
           console.error('❌ Error fetching user data:', error);
         } else if (userData) {
           console.log('✅ Loaded user data from database:', userData);
-          
+
           // Format the registration date
           const registrationDate = userData.created_at 
             ? new Date(userData.created_at).toLocaleDateString('zh-CN')
@@ -264,7 +265,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         <ThemedView style={styles.section}>
           <View style={styles.profileCard}>
             <View style={styles.avatarContainer}>
-              <Text style={styles.avatar}>👨‍🦲</Text>
+              <Avatar dharmaName={userProfile.dharmaName} size={80} />
             </View>
             <View style={styles.profileInfo}>
               <ThemedText type="subtitle" style={styles.userName}>
@@ -453,9 +454,6 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     marginRight: 16,
-  },
-  avatar: {
-    fontSize: 48,
   },
   profileInfo: {
     flex: 1,
