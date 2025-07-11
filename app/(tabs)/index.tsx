@@ -12,6 +12,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { RefreshControl } from 'react-native';
+import Avatar from '@/components/Avatar';
 
 interface NextLesson {
   courseId: string;
@@ -47,6 +48,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
   const [courseLessons, setCourseLessons] = useState<Array<{
     courseId: string;
     courseName: string;
@@ -75,7 +77,8 @@ export default function HomeScreen() {
       await Promise.all([
         loadCourseLessons(),
         loadDailyPractices(),
-        loadWeeklyPractices()
+        loadWeeklyPractices(),
+        loadUserProfile()
       ]);
     } catch (error) {
       console.error('❌ Error loading dashboard data:', error);
@@ -330,6 +333,24 @@ export default function HomeScreen() {
     }
   };
 
+  const loadUserProfile = async () => {
+    try {
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('dharma_name')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('❌ Error fetching user dharma name:', error);
+      } else if (userData?.dharma_name) {
+        setUserDharmaName(userData.dharma_name);
+      }
+    } catch (error) {
+      console.error('❌ Error loading user profile:', error);
+    }
+  };
+
   const navigateToProfile = () => {
     router.push('/(tabs)/profile');
   };
@@ -565,9 +586,9 @@ export default function HomeScreen() {
       <ThemedView style={styles.container}>
         <PageHeader 
           title="🏠 修行主页"
-          subtitle={`${getGreeting()} • 圆青居士 · 修行第365天 🔥`}
+          subtitle={`${getGreeting()} • ${userDharmaName}居士 · 修行第365天 🔥`}
           rightAction={{
-            text: "👤",
+            component: <Avatar dharmaName={userDharmaName} size={32} />,
             onPress: navigateToProfile
           }}
         />

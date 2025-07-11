@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,7 +8,8 @@ interface PageHeaderProps {
   showBackButton?: boolean;
   onBackPress?: () => void;
   rightAction?: {
-    text: string;
+    text?: string;
+    component?: React.ReactNode;
     onPress: () => void;
   };
   subtitle?: string;
@@ -32,14 +32,16 @@ export default function PageHeader({
         ) : (
           <View style={styles.placeholder} />
         )}
-        
+
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{title}</Text>
         </View>
-        
+
         {rightAction ? (
-          <TouchableOpacity onPress={rightAction.onPress}>
-            <Text style={styles.rightActionText}>{rightAction.text}</Text>
+          <TouchableOpacity onPress={rightAction.onPress} style={styles.rightAction}>
+            {rightAction.component ? rightAction.component : (
+              <Text style={styles.rightActionText}>{rightAction.text}</Text>
+            )}
           </TouchableOpacity>
         ) : (
           <View style={styles.placeholder} />
