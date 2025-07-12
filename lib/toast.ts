@@ -1,4 +1,5 @@
 
+import React from 'react';
 import Toast from 'react-native-toast-message';
 import { View, Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
