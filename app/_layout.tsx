@@ -8,6 +8,7 @@ import { View, Text, Platform } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 import Toast from 'react-native-toast-message';
+import { toastConfig } from '@/lib/toast';
 
 
 
@@ -153,7 +154,7 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar style="auto" />
       <RootLayoutNav />
-      <Toast />
+      <Toast config={toastConfig} />
     </AuthProvider>
   );
 }
