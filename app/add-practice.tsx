@@ -27,7 +27,7 @@ export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-
+  
 
   useEffect(() => {
     loadPractices();
@@ -111,7 +111,7 @@ export default function AddPracticeScreen() {
     </View>
   );
 
-
+  
 
   if (loading) {
     return (
@@ -159,85 +159,170 @@ export default function AddPracticeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f8f9fa',
   },
-  keyboardView: {
+  content: {
     flex: 1,
+    padding: 16,
   },
-  scrollView: {
+  loadingContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  formContainer: {
-    padding: 20,
-    gap: 20,
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.text,
   },
-  inputGroup: {
-    gap: 8,
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
   },
-  label: {
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  backButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  practiceList: {
+    flex: 1,
+  },
+  practiceCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  practiceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
     marginBottom: 4,
   },
-  input: {
+  practiceType: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  practiceDescription: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  configForm: {
     backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#e1e5e9',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#333',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    padding: 16,
   },
-  picker: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#e1e5e9',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+  inputGroup: {
+    marginBottom: 20,
   },
-  saveButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 20,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  saveButtonDisabled: {
-    backgroundColor: '#9CA3AF',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  cancelButton: {
-    backgroundColor: '#f8f9fa',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e1e5e9',
-  },
-  cancelButtonText: {
-    color: '#666',
+  inputLabel: {
     fontSize: 16,
     fontWeight: '500',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  periodSelector: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  periodButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    alignItems: 'center',
+  },
+  selectedPeriodButton: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  periodButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedPeriodButtonText: {
+    color: 'white',
+  },
+  footer: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+    backgroundColor: 'white',
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
   },
 });

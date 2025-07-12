@@ -64,71 +64,79 @@ export default function StatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f5f5f5',
   },
   scrollView: {
     flex: 1,
   },
-  loadingContainer: {
+  scrollContent: {
+    flexGrow: 1,
+  },
+  emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
+    padding: 40,
+    minHeight: 500,
   },
-  loadingText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
+  iconContainer: {
+    marginBottom: 24,
   },
-  statsCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#374151',
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    textAlign: 'center',
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 16,
-    letterSpacing: -0.3,
-  },
-  statItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#f0f0f0',
-  },
-  statLabel: {
+  emptyDescription: {
     fontSize: 16,
-    color: Colors.text,
-    fontWeight: '500',
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.primary,
-    letterSpacing: -0.2,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 20,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
+    color: '#6B7280',
     textAlign: 'center',
     lineHeight: 24,
+    marginBottom: 32,
+    maxWidth: 280,
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#7C3AED',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    marginBottom: 40,
+  },
+  startButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  featureContainer: {
+    alignItems: 'center',
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 20,
+  },
+  features: {
+    alignItems: 'stretch',
+  },
+  featureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    minWidth: 200,
+  },
+  featureText: {
+    fontSize: 14,
+    color: '#374151',
+    marginLeft: 12,
+    fontWeight: '500',
   },
 });

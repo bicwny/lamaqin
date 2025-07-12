@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -99,7 +100,7 @@ export default function CourseDetailScreen() {
       // Load user's enrollment for this course
       const userCourses = await studyService.getUserCourses(user.id);
       const foundUserCourse = userCourses.find(uc => uc.course_id === courseId);
-
+      
       if (!foundUserCourse) {
         toastService.error({
           title: '课程未找到',
@@ -149,7 +150,7 @@ export default function CourseDetailScreen() {
 
       // Trigger refresh of lesson counts
       setRefreshTrigger(prev => prev + 1);
-
+      
       // Reload course data to update progress
       loadCourseData();
     } catch (error) {
@@ -279,7 +280,7 @@ export default function CourseDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f8f9fa',
   },
   scrollView: {
     flex: 1,
@@ -288,152 +289,100 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   loadingText: {
+    fontSize: 16,
+    color: '#666',
     marginTop: 16,
-    fontSize: 16,
-    color: Colors.textSecondary,
-  },
-  courseInfo: {
-    backgroundColor: 'white',
-    padding: 20,
-    marginBottom: 16,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-  },
-  courseName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 8,
-    letterSpacing: -0.3,
-  },
-  courseTeacher: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    marginBottom: 12,
-    fontWeight: '500',
-  },
-  courseDescription: {
-    fontSize: 14,
-    color: Colors.text,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  progressInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  progressText: {
-    fontSize: 14,
-    color: Colors.text,
-    fontWeight: '500',
-  },
-  progressPercentage: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.primary,
-    letterSpacing: -0.2,
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.primary,
-    borderRadius: 3,
-  },
-  lessonsSection: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 16,
-    letterSpacing: -0.3,
+    fontWeight: '600',
+    color: '#333',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  courseInfoCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  courseInfoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  courseInfoText: {
+    fontSize: 14,
+    marginBottom: 4,
   },
   lessonItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#f0f0f0',
+    backgroundColor: '#fff',
+    padding: 12,
+    marginHorizontal: 16,
+    marginVertical: 2,
+    borderRadius: 8,
   },
-  lessonNumber: {
-    width: 30,
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '600',
-  },
-  lessonContent: {
-    flex: 1,
-    marginLeft: 12,
+  lessonHeader: {
+    marginBottom: 8,
   },
   lessonTitle: {
-    fontSize: 16,
-    color: Colors.text,
+    fontSize: 14,
+    fontWeight: '600',
     marginBottom: 4,
-    fontWeight: '500',
+  },
+  lessonProgressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
   },
   lessonProgress: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: '#666',
+    flex: 1,
   },
-  statusIcon: {
-    marginLeft: 12,
+  completionCheck: {
     fontSize: 16,
+    marginLeft: 8,
   },
-  actionButtons: {
+  lessonTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  recordButtons: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 8,
   },
-  actionButton: {
-    paddingVertical: 8,
+  recordButton: {
+    flex: 1,
     paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignItems: 'center',
   },
   listenButton: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
+    backgroundColor: '#28a745',
   },
   readButton: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: '#007bff',
   },
-  actionButtonText: {
+  viewButton: {
+    backgroundColor: '#da4347',
+  },
+  recordButtonText: {
+    color: '#fff',
     fontSize: 12,
-    fontWeight: '700',
-    color: 'white',
-    letterSpacing: -0.2,
+    fontWeight: '600',
   },
 });
