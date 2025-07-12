@@ -1,5 +1,14 @@
+
+import { useEffect } from 'react';
+import { router } from 'expo-router';
+
 // Profile moved to app/profile.tsx
-// This file is kept as placeholder since it's still referenced in _layout.tsx with href: null
+// This file redirects to the main profile screen
 export default function ProfileTabPlaceholder() {
+  useEffect(() => {
+    // If someone navigates here, redirect to the main profile
+    router.replace('/profile');
+  }, []);
+
   return null;
 }
