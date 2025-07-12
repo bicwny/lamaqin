@@ -58,7 +58,6 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen 
         name="profile" 
         options={{ 
@@ -66,6 +65,7 @@ function RootLayoutNav() {
           presentation: 'card'
         }} 
       />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen 
         name="edit-profile" 
         options={{ 
