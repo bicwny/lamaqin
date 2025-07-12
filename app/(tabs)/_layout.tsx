@@ -106,6 +106,7 @@ export default function TabLayout() {
           href: null, // Hide the explore tab
         }}
       />
+      />
     </Tabs>
   );
 }
