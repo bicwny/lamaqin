@@ -65,12 +65,20 @@ export default function HomeScreen() {
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
 
+  // Track when user is returning from recording to avoid unnecessary refresh
+  const [lastRecordTime, setLastRecordTime] = useState<number>(0);
+
   useFocusEffect(
     React.useCallback(() => {
       if (user?.id) {
-        loadDashboardData();
+        const now = Date.now();
+        // Only refresh if it's been more than 2 seconds since last record
+        // This prevents refresh when user just recorded something and came back
+        if (now - lastRecordTime > 2000) {
+          loadDashboardData();
+        }
       }
-    }, [user?.id])
+    }, [user?.id, lastRecordTime])
   );
 
   const loadDashboardData = async () => {
@@ -404,6 +412,31 @@ export default function HomeScreen() {
     if (!user) return;
 
     try {
+      // Optimistic update: immediately update the progress text
+      setCourseLessons(prev => prev.map(lesson => {
+        if (lesson.courseId === courseId && lesson.lessonNumber === lessonNumber) {
+          const currentProgress = lesson.progress;
+          const [listenPart, readPart] = currentProgress.split(' | ');
+          const listenCount = parseInt(listenPart.match(/\d+/)?.[0] || '0');
+          const readCount = parseInt(readPart.match(/\d+/)?.[0] || '0');
+          
+          const newListenCount = studyType === '听传承' ? listenCount + 1 : listenCount;
+          const newReadCount = studyType === '看法本' ? readCount + 1 : readCount;
+          
+          return {
+            ...lesson,
+            progress: `听传承: ${newListenCount}次 | 看法本: ${newReadCount}次`
+          };
+        }
+        return lesson;
+      }));
+
+      // Show success toast immediately
+      toastService.success({
+        title: '学习记录已保存',
+        message: `${studyType}完成 - 继续加油！`
+      });
+
       const today = new Date().toISOString().split('T')[0];
 
       // Find the lesson
@@ -419,6 +452,8 @@ export default function HomeScreen() {
           title: '课程信息有误',
           message: '无法找到对应的课程内容'
         });
+        // Revert optimistic update
+        loadCourseLessons();
         return;
       }
 
@@ -437,19 +472,20 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      toastService.success({
-        title: '学习记录已保存',
-        message: `${studyType}完成 - 继续加油！`
-      });
+      // Background refresh to ensure data consistency
+      setTimeout(() => {
+        loadCourseLessons();
+      }, 1000);
 
-      // Refresh the lessons
-      loadCourseLessons();
     } catch (error) {
       console.error('Error recording study:', error);
       toastService.error({
         title: '保存失败',
         message: '网络异常，请稍后重试'
       });
+      
+      // Revert optimistic update on error
+      loadCourseLessons();
     }
   };
 
@@ -498,13 +534,37 @@ export default function HomeScreen() {
     // Calculate remaining amount to complete daily target
     const remaining = practice.target - practice.current;
 
-    // Directly record without confirmation
-    recordQuickComplete(practice, remaining);
+    // Optimistic update: immediately update UI
+    updatePracticeOptimistically(practice.id, remaining, practice.type);
+
+    // Show success toast immediately
+    toastService.success({
+      title: '✅ 已完成今日目标',
+      message: `${practice.name} +${remaining.toLocaleString()} ${practice.unit}`
+    });
+
+    // Record in background
+    try {
+      await recordQuickCompleteBackground(practice, remaining);
+    } catch (error) {
+      // Revert optimistic update on error
+      console.error('❌ Error recording practice:', error);
+      toastService.error({
+        title: '记录失败',
+        message: '请检查网络连接后重试'
+      });
+      
+      // Refresh data to revert optimistic changes
+      loadDashboardData();
+    }
   };
 
   // Handle add record button (plus)
   const handleAddRecord = (e: any, practice: any) => {
     e.stopPropagation(); // Prevent card tap
+
+    // Track when user is going to record
+    setLastRecordTime(Date.now());
 
     if (practice.type === 'time' || practice.weekSessions !== undefined) {
       // For meditation practices (both daily and weekly), navigate to meditation record modal
@@ -529,69 +589,88 @@ export default function HomeScreen() {
     }
   };
 
-  // Record quick complete amount
-  const recordQuickComplete = async (practice: any, amount: number) => {
+  // Optimistic update helper function
+  const updatePracticeOptimistically = (practiceId: string, amount: number, practiceType: 'count' | 'time') => {
+    if (practiceType === 'time') {
+      // Update weekly practices
+      setWeeklyPractices(prev => prev.map(practice => {
+        if (practice.id === practiceId) {
+          const newWeekSessions = practice.weekSessions + 1;
+          const newTodaySessions = practice.todaySessions + 1;
+          
+          return {
+            ...practice,
+            weekSessions: newWeekSessions,
+            todaySessions: newTodaySessions,
+            status: newWeekSessions >= practice.weekTarget ? 'completed' : 'in_progress',
+            todayDetails: practice.todayDetails 
+              ? `${practice.todayDetails}；第${newTodaySessions}座${amount}分钟`
+              : `第${newTodaySessions}座${amount}分钟`
+          };
+        }
+        return practice;
+      }));
+    } else {
+      // Update daily practices
+      setDailyPractices(prev => prev.map(practice => {
+        if (practice.id === practiceId) {
+          const newCurrent = practice.current + amount;
+          const newProgressPercent = Math.min((newCurrent / practice.target) * 100, 100);
+          
+          return {
+            ...practice,
+            current: newCurrent,
+            progressPercent: newProgressPercent,
+            status: newCurrent >= practice.target ? 'completed' : 'in_progress'
+          };
+        }
+        return practice;
+      }));
+    }
+  };
+
+  // Background recording function (no UI updates)
+  const recordQuickCompleteBackground = async (practice: any, amount: number) => {
     if (!user) return;
 
-    try {
-      setLoading(true);
+    if (practice.type === 'time') {
+      // For time-based practices, create a meditation record with target duration
+      const { error } = await supabase
+        .from('meditation_records')
+        .insert({
+          user_id: user.id,
+          practice_id: practice.practiceId,
+          record_date: new Date().toISOString().split('T')[0],
+          duration_minutes: amount, // Use remaining amount as duration
+          session_number: 1,
+        });
 
-      if (practice.type === 'time') {
-        // For time-based practices, create a meditation record with target duration
-        const { error } = await supabase
-          .from('meditation_records')
-          .insert({
-            user_id: user.id,
-            practice_id: practice.practiceId,
-            record_date: new Date().toISOString().split('T')[0],
-            duration_minutes: amount, // Use remaining amount as duration
-            session_number: 1,
-          });
+      if (error) throw error;
+    } else {
+      // For count-based practices, create a daily record
+      const { error: recordError } = await supabase
+        .from('daily_records')
+        .insert({
+          user_id: user.id,
+          practice_project_id: practice.id,
+          record_date: new Date().toISOString().split('T')[0],
+          count: amount,
+          notes: '快速完成今日目标'
+        });
 
-        if (error) throw error;
-      } else {
-        // For count-based practices, create a daily record
-        const { error: recordError } = await supabase
-          .from('daily_records')
-          .insert({
-            user_id: user.id,
-            practice_project_id: practice.id,
-            record_date: new Date().toISOString().split('T')[0],
-            count: amount,
-            notes: '快速完成今日目标'
-          });
+      if (recordError) throw recordError;
 
-        if (recordError) throw recordError;
+      // Update project's current count
+      const { error: updateError } = await supabase
+        .from('user_practice_projects')
+        .update({ 
+          current_count: practice.current + amount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', practice.id)
+        .eq('user_id', user.id);
 
-        // Update project's current count
-        const { error: updateError } = await supabase
-          .from('user_practice_projects')
-          .update({ 
-            current_count: practice.current + amount,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', practice.id)
-          .eq('user_id', user.id);
-
-        if (updateError) throw updateError;
-      }
-
-      // Reload data to reflect changes
-      loadDashboardData();
-
-      // Show success toast
-      toastService.success({
-        title: '✅ 已完成今日目标',
-        message: `${practice.name} +${amount.toLocaleString()} ${practice.unit}`
-      });
-    } catch (error) {
-      console.error('❌ Error recording quick complete:', error);
-      toastService.error({
-        title: '记录失败',
-        message: '请检查网络连接后重试'
-      });
-    } finally {
-      setLoading(false);
+      if (updateError) throw updateError;
     }
   };
 
