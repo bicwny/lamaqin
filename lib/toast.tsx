@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Toast from 'react-native-toast-message';
 import { View, Text } from 'react-native';
@@ -35,7 +34,7 @@ export const toastConfig = {
           color: '#FFFFFF',
           marginBottom: 2,
         }}>
-          {props.text1}
+          {props.text1 || ''}
         </Text>
         {props.text2 && (
           <Text style={{
@@ -71,7 +70,7 @@ export const toastConfig = {
           color: '#FFFFFF',
           marginBottom: 2,
         }}>
-          {props.text1}
+          {props.text1 || ''}
         </Text>
         {props.text2 && (
           <Text style={{
@@ -107,7 +106,7 @@ export const toastConfig = {
           color: '#FFFFFF',
           marginBottom: 2,
         }}>
-          {props.text1}
+          {props.text1 || ''}
         </Text>
         {props.text2 && (
           <Text style={{
