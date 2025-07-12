@@ -274,6 +274,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 4,
+    color: '#000',
   },
   email: {
     fontSize: 14,
