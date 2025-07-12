@@ -1,76 +1,61 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack, router } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
+import { Stack } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
+import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
-import { View, Text, Platform } from 'react-native';
-import 'react-native-reanimated';
-import '../global.css';
-import Toast from 'react-native-toast-message';
-import { toastConfig } from '@/lib/toast';
-
-
-
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { toastService } from '@/lib/toast';
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
-  console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
-  console.log('📋 User object:', user ? JSON.stringify(user, null, 2) : 'null');
-  console.log('🕐 RootLayoutNav timestamp:', new Date().toISOString());
-
-  // Handle navigation based on auth state
   useEffect(() => {
-    console.log('🔄 RootLayoutNav useEffect triggered:', {
+    const timestamp = new Date().toISOString();
+    const info = {
       loading,
       user: user?.email || null,
-      timestamp: new Date().toISOString()
-    });
+      timestamp
+    };
+
+    console.log('🔄 RootLayoutNav useEffect triggered:', info);
+    setDebugInfo(JSON.stringify(info, null, 2));
 
     if (!loading) {
-      console.log('🔄 Auth state changed in RootLayoutNav, user:', user?.email || 'none');
       if (user) {
+        console.log('🔄 Auth state changed in RootLayoutNav, user:', user.email);
         console.log('✅ User authenticated, should show tabs');
-        router.replace('/(tabs)');
       } else {
-        console.log('❌ No user, should show auth');
-        router.replace('/auth');
+        console.log('❌ No user found in RootLayoutNav');
       }
     } else {
       console.log('⏳ RootLayoutNav still loading, not processing auth state yet');
     }
   }, [user, loading]);
 
+  // Debug logging
+  console.log('🔍 RootLayoutNav render - user:', user?.email || null, 'loading:', loading);
+  console.log('📋 User object:', JSON.stringify(user, null, 2));
+  console.log('🕐 RootLayoutNav timestamp:', new Date().toISOString());
+
   if (loading) {
     console.log('⏳ Showing loading screen...');
     return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="(tabs)" 
-          options={{ headerShown: false }}
-        />
-      </Stack>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
     );
   }
 
   console.log('✅ Auth state resolved, user:', user ? 'logged in' : 'not logged in');
   console.log('📱 About to render Stack with screens');
 
-  if (user) {
-    console.log('🎯 Will show: (tabs) screen');
-  } else {
+  if (!user) {
     console.log('🎯 Will show: auth screen');
+  } else {
+    console.log('🎯 Will show: (tabs) screen');
   }
 
   return (
-    <Stack 
-      screenOptions={{ headerShown: false }}
-    >
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -130,45 +115,10 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [fontLoaded, setFontLoaded] = useState(false);
-
-  // Only use useFonts on web platform
-  const [loaded, error] = useFonts(
-    Platform.OS === 'web' ? {
-      SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    } : {}
-  );
-
-  useEffect(() => {
-    if (error) {
-      console.warn('Font loading error:', error);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    // For native platforms, skip font loading and proceed immediately
-    if (Platform.OS !== 'web') {
-      setFontLoaded(true);
-      SplashScreen.hideAsync();
-    } else if (loaded) {
-      setFontLoaded(true);
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!fontLoaded && Platform.OS === 'web') {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
-    <AuthProvider>
-      <StatusBar style="auto" />
+    <>
       <RootLayoutNav />
-      <Toast config={toastConfig} />
-    </AuthProvider>
+      {toastService.ToastComponent && <toastService.ToastComponent />}
+    </>
   );
 }
