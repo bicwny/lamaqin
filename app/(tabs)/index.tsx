@@ -722,17 +722,17 @@ export default function HomeScreen() {
             </View>
 
             {courseLessons.map((nextLesson, index) => (
-              <TouchableOpacity 
+              <View 
                 key={index} 
-                style={styles.studyCard} 
-                onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}
+                style={styles.studyCard}
               >
                 <View style={styles.studyCardHeader}>
                   <View style={styles.studyCardTitleContainer}>
-                    <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                    <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
+                      <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                    </TouchableOpacity>
                     <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={24} color="#666" />
                 </View>
                 <Text style={styles.progressText}>{nextLesson.progress}</Text>
                 <View style={styles.quickActionButtons}>
@@ -757,7 +757,7 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                   ) : null}
                 </View>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
 
