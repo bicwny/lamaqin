@@ -20,6 +20,8 @@ interface NextLesson {
   lessonNumber: number;
   lessonTitle: string;
   progress: string;
+  lessonId: string;
+  url?: string;
 }
 
 interface DailyPractice {
@@ -57,6 +59,7 @@ export default function HomeScreen() {
     progress: string;
     lessonId: string;
     url?: string;
+    isCompleted?: boolean;
   }>>([]);
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
@@ -166,13 +169,10 @@ export default function HomeScreen() {
         const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
 
         // If all lessons are completed and course is still active, show success message but keep displaying the card
+        let isCourseCompleted = false;
         if (isAllLessonsCompleted && userCourse.status === 'active') {
-          Alert.alert(
-            '🎉 课程完成！', 
-            `恭喜您完成了《${userCourse.course.name}》的全部课程！您已经完成了所有 ${userCourse.course.total_lessons} 课的学习。刷新页面后此卡片将消失。`,
-            [{ text: '确认', style: 'default' }]
-          );
-          
+            isCourseCompleted = true;
+
           // Update course status to completed - this will hide the card on next refresh
           await supabase
             .from('user_courses')
@@ -217,7 +217,8 @@ export default function HomeScreen() {
           lessonTitle: nextLessonTitle,
           lessonId: nextLessonId,
           url: nextLessonUrl,
-          progress: ``
+          progress: ``,
+          isCompleted: isCourseCompleted
         });
       }
 
@@ -635,37 +636,56 @@ export default function HomeScreen() {
             </View>
 
             {courseLessons.map((nextLesson, index) => (
-              <TouchableOpacity key={index} style={styles.studyCard} onPress={navigateToStudy}>
-                <View style={styles.studyCardHeader}>
-                  <View style={styles.studyCardTitleContainer}>
-                    <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
+              <TouchableOpacity 
+                key={index} 
+                style={[styles.studyCard, nextLesson.isCompleted ? styles.completedStudyCard : {}]} 
+                onPress={navigateToStudy}
+              >
+                {nextLesson.isCompleted ? (
+                  <View style={styles.completionMessageContainer}>
+                    <Text style={styles.completionIcon}>🎉</Text>
+                    <Text style={styles.completionTitle}>课程完成！</Text>
+                    <Text style={styles.completionMessage}>
+                      恭喜您完成了《{nextLesson.courseName}》的全部课程！
+                    </Text>
+                    <Text style={styles.completionSubMessage}>
+                      您已经完成了所有 {nextLesson.courseName.total_lessons} 课的学习。
+                    </Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={24} color="#666" />
-                </View>
-                <Text style={styles.progressText}>{nextLesson.progress}</Text>
-                <View style={styles.quickActionButtons}>
-                  <TouchableOpacity 
-                    style={[styles.quickActionButton, styles.listenButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                  >
-                    <Text style={styles.quickActionButtonText}>听传承</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.quickActionButton, styles.readButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                  >
-                    <Text style={styles.quickActionButtonText}>看法本</Text>
-                  </TouchableOpacity>
-                  {nextLesson.url ? (
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.onlineButton]}
-                      onPress={() => Linking.openURL(nextLesson.url || '')}
-                    >
-                      <Text style={styles.quickActionButtonText}>在线课程</Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
+                ) : (
+                  <>
+                    <View style={styles.studyCardHeader}>
+                      <View style={styles.studyCardTitleContainer}>
+                        <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                        <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={24} color="#666" />
+                    </View>
+                    <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                    <View style={styles.quickActionButtons}>
+                      <TouchableOpacity 
+                        style={[styles.quickActionButton, styles.listenButton]}
+                        onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
+                      >
+                        <Text style={styles.quickActionButtonText}>听传承</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={[styles.quickActionButton, styles.readButton]}
+                        onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
+                      >
+                        <Text style={styles.quickActionButtonText}>看法本</Text>
+                      </TouchableOpacity>
+                      {nextLesson.url ? (
+                        <TouchableOpacity 
+                          style={[styles.quickActionButton, styles.onlineButton]}
+                          onPress={() => Linking.openURL(nextLesson.url || '')}
+                        >
+                          <Text style={styles.quickActionButtonText}>在线课程</Text>
+                        </TouchableOpacity>
+                      ) : null}
+                    </View>
+                  </>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -975,7 +995,7 @@ const styles = StyleSheet.create({
   },
   countPercentageRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between,
     alignItems: 'center',
     marginBottom: 6,
   },
@@ -1059,5 +1079,37 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  completedStudyCard: {
+    backgroundColor: '#f8f9fa',
+    borderColor: '#28a745',
+    borderWidth: 2,
+  },
+  completionMessageContainer: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  completionIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  completionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#28a745',
+    marginBottom: 8,
+  },
+  completionMessage: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 4,
+    lineHeight: 22,
+  },
+  completionSubMessage: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
