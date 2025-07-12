@@ -92,7 +92,7 @@ export default function MindfulnessScreen() {
     return (
       <View style={styles.container}>
         <PageHeader 
-          title="💝 心性观察" 
+          title="心性观察" 
           subtitle="观察内心善恶念头"
         />
         <View style={styles.loadingContainer}>
@@ -105,7 +105,7 @@ export default function MindfulnessScreen() {
   return (
     <View style={styles.container}>
       <PageHeader 
-        title="💝 心性观察" 
+        title="心性观察" 
         subtitle="观察内心善恶念头"
       />
       <ScrollView style={styles.scrollView}>
@@ -156,14 +156,14 @@ export default function MindfulnessScreen() {
             style={[styles.recordButton, styles.goodButton]}
             onPress={() => recordMindfulness('good')}
           >
-            <Text style={styles.buttonText}>😊 善心</Text>
+            <Text style={styles.buttonText}>善心</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={[styles.recordButton, styles.badButton]}
             onPress={() => recordMindfulness('bad')}
           >
-            <Text style={styles.buttonText}>😔 恶心</Text>
+            <Text style={styles.buttonText}>恶心</Text>
           </TouchableOpacity>
         </View>
       </View>
