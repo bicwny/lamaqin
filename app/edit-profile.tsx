@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import PageHeader from '@/components/PageHeader';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { toastService } from '@/lib/toast';
 
 export default function EditProfileScreen() {
   const { user } = useAuth();
@@ -62,7 +63,7 @@ export default function EditProfileScreen() {
 
   const handleSaveProfile = async () => {
     if (!user) {
-      Alert.alert('错误', '用户信息未找到');
+      toastService.error('用户信息未找到');
       return;
     }
 
@@ -82,7 +83,10 @@ export default function EditProfileScreen() {
 
       if (dbError) {
         console.error('Database update error:', dbError);
-        Alert.alert('保存失败', '更新数据库时发生错误，请重试。');
+        toastService.error({
+          title: '保存失败',
+          message: '更新数据库时发生错误，请重试'
+        });
         return;
       }
 
@@ -102,20 +106,22 @@ export default function EditProfileScreen() {
         // Don't fail the operation for auth metadata issues
       }
 
-      Alert.alert(
-        '保存成功', 
-        '个人资料已更新',
-        [
-          {
-            text: '确定',
-            onPress: () => router.back()
-          }
-        ]
-      );
+      toastService.success({
+        title: '保存成功',
+        message: '个人资料已更新'
+      });
+      
+      // Navigate back after a short delay to show the toast
+      setTimeout(() => {
+        router.back();
+      }, 1500);
 
     } catch (error) {
       console.error('❌ Save profile error:', error);
-      Alert.alert('保存失败', '请检查网络连接后重试。');
+      toastService.error({
+        title: '保存失败',
+        message: '请检查网络连接后重试'
+      });
     } finally {
       setLoading(false);
     }
@@ -145,7 +151,7 @@ export default function EditProfileScreen() {
   return (
     <ThemedView style={styles.container}>
       <PageHeader 
-        title="✏️ 编辑个人资料"
+        title="编辑个人资料"
         subtitle="更新您的个人信息"
         showBackButton={true}
         onBackPress={goBack}
