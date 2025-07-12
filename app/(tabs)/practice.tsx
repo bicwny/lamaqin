@@ -181,28 +181,13 @@ export default function PracticeScreen() {
   };
 
   const handleViewDetails = (projectId: string, practiceName: string) => {
-    const project = projects.find(p => p.id === projectId);
-    if (!project) return;
-
-    if (project.practices.type === 'time') {
-      // For meditation practices, show meditation history
-      router.push({
-        pathname: '/meditation-history',
-        params: {
-          practiceId: project.practice_id,
-          practiceName: practiceName,
-        },
-      });
-    } else {
-      // For count-based practices, show regular history
-      router.push({
-        pathname: '/practice-history',
-        params: {
-          projectId: projectId,
-          practiceName: practiceName,
-        },
-      });
-    }
+    // Navigate to dedicated practice detail screen
+    router.push({
+      pathname: '/practice-detail/[practiceId]',
+      params: {
+        practiceId: projectId,
+      },
+    });
   };
 
   if (loading) {

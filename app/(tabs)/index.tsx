@@ -497,25 +497,13 @@ export default function HomeScreen() {
 
   // Handle tapping the whole practice card to view history
   const handlePracticeCardTap = (practice: any) => {
-    if (practice.type === 'time' || practice.weekSessions !== undefined) {
-      // For meditation practices (both daily and weekly), show meditation history
-      router.push({
-        pathname: '/meditation-history',
-        params: {
-          practiceId: practice.practiceId || practice.id,
-          practiceName: practice.name,
-        },
-      });
-    } else {
-      // For count-based practices, show regular history
-      router.push({
-        pathname: '/practice-history',
-        params: {
-          projectId: practice.id,
-          practiceName: practice.name,
-        },
-      });
-    }
+    // Navigate directly to practice detail screen
+    router.push({
+      pathname: '/practice-detail/[practiceId]',
+      params: {
+        practiceId: practice.id,
+      },
+    });
   };
 
   // Handle quick complete button (check mark)
@@ -989,6 +977,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 12,
+```text
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',

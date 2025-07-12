@@ -344,12 +344,17 @@ export default function MeditationHistoryScreen() {
               {records.map((record) => {
                 const isDeleting = deletingRecords.has(record.id);
                 return (
-                  <View 
+                  <TouchableOpacity 
                     key={record.id} 
                     style={[
                       styles.recordCard,
                       isDeleting && styles.recordCardDeleting
                     ]}
+                    onPress={() => router.push({
+                      pathname: '/meditation-detail/[recordId]',
+                      params: { recordId: record.id }
+                    })}
+                    activeOpacity={0.7}
                   >
                     {isDeleting && (
                       <View style={styles.deletingOverlay}>
@@ -417,7 +422,7 @@ export default function MeditationHistoryScreen() {
                         </Text>
                       </TouchableOpacity>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 );
               })}
 
