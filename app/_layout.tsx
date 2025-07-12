@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import Toast from 'react-native-toast-message';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -150,6 +151,7 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar style="auto" />
       <RootLayoutNav />
+      <Toast />
     </AuthProvider>
   );
 }
