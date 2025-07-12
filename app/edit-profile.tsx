@@ -110,11 +110,6 @@ export default function EditProfileScreen() {
         title: '保存成功',
         message: '个人资料已更新'
       });
-      
-      // Navigate back after a short delay to show the toast
-      setTimeout(() => {
-        router.back();
-      }, 1500);
 
     } catch (error) {
       console.error('❌ Save profile error:', error);

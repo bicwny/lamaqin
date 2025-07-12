@@ -69,6 +69,7 @@ export default function ProfileSetupScreen() {
         return;
       }
 
+      // For profile setup, we still navigate since it's initial setup
       Alert.alert('保存成功', '个人资料已更新', [
         {
           text: '确定',
