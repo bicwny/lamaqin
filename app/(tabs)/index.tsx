@@ -583,6 +583,46 @@ export default function HomeScreen() {
     }
   };
 
+  const [todayStats, setTodayStats] = useState<{completedCount: number; totalMinutes: number} | null>(null);
+
+  useEffect(() => {
+    const fetchTodayStats = async () => {
+      if (!user?.id) return;
+
+      try {
+        const today = new Date().toISOString().split('T')[0];
+
+        // Fetch count-based practices completed today
+        const { data: countRecords, error: countError } = await supabase
+          .from('daily_records')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('record_date', today);
+
+        if (countError) throw countError;
+
+        // Fetch time-based practices (meditation) completed today
+        const { data: meditationRecords, error: meditationError } = await supabase
+          .from('meditation_records')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('record_date', today);
+
+        if (meditationError) throw meditationError;
+
+        const completedCount = (countRecords?.length || 0) + (meditationRecords?.length || 0);
+        const totalMinutes = meditationRecords?.reduce((sum, record) => sum + record.duration_minutes, 0) || 0;
+
+        setTodayStats({ completedCount, totalMinutes });
+      } catch (error) {
+        console.error('❌ Error fetching today stats:', error);
+        setTodayStats(null);
+      }
+    };
+
+    fetchTodayStats();
+  }, [user?.id]);
+
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -623,6 +663,11 @@ export default function HomeScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
+          {todayStats && (
+            <Text style={styles.statsText}>
+              {`今日已完成 ${todayStats.completedCount} 项修行，总计 ${todayStats.totalMinutes} 分钟`}
+            </Text>
+          )}
           {/* Study Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -1082,4 +1127,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 20,
   },
+  statsText: {
+    fontSize: 14,
+    color: Colors.text,
+    textAlign: 'center',
+    marginVertical: 8,
+  }
 });

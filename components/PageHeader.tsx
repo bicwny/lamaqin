@@ -37,19 +37,20 @@ export default function PageHeader({
           <Text style={styles.title}>{title}</Text>
           {subtitle && (
             <Text style={styles.subtitle}>
-              {subtitle}
+              {typeof subtitle === 'string' ? subtitle : subtitle}
             </Text>
           )}
         </View>
 
-        {rightAction ? (
-          <TouchableOpacity onPress={rightAction.onPress} style={styles.rightAction}>
+        {rightAction && (
+          <TouchableOpacity 
+            onPress={rightAction.onPress}
+            style={styles.rightAction}
+          >
             {rightAction.component ? rightAction.component : (
               <Text style={styles.rightActionText}>{rightAction.text}</Text>
             )}
           </TouchableOpacity>
-        ) : (
-          <View style={styles.placeholder} />
         )}
       </View>
     </View>
