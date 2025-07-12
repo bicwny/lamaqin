@@ -168,12 +168,9 @@ export default function HomeScreen() {
 
         const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
 
-        // If all lessons are completed and course is still active, show success message but keep displaying the card
-        let isCourseCompleted = false;
+        // If all lessons are completed and course is still active, update status and skip adding to display
         if (isAllLessonsCompleted && userCourse.status === 'active') {
-            isCourseCompleted = true;
-
-          // Update course status to completed - this will hide the card on next refresh
+          // Update course status to completed - this will hide the card immediately
           await supabase
             .from('user_courses')
             .update({ 
@@ -184,7 +181,8 @@ export default function HomeScreen() {
             .eq('user_id', user.id)
             .eq('course_id', userCourse.course_id);
 
-          // Continue to add the course to display (don't skip) so user can see it this time
+          // Skip adding this course to the display since it's now completed
+          continue;
         }
 
         // Find the next incomplete lesson
@@ -218,7 +216,7 @@ export default function HomeScreen() {
           lessonId: nextLessonId,
           url: nextLessonUrl,
           progress: ``,
-          isCompleted: isCourseCompleted
+          isCompleted: false
         });
       }
 
@@ -638,54 +636,39 @@ export default function HomeScreen() {
             {courseLessons.map((nextLesson, index) => (
               <TouchableOpacity 
                 key={index} 
-                style={[styles.studyCard, nextLesson.isCompleted ? styles.completedStudyCard : {}]} 
+                style={styles.studyCard} 
                 onPress={navigateToStudy}
               >
-                {nextLesson.isCompleted ? (
-                  <View style={styles.completionMessageContainer}>
-                    <Text style={styles.completionIcon}>🎉</Text>
-                    <Text style={styles.completionTitle}>课程完成！</Text>
-                    <Text style={styles.completionMessage}>
-                      恭喜您完成了《{nextLesson.courseName}》的全部课程！
-                    </Text>
-                    <Text style={styles.completionSubMessage}>
-                      您已经完成了所有 {nextLesson.courseName.total_lessons} 课的学习。
-                    </Text>
+                <View style={styles.studyCardHeader}>
+                  <View style={styles.studyCardTitleContainer}>
+                    <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
                   </View>
-                ) : (
-                  <>
-                    <View style={styles.studyCardHeader}>
-                      <View style={styles.studyCardTitleContainer}>
-                        <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                        <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
-                      </View>
-                      <Ionicons name="chevron-forward" size={24} color="#666" />
-                    </View>
-                    <Text style={styles.progressText}>{nextLesson.progress}</Text>
-                    <View style={styles.quickActionButtons}>
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.listenButton]}
-                        onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                      >
-                        <Text style={styles.quickActionButtonText}>听传承</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.readButton]}
-                        onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                      >
-                        <Text style={styles.quickActionButtonText}>看法本</Text>
-                      </TouchableOpacity>
-                      {nextLesson.url ? (
-                        <TouchableOpacity 
-                          style={[styles.quickActionButton, styles.onlineButton]}
-                          onPress={() => Linking.openURL(nextLesson.url || '')}
-                        >
-                          <Text style={styles.quickActionButtonText}>在线课程</Text>
-                        </TouchableOpacity>
-                      ) : null}
-                    </View>
-                  </>
-                )}
+                  <Ionicons name="chevron-forward" size={24} color="#666" />
+                </View>
+                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                <View style={styles.quickActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.listenButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
+                  >
+                    <Text style={styles.quickActionButtonText}>听传承</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.readButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
+                  >
+                    <Text style={styles.quickActionButtonText}>看法本</Text>
+                  </TouchableOpacity>
+                  {nextLesson.url ? (
+                    <TouchableOpacity 
+                      style={[styles.quickActionButton, styles.onlineButton]}
+                      onPress={() => Linking.openURL(nextLesson.url || '')}
+                    >
+                      <Text style={styles.quickActionButtonText}>在线课程</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -1080,36 +1063,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 20,
   },
-  completedStudyCard: {
-    backgroundColor: '#f8f9fa',
-    borderColor: '#28a745',
-    borderWidth: 2,
-  },
-  completionMessageContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  completionIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  completionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#28a745',
-    marginBottom: 8,
-  },
-  completionMessage: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 4,
-    lineHeight: 22,
-  },
-  completionSubMessage: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
+  
 });
