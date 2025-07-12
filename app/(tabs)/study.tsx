@@ -404,7 +404,7 @@ export default function StudyScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <PageHeader 
-          title="📚 闻思学习" 
+          title="闻思学习" 
           subtitle="系统学习佛法课程"
         />
         <View style={styles.loadingContainer}>
@@ -420,7 +420,7 @@ export default function StudyScreen() {
       return (
         <SafeAreaView style={styles.container}>
           <PageHeader 
-            title="📚 闻思学习" 
+            title="闻思学习" 
             subtitle="系统学习佛法课程"
           />
           <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -451,7 +451,7 @@ export default function StudyScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <PageHeader 
-          title="📚 闻思学习" 
+          title="闻思学习" 
           subtitle="系统学习佛法课程"
           rightAction={{
             text: "管理课程",
@@ -514,7 +514,7 @@ export default function StudyScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <PageHeader 
-          title="📚 课程管理" 
+          title="课程管理" 
           subtitle="管理您的学习课程"
           showBackButton={true}
           onBackPress={() => setViewMode('home')}

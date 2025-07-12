@@ -254,7 +254,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
   return (
     <ThemedView style={styles.container}>
       <PageHeader 
-        title="👤 个人中心"
+        title="个人中心"
         subtitle="管理您的账户信息和设置"
         showBackButton={true}
         onBackPress={goBackToPrevious}
@@ -269,7 +269,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
             </View>
             <View style={styles.profileInfo}>
               <ThemedText type="subtitle" style={styles.userName}>
-                {userProfile.dharmaName} 🌟
+                {userProfile.dharmaName}
               </ThemedText>
               <ThemedText style={styles.userDetails}>
                 修行年限：{userProfile.practiceYears}年 | 常住：{userProfile.location} | 班级：{userProfile.className}
@@ -293,26 +293,26 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         {/* Data Management */}
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            📊 数据管理
+            数据管理
           </ThemedText>
 
           <TouchableOpacity style={styles.dataButton} onPress={handleDataExport}>
-            <Text style={styles.dataButtonText}>📤 导出数据</Text>
+            <Text style={styles.dataButtonText}>导出数据</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.dataButton} onPress={handleDataBackup}>
-            <Text style={styles.dataButtonText}>🔄 备份恢复</Text>
+            <Text style={styles.dataButtonText}>备份恢复</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.dataButton} onPress={handleClearCache}>
-            <Text style={styles.dataButtonText}>🗑️ 清除缓存</Text>
+            <Text style={styles.dataButtonText}>清除缓存</Text>
           </TouchableOpacity>
         </ThemedView>
 
         {/* Practice Sharing */}
         <ThemedView style={styles.section}>
           <View style={styles.shareCard}>
-            <ThemedText style={styles.shareTitle}>📄 修行分享</ThemedText>
+            <ThemedText style={styles.shareTitle}>修行分享</ThemedText>
             <TouchableOpacity 
               style={styles.shareButton}
               onPress={() => setShowShareModal(true)}
@@ -345,15 +345,15 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <ThemedText type="subtitle" style={styles.modalTitle}>
-              📄 修行分享生成
+              修行分享生成
             </ThemedText>
 
             <ThemedText style={styles.modalSubtitle}>
-              📅 {new Date().toLocaleDateString('zh-CN')}修行总结
+              {new Date().toLocaleDateString('zh-CN')}修行总结
             </ThemedText>
 
             <View style={styles.sharePreview}>
-              <ThemedText style={styles.sharePreviewLabel}>🔄 自动生成格式：</ThemedText>
+              <ThemedText style={styles.sharePreviewLabel}>自动生成格式：</ThemedText>
               <ScrollView style={styles.shareTextContainer}>
                 <Text style={styles.shareText}>{generateShareText()}</Text>
               </ScrollView>
@@ -381,7 +381,7 @@ ${userProfile.dharmaName}：${practicesText}，${studyText}，${mindfulness}
       <Modal visible={showLogoutModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, styles.logoutModalContent]}>
-            <Text style={styles.logoutModalIcon}>⚠️</Text>
+            <Text style={styles.logoutModalIcon}>!</Text>
             <ThemedText type="subtitle" style={styles.logoutModalTitle}>
               确认退出
             </ThemedText>
