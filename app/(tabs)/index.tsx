@@ -158,6 +158,35 @@ export default function HomeScreen() {
           }
         });
 
+        // Check if all lessons are completed
+        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
+          lesson => lesson.听传承 && lesson.看法本
+        ).length;
+
+        const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
+
+        // If all lessons are completed, show success message and skip adding to display
+        if (isAllLessonsCompleted) {
+          Alert.alert(
+            '🎉 课程完成！', 
+            `恭喜您完成了《${userCourse.course.name}》的全部课程！您已经完成了所有 ${userCourse.course.total_lessons} 课的学习。`,
+            [{ text: '确认', style: 'default' }]
+          );
+          
+          // Update course status to completed
+          await supabase
+            .from('user_courses')
+            .update({ 
+              status: 'completed',
+              completed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user.id)
+            .eq('course_id', userCourse.course_id);
+
+          continue; // Skip adding this course to the display list
+        }
+
         // Find the next incomplete lesson
         let nextLessonNumber = 1;
         let nextLessonId = '';
@@ -180,10 +209,6 @@ export default function HomeScreen() {
             break;
           }
         }
-
-        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
-          lesson => lesson.听传承 && lesson.看法本
-        ).length;
 
         allCourseLessons.push({
           courseId: userCourse.course_id,
@@ -755,6 +780,12 @@ export default function HomeScreen() {
               ))}
             </View>
 
+            {courseLessons.length === 0 && (
+              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
+                <Text style={styles.noStudyText}>📚 暂无进行中的课程，点击查看课程库</Text>
+              </TouchableOpacity>
+            )}
+
             {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
               <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
                 <Text style={styles.noPracticeText}>🙏 暂无修行项目，点击添加</Text>
@@ -1018,6 +1049,12 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   noPracticeText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
+  noStudyText: {
     fontSize: 16,
     color: Colors.textSecondary,
     textAlign: 'center',
