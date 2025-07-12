@@ -995,7 +995,7 @@ const styles = StyleSheet.create({
   },
   countPercentageRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between,
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 6,
   },
