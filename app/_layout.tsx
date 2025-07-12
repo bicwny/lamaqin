@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { toastService } from '@/lib/toast';
@@ -116,9 +116,9 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <>
+    <AuthProvider>
       <RootLayoutNav />
       {toastService.ToastComponent && <toastService.ToastComponent />}
-    </>
+    </AuthProvider>
   );
 }
