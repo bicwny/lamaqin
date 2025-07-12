@@ -487,7 +487,10 @@ export default function HomeScreen() {
 
     if (practice.status === 'completed') {
       // Already completed, just show message
-      Alert.alert('已完成', '今日目标已达成！');
+      toastService.info({
+        title: '✅ 今日目标已达成',
+        message: '继续保持！明日再接再厉'
+      });
       return;
     }
 
@@ -584,10 +587,17 @@ export default function HomeScreen() {
       // Reload data to reflect changes
       loadDashboardData();
 
-      Alert.alert('成功', '已完成今日目标！');
+      // Show success toast
+      toastService.success({
+        title: '✅ 已完成今日目标',
+        message: `${practice.name} +${amount.toLocaleString()} ${practice.unit}`
+      });
     } catch (error) {
       console.error('❌ Error recording quick complete:', error);
-      Alert.alert('错误', '记录失败，请重试');
+      toastService.error({
+        title: '记录失败',
+        message: '请检查网络连接后重试'
+      });
     } finally {
       setLoading(false);
     }
