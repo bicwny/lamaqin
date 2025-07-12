@@ -36,9 +36,6 @@ export default function CustomRecordScreen() {
   const [loadingRecord, setLoadingRecord] = useState(false);
   const isEditing = !!editRecordId;
 
-  // Import toast service at the top
-  import { toastService } from '@/lib/toast';
-
   // Load existing record data when editing
   useEffect(() => {
     if (isEditing && editRecordId && user) {
