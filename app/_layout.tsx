@@ -81,14 +81,7 @@ function RootLayoutNav() {
           presentation: 'card'
         }} 
       />
-      <Stack.Screen 
-        name="add-practice" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }} 
-      /></Stack.Screen>
-<new_str>      <Stack.Screen name="auth" options={{ headerShown: false }} />
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen 
@@ -106,6 +99,44 @@ function RootLayoutNav() {
         }} 
       />
       <Stack.Screen 
+        name="add-practice" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }} 
+      />
+      <Stack.Screen 
+        name="practice-config" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }} 
+      />
+      <Stack.Screen name="practice-history" options={{ title: '修行历史' }} />
+      <Stack.Screen 
+        name="meditation-history" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }} 
+      />
+      <Stack.Screen 
+        name="modals/meditation-record" 
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+      <Stack.Screen 
+        name="modals/custom-record" 
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }} 
+      />
+      <Stack.Screen name="+not-found" />
+    </Stack></old_str>
+<new_str>      <Stack.Screen 
         name="add-practice" 
         options={{ 
           headerShown: false,
