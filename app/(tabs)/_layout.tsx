@@ -16,17 +16,43 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
-            backgroundColor: "transparent",
+            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            borderTopWidth: 0.5,
+            borderTopColor: Colors.border,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            paddingTop: 8,
+            paddingBottom: 4,
+            height: 88,
           },
-          default: {},
+          default: {
+            backgroundColor: "#fff",
+            borderTopWidth: 0.5,
+            borderTopColor: Colors.border,
+            elevation: 8,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            paddingTop: 8,
+            paddingBottom: 4,
+            height: 68,
+          },
         }),
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+          marginTop: 2,
+        },
       }}
       initialRouteName="index"
     >
