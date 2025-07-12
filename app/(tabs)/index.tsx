@@ -668,6 +668,18 @@ export default function HomeScreen() {
                       >
                         <Text style={styles.quickActionButtonText}>看法本</Text>
                       </TouchableOpacity>
+                      {currentLesson.url && (
+                        <TouchableOpacity 
+                          style={[styles.quickActionButton, styles.onlineButton]}
+                          onPress={() => {
+                            if (currentLesson.url) {
+                              Linking.openURL(currentLesson.url);
+                            }
+                          }}
+                        >
+                          <Text style={styles.quickActionButtonText}>在线听课</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   </>
                 )}
