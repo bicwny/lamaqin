@@ -128,16 +128,13 @@ export default function MindfulnessScreen() {
         </View>
 
         {stats.total > 0 && (
-          <View style={styles.progressBarContainer}>
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.goodFill, 
-                  { width: `${stats.goodPercent}%` }
-                ]} 
-              />
-            </View>
-            <Text style={styles.progressPercentage}>{stats.goodPercent}%</Text>
+          <View style={styles.progressBar}>
+            <View 
+              style={[
+                styles.goodFill, 
+                { width: `${stats.goodPercent}%` }
+              ]} 
+            />
           </View>
         )}
       </View>
@@ -227,27 +224,15 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-  progressBarContainer: {
-    position: 'relative',
-    alignItems: 'center',
-  },
   progressBar: {
-    height: 24,
-    width: '100%',
+    height: 8,
     backgroundColor: '#FFE5E5',
-    borderRadius: 12,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   goodFill: {
     height: '100%',
     backgroundColor: '#34C759',
-  },
-  progressPercentage: {
-    position: 'absolute',
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-    zIndex: 1,
   },
   recordCard: {
     backgroundColor: '#fff',
