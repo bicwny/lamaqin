@@ -132,7 +132,7 @@ export default function StudyScreen() {
       // Reload user courses to get updated progress percentages
       const updatedUserCoursesData = await getUserCourses(user.id);
       setUserCourses(updatedUserCoursesData);
-      
+
       console.log('📊 Updated user courses after progress calculation:', updatedUserCoursesData.map(uc => ({
         name: uc.course.name,
         progress: uc.progress_percentage
@@ -231,9 +231,9 @@ export default function StudyScreen() {
         study_count_for_lesson: 1
       });
 
-      toastService.success({ 
-        title: '学习记录已保存', 
-        message: `${studyType}完成 - 继续加油！` 
+      toastService.success({
+        title: '学习记录已保存',
+        message: `${studyType}完成 - 继续加油！`
       });
 
       // Trigger refresh of lesson counts
@@ -258,10 +258,10 @@ export default function StudyScreen() {
       // Check if user is already enrolled (both in state and database)
       const isAlreadyEnrolledInState = userCourses.some(uc => uc.course_id === courseId);
       if (isAlreadyEnrolledInState) {
-        toastService.info({ 
-          title: '已加入课程', 
-          message: '您已经在学习这门课程了' 
-        });
+        toastService.info({
+        title: '已加入课程',
+        message: '您已经在学习这门课程了'
+      });
         setViewMode('home');
         return;
       }
@@ -273,10 +273,10 @@ export default function StudyScreen() {
         if (isAlreadyEnrolledInDb) {
           console.log('⚠️ Course enrollment found in DB but not in state - syncing...');
           setUserCourses(dbUserCourses);
-          toastService.info({ 
-            title: '已加入课程', 
-            message: '您已经在学习这门课程了' 
-          });
+          toastService.info({
+        title: '已加入课程',
+        message: '您已经在学习这门课程了'
+      });
           setViewMode('home');
           return;
         }
@@ -309,10 +309,10 @@ export default function StudyScreen() {
       console.error('❌ Error joining course:', error);
       // Handle duplicate key error specifically
       if (error?.code === '23505') {
-        toastService.info({ 
-          title: '已加入课程', 
-          message: '课程数据已同步' 
-        });
+        toastService.info({
+        title: '已加入课程',
+        message: '课程数据已同步'
+      });
         // Reload data to sync state
         loadStudyData();
       } else {
@@ -336,9 +336,9 @@ export default function StudyScreen() {
           uc.course_id === courseId ? { ...uc, status: 'paused' } : uc
         )
       );
-      toastService.info({ 
-        title: '课程已暂停', 
-        message: '可在课程管理中恢复学习' 
+      toastService.info({
+        title: '课程已暂停',
+        message: '可在课程管理中恢复学习'
       });
     } catch (error) {
       console.error('Error pausing course:', error);

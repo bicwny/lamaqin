@@ -414,7 +414,10 @@ export default function HomeScreen() {
         .limit(1);
 
       if (lessonError || !lessons || lessons.length === 0) {
-        toastService.error('课程信息有误');
+        toastService.error({
+          title: '课程信息有误',
+          message: '无法找到对应的课程内容'
+        });
         return;
       }
 
@@ -433,13 +436,19 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      toastService.success(`${studyType}记录已保存`);
+      toastService.success({
+        title: '学习记录已保存',
+        message: `${studyType}完成 - 继续加油！`
+      });
 
       // Refresh the lessons
       loadCourseLessons();
     } catch (error) {
       console.error('Error recording study:', error);
-      toastService.error('保存失败，请重试');
+      toastService.error({
+        title: '保存失败',
+        message: '网络异常，请稍后重试'
+      });
     }
   };
 
