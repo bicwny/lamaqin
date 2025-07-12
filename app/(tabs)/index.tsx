@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { toastService } from '@/lib/toast';
 
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
@@ -632,6 +633,16 @@ export default function HomeScreen() {
           }}
         />
 
+        {/* Temporary Toast Test Button */}
+        <View style={styles.testContainer}>
+          <TouchableOpacity 
+            style={styles.testButton}
+            onPress={() => toastService.success({ title: 'Toast测试', message: 'Phase 2 设置成功！' })}
+          >
+            <Text style={styles.testButtonText}>🍞 测试Toast</Text>
+          </TouchableOpacity>
+        </View>
+
 
         <ScrollView 
           style={styles.scrollView}
@@ -1078,5 +1089,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 20,
   },
-  
+  testContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  testButton: {
+    backgroundColor: '#FF6B6B',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  testButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
 });
