@@ -217,12 +217,7 @@ export default function ProfileScreen() {
                 </ThemedText>
               )}
             </View>
-            <TouchableOpacity 
-              style={styles.editButton}
-              onPress={handleEditProfile}
-            >
-              <Text style={styles.editButtonText}>编辑</Text>
-            </TouchableOpacity>
+            
           </View>
 
           {/* Profile Details */}
