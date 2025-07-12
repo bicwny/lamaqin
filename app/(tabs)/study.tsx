@@ -502,8 +502,7 @@ export default function StudyScreen() {
                   style={styles.continueButton}
                   onPress={(e) => {
                     e.stopPropagation();
-                    setSelectedCourse(userCourse);
-                    setViewMode('courseDetail');
+                    router.push(`/course-detail/${userCourse.course_id}`);
                   }}
                 >
                   <Text style={styles.continueButtonText}>继续学习</Text>
