@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, Platform } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
+import Toast from 'react-native-toast-message';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -150,6 +151,7 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar style="auto" />
       <RootLayoutNav />
+      <Toast />
     </AuthProvider>
   );
 }
