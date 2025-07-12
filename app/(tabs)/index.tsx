@@ -200,7 +200,7 @@ export default function HomeScreen() {
         const completedLessons = Array.from(lessonStudyMap.values()).filter(
           lesson => lesson.听传承 > 0 && lesson.看法本 > 0
         ).length;
-        
+
         // Check if course is completed (all lessons have both study types)
         const isCourseCompleted = completedLessons === userCourse.course.total_lessons;
 
@@ -589,7 +589,7 @@ export default function HomeScreen() {
         <ThemedView style={styles.container}>
           <PageHeader 
             title="🏠 修行主页"
-            subtitle={getGreeting()}
+            subtitle={<Text>{getGreeting()}</Text>}
             rightAction={{
               text: "👤",
               onPress: navigateToProfile
@@ -609,7 +609,7 @@ export default function HomeScreen() {
       <ThemedView style={styles.container}>
         <PageHeader 
           title="🏠 修行主页"
-          subtitle={`${getGreeting()} • ${userDharmaName}居士 · 修行第365天 🔥`}
+          subtitle={<Text>{getGreeting()} • {userDharmaName}居士 · 修行第365天 🔥</Text>}
           rightAction={{
             component: <Avatar dharmaName={userDharmaName} size={32} />,
             onPress: navigateToProfile
@@ -714,8 +714,7 @@ export default function HomeScreen() {
 
                   <View style={styles.countPercentageRow}>
                     <Text style={styles.practiceCountColumn}>
-                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
-                    </Text>
+                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}</Text>
                     <Text style={styles.progressPercent}>
                       {Math.round(practice.progressPercent)}%
                     </Text>

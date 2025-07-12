@@ -128,7 +128,7 @@ export default function EmailVerificationScreen() {
       <View style={styles.steps}>
         <Text style={styles.stepTitle}>📝 验证步骤：</Text>
         <Text style={styles.step}>1. 检查邮箱(包括垃圾邮件文件夹)</Text>
-        <Text style={styles.step}>2. 点击邮件中的【验证邮箱】链接</Text>
+        <Text style={styles.step}>2. 点击邮件中的验证邮箱链接</Text>
         <Text style={styles.step}>3. 验证成功后会自动跳转</Text>
       </View>
 
