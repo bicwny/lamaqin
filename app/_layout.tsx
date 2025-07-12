@@ -9,54 +9,7 @@ import 'react-native-reanimated';
 import '../global.css';
 import Toast from 'react-native-toast-message';
 
-// Custom toast configurations for Buddhist app theme
-const toastConfig = {
-  success: {
-    style: {
-      borderLeftColor: '#28a745',
-      borderLeftWidth: 5,
-    },
-    text1Style: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: '#1d4e20',
-    },
-    text2Style: {
-      fontSize: 14,
-      color: '#495057',
-    },
-  },
-  error: {
-    style: {
-      borderLeftColor: '#dc3545',
-      borderLeftWidth: 5,
-    },
-    text1Style: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: '#721c24',
-    },
-    text2Style: {
-      fontSize: 14,
-      color: '#495057',
-    },
-  },
-  info: {
-    style: {
-      borderLeftColor: '#17a2b8',
-      borderLeftWidth: 5,
-    },
-    text1Style: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: '#0c5460',
-    },
-    text2Style: {
-      fontSize: 14,
-      color: '#495057',
-    },
-  },
-};
+
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
@@ -200,7 +153,7 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar style="auto" />
       <RootLayoutNav />
-      <Toast config={toastConfig} />
+      <Toast />
     </AuthProvider>
   );
 }
