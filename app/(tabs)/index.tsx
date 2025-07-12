@@ -190,6 +190,8 @@ export default function HomeScreen() {
         let nextLessonId = '';
         let nextLessonTitle = '';
         let nextLessonUrl = '';
+        let listenCount = 0;
+        let readCount = 0;
 
         for (let i = 1; i <= userCourse.course.total_lessons; i++) {
           const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
@@ -200,6 +202,19 @@ export default function HomeScreen() {
               nextLessonId = nextLesson.id;
               nextLessonTitle = nextLesson.title || `第${i}课`;
               nextLessonUrl = nextLesson.url || '';
+
+              // Get study counts for this specific lesson
+              const lessonStudyRecords = studyRecords?.filter(record => 
+                record.lesson?.lesson_number === i
+              ) || [];
+              
+              listenCount = lessonStudyRecords.filter(record => 
+                record.study_type === '听传承'
+              ).length;
+              
+              readCount = lessonStudyRecords.filter(record => 
+                record.study_type === '看法本'
+              ).length;
             } else {
               // If no lesson found, use fallback title
               nextLessonTitle = `第${i}课`;
@@ -215,7 +230,7 @@ export default function HomeScreen() {
           lessonTitle: nextLessonTitle,
           lessonId: nextLessonId,
           url: nextLessonUrl,
-          progress: ``,
+          progress: `听传承: ${listenCount}次 | 看法本: ${readCount}次`,
           isCompleted: false
         });
       }
