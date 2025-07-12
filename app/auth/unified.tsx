@@ -380,9 +380,10 @@ export default function UnifiedAuthScreen() {
           // New user - redirect to profile setup
           router.replace('/profile-setup');
         } else {
-          // Existing user - check if profile is complete (minimal requirements)
+          // Existing user - check if profile is complete
           const isProfileComplete = existingUser.dharma_name && 
                                   existingUser.class_name && 
+                                  existingUser.practice_years && 
                                   existingUser.location;
 
           if (!isProfileComplete) {

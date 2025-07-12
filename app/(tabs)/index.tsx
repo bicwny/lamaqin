@@ -57,11 +57,6 @@ export default function HomeScreen() {
     progress: string;
     lessonId: string;
     url?: string;
-    listenCount: number;
-    readCount: number;
-    totalLessons: number;
-    completedLessons: number;
-    isCourseCompleted: boolean;
   }>>([]);
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
@@ -143,79 +138,61 @@ export default function HomeScreen() {
 
         if (lessonsError) throw lessonsError;
 
-        // Count study records by lesson and type
-        const lessonStudyMap = new Map();
+        // Find completed lessons (both 听传承 and 看法本)
+        const lessonCompletionMap = new Map();
         studyRecords?.forEach(record => {
-          if (!lessonStudyMap.has(record.lesson_id)) {
-            lessonStudyMap.set(record.lesson_id, { 
-              听传承: 0, 
-              看法本: 0,
+          if (!lessonCompletionMap.has(record.lesson_id)) {
+            lessonCompletionMap.set(record.lesson_id, { 
+              听传承: false, 
+              看法本: false,
               lessonNumber: record.lesson?.lesson_number || 0,
               title: record.lesson?.title || `第${record.lesson?.lesson_number || 0}课`
             });
           }
 
-          const lessonData = lessonStudyMap.get(record.lesson_id);
+          const lessonData = lessonCompletionMap.get(record.lesson_id);
           if (record.study_type === '听传承') {
-            lessonData.听传承++;
+            lessonData.听传承 = true;
           } else if (record.study_type === '看法本') {
-            lessonData.看法本++;
+            lessonData.看法本 = true;
           }
         });
 
         // Find the next incomplete lesson
-        let currentLessonNumber = 1;
-        let currentLessonId = '';
-        let currentLessonTitle = '';
-        let currentLessonUrl = '';
-        let listenCount = 0;
-        let readCount = 0;
+        let nextLessonNumber = 1;
+        let nextLessonId = '';
+        let nextLessonTitle = '';
+        let nextLessonUrl = '';
 
         for (let i = 1; i <= userCourse.course.total_lessons; i++) {
-          const lessonData = Array.from(lessonStudyMap.values()).find(l => l.lessonNumber === i);
-          const hasListened = lessonData && lessonData.听传承 > 0;
-          const hasRead = lessonData && lessonData.看法本 > 0;
-
-          if (!hasListened || !hasRead) {
-            currentLessonNumber = i;
-            const currentLesson = allLessons?.find(l => l.lesson_number === i);
-            if (currentLesson) {
-              currentLessonId = currentLesson.id;
-              currentLessonTitle = currentLesson.title || `第${i}课`;
-              currentLessonUrl = currentLesson.url || '';
+          const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
+          if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
+            nextLessonNumber = i;
+            const nextLesson = allLessons?.find(l => l.lesson_number === i);
+            if (nextLesson) {
+              nextLessonId = nextLesson.id;
+              nextLessonTitle = nextLesson.title || `第${i}课`;
+              nextLessonUrl = nextLesson.url || '';
             } else {
               // If no lesson found, use fallback title
-              currentLessonTitle = `第${i}课`;
-            }
-
-            // Get current counts for this lesson
-            if (lessonData) {
-              listenCount = lessonData.听传承;
-              readCount = lessonData.看法本;
+              nextLessonTitle = `第${i}课`;
             }
             break;
           }
         }
 
-        const completedLessons = Array.from(lessonStudyMap.values()).filter(
-          lesson => lesson.听传承 > 0 && lesson.看法本 > 0
+        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
+          lesson => lesson.听传承 && lesson.看法本
         ).length;
-        
-        // Check if course is completed (all lessons have both study types)
-        const isCourseCompleted = completedLessons === userCourse.course.total_lessons;
 
         allCourseLessons.push({
           courseId: userCourse.course_id,
           courseName: userCourse.course.name,
-          lessonNumber: currentLessonNumber,
-          lessonTitle: currentLessonTitle,
-          lessonId: currentLessonId,
-          url: currentLessonUrl,
-          listenCount,
-          readCount,
-          totalLessons: userCourse.course.total_lessons,
-          completedLessons,
-          isCourseCompleted
+          lessonNumber: nextLessonNumber,
+          lessonTitle: nextLessonTitle,
+          lessonId: nextLessonId,
+          url: nextLessonUrl,
+          progress: ``
         });
       }
 
@@ -418,8 +395,8 @@ export default function HomeScreen() {
 
       Alert.alert('成功', `${studyType}记录已保存`);
 
-      // Refresh the lessons to update counts and check for lesson completion
-      await loadCourseLessons();
+      // Refresh the lessons
+      loadCourseLessons();
     } catch (error) {
       console.error('Error recording study:', error);
       Alert.alert('错误', '保存失败，请重试');
@@ -632,57 +609,38 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {courseLessons.map((currentLesson, index) => (
+            {courseLessons.map((nextLesson, index) => (
               <TouchableOpacity key={index} style={styles.studyCard} onPress={navigateToStudy}>
                 <View style={styles.studyCardHeader}>
                   <View style={styles.studyCardTitleContainer}>
-                    <Text style={styles.courseName}>{currentLesson.courseName}</Text>
-                    {currentLesson.isCourseCompleted ? (
-                      <Text style={styles.completedCourseText}>🎉 课程已完成！</Text>
-                    ) : (
-                      <Text style={styles.continueStudyText}>当前学习 · {currentLesson.lessonTitle}</Text>
-                    )}
+                    <Text style={styles.courseName}>{nextLesson.courseName}</Text>
+                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={24} color="#666" />
                 </View>
-
-                {currentLesson.isCourseCompleted ? (
-                  <Text style={styles.courseCompletionMessage}>
-                    恭喜完成全部 {currentLesson.totalLessons} 课的学习！
-                  </Text>
-                ) : (
-                  <>
-                    <Text style={styles.studyProgressText}>
-                      听传承: {currentLesson.listenCount}次 | 看法本: {currentLesson.readCount}次
-                    </Text>
-                    <View style={styles.quickActionButtons}>
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.listenButton]}
-                        onPress={() => recordStudy(currentLesson.courseId, currentLesson.lessonNumber, '听传承')}
-                      >
-                        <Text style={styles.quickActionButtonText}>听传承</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.readButton]}
-                        onPress={() => recordStudy(currentLesson.courseId, currentLesson.lessonNumber, '看法本')}
-                      >
-                        <Text style={styles.quickActionButtonText}>看法本</Text>
-                      </TouchableOpacity>
-                      {currentLesson.url && (
-                        <TouchableOpacity 
-                          style={[styles.quickActionButton, styles.onlineButton]}
-                          onPress={() => {
-                            if (currentLesson.url) {
-                              Linking.openURL(currentLesson.url);
-                            }
-                          }}
-                        >
-                          <Text style={styles.quickActionButtonText}>在线听课</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  </>
-                )}
+                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                <View style={styles.quickActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.listenButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
+                  >
+                    <Text style={styles.quickActionButtonText}>听传承</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.readButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
+                  >
+                    <Text style={styles.quickActionButtonText}>看法本</Text>
+                  </TouchableOpacity>
+                  {nextLesson.url ? (
+                    <TouchableOpacity 
+                      style={[styles.quickActionButton, styles.onlineButton]}
+                      onPress={() => Linking.openURL(nextLesson.url || '')}
+                    >
+                      <Text style={styles.quickActionButtonText}>在线课程</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -889,12 +847,6 @@ const styles = StyleSheet.create({
     color: '#888',
     marginBottom: 12,
   },
-  studyProgressText: {
-    fontSize: 13,
-    color: '#da4347',
-    marginBottom: 12,
-    fontWeight: '500',
-  },
   quickActionButtons: {
     flexDirection: 'row',
     gap: 12,
@@ -918,21 +870,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F44336',
   },
   quickActionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  completedCourseText: {
+    color: '#fff',
     fontSize: 14,
-    color: '#4CAF50',
     fontWeight: '600',
-  },
-  courseCompletionMessage: {
-    fontSize: 14,
-    color: '#4CAF50',
-    textAlign: 'center',
-    paddingVertical: 8,
-    fontWeight: '500',
   },
   noStudyText: {
     fontSize: 16,
@@ -1020,7 +960,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.primary,
     borderRadius: 3,
-   },
+  },
   progressPercent: {
     fontSize: 12,
     color: Colors.textSecondary,
