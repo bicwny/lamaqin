@@ -118,12 +118,12 @@ export default function MindfulnessScreen() {
             <Text style={styles.statLabel}>善心</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.bad}</Text>
-            <Text style={styles.statLabel}>恶心</Text>
-          </View>
-          <View style={styles.statItem}>
             <Text style={styles.statNumber}>{stats.goodPercent}%</Text>
             <Text style={styles.statLabel}>善心比例</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{stats.bad}</Text>
+            <Text style={styles.statLabel}>恶心</Text>
           </View>
         </View>
 
