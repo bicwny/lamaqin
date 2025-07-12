@@ -57,6 +57,8 @@ export default function HomeScreen() {
     progress: string;
     lessonId: string;
     url?: string;
+    listenCount: number;
+    readCount: number;
   }>>([]);
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
@@ -138,23 +140,23 @@ export default function HomeScreen() {
 
         if (lessonsError) throw lessonsError;
 
-        // Find completed lessons (both 听传承 and 看法本)
-        const lessonCompletionMap = new Map();
+        // Count study records by lesson and type
+        const lessonStudyMap = new Map();
         studyRecords?.forEach(record => {
-          if (!lessonCompletionMap.has(record.lesson_id)) {
-            lessonCompletionMap.set(record.lesson_id, { 
-              听传承: false, 
-              看法本: false,
+          if (!lessonStudyMap.has(record.lesson_id)) {
+            lessonStudyMap.set(record.lesson_id, { 
+              听传承: 0, 
+              看法本: 0,
               lessonNumber: record.lesson?.lesson_number || 0,
               title: record.lesson?.title || `第${record.lesson?.lesson_number || 0}课`
             });
           }
 
-          const lessonData = lessonCompletionMap.get(record.lesson_id);
+          const lessonData = lessonStudyMap.get(record.lesson_id);
           if (record.study_type === '听传承') {
-            lessonData.听传承 = true;
+            lessonData.听传承++;
           } else if (record.study_type === '看法本') {
-            lessonData.看法本 = true;
+            lessonData.看法本++;
           }
         });
 
@@ -163,10 +165,15 @@ export default function HomeScreen() {
         let nextLessonId = '';
         let nextLessonTitle = '';
         let nextLessonUrl = '';
+        let listenCount = 0;
+        let readCount = 0;
 
         for (let i = 1; i <= userCourse.course.total_lessons; i++) {
-          const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
-          if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
+          const lessonData = Array.from(lessonStudyMap.values()).find(l => l.lessonNumber === i);
+          const hasListened = lessonData && lessonData.听传承 > 0;
+          const hasRead = lessonData && lessonData.看法本 > 0;
+          
+          if (!hasListened || !hasRead) {
             nextLessonNumber = i;
             const nextLesson = allLessons?.find(l => l.lesson_number === i);
             if (nextLesson) {
@@ -177,12 +184,18 @@ export default function HomeScreen() {
               // If no lesson found, use fallback title
               nextLessonTitle = `第${i}课`;
             }
+            
+            // Get current counts for this lesson
+            if (lessonData) {
+              listenCount = lessonData.听传承;
+              readCount = lessonData.看法本;
+            }
             break;
           }
         }
 
-        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
-          lesson => lesson.听传承 && lesson.看法本
+        const completedLessons = Array.from(lessonStudyMap.values()).filter(
+          lesson => lesson.听传承 > 0 && lesson.看法本 > 0
         ).length;
 
         allCourseLessons.push({
@@ -192,7 +205,9 @@ export default function HomeScreen() {
           lessonTitle: nextLessonTitle,
           lessonId: nextLessonId,
           url: nextLessonUrl,
-          progress: ``
+          progress: ``,
+          listenCount,
+          readCount
         });
       }
 
@@ -395,8 +410,8 @@ export default function HomeScreen() {
 
       Alert.alert('成功', `${studyType}记录已保存`);
 
-      // Refresh the lessons
-      loadCourseLessons();
+      // Refresh the lessons to update counts and check for lesson completion
+      await loadCourseLessons();
     } catch (error) {
       console.error('Error recording study:', error);
       Alert.alert('错误', '保存失败，请重试');
@@ -618,7 +633,9 @@ export default function HomeScreen() {
                   </View>
                   <Ionicons name="chevron-forward" size={24} color="#666" />
                 </View>
-                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                <Text style={styles.studyProgressText}>
+                  听传承: {nextLesson.listenCount}次 | 看法本: {nextLesson.readCount}次
+                </Text>
                 <View style={styles.quickActionButtons}>
                   <TouchableOpacity 
                     style={[styles.quickActionButton, styles.listenButton]}
@@ -846,6 +863,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#888',
     marginBottom: 12,
+  },
+  studyProgressText: {
+    fontSize: 13,
+    color: '#da4347',
+    marginBottom: 12,
+    fontWeight: '500',
   },
   quickActionButtons: {
     flexDirection: 'row',
