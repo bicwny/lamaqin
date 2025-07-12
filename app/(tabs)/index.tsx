@@ -633,14 +633,39 @@ export default function HomeScreen() {
           }}
         />
 
-        {/* Temporary Toast Test Button */}
+        {/* Temporary Toast Test Buttons */}
         <View style={styles.testContainer}>
-          <TouchableOpacity 
-            style={styles.testButton}
-            onPress={() => toastService.success({ title: 'Toast测试', message: 'Phase 2 设置成功！' })}
-          >
-            <Text style={styles.testButtonText}>🍞 测试Toast</Text>
-          </TouchableOpacity>
+          <View style={styles.testButtonRow}>
+            <TouchableOpacity 
+              style={[styles.testButton, styles.successButton]}
+              onPress={() => toastService.success({ title: '✅ 修行完成', message: '今日功课圆满完成！' })}
+            >
+              <Text style={styles.testButtonText}>成功</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.testButton, styles.errorButton]}
+              onPress={() => toastService.error({ title: '❌ 网络错误', message: '请检查网络连接后重试' })}
+            >
+              <Text style={styles.testButtonText}>错误</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.testButtonRow}>
+            <TouchableOpacity 
+              style={[styles.testButton, styles.infoButton]}
+              onPress={() => toastService.info({ title: 'ℹ️ 后台同步', message: '正在同步修行数据...' })}
+            >
+              <Text style={styles.testButtonText}>信息</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.testButton, styles.achievementButton]}
+              onPress={() => toastService.achievement({ title: '课程完成', message: '恭喜完成《佛子行三十七颂》！' })}
+            >
+              <Text style={styles.testButtonText}>成就</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
 
@@ -1093,14 +1118,33 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
   },
+  testButtonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+  },
   testButton: {
-    backgroundColor: '#FF6B6B',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    flex: 1,
+    alignItems: 'center',
+  },
+  successButton: {
+    backgroundColor: '#28a745',
+  },
+  errorButton: {
+    backgroundColor: '#dc3545',
+  },
+  infoButton: {
+    backgroundColor: '#17a2b8',
+  },
+  achievementButton: {
+    backgroundColor: '#ffc107',
   },
   testButtonText: {
     color: 'white',
     fontWeight: '600',
+    fontSize: 12,
   },
 });
