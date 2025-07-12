@@ -45,7 +45,7 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
       <Text style={styles.lessonProgress}>
         听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
       </Text>
-      {isCompleted && <Text style={styles.completionCheck}>✅</Text>}
+      {isCompleted && <Text style={styles.completionCheck}>已完成</Text>}
     </View>
   );
 };
@@ -380,10 +380,10 @@ export default function StudyScreen() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return '✅';
-      case 'paused': return '⏸️';
-      case 'completed': return '🎉';
-      default: return '📖';
+      case 'active': return '';
+      case 'paused': return '';
+      case 'completed': return '';
+      default: return '';
     }
   };
 
@@ -615,7 +615,7 @@ export default function StudyScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <PageHeader 
-          title={`📚 ${selectedCourse.course.name}`}
+          title={selectedCourse.course.name}
           subtitle="课程详情与学习记录"
           showBackButton={true}
           onBackPress={() => setViewMode('home')}
@@ -624,10 +624,10 @@ export default function StudyScreen() {
 
           <View style={styles.courseInfoCard}>
             <Text style={styles.courseInfoTitle}>课程信息：</Text>
-            <Text style={styles.courseInfoText}>👨‍🏫 {selectedCourse.course.teacher}</Text>
-            <Text style={styles.courseInfoText}>📖 总课数：{selectedCourse.course.total_lessons}课</Text>
+            <Text style={styles.courseInfoText}>授课老师：{selectedCourse.course.teacher}</Text>
+            <Text style={styles.courseInfoText}>总课数：{selectedCourse.course.total_lessons}课</Text>
             <Text style={styles.courseInfoText}>
-              📊 完成进度：{(selectedCourse.progress_percentage || 0).toFixed(1)}% 
+              完成进度：{(selectedCourse.progress_percentage || 0).toFixed(1)}% 
               ({Math.round((selectedCourse.progress_percentage || 0) * selectedCourse.course.total_lessons / 100)}/{selectedCourse.course.total_lessons}课)
             </Text>
           </View>
