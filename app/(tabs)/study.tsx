@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 
 // Component to display lesson progress with real-time counts
@@ -88,6 +88,7 @@ type ViewMode = 'home' | 'manage' | 'courseDetail';
 
 export default function StudyScreen() {
   const { user } = useAuth();
+  const params = useLocalSearchParams();
   const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [progress, setProgress] = useState<StudyProgress[]>([]);
@@ -101,6 +102,19 @@ export default function StudyScreen() {
   useEffect(() => {
     loadStudyData();
   }, [user]);
+
+  // Handle navigation from index page
+  useEffect(() => {
+    if (params.courseId && params.viewMode === 'courseDetail' && userCourses.length > 0) {
+      const course = userCourses.find(uc => uc.course_id === params.courseId);
+      if (course) {
+        setSelectedCourse(course);
+        setViewMode('courseDetail');
+        // Clear the params to prevent re-triggering
+        router.setParams({ courseId: undefined, viewMode: undefined });
+      }
+    }
+  }, [params.courseId, params.viewMode, userCourses]);
 
   const loadStudyData = async () => {
     if (!user) {

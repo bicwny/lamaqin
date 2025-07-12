@@ -737,7 +737,13 @@ export default function HomeScreen() {
               <TouchableOpacity 
                 key={index} 
                 style={styles.studyCard} 
-                onPress={navigateToStudy}
+                onPress={() => router.push({
+                  pathname: '/(tabs)/study',
+                  params: {
+                    courseId: nextLesson.courseId,
+                    viewMode: 'courseDetail'
+                  }
+                })}
               >
                 <View style={styles.studyCardHeader}>
                   <View style={styles.studyCardTitleContainer}>
