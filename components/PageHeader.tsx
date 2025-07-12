@@ -35,6 +35,11 @@ export default function PageHeader({
 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{title}</Text>
+          {subtitle && (
+        <Text style={styles.subtitle}>
+          {typeof subtitle === 'string' ? subtitle : subtitle}
+        </Text>
+      )}
         </View>
 
         {rightAction ? (

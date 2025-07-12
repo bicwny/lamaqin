@@ -589,7 +589,7 @@ export default function HomeScreen() {
         <ThemedView style={styles.container}>
           <PageHeader 
             title="🏠 修行主页"
-            subtitle={<Text>{getGreeting()}</Text>}
+            subtitle={getGreeting()}
             rightAction={{
               text: "👤",
               onPress: navigateToProfile
@@ -609,7 +609,7 @@ export default function HomeScreen() {
       <ThemedView style={styles.container}>
         <PageHeader 
           title="🏠 修行主页"
-          subtitle={<Text>{getGreeting()} • {userDharmaName}居士 · 修行第365天 🔥</Text>}
+          subtitle={`${getGreeting()} • ${userDharmaName}居士 · 修行第365天 🔥`}
           rightAction={{
             component: <Avatar dharmaName={userDharmaName} size={32} />,
             onPress: navigateToProfile
