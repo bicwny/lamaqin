@@ -151,7 +151,10 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar style="auto" />
       <RootLayoutNav />
-      <Toast />
+      <Toast 
+        position="top"
+        bottomOffset={20}
+      />
     </AuthProvider>
   );
 }
