@@ -124,36 +124,63 @@ export const toastConfig = {
 
 class ToastService {
   // Success toasts (practice completions, saves, etc.)
-  success(config: ToastConfig) {
-    Toast.show({
-      type: 'success',
-      text1: config.title,
-      text2: config.message,
-      visibilityTime: config.duration || 2000,
-      onPress: config.onPress,
-    });
+  success(config: ToastConfig | string) {
+    if (typeof config === 'string') {
+      Toast.show({
+        type: 'success',
+        text1: config,
+        text2: undefined,
+        visibilityTime: 2000,
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        text1: config.title,
+        text2: config.message,
+        visibilityTime: config.duration || 2000,
+        onPress: config.onPress,
+      });
+    }
   }
 
   // Error toasts (network failures, validation errors, etc.)
-  error(config: ToastConfig) {
-    Toast.show({
-      type: 'error',
-      text1: config.title,
-      text2: config.message,
-      visibilityTime: config.duration || 5000,
-      onPress: config.onPress,
-    });
+  error(config: ToastConfig | string) {
+    if (typeof config === 'string') {
+      Toast.show({
+        type: 'error',
+        text1: config,
+        text2: undefined,
+        visibilityTime: 5000,
+      });
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: config.title,
+        text2: config.message,
+        visibilityTime: config.duration || 5000,
+        onPress: config.onPress,
+      });
+    }
   }
 
   // Info toasts (background sync, general information)
-  info(config: ToastConfig) {
-    Toast.show({
-      type: 'info',
-      text1: config.title,
-      text2: config.message,
-      visibilityTime: config.duration || 3000,
-      onPress: config.onPress,
-    });
+  info(config: ToastConfig | string) {
+    if (typeof config === 'string') {
+      Toast.show({
+        type: 'info',
+        text1: config,
+        text2: undefined,
+        visibilityTime: 3000,
+      });
+    } else {
+      Toast.show({
+        type: 'info',
+        text1: config.title,
+        text2: config.message,
+        visibilityTime: config.duration || 3000,
+        onPress: config.onPress,
+      });
+    }
   }
 
   // Achievement toasts (course completions, milestones)
