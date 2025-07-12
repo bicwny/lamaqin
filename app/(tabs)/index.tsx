@@ -497,17 +497,8 @@ export default function HomeScreen() {
     // Calculate remaining amount to complete daily target
     const remaining = practice.target - practice.current;
 
-    Alert.alert(
-      '快速完成',
-      `需要记录 ${remaining.toLocaleString()} ${practice.unit} 来完成今日目标，确认记录？`,
-      [
-        { text: '取消', style: 'cancel' },
-        { 
-          text: '确认', 
-          onPress: () => recordQuickComplete(practice, remaining)
-        }
-      ]
-    );
+    // Directly record without confirmation
+    recordQuickComplete(practice, remaining);
   };
 
   // Handle add record button (plus)
