@@ -255,6 +255,7 @@ export default function HomeScreen() {
         .eq('user_id', user.id)
         .eq('status', 'active')
         .eq('target_period', 'daily')
+        .order('created_at', { ascending: true })
         .limit(3);
 
       if (error) throw error;
