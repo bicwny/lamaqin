@@ -9,13 +9,6 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import Toast from 'react-native-toast-message';
-import { ErrorBoundary } from 'react-error-boundary';
-
-function ErrorFallback({error, resetErrorBoundary}: any) {
-  console.error('❌ Error caught by boundary:', error);
-  return null;
-}
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -155,14 +148,8 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <StatusBar style="auto" />
-        <RootLayoutNav />
-        <Toast 
-          position="top"
-          bottomOffset={20}
-        />
-      </ErrorBoundary>
+      <StatusBar style="auto" />
+      <RootLayoutNav />
     </AuthProvider>
   );
 }

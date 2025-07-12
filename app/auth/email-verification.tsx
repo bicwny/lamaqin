@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import Toast from 'react-native-toast-message';
 
 export default function EmailVerificationScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -49,12 +48,7 @@ export default function EmailVerificationScreen() {
 
   const handleResendVerification = async () => {
     if (!email) {
-      Toast.show({
-        type: 'error',
-        text1: '错误',
-        text2: '邮箱地址丢失',
-        position: 'top',
-      });
+      Alert.alert('错误', '邮箱地址丢失');
       return;
     }
 
@@ -66,28 +60,13 @@ export default function EmailVerificationScreen() {
       });
 
       if (error) {
-        Toast.show({
-          type: 'error',
-          text1: '发送失败',
-          text2: error.message,
-          position: 'top',
-        });
+        Alert.alert('发送失败', error.message);
       } else {
         setCountdown(60);
-        Toast.show({
-          type: 'success',
-          text1: '发送成功',
-          text2: '已重新发送验证邮件',
-          position: 'top',
-        });
+        Alert.alert('发送成功', '已重新发送验证邮件');
       }
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: '发送失败',
-        text2: '网络错误，请稍后重试',
-        position: 'top',
-      });
+      Alert.alert('发送失败', '网络错误，请稍后重试');
     }
     setIsResending(false);
   };
@@ -100,20 +79,10 @@ export default function EmailVerificationScreen() {
       if (session?.user?.email_confirmed_at) {
         router.replace('/(tabs)');
       } else {
-        Toast.show({
-          type: 'info',
-          text1: '未验证',
-          text2: '邮箱尚未验证，请检查邮箱',
-          position: 'top',
-        });
+        Alert.alert('未验证', '邮箱尚未验证，请检查邮箱');
       }
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: '检查失败',
-        text2: '无法检查验证状态',
-        position: 'top',
-      });
+      Alert.alert('检查失败', '无法检查验证状态');
     }
     setCheckingStatus(false);
   };
@@ -128,7 +97,7 @@ export default function EmailVerificationScreen() {
       <View style={styles.steps}>
         <Text style={styles.stepTitle}>📝 验证步骤：</Text>
         <Text style={styles.step}>1. 检查邮箱(包括垃圾邮件文件夹)</Text>
-        <Text style={styles.step}>2. 点击邮件中的验证邮箱链接</Text>
+        <Text style={styles.step}>2. 点击邮件中的【验证邮箱】链接</Text>
         <Text style={styles.step}>3. 验证成功后会自动跳转</Text>
       </View>
 
