@@ -165,15 +165,15 @@ export default function HomeScreen() {
 
         const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
 
-        // If all lessons are completed, show success message and skip adding to display
-        if (isAllLessonsCompleted) {
+        // If all lessons are completed and course is still active, show success message but keep displaying the card
+        if (isAllLessonsCompleted && userCourse.status === 'active') {
           Alert.alert(
             '🎉 课程完成！', 
-            `恭喜您完成了《${userCourse.course.name}》的全部课程！您已经完成了所有 ${userCourse.course.total_lessons} 课的学习。`,
+            `恭喜您完成了《${userCourse.course.name}》的全部课程！您已经完成了所有 ${userCourse.course.total_lessons} 课的学习。刷新页面后此卡片将消失。`,
             [{ text: '确认', style: 'default' }]
           );
           
-          // Update course status to completed
+          // Update course status to completed - this will hide the card on next refresh
           await supabase
             .from('user_courses')
             .update({ 
@@ -184,7 +184,7 @@ export default function HomeScreen() {
             .eq('user_id', user.id)
             .eq('course_id', userCourse.course_id);
 
-          continue; // Skip adding this course to the display list
+          // Continue to add the course to display (don't skip) so user can see it this time
         }
 
         // Find the next incomplete lesson
