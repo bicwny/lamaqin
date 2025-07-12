@@ -208,11 +208,11 @@ export default function HomeScreen() {
               const lessonStudyRecords = studyRecords?.filter(record => 
                 record.lesson?.lesson_number === i
               ) || [];
-              
+
               listenCount = lessonStudyRecords.filter(record => 
                 record.study_type === '听传承'
               ).length;
-              
+
               readCount = lessonStudyRecords.filter(record => 
                 record.study_type === '看法本'
               ).length;
@@ -414,7 +414,7 @@ export default function HomeScreen() {
         .limit(1);
 
       if (lessonError || !lessons || lessons.length === 0) {
-        Alert.alert('错误', '课程信息有误');
+        toastService.error('课程信息有误');
         return;
       }
 
@@ -433,13 +433,13 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      Alert.alert('成功', `${studyType}记录已保存`);
+      toastService.success(`${studyType}记录已保存`);
 
       // Refresh the lessons
       loadCourseLessons();
     } catch (error) {
       console.error('Error recording study:', error);
-      Alert.alert('错误', '保存失败，请重试');
+      toastService.error('保存失败，请重试');
     }
   };
 
@@ -633,7 +633,7 @@ export default function HomeScreen() {
           }}
         />
 
-        
+
 
 
         <ScrollView 
@@ -1004,8 +1004,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   progressBarBg: {
-    height: 6,
-    backgroundColor: '#f0f0f0',
+    height: 6,backgroundColor: '#f0f0f0',
     borderRadius: 3,
   },
   progressBarFill: {

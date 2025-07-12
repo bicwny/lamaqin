@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
 import { router } from 'expo-router';
+import { toastService } from '@/lib/toast';
 
 // Component to display lesson progress with real-time counts
 const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
@@ -230,14 +231,20 @@ export default function StudyScreen() {
         study_count_for_lesson: 1
       });
 
-      Alert.alert('成功', `${studyType}记录已保存`);
+      toastService.success({ 
+        title: '学习记录已保存', 
+        message: `${studyType}完成 - 继续加油！` 
+      });
 
       // Trigger refresh of lesson counts
       setRefreshTrigger(prev => prev + 1);
       loadStudyData(); // Refresh overall data
     } catch (error) {
       console.error('Error recording study:', error);
-      Alert.alert('错误', '保存失败，请重试');
+      toastService.error({ 
+        title: '保存失败', 
+        message: '网络异常，请稍后重试' 
+      });
     }
   };
 
@@ -251,7 +258,10 @@ export default function StudyScreen() {
       // Check if user is already enrolled (both in state and database)
       const isAlreadyEnrolledInState = userCourses.some(uc => uc.course_id === courseId);
       if (isAlreadyEnrolledInState) {
-        Alert.alert('提示', '您已经加入了这门课程');
+        toastService.info({ 
+          title: '已加入课程', 
+          message: '您已经在学习这门课程了' 
+        });
         setViewMode('home');
         return;
       }
@@ -263,7 +273,10 @@ export default function StudyScreen() {
         if (isAlreadyEnrolledInDb) {
           console.log('⚠️ Course enrollment found in DB but not in state - syncing...');
           setUserCourses(dbUserCourses);
-          Alert.alert('提示', '您已经加入了这门课程');
+          toastService.info({ 
+            title: '已加入课程', 
+            message: '您已经在学习这门课程了' 
+          });
           setViewMode('home');
           return;
         }
@@ -285,7 +298,10 @@ export default function StudyScreen() {
       };
       setProgress(prev => [...prev, newProgress]);
 
-      Alert.alert('成功', '课程已加入，开始学习吧！');
+      toastService.success({ 
+        title: '课程加入成功', 
+        message: '开始您的学习之旅吧！' 
+      });
       setViewMode('home');
 
       console.log('✅ 课程加入成功');
@@ -293,11 +309,17 @@ export default function StudyScreen() {
       console.error('❌ Error joining course:', error);
       // Handle duplicate key error specifically
       if (error?.code === '23505') {
-        Alert.alert('提示', '您已经加入了这门课程');
+        toastService.info({ 
+          title: '已加入课程', 
+          message: '课程数据已同步' 
+        });
         // Reload data to sync state
         loadStudyData();
       } else {
-        Alert.alert('错误', '加入课程失败，请重试');
+        toastService.error({ 
+          title: '加入失败', 
+          message: '网络异常，请稍后重试' 
+        });
       }
     } finally {
       setJoiningCourse(null);
@@ -314,10 +336,16 @@ export default function StudyScreen() {
           uc.course_id === courseId ? { ...uc, status: 'paused' } : uc
         )
       );
-      Alert.alert('成功', '课程已暂停');
+      toastService.info({ 
+        title: '课程已暂停', 
+        message: '可在课程管理中恢复学习' 
+      });
     } catch (error) {
       console.error('Error pausing course:', error);
-      Alert.alert('错误', '暂停失败，请重试');
+      toastService.error({ 
+        title: '暂停失败', 
+        message: '请稍后重试' 
+      });
     }
   };
 
@@ -331,10 +359,16 @@ export default function StudyScreen() {
           uc.course_id === courseId ? { ...uc, status: 'active' } : uc
         )
       );
-      Alert.alert('成功', '课程已恢复');
+      toastService.success({ 
+        title: '课程已恢复', 
+        message: '继续您的学习进度' 
+      });
     } catch (error) {
       console.error('Error resuming course:', error);
-      Alert.alert('错误', '恢复失败，请重试');
+      toastService.error({ 
+        title: '恢复失败', 
+        message: '请稍后重试' 
+      });
     }
   };
 
@@ -643,10 +677,16 @@ export default function StudyScreen() {
                         // Open URL directly in user's default browser
                         Linking.openURL(lesson.url).catch(err => {
                           console.error('Failed to open URL:', err);
-                          Alert.alert('错误', '无法打开链接');
+                          toastService.error({ 
+                            title: '无法打开链接', 
+                            message: '请检查网络连接或稍后重试' 
+                          });
                         });
                       } else {
-                        Alert.alert('提示', '此课程暂无在线链接');
+                        toastService.info({ 
+                          title: '暂无在线链接', 
+                          message: '该课程资源正在准备中' 
+                        });
                       }
                     }}
                   >
