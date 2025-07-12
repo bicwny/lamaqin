@@ -40,15 +40,34 @@ export default function ProfileScreen() {
     try {
       console.log('🔍 Loading profile for user:', user.id);
       
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
       const { data, error: fetchError } = await supabase
         .from('users')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .single()
+        .abortSignal(controller.signal);
+
+      clearTimeout(timeoutId);
 
       if (fetchError) {
         console.error('❌ Error fetching profile:', fetchError);
-        setError('网络连接异常，使用本地数据');
+        console.error('❌ Error details:', {
+          code: fetchError.code,
+          message: fetchError.message,
+          details: fetchError.details
+        });
+        
+        // Check if it's a network/timeout error vs data error
+        if (fetchError.code === '23503' || fetchError.message?.includes('timeout') || 
+            fetchError.message?.includes('network') || fetchError.message?.includes('fetch')) {
+          setError('网络连接异常，使用本地数据');
+        } else {
+          setError('数据加载失败，使用本地数据');
+        }
         
         // Use fallback data from user auth context
         const fallbackProfile = {
@@ -69,9 +88,19 @@ export default function ProfileScreen() {
       console.log('✅ Profile loaded successfully:', data);
       setProfile(data);
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('❌ Profile loading error:', err);
-      setError('网络连接异常，使用本地数据');
+      console.error('❌ Error type:', err.name, 'Message:', err.message);
+      
+      // Determine error type for better user feedback
+      let errorMessage = '网络连接异常，使用本地数据';
+      if (err.name === 'AbortError') {
+        errorMessage = '请求超时，使用本地数据';
+      } else if (err.message?.includes('Failed to fetch')) {
+        errorMessage = '网络连接失败，使用本地数据';
+      }
+      
+      setError(errorMessage);
       
       // Use fallback data from user auth context
       const fallbackProfile = {
