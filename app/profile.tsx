@@ -48,7 +48,21 @@ export default function ProfileScreen() {
 
       if (fetchError) {
         console.error('❌ Error fetching profile:', fetchError);
-        setError('加载个人资料失败');
+        setError('网络连接异常，使用本地数据');
+        
+        // Use fallback data from user auth context
+        const fallbackProfile = {
+          id: user.id,
+          email: user.email,
+          dharma_name: user.dharma_name || '未设置法名',
+          location: null,
+          current_class: null,
+          practice_years: null,
+          bio: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setProfile(fallbackProfile);
         return;
       }
 
@@ -57,7 +71,21 @@ export default function ProfileScreen() {
       setError(null);
     } catch (err) {
       console.error('❌ Profile loading error:', err);
-      setError('加载个人资料时发生错误');
+      setError('网络连接异常，使用本地数据');
+      
+      // Use fallback data from user auth context
+      const fallbackProfile = {
+        id: user.id,
+        email: user.email,
+        dharma_name: user.dharma_name || '未设置法名',
+        location: null,
+        current_class: null,
+        practice_years: null,
+        bio: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      setProfile(fallbackProfile);
     } finally {
       setLoading(false);
     }
@@ -99,7 +127,7 @@ export default function ProfileScreen() {
     );
   }
 
-  if (error) {
+  if (error && !profile) {
     return (
       <SafeAreaView style={styles.container}>
         <ThemedView style={styles.container}>
@@ -131,6 +159,16 @@ export default function ProfileScreen() {
         />
         
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* Network Error Banner */}
+          {error && (
+            <View style={styles.errorBanner}>
+              <Text style={styles.errorBannerText}>{error}</Text>
+              <TouchableOpacity onPress={loadProfile} style={styles.retryButtonSmall}>
+                <Text style={styles.retryButtonSmallText}>重试</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          
           {/* Profile Header */}
           <View style={styles.profileHeader}>
             <Avatar 
@@ -346,5 +384,33 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#FF3B30',
+  },
+  errorBanner: {
+    backgroundColor: '#FFF3CD',
+    borderColor: '#FFEAA7',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    margin: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  errorBannerText: {
+    fontSize: 14,
+    color: '#856404',
+    flex: 1,
+  },
+  retryButtonSmall: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  retryButtonSmallText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
