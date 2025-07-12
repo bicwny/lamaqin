@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
 import PageHeader from '@/components/PageHeader';
+import { toastService } from '@/lib/toast';
 
 interface PracticeProject {
   id: string;
@@ -111,7 +112,7 @@ export default function PracticeScreen() {
       setProjects(practiceProjects || []);
     } catch (error) {
       console.error('Error loading practice data:', error);
-      Alert.alert('错误', '加载修行数据失败');
+      toastService.error({ title: '❌ 加载失败', message: '修行数据加载失败，请重试' });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -152,7 +153,7 @@ export default function PracticeScreen() {
 
     const project = projects.find(p => p.id === projectId);
     if (!project) {
-      Alert.alert('错误', '未找到修行项目');
+      toastService.error({ title: '❌ 项目错误', message: '未找到修行项目' });
       return;
     }
 

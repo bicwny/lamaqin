@@ -8,7 +8,6 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
-  ToastAndroid,
   Platform,
   SafeAreaView,
   KeyboardAvoidingView,
@@ -18,6 +17,7 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
+import { toastService } from '@/lib/toast';
 
 export default function MeditationRecordScreen() {
   const { user } = useAuth();
@@ -45,15 +45,6 @@ export default function MeditationRecordScreen() {
   }>>([]);
 
   const isEditing = !!editRecordId;
-
-  // Toast function for cross-platform support
-  const showToast = (message: string) => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.show(message, ToastAndroid.SHORT);
-    } else {
-      Alert.alert('提示', message);
-    }
-  };
 
   useEffect(() => {
     loadMeditationTopics();
@@ -87,20 +78,20 @@ export default function MeditationRecordScreen() {
       }
     } catch (error) {
       console.error('❌ Error loading existing record:', error);
-      Alert.alert('错误', '加载记录失败');
+      toastService.error({ title: '❌ 加载失败', message: '记录加载失败，请重试' });
     }
   };
 
   const validateForm = () => {
     const durationNum = parseInt(duration);
     if (isNaN(durationNum) || durationNum <= 0) {
-      Alert.alert('提示', '请输入有效的观修时长（大于0分钟）');
+      toastService.error({ title: '⚠️ 输入错误', message: '请输入有效的观修时长（大于0分钟）' });
       return false;
     }
 
     const sessionNum = parseInt(sessionNumber);
     if (isNaN(sessionNum) || sessionNum < 1) {
-      Alert.alert('提示', '请选择有效的观修内容');
+      toastService.error({ title: '⚠️ 选择错误', message: '请选择有效的观修内容' });
       return false;
     }
 
@@ -129,24 +120,27 @@ export default function MeditationRecordScreen() {
           reflection: recordData.reflection
         });
         console.log('✅ Meditation record updated successfully');
-        showToast('观修记录已更新');
-        // Navigate back with a small delay to ensure toast shows
-        setTimeout(() => {
-          router.back();
-        }, 500);
+        toastService.success({ 
+          title: '✅ 更新成功', 
+          message: `观修记录已更新：${recordData.duration_minutes}分钟` 
+        });
+        router.back();
       } else {
         const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
         console.log('✅ Record saved successfully');
 
-        // Show success toast
-        showToast('观修记录已保存成功');
+        // Show achievement toast for new meditation record
+        toastService.achievement({ 
+          title: '观修完成', 
+          message: `第${recordData.session_number}座 ${recordData.duration_minutes}分钟观修记录成功！` 
+        });
 
         // Navigate back to practice page
         router.back();
       }
     } catch (error) {
       console.error('❌ Error saving meditation record:', error);
-      Alert.alert('错误', '保存失败，请重试');
+      toastService.error({ title: '❌ 保存失败', message: '观修记录保存失败，请检查网络后重试' });
     } finally {
       setLoading(false);
     }
