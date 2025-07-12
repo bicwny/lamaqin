@@ -401,7 +401,7 @@ export default function HomeScreen() {
   };
 
   const navigateToProfile = () => {
-    router.push('/(tabs)/profile');
+    router.push('/profile');
   };
 
   const navigateToStudy = () => {

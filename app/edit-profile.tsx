@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -158,7 +157,7 @@ export default function EditProfileScreen() {
       >
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.formContainer}>
-            
+
             <View style={styles.inputGroup}>
               <ThemedText style={styles.label}>法名 *</ThemedText>
               <TextInput
