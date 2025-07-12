@@ -59,6 +59,9 @@ export default function HomeScreen() {
     url?: string;
     listenCount: number;
     readCount: number;
+    totalLessons: number;
+    completedLessons: number;
+    isCourseCompleted: boolean;
   }>>([]);
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
@@ -161,10 +164,10 @@ export default function HomeScreen() {
         });
 
         // Find the next incomplete lesson
-        let nextLessonNumber = 1;
-        let nextLessonId = '';
-        let nextLessonTitle = '';
-        let nextLessonUrl = '';
+        let currentLessonNumber = 1;
+        let currentLessonId = '';
+        let currentLessonTitle = '';
+        let currentLessonUrl = '';
         let listenCount = 0;
         let readCount = 0;
 
@@ -172,19 +175,19 @@ export default function HomeScreen() {
           const lessonData = Array.from(lessonStudyMap.values()).find(l => l.lessonNumber === i);
           const hasListened = lessonData && lessonData.听传承 > 0;
           const hasRead = lessonData && lessonData.看法本 > 0;
-          
+
           if (!hasListened || !hasRead) {
-            nextLessonNumber = i;
-            const nextLesson = allLessons?.find(l => l.lesson_number === i);
-            if (nextLesson) {
-              nextLessonId = nextLesson.id;
-              nextLessonTitle = nextLesson.title || `第${i}课`;
-              nextLessonUrl = nextLesson.url || '';
+            currentLessonNumber = i;
+            const currentLesson = allLessons?.find(l => l.lesson_number === i);
+            if (currentLesson) {
+              currentLessonId = currentLesson.id;
+              currentLessonTitle = currentLesson.title || `第${i}课`;
+              currentLessonUrl = currentLesson.url || '';
             } else {
               // If no lesson found, use fallback title
-              nextLessonTitle = `第${i}课`;
+              currentLessonTitle = `第${i}课`;
             }
-            
+
             // Get current counts for this lesson
             if (lessonData) {
               listenCount = lessonData.听传承;
@@ -197,17 +200,22 @@ export default function HomeScreen() {
         const completedLessons = Array.from(lessonStudyMap.values()).filter(
           lesson => lesson.听传承 > 0 && lesson.看法本 > 0
         ).length;
+        
+        // Check if course is completed (all lessons have both study types)
+        const isCourseCompleted = completedLessons === userCourse.course.total_lessons;
 
         allCourseLessons.push({
           courseId: userCourse.course_id,
           courseName: userCourse.course.name,
-          lessonNumber: nextLessonNumber,
-          lessonTitle: nextLessonTitle,
-          lessonId: nextLessonId,
-          url: nextLessonUrl,
-          progress: ``,
+          lessonNumber: currentLessonNumber,
+          lessonTitle: currentLessonTitle,
+          lessonId: currentLessonId,
+          url: currentLessonUrl,
           listenCount,
-          readCount
+          readCount,
+          totalLessons: userCourse.course.total_lessons,
+          completedLessons,
+          isCourseCompleted
         });
       }
 
@@ -624,40 +632,45 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {courseLessons.map((nextLesson, index) => (
+            {courseLessons.map((currentLesson, index) => (
               <TouchableOpacity key={index} style={styles.studyCard} onPress={navigateToStudy}>
                 <View style={styles.studyCardHeader}>
                   <View style={styles.studyCardTitleContainer}>
-                    <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
+                    <Text style={styles.courseName}>{currentLesson.courseName}</Text>
+                    {currentLesson.isCourseCompleted ? (
+                      <Text style={styles.completedCourseText}>🎉 课程已完成！</Text>
+                    ) : (
+                      <Text style={styles.continueStudyText}>当前学习 · {currentLesson.lessonTitle}</Text>
+                    )}
                   </View>
                   <Ionicons name="chevron-forward" size={24} color="#666" />
                 </View>
-                <Text style={styles.studyProgressText}>
-                  听传承: {nextLesson.listenCount}次 | 看法本: {nextLesson.readCount}次
-                </Text>
-                <View style={styles.quickActionButtons}>
-                  <TouchableOpacity 
-                    style={[styles.quickActionButton, styles.listenButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                  >
-                    <Text style={styles.quickActionButtonText}>听传承</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.quickActionButton, styles.readButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                  >
-                    <Text style={styles.quickActionButtonText}>看法本</Text>
-                  </TouchableOpacity>
-                  {nextLesson.url ? (
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.onlineButton]}
-                      onPress={() => Linking.openURL(nextLesson.url || '')}
-                    >
-                      <Text style={styles.quickActionButtonText}>在线课程</Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
+
+                {currentLesson.isCourseCompleted ? (
+                  <Text style={styles.courseCompletionMessage}>
+                    恭喜完成全部 {currentLesson.totalLessons} 课的学习！
+                  </Text>
+                ) : (
+                  <>
+                    <Text style={styles.studyProgressText}>
+                      听传承: {currentLesson.listenCount}次 | 看法本: {currentLesson.readCount}次
+                    </Text>
+                    <View style={styles.quickActionButtons}>
+                      <TouchableOpacity 
+                        style={[styles.quickActionButton, styles.listenButton]}
+                        onPress={() => recordStudy(currentLesson.courseId, currentLesson.lessonNumber, '听传承')}
+                      >
+                        <Text style={styles.quickActionButtonText}>听传承</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={[styles.quickActionButton, styles.readButton]}
+                        onPress={() => recordStudy(currentLesson.courseId, currentLesson.lessonNumber, '看法本')}
+                      >
+                        <Text style={styles.quickActionButtonText}>看法本</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -893,9 +906,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#F44336',
   },
   quickActionButtonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '600',
+  },
+  completedCourseText: {
+    fontSize: 14,
+    color: '#4CAF50',
+    fontWeight: '600',
+  },
+  courseCompletionMessage: {
+    fontSize: 14,
+    color: '#4CAF50',
+    textAlign: 'center',
+    paddingVertical: 8,
+    fontWeight: '500',
   },
   noStudyText: {
     fontSize: 16,
@@ -983,7 +1008,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.primary,
     borderRadius: 3,
-  },
+   },
   progressPercent: {
     fontSize: 12,
     color: Colors.textSecondary,
