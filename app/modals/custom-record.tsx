@@ -9,13 +9,12 @@ import {
   Alert,
   ActivityIndicator,
   SafeAreaView,
-  ToastAndroid,
-  Platform,
 } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { toastService } from '@/lib/toast';
 
 export default function CustomRecordScreen() {
   const { user } = useAuth();
@@ -37,14 +36,8 @@ export default function CustomRecordScreen() {
   const [loadingRecord, setLoadingRecord] = useState(false);
   const isEditing = !!editRecordId;
 
-  // Toast function for cross-platform support
-  const showToast = (message: string) => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.show(message, ToastAndroid.SHORT);
-    } else {
-      Alert.alert('提示', message);
-    }
-  };
+  // Import toast service at the top
+  import { toastService } from '@/lib/toast';
 
   // Load existing record data when editing
   useEffect(() => {
@@ -105,7 +98,10 @@ export default function CustomRecordScreen() {
         await handleCreateRecord(countNum);
       }
 
-      showToast(isEditing ? '记录已更新' : `已记录 ${countNum} 次`);
+      toastService.success({
+        title: isEditing ? '记录已更新' : `已记录 ${countNum} 次`,
+        message: isEditing ? undefined : '继续加油！'
+      });
       router.back();
     } catch (error) {
       console.error('❌ Error saving count record:', error);
