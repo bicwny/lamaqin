@@ -419,10 +419,10 @@ export default function HomeScreen() {
           const [listenPart, readPart] = currentProgress.split(' | ');
           const listenCount = parseInt(listenPart.match(/\d+/)?.[0] || '0');
           const readCount = parseInt(readPart.match(/\d+/)?.[0] || '0');
-          
+
           const newListenCount = studyType === '听传承' ? listenCount + 1 : listenCount;
           const newReadCount = studyType === '看法本' ? readCount + 1 : readCount;
-          
+
           return {
             ...lesson,
             progress: `听传承: ${newListenCount}次 | 看法本: ${newReadCount}次`
@@ -483,7 +483,7 @@ export default function HomeScreen() {
         title: '保存失败',
         message: '网络异常，请稍后重试'
       });
-      
+
       // Revert optimistic update on error
       loadCourseLessons();
     }
@@ -553,7 +553,7 @@ export default function HomeScreen() {
         title: '记录失败',
         message: '请检查网络连接后重试'
       });
-      
+
       // Refresh data to revert optimistic changes
       loadDashboardData();
     }
@@ -597,7 +597,7 @@ export default function HomeScreen() {
         if (practice.id === practiceId) {
           const newWeekSessions = practice.weekSessions + 1;
           const newTodaySessions = practice.todaySessions + 1;
-          
+
           return {
             ...practice,
             weekSessions: newWeekSessions,
@@ -616,7 +616,7 @@ export default function HomeScreen() {
         if (practice.id === practiceId) {
           const newCurrent = practice.current + amount;
           const newProgressPercent = Math.min((newCurrent / practice.target) * 100, 100);
-          
+
           return {
             ...practice,
             current: newCurrent,
@@ -695,10 +695,10 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ThemedView style={styles.container}>
           <PageHeader 
-            title="🏠 修行主页"
+            title="修行主页"
             subtitle={getGreeting()}
             rightAction={{
-              text: "👤",
+              component: <Avatar dharmaName={userDharmaName} size={32} />,
               onPress: navigateToProfile
             }}
           />
@@ -715,7 +715,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
         <PageHeader 
-          title="🏠 修行主页"
+          title="修行主页"
           subtitle={`${getGreeting()} • ${userDharmaName}居士 · 修行第365天 🔥`}
           rightAction={{
             component: <Avatar dharmaName={userDharmaName} size={32} />,
