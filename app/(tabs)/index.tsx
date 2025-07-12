@@ -665,16 +665,17 @@ export default function HomeScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.practiceHeader}>
-                    <View style={styles.practiceNameRow}>
-                      <Text style={styles.practiceStatusIcon}>
-                        {getStatusIcon(practice.status)}
-                      </Text>
-                      <Text style={styles.practiceNameColumn} numberOfLines={1}>
-                        {practice.name}
-                      </Text>
-                    </View>
+                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
+                      {practice.name}
+                    </Text>
+                  </View>
+
+                  <View style={styles.countPercentageRow}>
                     <Text style={styles.practiceCountColumn}>
                       {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
+                    </Text>
+                    <Text style={styles.progressPercent}>
+                      {Math.round(practice.progressPercent)}%
                     </Text>
                   </View>
 
@@ -687,9 +688,6 @@ export default function HomeScreen() {
                         ]} 
                       />
                     </View>
-                    <Text style={styles.progressPercent}>
-                      {Math.round(practice.progressPercent)}%
-                    </Text>
                   </View>
 
                   {/* Action Buttons */}
@@ -729,14 +727,9 @@ export default function HomeScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.practiceHeader}>
-                    <View style={styles.practiceNameRow}>
-                      <Text style={styles.practiceStatusIcon}>
-                        {getStatusIcon(practice.status)}
-                      </Text>
-                      <Text style={styles.practiceNameColumn} numberOfLines={1}>
-                        {practice.name}
-                      </Text>
-                    </View>
+                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
+                      {practice.name}
+                    </Text>
                   </View>
                   <Text style={styles.weeklyProgressColumn}>
                     本周 {practice.weekSessions}/{practice.weekTarget}座
@@ -750,6 +743,7 @@ export default function HomeScreen() {
 
                   {/* Action Button for Weekly Practices */}
                   <View style={styles.practiceActions}>
+                    <View style={styles.actionButtonSpacer} />
                     <TouchableOpacity 
                       style={[styles.actionButton, styles.addButton]}
                       onPress={(e) => handleAddRecord(e, practice)}
@@ -948,16 +942,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
   },
-  progressBarContainer: {
+  countPercentageRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 6,
+  },
+  progressBarContainer: {
+    marginBottom: 8,
   },
   progressBarBg: {
-    flex: 1,
     height: 6,
     backgroundColor: '#f0f0f0',
     borderRadius: 3,
-    marginRight: 8,
   },
   progressBarFill: {
     height: '100%',
@@ -967,14 +964,14 @@ const styles = StyleSheet.create({
   progressPercent: {
     fontSize: 12,
     color: Colors.textSecondary,
-    marginLeft: 8,
-    minWidth: 35,
   },
   practiceActions: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 6,
-    marginTop: 8,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  actionButtonSpacer: {
+    width: 28,
   },
   actionButton: {
     width: 28,
