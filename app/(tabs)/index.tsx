@@ -525,7 +525,7 @@ export default function HomeScreen() {
     if (practice.status === 'completed') {
       // Already completed, just show message
       toastService.info({
-        title: '✅ 今日目标已达成',
+        title: '今日目标已达成',
         message: '继续保持！明日再接再厉'
       });
       return;
@@ -539,7 +539,7 @@ export default function HomeScreen() {
 
     // Show success toast immediately
     toastService.success({
-      title: '✅ 已完成今日目标',
+      title: '已完成今日目标',
       message: `${practice.name} +${remaining.toLocaleString()} ${practice.unit}`
     });
 
@@ -676,18 +676,10 @@ export default function HomeScreen() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 6) return '🌙 夜深了，早点休息';
-    if (hour < 12) return '🌅 早上好，开始今日修行';
-    if (hour < 18) return '☀️ 下午好，精进不懈';
-    return '🌆 晚上好，回顾今日收获';
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return '✅';
-      case 'in_progress': return '🔄';
-      default: return '⏳';
-    }
+    if (hour < 6) return '夜深了，早点休息';
+    if (hour < 12) return '早上好，开始今日修行';
+    if (hour < 18) return '下午好，精进不懈';
+    return '晚上好，回顾今日收获';
   };
 
   if (loading) {
@@ -716,7 +708,7 @@ export default function HomeScreen() {
       <ThemedView style={styles.container}>
         <PageHeader 
           title="修行主页"
-          subtitle={`${getGreeting()} • ${userDharmaName}居士 · 修行第365天 🔥`}
+          subtitle={`${getGreeting()} • ${userDharmaName}居士 · 修行第365天`}
           rightAction={{
             component: <Avatar dharmaName={userDharmaName} size={32} />,
             onPress: navigateToProfile
@@ -735,7 +727,7 @@ export default function HomeScreen() {
           {/* Study Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>📚 今日学习</Text>
+              <Text style={styles.sectionTitle}>今日学习</Text>
               <TouchableOpacity onPress={navigateToStudy}>
                 <Text style={styles.viewMoreText}>查看更多</Text>
               </TouchableOpacity>
@@ -784,7 +776,7 @@ export default function HomeScreen() {
           {/* Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>📿 今日修行</Text>
+              <Text style={styles.sectionTitle}>今日修行</Text>
               <TouchableOpacity onPress={navigateToPractice}>
                 <Text style={styles.viewMoreText}>查看更多</Text>
               </TouchableOpacity>
@@ -869,7 +861,7 @@ export default function HomeScreen() {
                   </View>
                   <Text style={styles.weeklyProgressColumn}>
                     本周 {practice.weekSessions}/{practice.weekTarget}座
-                    {practice.status === 'completed' && ' ✅'}
+                    {practice.status === 'completed' && ' 已完成'}
                   </Text>
                   {practice.todaySessions > 0 && practice.todayDetails && (
                     <Text style={styles.todayDetailsColumn} numberOfLines={2}>
@@ -893,13 +885,13 @@ export default function HomeScreen() {
 
             {courseLessons.length === 0 && (
               <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
-                <Text style={styles.noStudyText}>📚 暂无进行中的课程，点击查看课程库</Text>
+                <Text style={styles.noStudyText}>暂无进行中的课程，点击查看课程库</Text>
               </TouchableOpacity>
             )}
 
             {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
               <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
-                <Text style={styles.noPracticeText}>🙏 暂无修行项目，点击添加</Text>
+                <Text style={styles.noPracticeText}>暂无修行项目，点击添加</Text>
               </TouchableOpacity>
             )}
           </View>
