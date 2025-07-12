@@ -181,7 +181,9 @@ const styles4 = StyleSheet.create({
     padding: 10,
     backgroundColor: '#e2e8f0',
     marginTop: 20,
-    marginBottom: 10,
+    marginHorizontal: 16,
+  },
+});Bottom: 10,
   },
   title: {
     fontSize: 18,
