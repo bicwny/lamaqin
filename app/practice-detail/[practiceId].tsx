@@ -522,6 +522,62 @@ export default function PracticeDetailScreen() {
           </View>
         )}
 
+        {/* Meditation History for Time-based Practices */}
+        {project.practices.type === 'time' && (todayRecords.length > 0 || weeklyRecords.length > 0) && (
+          <View style={styles.historyCard}>
+            <View style={styles.historyHeader}>
+              <Text style={styles.historyTitle}>观修记录</Text>
+              <TouchableOpacity
+                style={styles.viewAllButton}
+                onPress={handleViewHistory}
+              >
+                <Text style={styles.viewAllText}>查看全部</Text>
+                <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
+            
+            {/* Show recent records - combine today and weekly records and sort by date */}
+            {[...todayRecords, ...weeklyRecords]
+              .filter((record, index, arr) => 
+                // Remove duplicates by id
+                arr.findIndex(r => r.id === record.id) === index
+              )
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+              .slice(0, 5)
+              .map((record) => (
+                <View key={record.id} style={styles.recordItem}>
+                  <View style={styles.recordHeader}>
+                    <Text style={styles.recordDate}>
+                      {new Date(record.record_date).toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        weekday: 'long'
+                      })}
+                    </Text>
+                    <Text style={styles.recordTime}>
+                      {new Date(record.created_at).toLocaleTimeString('zh-CN', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </Text>
+                  </View>
+                  
+                  <Text style={styles.recordCount}>
+                    {record.session_number ? `第${record.session_number}座` : '观修'}: {record.duration_minutes}分钟
+                  </Text>
+                  
+                  {record.notes && (
+                    <View style={styles.recordNotes}>
+                      <Text style={styles.notesLabel}>备注:</Text>
+                      <Text style={styles.notesText}>{record.notes}</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+          </View>
+        )}
+
         
       </ScrollView>
     </SafeAreaView>
