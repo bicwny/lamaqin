@@ -5,6 +5,7 @@ import { Colors } from '@/constants/Colors';
 
 interface PageHeaderProps {
   title: string;
+  subtitle?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
   rightAction?: {
@@ -12,7 +13,6 @@ interface PageHeaderProps {
     component?: React.ReactNode;
     onPress: () => void;
   };
-  subtitle?: string;
 }
 
 export default function PageHeader({ 

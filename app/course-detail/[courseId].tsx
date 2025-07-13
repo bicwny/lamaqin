@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -100,7 +99,7 @@ export default function CourseDetailScreen() {
       // Load user's enrollment for this course
       const userCourses = await studyService.getUserCourses(user.id);
       const foundUserCourse = userCourses.find(uc => uc.course_id === courseId);
-      
+
       if (!foundUserCourse) {
         toastService.error({
           title: '课程未找到',
@@ -150,7 +149,7 @@ export default function CourseDetailScreen() {
 
       // Trigger refresh of lesson counts
       setRefreshTrigger(prev => prev + 1);
-      
+
       // Reload course data to update progress
       loadCourseData();
     } catch (error) {
