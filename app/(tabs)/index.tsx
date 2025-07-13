@@ -1083,31 +1083,7 @@ const styles = StyleSheet.create({
         marginBottom: 6,
   },
   progressBarContainer: {
-    marginBottom: 6,
-  },
-  practiceActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  actionButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  checkButton: {
-    backgroundColor: '#e8f5e8',
-    borderColor: '#4CAF50',
-  },
-  addButton: {
-    backgroundColor: '#fdeaea',
-    borderColor: '#da4347',
+    marginBottom: 8,
   },
   progressBarBg: {
     height: 6,backgroundColor: '#f0f0f0',
@@ -1122,8 +1098,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
   },
+  practiceActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   actionButtonSpacer: {
     width: 28,
+  },
+  actionButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  checkButton: {
+    backgroundColor: '#f8f9fa',
+    borderColor: '#10B981',
+  },
+  checkButtonCompleted: {
+    backgroundColor: '#10B981',
+    borderColor: '#10B981',
+  },
+  addButton: {
+    backgroundColor: '#f8f9fa',
+    borderColor: Colors.primary,
   },
   actionButtonText: {
     fontSize: 16,
