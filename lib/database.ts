@@ -857,13 +857,23 @@ export const studyService = {
 
   async calculateProgress(userId: string, courseId: string) {
     // Get total lessons for the course
-    const { data: course } = await supabase
+    const { data: course, error: courseError } = await supabase
       .from('courses')
       .select('total_lessons')
       .eq('id', courseId)
       .single();
 
-    if (!course) return 0;
+    if (courseError) {
+      console.error('❌ Error fetching course for progress calculation:', courseError);
+      return 0;
+    }
+
+    if (!course) {
+      console.error('❌ Course not found for ID:', courseId);
+      return 0;
+    }
+
+    console.log(`📊 Course ${courseId} has ${course.total_lessons} total lessons`);
 
     // Get all study records for this course with lesson info
     const { data: studyRecords } = await supabase
