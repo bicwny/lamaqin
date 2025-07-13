@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -13,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,7 +45,7 @@ interface Practice {
 export default function MeditationRecordDetailScreen() {
   const { user } = useAuth();
   const { recordId } = useLocalSearchParams<{ recordId: string }>();
-  
+
   const [record, setRecord] = useState<MeditationRecord | null>(null);
   const [practice, setPractice] = useState<Practice | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,7 +104,7 @@ export default function MeditationRecordDetailScreen() {
 
       setRecord(updatedRecord);
       setIsEditing(false);
-      
+
       toastService.success({ 
         title: '✅ 保存成功', 
         message: '观后感已保存' 
@@ -136,7 +135,7 @@ export default function MeditationRecordDetailScreen() {
           onPress: async () => {
             try {
               await meditationService.deleteMeditationRecord(record.id, user.id);
-              
+
               toastService.success({ 
                 title: '✅ 删除成功', 
                 message: '观修记录已删除' 
@@ -293,7 +292,7 @@ export default function MeditationRecordDetailScreen() {
                   numberOfLines={6}
                   textAlignVertical="top"
                 />
-                
+
                 <View style={styles.editingActions}>
                   <TouchableOpacity
                     style={styles.cancelButton}
@@ -304,7 +303,7 @@ export default function MeditationRecordDetailScreen() {
                   >
                     <Text style={styles.cancelButtonText}>取消</Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     style={[styles.saveButton, savingReflection && styles.disabledButton]}
                     onPress={handleSaveReflection}
