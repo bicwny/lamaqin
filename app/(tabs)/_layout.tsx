@@ -123,12 +123,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
-        options={{
-          href: null, // Hide the profile tab
-        }}
-      />
-      <Tabs.Screen
         name="explore"
         options={{
           href: null, // Hide the explore tab
