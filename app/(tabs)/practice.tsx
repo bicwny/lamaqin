@@ -302,7 +302,7 @@ export default function PracticeScreen() {
                   {project.practices.type === 'time' && ` (${practiceDisplayType})`}
                   {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
                 </Text>
-                
+
                 {/* Project Name Display */}
                 {(project.project_name || project.preset_project_id) && (
                   <View style={styles.projectNamePill}>
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   projectNamePill: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
