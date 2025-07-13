@@ -808,28 +808,24 @@ export default function HomeScreen() {
 
                   {/* Action Buttons */}
                   <View style={styles.practiceActions}>
-                    <TouchableOpacity 
-                      style={[
-                        styles.actionButton, 
-                        styles.checkButton,
-                        practice.status === 'completed' && styles.checkButtonCompleted
-                      ]}
+                    <TouchableOpacity
                       onPress={(e) => handleQuickComplete(e, practice)}
                     >
                       <Ionicons 
-                        name="checkmark-circle-outline" 
-                        size={20} 
-                        color={practice.status === 'completed' ? 'white' : '#10B981'} 
+                        name="checkmark-circle" 
+                        size={24} 
+                        color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
                       />
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
-                      style={[styles.actionButton, styles.addButton]}
+                    <View style={styles.actionButtonSpacer} />
+
+                    <TouchableOpacity
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
                       <Ionicons 
-                        name="add-circle-outline" 
-                        size={20} 
+                        name="add-circle" 
+                        size={24} 
                         color={Colors.primary} 
                       />
                     </TouchableOpacity>
@@ -863,13 +859,12 @@ export default function HomeScreen() {
                   {/* Action Button for Weekly Practices */}
                   <View style={styles.practiceActions}>
                     <View style={styles.actionButtonSpacer} />
-                    <TouchableOpacity 
-                      style={[styles.actionButton, styles.addButton]}
+                    <TouchableOpacity
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
                       <Ionicons 
-                        name="add-circle-outline" 
-                        size={20} 
+                        name="add-circle" 
+                        size={24} 
                         color={Colors.primary} 
                       />
                     </TouchableOpacity>
@@ -986,7 +981,8 @@ const styles = StyleSheet.create({
   },
   quickActionButton: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: ```text
+12,
     paddingHorizontal: 16,
     borderRadius: 10,
     alignItems: 'center',
@@ -1112,31 +1108,6 @@ const styles = StyleSheet.create({
   },
   actionButtonSpacer: {
     width: 28,
-  },
-  actionButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  checkButton: {
-    backgroundColor: '#f8f9fa',
-    borderColor: '#10B981',
-  },
-  checkButtonCompleted: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
-  },
-  addButton: {
-    backgroundColor: '#f8f9fa',
-    borderColor: Colors.primary,
   },
   weeklyProgress: {
     fontSize: 14,
