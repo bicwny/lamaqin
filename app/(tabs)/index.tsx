@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -9,7 +8,7 @@ import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 
 import { Colors } from '@/constants/Colors';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
@@ -709,46 +708,42 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.container}>
-          <PageHeader 
-            title="修行主页"
-            subtitle={getGreeting()}
-            rightAction={{
-              component: <Avatar dharmaName={userDharmaName} size={32} />,
-              onPress: navigateToProfile
-            }}
-          />
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>加载中...</Text>
-          </View>
-        </ThemedView>
-      </SafeAreaView>
+      <PageTemplate
+        title="修行主页"
+        subtitle={getGreeting()}
+        rightAction={{
+          component: <Avatar dharmaName={userDharmaName} size={32} />,
+          onPress: navigateToProfile
+        }}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>加载中...</Text>
+        </View>
+      </PageTemplate>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ThemedView style={styles.container}>
-        <PageHeader 
-          title="修行主页"
-          subtitle={`${getGreeting()} • ${userDharmaName}居士`}
-          rightAction={{
-            component: <Avatar dharmaName={userDharmaName} size={32} />,
-            onPress: navigateToProfile
-          }}
-        />
-
-
-
-
-        <ScrollView 
-          style={styles.scrollView}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
+    <PageTemplate
+      title="修行主页"
+      subtitle={`${getGreeting()} • ${userDharmaName}居士`}
+      rightAction={{
+        component: <Avatar dharmaName={userDharmaName} size={32} />,
+        onPress: navigateToProfile
+      }}
+      scrollable={false}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
+      <ScrollView 
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
           {/* Study Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -923,20 +918,11 @@ export default function HomeScreen() {
             )}
           </View>
         </ScrollView>
-      </ThemedView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
   scrollView: {
     flex: 1,
   },
