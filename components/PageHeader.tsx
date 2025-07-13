@@ -23,10 +23,8 @@ export default function PageHeader({
   rightAction,
   subtitle 
 }: PageHeaderProps) {
-  const insets = useSafeAreaInsets();
-
   return (
-    <View style={[styles.container, { paddingTop: Math.max(insets.top, 44) }]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         {showBackButton ? (
           <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
