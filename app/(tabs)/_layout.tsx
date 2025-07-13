@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -61,9 +62,9 @@ export default function TabLayout() {
         options={{
           title: "当日",
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol
+            <Ionicons
               size={28}
-              name={focused ? "book.fill" : "book"}
+              name={focused ? "sunny" : "sunny-outline"}
               color={color}
             />
           ),
@@ -74,9 +75,9 @@ export default function TabLayout() {
         options={{
           title: "闻思",
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol
+            <Ionicons
               size={28}
-              name={focused ? "book.fill" : "book"}
+              name={focused ? "ear" : "ear-outline"}
               color={color}
             />
           ),
@@ -87,9 +88,9 @@ export default function TabLayout() {
         options={{
           title: "心性",
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol
+            <Ionicons
               size={28}
-              name={focused ? "heart.fill" : "heart"}
+              name={focused ? "heart" : "heart-outline"}
               color={color}
             />
           ),
@@ -100,9 +101,9 @@ export default function TabLayout() {
         options={{
           title: "修行",
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol
+            <Ionicons
               size={28}
-              name={focused ? "hands.and.sparkles.fill" : "hands.and.sparkles"}
+              name={focused ? "happy" : "happy-outline"}
               color={color}
             />
           ),
@@ -113,9 +114,9 @@ export default function TabLayout() {
         options={{
           title: "回向",
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol
+            <Ionicons
               size={28}
-              name={focused ? "chart.bar.fill" : "chart.bar"}
+              name={focused ? "moon" : "moon-outline"}
               color={color}
             />
           ),
