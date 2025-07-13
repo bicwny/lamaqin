@@ -828,7 +828,7 @@ export default function HomeScreen() {
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
                       <Ionicons 
-                        name="add-circle" 
+                        name="add-circle-outline" 
                         size={20} 
                         color={Colors.primary} 
                       />
@@ -868,7 +868,7 @@ export default function HomeScreen() {
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
                       <Ionicons 
-                        name="add-circle" 
+                        name="add-circle-outline" 
                         size={20} 
                         color={Colors.primary} 
                       />
