@@ -303,9 +303,11 @@ export default function PracticeScreen() {
 
               {/* Project Name Display */}
               {(project.project_name || project.preset_project_id) && (
-                <Text style={styles.projectName}>
-                  项目: {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
-                </Text>
+                <View style={styles.projectNamePill}>
+                  <Text style={styles.projectNameText}>
+                    {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
+                  </Text>
+                </View>
               )}
 
               <View style={styles.progressContainer}>
@@ -580,12 +582,19 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     marginBottom: 8,
   },
-  projectName: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-    fontStyle: 'italic',
+  projectNamePill: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
     marginBottom: 8,
+  },
+  projectNameText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    letterSpacing: -0.1,
   },
   practiceInfo: {
     fontSize: 14,
