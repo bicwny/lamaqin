@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { mindfulnessService } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTimezone } from '@/hooks/useTimezone';
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
+import { toastService } from '@/lib/toast';
 
 interface MindfulnessRecord {
   id: string;
@@ -84,13 +85,21 @@ export default function MindfulnessScreen() {
         description: description.trim() || undefined
       });
 
-      Alert.alert('成功', '心性记录已保存');
+      const mindTypeText = mindType === 'good' ? '善心' : '恶心';
+      toastService.success({
+        title: '记录成功',
+        message: `${mindTypeText}已记录`
+      });
+      
       setDescription('');
       loadTodayRecords(); // Refresh data
 
     } catch (error) {
       console.error('Error recording mindfulness:', error);
-      Alert.alert('错误', '保存失败，请重试');
+      toastService.error({
+        title: '记录失败',
+        message: '请重试'
+      });
     }
   };
 
