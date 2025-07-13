@@ -62,15 +62,15 @@ export default function MindfulnessScreen() {
     if (!user || !timezoneInfo) return;
 
     try {
-      // Use timezone-aware date and time
+      // Store date in user's timezone but time in UTC
       const today = getCurrentDateInTimezone(timezoneInfo.timezone);
       const now = new Date();
-      const currentTime = now.toTimeString().split(' ')[0];
+      const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
 
       await mindfulnessService.recordMindfulness({
         user_id: user.id,
         record_date: today,
-        record_time: currentTime,
+        record_time: utcTime, // Store UTC time
         mind_type: mindType,
         description: description.trim() || undefined
       });
@@ -95,7 +95,19 @@ export default function MindfulnessScreen() {
   };
 
   const formatTime = (timeString: string) => {
-    return timeString.substring(0, 5); // HH:MM
+    try {
+      // Convert UTC time to user's local time for display
+      const utcDate = new Date(`1970-01-01T${timeString}Z`);
+      return utcDate.toLocaleTimeString('en-US', {
+        timeZone: timezoneInfo?.timezone || 'UTC',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeString.substring(0, 5); // Fallback to original format
+    }
   };
 
   const stats = getTodayStats();

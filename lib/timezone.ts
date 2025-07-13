@@ -217,6 +217,35 @@ function getTimezoneDisplayName(timezone: string, offsetMinutes: number): string
   return `${displayName} (${offsetStr})`;
 }
 
+/**
+ * Convert UTC time string to local time in specified timezone
+ */
+export function convertUtcToLocalTime(utcTimeString: string, timezone: string): string {
+  try {
+    // Create a date object with UTC time
+    const utcDate = new Date(`1970-01-01T${utcTimeString}Z`);
+    
+    // Convert to local time in specified timezone
+    return utcDate.toLocaleTimeString('en-US', {
+      timeZone: timezone,
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('❌ Error converting UTC to local time:', error);
+    return utcTimeString.substring(0, 5); // Fallback
+  }
+}
+
+/**
+ * Get current UTC time string (HH:MM:SS format)
+ */
+export function getCurrentUtcTime(): string {
+  const now = new Date();
+  return now.toISOString().split('T')[1].split('.')[0];
+}
+
 // Common timezone options for manual selection
 export const COMMON_TIMEZONES = [
   { timezone: 'Asia/Shanghai', name: '北京时间 (GMT+8)' },

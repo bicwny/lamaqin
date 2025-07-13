@@ -981,6 +981,7 @@ export const studyService = {
 };
 
 // Mindfulness Records
+// Note: record_time is stored in UTC, convert to local time for display
 export const mindfulnessService = {
   async getTodayRecords(userId: string, date: string): Promise<MindfulnessRecord[]> {
     const { data, error } = await supabase
