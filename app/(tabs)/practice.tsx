@@ -9,14 +9,13 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 
 interface PracticeProject {
@@ -208,31 +207,34 @@ export default function PracticeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="修行记录" 
-          rightAction={{
-            text: "添加",
-            onPress: handleAddPractice
-          }}
-        />
+      <PageTemplate
+        title="修行记录" 
+        rightAction={{
+          text: "添加",
+          onPress: handleAddPractice
+        }}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   if (projects.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="修行记录" 
-          rightAction={{
-            text: "添加",
-            onPress: handleAddPractice
-          }}
-        />
+      <PageTemplate
+        title="修行记录" 
+        rightAction={{
+          text: "添加",
+          onPress: handleAddPractice
+        }}
+        scrollable={false}
+        backgroundColor={Colors.background}
+        padding={0}
+      >
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 
 
@@ -255,19 +257,21 @@ export default function PracticeScreen() {
             </TouchableOpacity>
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="修行记录" 
-          rightAction={{
-            text: "添加",
-            onPress: handleAddPractice
-          }}
-        />
+      <PageTemplate
+        title="修行记录" 
+        rightAction={{
+          text: "添加",
+          onPress: handleAddPractice
+        }}
+        scrollable={false}
+        backgroundColor={Colors.background}
+        padding={0}
+      >
         <ScrollView 
         style={styles.scrollView}
         refreshControl={
@@ -360,7 +364,7 @@ export default function PracticeScreen() {
           );
         })}
       </ScrollView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 

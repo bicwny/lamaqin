@@ -5,7 +5,7 @@ import { mindfulnessService } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTimezone } from '@/hooks/useTimezone';
 import { Colors } from '@/constants/Colors';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { toastService } from '@/lib/toast';
 
@@ -132,24 +132,27 @@ export default function MindfulnessScreen() {
 
   if (loading || !timezoneInfo) {
     return (
-      <View style={styles.container}>
-        <PageHeader 
-          title="心性观察" 
-          subtitle="观察内心善恶念头"
-        />
+      <PageTemplate
+        title="心性观察" 
+        subtitle="观察内心善恶念头"
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <Text>加载中...</Text>
         </View>
-      </View>
+      </PageTemplate>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <PageHeader 
-        title="心性观察" 
-        subtitle="观察内心善恶念头"
-      />
+    <PageTemplate
+      title="心性观察" 
+      subtitle="观察内心善恶念头"
+      scrollable={false}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
       <ScrollView style={styles.scrollView}>
 
       {timezoneInfo && (
@@ -218,7 +221,7 @@ export default function MindfulnessScreen() {
 
 
     </ScrollView>
-    </View>
+    </PageTemplate>
   );
 }
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList, Linking, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -416,7 +415,7 @@ export default function StudyScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <PageTemplate>
         <PageHeader 
           title="闻思学习" 
           subtitle="系统学习佛法课程"
@@ -425,7 +424,7 @@ export default function StudyScreen() {
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
@@ -433,7 +432,7 @@ export default function StudyScreen() {
   if (viewMode === 'home') {
     if (userCourses.length === 0) {
       return (
-        <SafeAreaView style={styles.safeArea}>
+        <PageTemplate>
           <PageHeader 
             title="闻思学习" 
             subtitle="系统学习佛法课程"
@@ -458,12 +457,12 @@ export default function StudyScreen() {
               </TouchableOpacity>
             </View>
           </ScrollView>
-        </SafeAreaView>
+        </PageTemplate>
       );
     }
 
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <PageTemplate>
         <PageHeader 
           title="闻思学习" 
           subtitle="系统学习佛法课程"
@@ -505,7 +504,7 @@ export default function StudyScreen() {
                         上次完成：第{currentLesson}课
                       </Text>
                     </View>
-                    
+
                     <View style={styles.progressBarContainer}>
                       <View style={styles.progressBarBg}>
                         <View 
@@ -542,14 +541,14 @@ export default function StudyScreen() {
             </Text>
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   // Course Management View
   if (viewMode === 'manage') {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <PageTemplate>
         <PageHeader 
           title="课程管理" 
           subtitle="管理您的学习课程"
@@ -562,7 +561,7 @@ export default function StudyScreen() {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>我的课程</Text>
               </View>
-              
+
               {userCourses.map(userCourse => {
                 const courseProgress = getCourseProgress(userCourse.course_id);
                 const progressPercentage = userCourse.progress_percentage || 0;
@@ -617,7 +616,7 @@ export default function StudyScreen() {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>可加入课程</Text>
               </View>
-              
+
               {availableCourses.map(course => (
                 <View key={course.id} style={styles.availableCourseCard}>
                   <View style={styles.courseHeader}>
@@ -647,7 +646,7 @@ export default function StudyScreen() {
             </View>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
@@ -657,7 +656,7 @@ export default function StudyScreen() {
     const lessons = courseLessons[selectedCourse.course_id] || [];
 
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <PageTemplate>
         <PageHeader 
           title={selectedCourse.course.name}
           subtitle="课程详情与学习记录"
@@ -744,7 +743,7 @@ export default function StudyScreen() {
             ))}
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
