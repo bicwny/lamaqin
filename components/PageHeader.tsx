@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 
@@ -23,10 +22,8 @@ export default function PageHeader({
   rightAction,
   subtitle 
 }: PageHeaderProps) {
-  const insets = useSafeAreaInsets();
-  
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         {showBackButton ? (
           <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
