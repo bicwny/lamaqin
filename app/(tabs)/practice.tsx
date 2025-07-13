@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   projectNamePill: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: '#E5E7EB',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
   },
   projectNameText: {
     fontSize: 12,
-    color: '#FFFFFF',
+    color: Colors.textPrimary,
     fontWeight: '600',
     letterSpacing: -0.1,
   },
