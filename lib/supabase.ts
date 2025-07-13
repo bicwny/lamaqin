@@ -63,23 +63,47 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-// Test function to verify connection
+// Test function to verify connection with detailed diagnostics
 export async function testConnection() {
   try {
-    const { data, error } = await supabase
-      .from("practices")
-      .select("name")
-      .limit(5);
-
-    if (error) {
-      console.error("Supabase connection error:", error);
+    console.log('🔍 Testing Supabase connection...');
+    console.log('📋 Supabase URL:', supabaseUrl ? 'Set' : 'Missing');
+    console.log('🔑 Supabase Key:', supabaseAnonKey ? 'Set' : 'Missing');
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('❌ Missing Supabase environment variables');
       return false;
     }
 
-    console.log("✅ Supabase connected! Found practices:", data);
+    // Test with a timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Connection timeout (10s)')), 10000);
+    });
+
+    const connectionTest = supabase
+      .from("practices")
+      .select("name")
+      .limit(1);
+
+    const { data, error } = await Promise.race([connectionTest, timeoutPromise]);
+
+    if (error) {
+      console.error("❌ Supabase connection error:", error);
+      console.error("🔍 Error details:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      return false;
+    }
+
+    console.log("✅ Supabase connected! Found practices:", data?.length || 0);
     return true;
   } catch (err) {
-    console.error("Connection test failed:", err);
+    console.error("❌ Connection test failed:", err);
+    console.error("🔍 Error type:", err instanceof Error ? err.constructor.name : typeof err);
+    console.error("🔍 Error message:", err instanceof Error ? err.message : String(err));
     return false;
   }
 }

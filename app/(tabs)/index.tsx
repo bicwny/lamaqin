@@ -8,6 +8,10 @@ import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 
 import { Colors } from '@/constants/Colors';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTimezone } from '@/hooks/useTimezone';
+import PageTemplate from '@/components/PageTemplate';
+import { ConnectionTest } from '@/components/ConnectionTest';
 import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -68,7 +72,7 @@ export default function HomeScreen() {
 
   // Track when user is returning from recording to avoid unnecessary refresh
   const [lastRecordTime, setLastRecordTime] = useState<number>(0);
-  
+
   // Add timezone support for daily reset
   const { timezoneInfo, handleDailyResetCheck } = useTimezone();
 
@@ -90,7 +94,7 @@ export default function HomeScreen() {
             loadDashboardData();
           });
         }
-        
+
         const now = Date.now();
         // Only refresh if it's been more than 2 seconds since last record
         // This prevents refresh when user just recorded something and came back
@@ -292,7 +296,7 @@ export default function HomeScreen() {
       const today = timezoneInfo 
         ? getCurrentDateInTimezone(timezoneInfo.timezone)
         : new Date().toISOString().split('T')[0];
-      
+
       const practicesData: DailyPractice[] = [];
 
       for (const project of projects || []) {
@@ -359,7 +363,7 @@ export default function HomeScreen() {
       const todayDate = timezoneInfo 
         ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
         : new Date();
-      
+
       const dayOfWeek = todayDate.getDay();
       const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
       const monday = new Date(todayDate.setDate(diff));
@@ -738,12 +742,15 @@ export default function HomeScreen() {
       backgroundColor={Colors.background}
       padding={0}
     >
-      <ScrollView 
+        <ScrollView 
         style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+          {/* Connection Test - Remove this after fixing the issue */}
+          <ConnectionTest />
+
           {/* Study Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>

@@ -464,22 +464,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
 
-      // Set a shorter timeout for database operations
+      // Set a longer timeout for database operations to handle network issues
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Database operation timeout (3s)')), 3000);
+        setTimeout(() => reject(new Error('Database operation timeout (10s)')), 10000);
       });
 
       const dbOperation = async () => {
-        // First check if we can connect to Supabase at all
-        const { data: connectionTest, error: connectionError } = await supabase
-          .from('users')
-          .select('count')
-          .limit(1)
-          .maybeSingle();
+        // First test basic connectivity with a simple health check
+        console.log('🏥 AuthContext: Testing database health...');
+        
+        try {
+          const { data: healthCheck, error: healthError } = await supabase
+            .from('users')
+            .select('id')
+            .limit(1);
 
-        if (connectionError) {
-          console.error('❌ AuthContext: Database connection failed:', connectionError);
-          throw new Error(`Database connection failed: ${connectionError.message}`);
+          if (healthError) {
+            console.error('❌ AuthContext: Database health check failed:', {
+              message: healthError.message,
+              code: healthError.code,
+              details: healthError.details,
+              hint: healthError.hint
+            });
+            throw new Error(`Database connection failed: ${healthError.message}`);
+          }
+          
+          console.log('✅ AuthContext: Database health check passed');
+        } catch (fetchError) {
+          console.error('❌ AuthContext: Network fetch error during health check:', fetchError);
+          throw new Error(`Network connection failed: ${fetchError.message}`);
         }
 
         // Check if user exists by ID (more reliable than email)
