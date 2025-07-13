@@ -812,7 +812,7 @@ export default function HomeScreen() {
                       onPress={(e) => handleQuickComplete(e, practice)}
                     >
                       <Ionicons 
-                        name="checkmark-circle" 
+                        name="checkmark-circle-outline" 
                         size={24} 
                         color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
                       />
@@ -824,7 +824,7 @@ export default function HomeScreen() {
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
                       <Ionicons 
-                        name="add-circle" 
+                        name="add-circle-outline" 
                         size={24} 
                         color={Colors.primary} 
                       />
@@ -863,7 +863,7 @@ export default function HomeScreen() {
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
                       <Ionicons 
-                        name="add-circle" 
+                        name="add-circle-outline" 
                         size={24} 
                         color={Colors.primary} 
                       />
