@@ -487,10 +487,7 @@ export default function StudyScreen() {
                 <TouchableOpacity 
                   key={userCourse.id} 
                   style={styles.courseCard}
-                  onPress={() => {
-                    setSelectedCourse(userCourse);
-                    setViewMode('courseDetail');
-                  }}
+                  onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
                 >
                   <View style={styles.courseHeader}>
                     <Text style={styles.courseName}>{userCourse.course.name}</Text>
@@ -589,10 +586,7 @@ export default function StudyScreen() {
                         <>
                           <TouchableOpacity 
                             style={styles.primaryButton}
-                            onPress={() => {
-                              setSelectedCourse(userCourse);
-                              setViewMode('courseDetail');
-                            }}
+                            onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
                           >
                             <Text style={styles.buttonText}>继续学习</Text>
                           </TouchableOpacity>
