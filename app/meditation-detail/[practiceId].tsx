@@ -337,65 +337,12 @@ export default function MeditationDetailScreen() {
           )}
         </View>
 
-        {/* Recent Meditation History */}
-        {(todayRecords.length > 0 || weeklyRecords.length > 0) && (
-          <View style={styles.historyCard}>
-            <View style={styles.historyHeader}>
-              <Text style={styles.historyTitle}>最近观修</Text>
-              <TouchableOpacity
-                style={styles.viewAllButton}
-                onPress={handleViewHistory}
-              >
-                <Text style={styles.viewAllText}>查看全部</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
-              </TouchableOpacity>
-            </View>
-            
-            {/* Show recent records */}
-            {[...todayRecords, ...weeklyRecords]
-              .filter((record, index, arr) => 
-                arr.findIndex(r => r.id === record.id) === index
-              )
-              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-              .slice(0, 5)
-              .map((record) => (
-                <TouchableOpacity
-                  key={record.id}
-                  style={styles.recordItem}
-                  onPress={() => router.push({
-                    pathname: '/meditation-record-detail/[recordId]',
-                    params: { recordId: record.id }
-                  })}
-                >
-                  <View style={styles.recordHeader}>
-                    <Text style={styles.recordDate}>
-                      {new Date(record.record_date).toLocaleDateString('zh-CN', {
-                        month: 'short',
-                        day: 'numeric',
-                        weekday: 'short'
-                      })}
-                    </Text>
-                    <Text style={styles.recordTime}>
-                      {new Date(record.created_at).toLocaleTimeString('zh-CN', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </Text>
-                  </View>
-                  
-                  <Text style={styles.recordDuration}>
-                    {record.session_number ? `第${record.session_number}座` : '观修'}: {record.duration_minutes}分钟
-                  </Text>
-                  
-                  {record.reflection && (
-                    <Text style={styles.recordNotes} numberOfLines={2}>
-                      {record.reflection}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              ))}
-          </View>
-        )}
+        {/* Full Meditation History */}
+        <MeditationHistorySection 
+          practiceId={project.practice_id}
+          projectId={project.id}
+          user={user}
+        />
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
@@ -406,17 +353,178 @@ export default function MeditationDetailScreen() {
             <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>记录观修</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleViewHistory}
-          >
-            <Ionicons name="time-outline" size={24} color={Colors.primary} />
-            <Text style={styles.secondaryButtonText}>观修历史</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+// Meditation History Component
+function MeditationHistorySection({ 
+  practiceId, 
+  projectId, 
+  user 
+}: { 
+  practiceId: string; 
+  projectId: string; 
+  user: any; 
+}) {
+  const [allRecords, setAllRecords] = useState<MeditationRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    if (user && practiceId) {
+      loadAllRecords();
+    }
+  }, [user, practiceId]);
+
+  const loadAllRecords = async () => {
+    if (!user?.id || !practiceId) return;
+
+    try {
+      setLoading(true);
+
+      const { data: records, error } = await supabase
+        .from('meditation_records')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('practice_id', practiceId)
+        .order('record_date', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setAllRecords(records || []);
+
+    } catch (error) {
+      console.error('Error loading meditation records:', error);
+      toastService.error({ title: '❌ 错误', message: '观修记录加载失败' });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadAllRecords();
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.historyCard}>
+        <Text style={styles.historyTitle}>观修历史</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={Colors.primary} />
+          <Text style={styles.loadingText}>加载中...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (allRecords.length === 0) {
+    return (
+      <View style={styles.historyCard}>
+        <Text style={styles.historyTitle}>观修历史</Text>
+        <View style={styles.emptyHistoryContainer}>
+          <Ionicons name="time-outline" size={48} color="#ccc" />
+          <Text style={styles.emptyHistoryText}>还没有观修记录</Text>
+          <Text style={styles.emptyHistorySubtext}>开始你的第一次观修吧</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Group records by date
+  const groupedRecords = allRecords.reduce((groups, record) => {
+    const date = record.record_date;
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(record);
+    return groups;
+  }, {} as Record<string, MeditationRecord[]>);
+
+  const sortedDates = Object.keys(groupedRecords).sort((a, b) => b.localeCompare(a));
+
+  return (
+    <View style={styles.historyCard}>
+      <View style={styles.historyHeader}>
+        <Text style={styles.historyTitle}>观修历史</Text>
+        <Text style={styles.historyCount}>共 {allRecords.length} 次</Text>
+      </View>
+
+      <ScrollView 
+        style={styles.historyScrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        nestedScrollEnabled={true}
+      >
+        {sortedDates.map((date) => {
+          const dayRecords = groupedRecords[date];
+          const totalDuration = dayRecords.reduce((sum, record) => sum + record.duration_minutes, 0);
+          
+          return (
+            <View key={date} style={styles.dateGroup}>
+              <View style={styles.dateHeader}>
+                <Text style={styles.dateTitle}>
+                  {new Date(date).toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                  })}
+                </Text>
+                <Text style={styles.dateSummary}>
+                  {dayRecords.length}座 · {totalDuration}分钟
+                </Text>
+              </View>
+              
+              {dayRecords
+                .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                .map((record, index) => (
+                  <TouchableOpacity
+                    key={record.id}
+                    style={styles.recordItem}
+                    onPress={() => router.push({
+                      pathname: '/meditation-record-detail/[recordId]',
+                      params: { recordId: record.id }
+                    })}
+                  >
+                    <View style={styles.recordContent}>
+                      <View style={styles.recordMainInfo}>
+                        <Text style={styles.recordSession}>
+                          第{record.session_number || (index + 1)}座
+                        </Text>
+                        <Text style={styles.recordDuration}>
+                          {record.duration_minutes}分钟
+                        </Text>
+                      </View>
+                      
+                      <Text style={styles.recordTime}>
+                        {new Date(record.created_at).toLocaleTimeString('zh-CN', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </Text>
+                    </View>
+                    
+                    {record.reflection && (
+                      <Text style={styles.recordReflection} numberOfLines={2}>
+                        {record.reflection}
+                      </Text>
+                    )}
+                    
+                    <Ionicons name="chevron-forward" size={16} color="#ccc" style={styles.recordChevron} />
+                  </TouchableOpacity>
+                ))}
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -629,13 +737,10 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
     margin: 16,
     marginTop: 0,
   },
   primaryButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -665,5 +770,79 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: 16,
     fontWeight: '700',
+  },
+  historyCount: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  historyScrollView: {
+    maxHeight: 400,
+  },
+  emptyHistoryContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyHistoryText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 12,
+    fontWeight: '500',
+  },
+  emptyHistorySubtext: {
+    fontSize: 14,
+    color: '#ccc',
+    marginTop: 4,
+  },
+  dateGroup: {
+    marginBottom: 20,
+  },
+  dateHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    marginBottom: 8,
+  },
+  dateTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  dateSummary: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  recordContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  recordMainInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  recordSession: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  recordReflection: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  recordChevron: {
+    position: 'absolute',
+    right: 8,
+    top: 8,
   },
 });
