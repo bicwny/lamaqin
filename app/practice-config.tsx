@@ -54,12 +54,7 @@ export default function PracticeConfigScreen() {
     practiceType === 'time' ? 'topic_progress' : 'total'
   );
 
-  // Reset duration mode when switching between total and daily for count practices
-  useEffect(() => {
-    if (practiceType === 'count' && configMode === 'total' && durationMode === '持续进行') {
-      setDurationMode('60天');
-    }
-  }, [configMode, practiceType]);
+  
 
   // Count-based configuration
   const [totalTarget, setTotalTarget] = useState('');
@@ -73,7 +68,7 @@ export default function PracticeConfigScreen() {
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义' | '持续进行'>('60天');
+  const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
   const [customEndDate, setCustomEndDate] = useState(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
 
@@ -431,32 +426,7 @@ export default function PracticeConfigScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.ongoingButton,
-            durationMode === '持续进行' && styles.ongoingButtonActive,
-            // Disable for count-based practices with total target mode
-            (practiceType === 'count' && configMode === 'total') && styles.ongoingButtonDisabled,
-          ]}
-          onPress={() => {
-            // Only allow ongoing for time-based practices or count-based daily target mode
-            if (practiceType === 'time' || configMode === 'daily') {
-              setDurationMode('持续进行' as any);
-            }
-          }}
-          disabled={practiceType === 'count' && configMode === 'total'}
-        >
-          <Text
-            style={[
-              styles.ongoingButtonText,
-              durationMode === '持续进行' && styles.ongoingButtonTextActive,
-              // Disabled text style
-              (practiceType === 'count' && configMode === 'total') && styles.ongoingButtonTextDisabled,
-            ]}
-          >
-            持续进行 (直到我停止)
-          </Text>
-        </TouchableOpacity>
+        
 
         {durationMode === '自定义' && (
           <View style={styles.customInputContainer}>
@@ -492,61 +462,31 @@ export default function PracticeConfigScreen() {
   const calculateSummary = () => {
     if (practiceType === 'time') {
       // Time-based practice summary
-      if (configMode === 'topic_progress') {
-        const weeks = durationMode === '持续进行' ? null : calculateWeeks();
-        const totalSessions = weeks ? parseInt(sessionsTarget) * weeks : null;
-
-        return {
-          duration: weeks ? `约 ${weeks} 周` : '持续进行',
-          weeklyTarget: `每周 ${sessionsTarget} 座`,
-          totalSessions: totalSessions ? `预计总计完成约 ${totalSessions} 座观修` : '无固定总数，持续进行',
-        };
-      } else {
-        // Fixed duration mode for time practices
-        const weeks = calculateWeeks();
-        const totalSessions = parseInt(sessionsTarget) * weeks;
-        return {
-          duration: `约 ${weeks} 周`,
-          weeklyTarget: `每周 ${sessionsTarget} 座`,
-          totalSessions: `预计总计完成约 ${totalSessions} 座观修`,
-        };
-      }
+      const weeks = calculateWeeks();
+      const totalSessions = parseInt(sessionsTarget) * weeks;
+      return {
+        duration: `约 ${weeks} 周`,
+        weeklyTarget: `每周 ${sessionsTarget} 座`,
+        totalSessions: `预计总计完成约 ${totalSessions} 座观修`,
+      };
     } else {
       // Count-based practice summary
-      if (durationMode === '持续进行') {
-        // For ongoing count practices
-        if (configMode === 'total') {
-          return {
-            duration: '持续进行',
-            target: `目标总数：${parseInt(totalTarget).toLocaleString()} ${practiceUnit}`,
-            daily: `建议每日持诵约 ${Math.ceil(parseInt(totalTarget) / 365).toLocaleString()} ${practiceUnit}`,
-          };
-        } else {
-          return {
-            duration: '持续进行',
-            target: '无固定总数，持续进行',
-            daily: `每日 ${parseInt(dailyTarget).toLocaleString()} ${practiceUnit}`,
-          };
-        }
+      if (configMode === 'total') {
+        const days = calculateDays();
+        const dailyAmount = Math.ceil(parseInt(totalTarget) / days);
+        return {
+          duration: `约 ${days} 天`,
+          target: `总计 ${parseInt(totalTarget).toLocaleString()} ${practiceUnit}`,
+          daily: `建议每日持诵约 ${dailyAmount.toLocaleString()} ${practiceUnit}`,
+        };
       } else {
-        // For fixed duration count practices
-        if (configMode === 'total') {
-          const days = calculateDays();
-          const dailyAmount = Math.ceil(parseInt(totalTarget) / days);
-          return {
-            duration: `约 ${days} 天`,
-            target: `总计 ${parseInt(totalTarget).toLocaleString()} ${practiceUnit}`,
-            daily: `建议每日持诵约 ${dailyAmount.toLocaleString()} ${practiceUnit}`,
-          };
-        } else {
-          const days = calculateDays();
-          const totalAmount = parseInt(dailyTarget) * days;
-          return {
-            duration: `约 ${days} 天`,
-            target: `总计 ${totalAmount.toLocaleString()} ${practiceUnit}`,
-            daily: `每日 ${parseInt(dailyTarget).toLocaleString()} ${practiceUnit}`,
-          };
-        }
+        const days = calculateDays();
+        const totalAmount = parseInt(dailyTarget) * days;
+        return {
+          duration: `约 ${days} 天`,
+          target: `总计 ${totalAmount.toLocaleString()} ${practiceUnit}`,
+          daily: `每日 ${parseInt(dailyTarget).toLocaleString()} ${practiceUnit}`,
+        };
       }
     }
   };
@@ -589,25 +529,10 @@ export default function PracticeConfigScreen() {
             </View>
           ) : (
             <View>
-              {durationMode === '持续进行' ? (
+              {sessionsTarget ? (
                 <View>
                   <Text style={styles.summaryText}>
-                    🎯 持续进行模式：每周目标 {sessionsTarget || 4} 座观修
-                  </Text>
-                  <Text style={styles.summaryText}>
-                    📅 从 {formatDate(startDate)} 开始
-                  </Text>
-                  <Text style={styles.summaryHighlight}>
-                    👉 记录时需选择具体修法主题和观修时长
-                  </Text>
-                  <Text style={styles.summaryHighlight}>
-                    🏁 将持续进行直到您手动停止
-                  </Text>
-                </View>
-              ) : sessionsTarget ? (
-                <View>
-                  <Text style={styles.summaryText}>
-                    🎯 固定时长模式：在约 {days} 天内完成
+                    🎯 在约 {days} 天内完成
                   </Text>
                   <Text style={styles.summaryText}>
                     📅 从 {formatDate(startDate)} 开始，每周 {sessionsTarget} 座观修
@@ -646,8 +571,6 @@ export default function PracticeConfigScreen() {
       case '自定义':
         end = customEndDate;
         break;
-        case '持续进行':
-          return 36500;
       default:
         end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
     }
@@ -690,15 +613,10 @@ export default function PracticeConfigScreen() {
       if (practiceType === 'time') {
         // Time-based practice configuration
         const startDateObj = new Date(startDate);
-        let endDate = null;
-        let targetCount = 0;
-
-        if (durationMode !== '持续进行') {
-          const weeks = calculateWeeks();
-          endDate = new Date(startDateObj);
-          endDate.setDate(startDateObj.getDate() + (weeks * 7));
-          targetCount = parseInt(sessionsTarget) * weeks;
-        }
+        const weeks = calculateWeeks();
+        const endDate = new Date(startDateObj);
+        endDate.setDate(startDateObj.getDate() + (weeks * 7));
+        const targetCount = parseInt(sessionsTarget) * weeks;
 
         projectData = {
           user_id: user.id,
@@ -706,7 +624,7 @@ export default function PracticeConfigScreen() {
           target_period: 'weekly',
           daily_target: parseInt(sessionsTarget),
           start_date: startDateObj.toISOString().split('T')[0],
-          target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
+          target_end_date: endDate.toISOString().split('T')[0],
           target_count: targetCount,
           current_count: 0,
           status: 'active',
@@ -717,32 +635,17 @@ export default function PracticeConfigScreen() {
       } else {
         // Count-based practice configuration
         const startDateObj = new Date(startDate);
-        let endDate = null;
+        const days = calculateDays();
+        const endDate = new Date(startDateObj);
+        endDate.setDate(startDateObj.getDate() + days);
         let finalTargetCount, finalDailyTarget;
 
-        if (durationMode === '持续进行') {
-          // For ongoing count practices
-          endDate = null;
-          if (configMode === 'total') {
-            finalTargetCount = parseInt(totalTarget);
-            finalDailyTarget = Math.ceil(finalTargetCount / 365); // Rough daily estimate
-          } else {
-            finalDailyTarget = parseInt(dailyTarget);
-            finalTargetCount = 0; // No fixed total for ongoing practices
-          }
+        if (configMode === 'total') {
+          finalTargetCount = parseInt(totalTarget);
+          finalDailyTarget = Math.ceil(finalTargetCount / days);
         } else {
-          // For fixed duration count practices
-          const days = calculateDays();
-          endDate = new Date(startDateObj);
-          endDate.setDate(startDateObj.getDate() + days);
-
-          if (configMode === 'total') {
-            finalTargetCount = parseInt(totalTarget);
-            finalDailyTarget = Math.ceil(finalTargetCount / days);
-          } else {
-            finalDailyTarget = parseInt(dailyTarget);
-            finalTargetCount = finalDailyTarget * days;
-          }
+          finalDailyTarget = parseInt(dailyTarget);
+          finalTargetCount = finalDailyTarget * days;
         }
 
         projectData = {
@@ -751,7 +654,7 @@ export default function PracticeConfigScreen() {
           target_count: finalTargetCount,
           daily_target: finalDailyTarget,
           start_date: startDateObj.toISOString().split('T')[0],
-          target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
+          target_end_date: endDate.toISOString().split('T')[0],
           current_count: 0,
           status: 'active',
           target_period: 'daily',
@@ -1115,34 +1018,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  ongoingButton: {
-    backgroundColor: '#e8f5e8',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 8,
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  ongoingButtonActive: {
-    backgroundColor: '#4CAF50',
-  },
-  ongoingButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4CAF50',
-  },
-  ongoingButtonTextActive: {
-    color: 'white',
-  },
-  ongoingButtonDisabled: {
-    backgroundColor: '#f1f1f1',
-    borderColor: '#ddd',
-    opacity: 0.5,
-  },
-  ongoingButtonTextDisabled: {
-    color: '#999',
-  },
+  
   summaryContainer: {
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
