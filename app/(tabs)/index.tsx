@@ -745,8 +745,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-          {/* Connection Test - Remove this after fixing the issue */}
-          <ConnectionTest />
+          
 
           {/* Study Section */}
           <View style={styles.section}>

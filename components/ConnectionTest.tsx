@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { supabase, testConnection } from '@/lib/supabase';
@@ -22,7 +21,7 @@ export function ConnectionTest() {
       // Check environment variables
       const hasUrl = !!process.env.EXPO_PUBLIC_SUPABASE_URL;
       const hasKey = !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-      
+
       setDetails(`Environment: URL=${hasUrl}, Key=${hasKey}`);
 
       if (!hasUrl || !hasKey) {
@@ -31,7 +30,7 @@ export function ConnectionTest() {
 
       // Test the connection
       const connected = await testConnection();
-      
+
       if (connected) {
         setStatus('connected');
         setDetails('Connection successful!');
