@@ -48,6 +48,7 @@ interface MeditationRecord {
   record_date: string;
   duration_minutes: number;
   session_number?: number;
+  notes?: string;
   created_at: string;
 }
 
@@ -536,15 +537,12 @@ export default function PracticeDetailScreen() {
               </TouchableOpacity>
             </View>
             
-            {/* Show recent records - combine today and weekly records and sort by date */}
-            {[...todayRecords, ...weeklyRecords]
-              .filter((record, index, arr) => 
-                // Remove duplicates by id
-                arr.findIndex(r => r.id === record.id) === index
-              )
-              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-              .slice(0, 5)
-              .map((record) => (
+            {/* Display recent meditation records */}
+            {(() => {
+              const allRecords = project.target_period === 'weekly' ? weeklyRecords : todayRecords;
+              const recentRecords = allRecords.slice(-5).reverse(); // Show last 5 records, most recent first
+              
+              return recentRecords.map((record) => (
                 <View key={record.id} style={styles.recordItem}>
                   <View style={styles.recordHeader}>
                     <Text style={styles.recordDate}>
@@ -564,7 +562,8 @@ export default function PracticeDetailScreen() {
                   </View>
                   
                   <Text style={styles.recordCount}>
-                    {record.session_number ? `第${record.session_number}座` : '观修'}: {record.duration_minutes}分钟
+                    时长: {record.duration_minutes} 分钟
+                    {record.session_number && ` (第${record.session_number}座)`}
                   </Text>
                   
                   {record.notes && (
@@ -574,7 +573,8 @@ export default function PracticeDetailScreen() {
                     </View>
                   )}
                 </View>
-              ))}
+              ));
+            })()}
           </View>
         )}
 
