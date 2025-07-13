@@ -181,13 +181,30 @@ export default function PracticeScreen() {
   };
 
   const handleViewDetails = (projectId: string, practiceName: string) => {
-    // Navigate to dedicated practice detail screen
-    router.push({
-      pathname: '/practice-detail/[practiceId]',
-      params: {
-        practiceId: projectId,
-      },
-    });
+    const project = projects.find(p => p.id === projectId);
+    if (!project) {
+      toastService.error({ title: '❌ 项目错误', message: '未找到修行项目' });
+      return;
+    }
+
+    if (project.practices.type === 'time') {
+      // For meditation practices, navigate to meditation history
+      router.push({
+        pathname: '/meditation-history',
+        params: {
+          practiceId: project.practice_id,
+          practiceName: practiceName,
+        },
+      });
+    } else {
+      // For count-based practices, navigate to practice detail
+      router.push({
+        pathname: '/practice-detail/[practiceId]',
+        params: {
+          practiceId: projectId,
+        },
+      });
+    }
   };
 
   if (loading) {
