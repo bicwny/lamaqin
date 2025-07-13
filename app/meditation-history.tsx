@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,10 +12,9 @@ import {
   ToastAndroid,
   Platform,
 } from 'react-native';
-import { router, useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
-import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { PageHeader } from '@/components/PageHeader';
 
