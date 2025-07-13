@@ -314,10 +314,7 @@ export default function PracticeScreen() {
                 {project.practices.type === 'count' ? (
                   <View>
                     <Text style={styles.practiceInfo}>
-                      {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
-                    </Text>
-                    <Text style={styles.practiceDetails}>
-                      每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
+                      {progress.current.toLocaleString()}/{progress.target.toLocaleString()}{project.practices.unit} • 每日：{project.daily_target.toLocaleString()}{project.practices.unit}
                     </Text>
                   </View>
                 ) : (
