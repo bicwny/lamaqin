@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,11 +10,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 
 // Component to display lesson progress with real-time counts
-const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
+const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, showOnlyIcon }: {
   userId: string;
   courseId: string;
   lessonId: string;
   refreshTrigger?: number;
+  showOnlyIcon?: boolean;
 }) => {
   const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0 });
   const [loading, setLoading] = useState(true);
@@ -41,12 +41,20 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
 
   const isCompleted = counts.听传承 > 0 && counts.看法本 > 0;
 
+  if (showOnlyIcon) {
+    return isCompleted ? (
+      <Ionicons name="checkmark-done" size={18} color="#28a745" style={{ marginLeft: 8 }} />
+    ) : null;
+  }
+
   return (
     <View style={styles.lessonProgressContainer}>
       <Text style={styles.lessonProgress}>
         听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
       </Text>
-      {isCompleted && <Text style={styles.completionCheck}>已完成</Text>}
+      {isCompleted && (
+        <Text style={styles.completionCheck}>✅</Text>
+      )}
     </View>
   );
 };
@@ -223,6 +231,13 @@ export default function CourseDetailScreen() {
                 <Text style={styles.lessonTitle}>
                   {lesson.title}
                 </Text>
+                <LessonProgressDisplay 
+                  userId={user.id} 
+                  courseId={courseId} 
+                  lessonId={lesson.id} 
+                  refreshTrigger={refreshTrigger}
+                  showOnlyIcon={true}
+                />
               </View>
               <LessonProgressDisplay 
                 userId={user.id}
