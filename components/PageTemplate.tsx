@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, ScrollView, StyleSheet, StatusBar, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,7 +36,7 @@ export default function PageTemplate({
   showHeader = true,
 }: PageTemplateProps) {
   const insets = useSafeAreaInsets();
-  
+
   const content = (
     <View style={[styles.content, { padding }, contentContainerStyle]}>
       {children}
@@ -45,7 +44,7 @@ export default function PageTemplate({
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['left', 'right', 'top', 'bottom']}>
       <StatusBar 
         barStyle="dark-content" 
         backgroundColor={backgroundColor}
