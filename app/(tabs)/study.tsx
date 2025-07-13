@@ -644,6 +644,7 @@ export default function StudyScreen() {
                 </View>
               ))}
             </View>
+          )}
         </ScrollView>
       </PageTemplate>
     );
