@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
+  ToastAndroid,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, useFocusEffect, Stack } from 'expo-router';
@@ -60,6 +63,11 @@ export default function MeditationDetailScreen() {
   const [totalSessions, setTotalSessions] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [viewMode, setViewMode] = useState<'chronological' | 'by_topic'>('chronological');
+  const [allRecords, setAllRecords] = useState<MeditationRecord[]>([]);
+  const [topicStats, setTopicStats] = useState<any[]>([]);
+  const [topics, setTopics] = useState<any[]>([]);
+  const [deletingRecords, setDeletingRecords] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (user && practiceId) {
@@ -155,20 +163,49 @@ export default function MeditationDetailScreen() {
         setWeeklyRecords(weeklyData || []);
       }
 
-      // Get total sessions count
-      const { data: allRecords, error: allError } = await supabase
-        .from('meditation_records')
-        .select('id', { count: 'exact' })
-        .eq('user_id', user.id)
-        .eq('practice_id', projectData.practice_id);
+      // Get all meditation records for history
+      const allMeditationRecords = await meditationService.getMeditationRecords(user.id, projectData.practice_id);
+      setAllRecords(allMeditationRecords);
+      setTotalSessions(allMeditationRecords.length);
 
-      if (allError) throw allError;
-      setTotalSessions(allRecords?.length || 0);
+      // Load topics and calculate stats
+      await loadTopicsAndStats(allMeditationRecords, projectData.practice_id);
 
       setTodayRecords(todayData || []);
 
     } catch (error) {
       console.error('Error loading meditation records:', error);
+    }
+  };
+
+  const loadTopicsAndStats = async (allRecords: MeditationRecord[], practiceId: string) => {
+    try {
+      // Load meditation topics
+      const topicsData = await meditationService.getMeditationTopics(practiceId);
+      setTopics(topicsData);
+
+      // Calculate topic statistics - only include records with valid topic_number
+      const topicCounts = topicsData.map(topic => {
+        const recordsForTopic = allRecords.filter(record => {
+          // Only match records that have a valid topic_number
+          return record.topic_number && record.topic_number === topic.topic_number;
+        });
+
+        return {
+          ...topic,
+          count: recordsForTopic.length,
+          totalDuration: recordsForTopic.reduce((sum, record) => sum + record.duration_minutes, 0),
+          latestRecord: recordsForTopic.length > 0 ? recordsForTopic[0] : null
+        };
+      });
+
+      // Sort by topic_number in ascending order
+      topicCounts.sort((a, b) => a.topic_number - b.topic_number);
+      setTopicStats(topicCounts);
+
+      console.log('📚 Loaded topic stats:', topicCounts.length);
+    } catch (error) {
+      console.error('❌ Error loading topics:', error);
     }
   };
 
@@ -210,6 +247,251 @@ export default function MeditationDetailScreen() {
       percentage: percentage,
       isCompleted: project.current_count >= project.target_count,
     };
+  };
+
+  const handleEdit = (record: any) => {
+    if (!project) return;
+    router.push({
+      pathname: '/modals/meditation-record',
+      params: {
+        practiceId: project.practice_id,
+        practiceName: project.practices.name,
+        editRecordId: record.id
+      }
+    });
+  };
+
+  const handleDelete = async (record: any) => {
+    const executeDelete = async () => {
+      if (!user?.id) {
+        if (Platform.OS === 'web') {
+          alert('用户认证失败，请重新登录');
+        } else {
+          Alert.alert('错误', '用户认证失败，请重新登录');
+        }
+        return;
+      }
+
+      setDeletingRecords(prev => new Set(prev).add(record.id));
+
+      try {
+        await meditationService.deleteMeditationRecord(record.id, user.id);
+        setAllRecords(prev => prev.filter(r => r.id !== record.id));
+        
+        if (Platform.OS === 'android') {
+          ToastAndroid.show('✅ 记录已删除', ToastAndroid.SHORT);
+        } else if (Platform.OS === 'web') {
+          console.log('📱 WEB SUCCESS - Record deleted');
+        } else {
+          Alert.alert('成功', '记录已删除');
+        }
+
+        // Refresh data after deletion
+        if (project) {
+          await loadMeditationRecords(project);
+        }
+
+      } catch (error) {
+        console.error('❌ DELETE OPERATION FAILED:', error);
+        setDeletingRecords(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(record.id);
+          return newSet;
+        });
+
+        if (Platform.OS === 'android') {
+          ToastAndroid.show('❌ 删除失败，请重试', ToastAndroid.LONG);
+        } else if (Platform.OS === 'web') {
+          alert(`删除失败: ${error.message || '请重试'}`);
+        } else {
+          Alert.alert('错误', `删除失败: ${error.message || '请重试'}`);
+        }
+      } finally {
+        setDeletingRecords(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(record.id);
+          return newSet;
+        });
+      }
+    };
+
+    await executeDelete();
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      weekday: 'short'
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const MeditationHistoryComponent = ({ practiceId, practiceName, viewMode, embedded = false }) => {
+    const records = allRecords.slice(0, embedded ? 10 : allRecords.length); // Show only first 10 if embedded
+    
+    if (viewMode === 'by_topic') {
+      return (
+        <View style={styles.historyContent}>
+          {topicStats.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>📚 暂无主题记录</Text>
+              <Text style={styles.emptySubtext}>开始选择观修主题吧！</Text>
+            </View>
+          ) : (
+            <>
+              <View style={styles.topicSummary}>
+                <Text style={styles.topicSummaryText}>
+                  📊 已观修 {topicStats.filter(t => t.count > 0).length} / {topicStats.length} 个主题
+                </Text>
+                <Text style={styles.topicSummarySubtext}>
+                  * 此视图仅显示有主题标记的观修记录
+                </Text>
+              </View>
+
+              {topicStats.slice(0, embedded ? 5 : topicStats.length).map((topic) => (
+                <View key={topic.id} style={styles.topicCard}>
+                  <View style={styles.topicHeader}>
+                    <Text style={styles.topicTitle}>{topic.title}</Text>
+                    <Text style={styles.topicNumber}>第{topic.topic_number}修法</Text>
+                  </View>
+
+                  <View style={styles.topicStatsRow}>
+                    <Text style={styles.topicCount}>🧘 {topic.count} 次观修</Text>
+                    {topic.totalDuration > 0 && (
+                      <Text style={styles.topicDuration}>⏱️ 总时长: {topic.totalDuration} 分钟</Text>
+                    )}
+                    {topic.latestRecord && (
+                      <Text style={styles.topicLatest}>📅 最近: {formatDate(topic.latestRecord.record_date)}</Text>
+                    )}
+                  </View>
+
+                  {topic.description && (
+                    <Text style={styles.topicDescription} numberOfLines={2}>
+                      {topic.description}
+                    </Text>
+                  )}
+                </View>
+              ))}
+            </>
+          )}
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.historyContent}>
+        {records.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>📭 暂无观修记录</Text>
+            <Text style={styles.emptySubtext}>开始您的第一次观修吧！</Text>
+          </View>
+        ) : (
+          <>
+            {records.map((record) => {
+              const isDeleting = deletingRecords.has(record.id);
+              return (
+                <TouchableOpacity 
+                  key={record.id} 
+                  style={[
+                    styles.recordCard,
+                    isDeleting && styles.recordCardDeleting
+                  ]}
+                  onPress={() => router.push({
+                    pathname: '/meditation-record-detail/[recordId]',
+                    params: { recordId: record.id }
+                  })}
+                  activeOpacity={0.7}
+                >
+                  {isDeleting && (
+                    <View style={styles.deletingOverlay}>
+                      <ActivityIndicator color="#dc3545" size="small" />
+                      <Text style={styles.deletingText}>删除中...</Text>
+                    </View>
+                  )}
+
+                  <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
+                    <Text style={styles.recordDate}>
+                      {formatDate(record.record_date)}
+                    </Text>
+                    <Text style={styles.recordTime}>
+                      {formatTime(record.created_at)}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
+                    <Text style={styles.recordDuration}>
+                      时长: {record.duration_minutes} 分钟
+                    </Text>
+
+                    {record.session_number && (
+                      <Text style={styles.recordSession}>
+                        第 {record.session_number} 座
+                      </Text>
+                    )}
+
+                    {record.method && (
+                      <Text style={styles.recordMethod}>
+                        方法: {record.method}
+                      </Text>
+                    )}
+
+                    {record.reflection && (
+                      <View style={styles.reflectionContainer}>
+                        <Text style={styles.reflectionLabel}>观后感:</Text>
+                        <Text style={styles.reflectionText} numberOfLines={3}>
+                          {record.reflection}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.recordActions}>
+                    <TouchableOpacity
+                      style={[styles.editButton, isDeleting && styles.disabledButton]}
+                      onPress={() => handleEdit(record)}
+                      disabled={isDeleting}
+                    >
+                      <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
+                        编辑
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.deleteButton, isDeleting && styles.disabledButton]}
+                      onPress={() => handleDelete(record)}
+                      disabled={isDeleting}
+                    >
+                      <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
+                        删除
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+            
+            {embedded && allRecords.length > 10 && (
+              <TouchableOpacity
+                style={styles.viewAllHistoryButton}
+                onPress={handleViewHistory}
+              >
+                <Text style={styles.viewAllHistoryText}>查看全部历史记录 ({allRecords.length} 条)</Text>
+                <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+              </TouchableOpacity>
+            )}
+          </>
+        )}
+      </View>
+    );
   };
 
   if (loading) {
@@ -397,6 +679,29 @@ export default function MeditationDetailScreen() {
           </View>
         )}
 
+        {/* Meditation History Section */}
+        <View style={styles.historySection}>
+          <View style={styles.historySectionHeader}>
+            <Text style={styles.historySectionTitle}>📿 观修历史</Text>
+            <TouchableOpacity
+              style={styles.viewModeToggle}
+              onPress={() => setViewMode(viewMode === 'chronological' ? 'by_topic' : 'chronological')}
+            >
+              <Text style={styles.viewModeText}>
+                {viewMode === 'chronological' ? '按主题' : '按时间'}
+              </Text>
+              <Ionicons name="swap-horizontal" size={16} color={Colors.primary} />
+            </TouchableOpacity>
+          </View>
+          
+          <MeditationHistoryComponent 
+            practiceId={project.practice_id}
+            practiceName={project.practices.name}
+            viewMode={viewMode}
+            embedded={true}
+          />
+        </View>
+
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity
@@ -405,14 +710,6 @@ export default function MeditationDetailScreen() {
           >
             <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
             <Text style={styles.primaryButtonText}>记录观修</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleViewHistory}
-          >
-            <Ionicons name="time-outline" size={24} color={Colors.primary} />
-            <Text style={styles.secondaryButtonText}>观修历史</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -665,5 +962,271 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: 16,
     fontWeight: '700',
+  },
+  historySection: {
+    backgroundColor: 'white',
+    margin: 16,
+    marginTop: 0,
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  historySectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  historySectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  viewModeToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  viewModeText: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  historyContent: {
+    gap: 12,
+  },
+  recordCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  recordCardDeleting: {
+    opacity: 0.6,
+    position: 'relative',
+  },
+  deletingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deletingText: {
+    color: '#dc3545',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.08)',
+  },
+  recordDate: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  recordTime: {
+    fontSize: 12,
+    color: '#666',
+  },
+  recordContent: {
+    marginBottom: 8,
+  },
+  recordDuration: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  recordSession: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 2,
+  },
+  recordMethod: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 6,
+  },
+  reflectionContainer: {
+    marginTop: 6,
+    padding: 8,
+    backgroundColor: '#e9ecef',
+    borderRadius: 6,
+    borderLeftWidth: 2,
+    borderLeftColor: Colors.primary,
+  },
+  reflectionLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  reflectionText: {
+    fontSize: 12,
+    color: '#666',
+    lineHeight: 16,
+  },
+  recordActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  editButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  disabledContent: {
+    opacity: 0.5,
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  disabledButtonText: {
+    opacity: 0.5,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 4,
+  },
+  emptySubtext: {
+    fontSize: 12,
+    color: '#999',
+  },
+  topicCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  topicHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  topicTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+    marginRight: 8,
+  },
+  topicNumber: {
+    fontSize: 10,
+    color: '#666',
+    backgroundColor: '#e9ecef',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  topicStatsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 6,
+  },
+  topicCount: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  topicDuration: {
+    fontSize: 12,
+    color: '#666',
+  },
+  topicLatest: {
+    fontSize: 12,
+    color: '#666',
+  },
+  topicDescription: {
+    fontSize: 12,
+    color: '#666',
+    opacity: 0.8,
+    lineHeight: 16,
+    marginTop: 2,
+  },
+  topicSummary: {
+    backgroundColor: '#e9ecef',
+    padding: 8,
+    borderRadius: 6,
+    marginBottom: 12,
+    borderLeftWidth: 2,
+    borderLeftColor: Colors.primary,
+  },
+  topicSummaryText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  topicSummarySubtext: {
+    fontSize: 10,
+    color: '#666',
+    fontStyle: 'italic',
+  },
+  viewAllHistoryButton: {
+    backgroundColor: '#f8f9fa',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  viewAllHistoryText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
