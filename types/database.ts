@@ -77,6 +77,7 @@ export interface DailyRecord {
   user_id: string;
   practice_project_id: string;
   record_date: string;
+  record_time?: string; // UTC time (HH:MM:SS)
   count: number;
   notes?: string;
   created_at: string;
@@ -87,6 +88,7 @@ export interface MeditationRecord {
   user_id: string;
   practice_id: string;
   record_date: string;
+  record_time?: string; // UTC time (HH:MM:SS)
   duration_minutes: number;
   session_number?: number;
   method?: string;
@@ -101,6 +103,8 @@ export interface StudyRecord {
   course_id: string;
   lesson_id: string;
   study_date: string;
+  study_time?: string; // UTC time (HH:MM:SS)
+  study_type?: '听传承' | '看法本';
   study_count_for_lesson: number;
   created_at: string;
 }

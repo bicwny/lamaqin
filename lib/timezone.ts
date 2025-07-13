@@ -246,6 +246,33 @@ export function getCurrentUtcTime(): string {
   return now.toISOString().split('T')[1].split('.')[0];
 }
 
+/**
+ * Format UTC time for display in practice/study records
+ */
+export function formatRecordTime(utcTimeString: string, timezone: string): string {
+  try {
+    if (!utcTimeString) return '--:--';
+    return convertUtcToLocalTime(utcTimeString, timezone);
+  } catch (error) {
+    console.error('❌ Error formatting record time:', error);
+    return utcTimeString.substring(0, 5); // Fallback to HH:MM
+  }
+}
+
+/**
+ * Format time for practice history display
+ */
+export function formatPracticeTime(utcTimeString: string, timezone: string): string {
+  try {
+    if (!utcTimeString) return '';
+    const localTime = convertUtcToLocalTime(utcTimeString, timezone);
+    return ` (${localTime})`;
+  } catch (error) {
+    console.error('❌ Error formatting practice time:', error);
+    return '';
+  }
+}
+
 // Common timezone options for manual selection
 export const COMMON_TIMEZONES = [
   { timezone: 'Asia/Shanghai', name: '北京时间 (GMT+8)' },

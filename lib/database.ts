@@ -280,9 +280,13 @@ export const dailyRecordService = {
     arg3?: number,
     arg4?: string
   ): Promise<DailyRecord | void> {
+    // Get UTC time for all record operations
+    const now = new Date();
+    const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
+
     if (typeof arg1 === 'object') {
       // Case 1: Called with a DailyRecord object
-      const record = arg1;
+      const record = { ...arg1, record_time: utcTime }; // Add UTC time
       const { data, error } = await supabase
         .from('daily_records')
         .insert(record)
@@ -316,21 +320,25 @@ export const dailyRecordService = {
       if (existingRecordError) throw existingRecordError;
 
       if (existingRecord) {
-        // Update existing record
+        // Update existing record with UTC time
         const { error: updateError } = await supabase
           .from('daily_records')
-          .update({ count: existingRecord.count + amount })
+          .update({ 
+            count: existingRecord.count + amount,
+            record_time: utcTime // Update UTC time
+          })
           .eq('id', existingRecord.id);
 
         if (updateError) throw updateError;
       } else {
-        // Create new record
+        // Create new record with UTC time
         const { error: insertError } = await supabase
           .from('daily_records')
           .insert({
             user_id: userId,
             practice_project_id: projectId,
             record_date: date,
+            record_time: utcTime, // Store UTC time
             count: amount
           });
 
@@ -386,12 +394,16 @@ export const meditationService = {
   },
 
   async recordMeditation(record: Omit<MeditationRecord, 'id' | 'created_at'>): Promise<MeditationRecord> {
+    const now = new Date();
+    const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
+
     const recordData: any = {
       user_id: record.user_id,
       practice_id: record.practice_id,
       record_date: record.record_date,
+      record_time: utcTime, // Store UTC time
       duration_minutes: record.duration_minutes,
-      created_at: new Date().toISOString()
+      created_at: now.toISOString()
     };
 
     // Add optional fields
@@ -399,7 +411,7 @@ export const meditationService = {
     if (record.method) recordData.method = record.method;
     if (record.reflection && record.reflection.trim()) {
       recordData.reflection = record.reflection;
-      recordData.reflection_created_at = new Date().toISOString();
+      recordData.reflection_created_at = now.toISOString();
     }
 
     const { data, error } = await supabase
@@ -443,19 +455,24 @@ export const meditationService = {
   }): Promise<MeditationRecord> {
     console.log('💾 Saving meditation record to Supabase:', record);
 
+    // Store UTC time
+    const now = new Date();
+    const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
+
     const recordData: any = {
       user_id: record.user_id,
       practice_id: record.practice_id,
       record_date: record.record_date,
+      record_time: utcTime, // Store UTC time
       duration_minutes: record.duration_minutes,
-      created_at: new Date().toISOString()
+      created_at: now.toISOString()
     };
 
     // Add optional fields
     if (record.session_number) recordData.session_number = record.session_number;
     if (record.reflection && record.reflection.trim()) {
       recordData.reflection = record.reflection;
-      recordData.reflection_created_at = new Date().toISOString();
+      recordData.reflection_created_at = now.toISOString();
     }
 
     console.log('📝 Final record data being inserted:', recordData);
@@ -722,11 +739,16 @@ export const studyService = {
 
       const lesson = lessons[0]; // Take the first lesson if there are duplicates
 
+      // Store UTC timestamp
+      const now = new Date();
+      const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
+
       const studyRecord = {
         user_id: record.user_id,
         course_id: record.course_id,
         lesson_id: lesson.id,
         study_date: record.study_date,
+        study_time: utcTime, // Store UTC time
         study_type: record.study_type,
         study_count_for_lesson: record.study_count_for_lesson
       };
