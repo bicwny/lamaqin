@@ -142,7 +142,7 @@ export default function PracticeDetailScreen() {
       // Get today's records
       const { data: todayData, error: todayError } = await supabase
         .from('meditation_records')
-        .select('*')
+        .select('id, user_id, practice_id, record_date, duration_minutes, session_number, notes, created_at')
         .eq('user_id', user.id)
         .eq('practice_id', projectData.practice_id)
         .eq('record_date', today)
@@ -159,7 +159,7 @@ export default function PracticeDetailScreen() {
 
         const { data: weeklyData, error: weeklyError } = await supabase
           .from('meditation_records')
-          .select('*')
+          .select('id, user_id, practice_id, record_date, duration_minutes, session_number, notes, created_at')
           .eq('user_id', user.id)
           .eq('practice_id', projectData.practice_id)
           .gte('record_date', startOfWeek.toISOString().split('T')[0])
