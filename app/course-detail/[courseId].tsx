@@ -211,11 +211,8 @@ export default function CourseDetailScreen() {
 
         <View style={styles.courseInfoCard}>
           <Text style={styles.courseInfoTitle}>课程信息：</Text>
-          <Text style={styles.courseInfoText}>授课老师：{userCourse.course.teacher}</Text>
-          <Text style={styles.courseInfoText}>总课数：{userCourse.course.total_lessons}课</Text>
           <Text style={styles.courseInfoText}>
-            完成进度：{(userCourse.progress_percentage || 0).toFixed(1)}% 
-            ({Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课)
+            讲解：{userCourse.course.teacher} • 完成：{Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课（{(userCourse.progress_percentage || 0).toFixed(1)}%）
           </Text>
         </View>
 
