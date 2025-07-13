@@ -46,12 +46,7 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
       <Text style={styles.lessonProgress}>
         听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
       </Text>
-      {isCompleted && (
-        <View style={styles.completionBadge}>
-          <Ionicons name="checkmark-circle" size={16} color="#10B981" />
-          <Text style={styles.completionText}>已完成</Text>
-        </View>
-      )}
+      {isCompleted && <Text style={styles.completionCheck}>已完成</Text>}
     </View>
   );
 };
@@ -208,101 +203,75 @@ export default function CourseDetailScreen() {
         onBackPress={() => router.back()}
       />
       <ScrollView style={styles.scrollView}>
-        {/* Course Info Card */}
+
         <View style={styles.courseInfoCard}>
-          <Text style={styles.courseInfoTitle}>课程信息</Text>
-          <View style={styles.courseInfoRow}>
-            <Text style={styles.courseInfoLabel}>授课老师：</Text>
-            <Text style={styles.courseInfoValue}>{userCourse.course.teacher}</Text>
-          </View>
-          <View style={styles.courseInfoRow}>
-            <Text style={styles.courseInfoLabel}>总课数：</Text>
-            <Text style={styles.courseInfoValue}>{userCourse.course.total_lessons}课</Text>
-          </View>
-          <View style={styles.courseInfoRow}>
-            <Text style={styles.courseInfoLabel}>完成进度：</Text>
-            <Text style={styles.courseInfoValue}>
-              {(userCourse.progress_percentage || 0).toFixed(1)}% 
-              ({Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课)
-            </Text>
-          </View>
+          <Text style={styles.courseInfoTitle}>课程信息：</Text>
+          <Text style={styles.courseInfoText}>授课老师：{userCourse.course.teacher}</Text>
+          <Text style={styles.courseInfoText}>总课数：{userCourse.course.total_lessons}课</Text>
+          <Text style={styles.courseInfoText}>
+            完成进度：{(userCourse.progress_percentage || 0).toFixed(1)}% 
+            ({Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课)
+          </Text>
         </View>
 
-        {/* Course Lessons */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>课程内容</Text>
-          </View>
+        <Text style={styles.sectionTitle}>课程内容：</Text>
 
-          {lessons.map(lesson => (
-            <View key={lesson.id} style={styles.lessonCard}>
-              <View style={styles.lessonHeader}>
+        {lessons.map(lesson => (
+          <View key={lesson.id} style={styles.lessonItem}>
+            <View style={styles.lessonHeader}>
+              <View style={styles.lessonTitleRow}>
                 <Text style={styles.lessonTitle}>
-                  第{lesson.lesson_number}课 · {lesson.title}
+                  {lesson.title}
                 </Text>
-                <LessonProgressDisplay 
-                  userId={user.id}
-                  courseId={courseId}
-                  lessonId={lesson.id}
-                  refreshTrigger={refreshTrigger}
-                />
               </View>
-
-              <View style={styles.quickActionButtons}>
-                <TouchableOpacity 
-                  style={styles.quickActionButton}
-                  onPress={() => recordStudy(lesson.lesson_number, '听传承')}
-                >
-                  <Ionicons 
-                    name="checkmark-circle-outline" 
-                    size={20} 
-                    color="#fff" 
-                  />
-                  <Text style={styles.buttonText}>听传承</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.quickActionButton, styles.readButton]}
-                  onPress={() => recordStudy(lesson.lesson_number, '看法本')}
-                >
-                  <Ionicons 
-                    name="add-circle-outline" 
-                    size={20} 
-                    color="#fff" 
-                  />
-                  <Text style={styles.buttonText}>看法本</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={[styles.quickActionButton, styles.viewButton]}
-                  onPress={() => {
-                    if (lesson.url) {
-                      Linking.openURL(lesson.url).catch(err => {
-                        console.error('Failed to open URL:', err);
-                        toastService.error({ 
-                          title: '无法打开链接', 
-                          message: '请检查网络连接或稍后重试' 
-                        });
-                      });
-                    } else {
-                      toastService.info({ 
-                        title: '暂无在线链接', 
-                        message: '该课程资源正在准备中' 
-                      });
-                    }
-                  }}
-                >
-                  <Ionicons 
-                    name="play-circle-outline" 
-                    size={20} 
-                    color="#fff" 
-                  />
-                  <Text style={styles.buttonText}>在线课程</Text>
-                </TouchableOpacity>
-              </View>
+              <LessonProgressDisplay 
+                userId={user.id}
+                courseId={courseId}
+                lessonId={lesson.id}
+                refreshTrigger={refreshTrigger}
+              />
             </View>
-          ))}
-        </View>
+
+            <View style={styles.recordButtons}>
+              <TouchableOpacity 
+                style={[styles.recordButton, styles.listenButton]}
+                onPress={() => recordStudy(lesson.lesson_number, '听传承')}
+              >
+                <Text style={styles.recordButtonText}>听传承</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.recordButton, styles.readButton]}
+                onPress={() => recordStudy(lesson.lesson_number, '看法本')}
+              >
+                <Text style={styles.recordButtonText}>看法本</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.recordButton, styles.viewButton]}
+                onPress={() => {
+                  if (lesson.url) {
+                    Linking.openURL(lesson.url).catch(err => {
+                      console.error('Failed to open URL:', err);
+                      toastService.error({ 
+                        title: '无法打开链接', 
+                        message: '请检查网络连接或稍后重试' 
+                      });
+                    });
+                  } else {
+                    toastService.info({ 
+                      title: '暂无在线链接', 
+                      message: '该课程资源正在准备中' 
+                    });
+                  }
+                }}
+              >
+                <Text style={styles.recordButtonText}>在线课程</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -311,7 +280,7 @@ export default function CourseDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f8f9fa',
   },
   scrollView: {
     flex: 1,
@@ -320,149 +289,100 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    minHeight: 500,
+    padding: 20,
   },
   loadingText: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: '#666',
     marginTop: 16,
-  },
-  section: {
-    marginBottom: 16,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 12,
-    paddingTop: 8,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
+    fontWeight: '600',
+    color: '#333',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
   },
   courseInfoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-  },
-  courseInfoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 12,
-    letterSpacing: -0.3,
-  },
-  courseInfoRow: {
-    flexDirection: 'row',
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  courseInfoLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-    minWidth: 80,
-  },
-  courseInfoValue: {
-    fontSize: 14,
-    color: '#1a1a1a',
-    fontWeight: '600',
-    flex: 1,
-  },
-  lessonCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
-    marginBottom: 12,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  courseInfoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  courseInfoText: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  lessonItem: {
+    backgroundColor: '#fff',
+    padding: 12,
+    marginHorizontal: 16,
+    marginVertical: 2,
+    borderRadius: 8,
   },
   lessonHeader: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   lessonTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 8,
-    letterSpacing: -0.3,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
   },
   lessonProgressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 2,
   },
   lessonProgress: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#666',
-    fontWeight: '500',
     flex: 1,
   },
-  completionBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0FDF4',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+  completionCheck: {
+    fontSize: 16,
     marginLeft: 8,
   },
-  completionText: {
-    fontSize: 12,
-    color: '#10B981',
-    fontWeight: '600',
-    marginLeft: 4,
+  lessonTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
-  quickActionButtons: {
+  recordButtons: {
     flexDirection: 'row',
     gap: 8,
   },
-  quickActionButton: {
+  recordButton: {
     flex: 1,
-    backgroundColor: Colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
     alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  },
+  listenButton: {
+    backgroundColor: '#28a745',
   },
   readButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#007bff',
   },
   viewButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#da4347',
   },
-  buttonText: {
+  recordButtonText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
