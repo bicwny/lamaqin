@@ -20,14 +20,23 @@ export default function MindfulnessScreen() {
   const [todayRecords, setTodayRecords] = useState<MindfulnessRecord[]>([]);
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(true);
-  const { timezoneInfo } = useTimezone();
+  const { timezoneInfo, handleDailyResetCheck } = useTimezone();
 
   useEffect(() => {
     loadTodayRecords();
-  }, [user]);
+    
+    // Set up daily reset check
+    if (user && timezoneInfo) {
+      handleDailyResetCheck(() => {
+        console.log('🌅 Daily reset triggered for mindfulness - clearing today\'s records display');
+        setTodayRecords([]); // Reset display to show 0/0
+        loadTodayRecords(); // Reload from database (should be empty for new day)
+      });
+    }
+  }, [user, timezoneInfo]);
 
   const loadTodayRecords = async () => {
-    if (!user) {
+    if (!user || !timezoneInfo) {
       setLoading(false);
       return;
     }
@@ -35,7 +44,8 @@ export default function MindfulnessScreen() {
     try {
       console.log('🔄 Loading mindfulness records for user:', user.id);
 
-      const today = new Date().toISOString().split('T')[0];
+      // Use timezone-aware date
+      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
       const records = await mindfulnessService.getTodayRecords(user.id, today);
 
       console.log('💝 Loaded mindfulness records:', records.length);
@@ -49,11 +59,12 @@ export default function MindfulnessScreen() {
   };
 
   const recordMindfulness = async (mindType: 'good' | 'bad') => {
-    if (!user) return;
+    if (!user || !timezoneInfo) return;
 
     try {
+      // Use timezone-aware date and time
+      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
       const now = new Date();
-      const today = now.toISOString().split('T')[0];
       const currentTime = now.toTimeString().split(' ')[0];
 
       await mindfulnessService.recordMindfulness({
@@ -89,7 +100,7 @@ export default function MindfulnessScreen() {
 
   const stats = getTodayStats();
 
-  if (loading) {
+  if (loading || !timezoneInfo) {
     return (
       <View style={styles.container}>
         <PageHeader 
@@ -110,6 +121,12 @@ export default function MindfulnessScreen() {
         subtitle="观察内心善恶念头"
       />
       <ScrollView style={styles.scrollView}>
+
+      {timezoneInfo && (
+        <Text style={styles.timezoneDisplay}>
+          {timezoneInfo.displayName} • 每日午夜12点重置
+        </Text>
+      )}
 
       <View style={styles.statsCard}>
         <Text style={styles.statsTitle}>今日统计</Text>
