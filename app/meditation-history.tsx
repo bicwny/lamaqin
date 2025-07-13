@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { PageHeader } from '@/components/PageHeader';
 
 export default function MeditationHistoryScreen() {
   const { user } = useAuth();
@@ -282,12 +283,7 @@ export default function MeditationHistoryScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>📿 {practiceName} - 历史记录</Text>
-
+      <PageHeader title={`📿 ${practiceName} - 历史记录`} showBackButton>
         {/* View Mode Toggle */}
         <View style={styles.viewToggle}>
           <TouchableOpacity
@@ -315,7 +311,7 @@ export default function MeditationHistoryScreen() {
             ]}>主题</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </PageHeader>
 
       {/* Records List */}
       <ScrollView
@@ -501,34 +497,7 @@ export default function MeditationHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
+    backgroundColor: Colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -538,7 +507,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   scrollView: {
     flex: 1,
@@ -551,12 +520,13 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: '#666',
+    color: Colors.textSecondary,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#999',
+    color: Colors.textSecondary,
+    opacity: 0.7,
   },
   recordsList: {
     padding: 16,
@@ -567,10 +537,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 3,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   recordHeader: {
     flexDirection: 'row',
@@ -579,53 +551,56 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: 'rgba(0,0,0,0.08)',
   },
   recordDate: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: Colors.text,
+    letterSpacing: -0.3,
   },
   recordTime: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   recordContent: {
     marginBottom: 12,
   },
   recordDuration: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: '700',
+    color: Colors.text,
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   recordSession: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   recordMethod: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
     marginBottom: 8,
   },
   reflectionContainer: {
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background,
     borderRadius: 8,
     borderLeftWidth: 3,
     borderLeftColor: Colors.primary,
   },
   reflectionLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: Colors.text,
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   reflectionText: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   recordActions: {
@@ -634,26 +609,38 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   editButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 6,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   editButtonText: {
     color: 'white',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   deleteButton: {
     backgroundColor: '#dc3545',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 6,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   deleteButtonText: {
     color: 'white',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   loadMoreButton: {
     backgroundColor: 'white',
@@ -662,15 +649,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 2,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   loadMoreText: {
     color: Colors.primary,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   recordCardDeleting: {
     opacity: 0.6,
@@ -706,7 +696,7 @@ const styles = StyleSheet.create({
   },
   viewToggle: {
     flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: Colors.background,
     borderRadius: 8,
     padding: 2,
     marginTop: 12,
@@ -720,14 +710,21 @@ const styles = StyleSheet.create({
   },
   toggleButtonActive: {
     backgroundColor: Colors.primary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   toggleButtonText: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
+    color: Colors.textSecondary,
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   toggleButtonTextActive: {
     color: 'white',
+    fontWeight: '700',
   },
   topicCard: {
     backgroundColor: 'white',
@@ -735,10 +732,12 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 3,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   topicHeader: {
     flexDirection: 'row',
@@ -748,15 +747,16 @@ const styles = StyleSheet.create({
   },
   topicTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: Colors.text,
     flex: 1,
     marginRight: 8,
+    letterSpacing: -0.3,
   },
   topicNumber: {
     fontSize: 12,
-    color: '#666',
-    backgroundColor: '#f0f0f0',
+    color: Colors.textSecondary,
+    backgroundColor: Colors.background,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -770,24 +770,26 @@ const styles = StyleSheet.create({
   topicCount: {
     fontSize: 14,
     color: Colors.primary,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
   topicDuration: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   topicLatest: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   topicDescription: {
     fontSize: 14,
-    color: '#888',
+    color: Colors.textSecondary,
+    opacity: 0.8,
     lineHeight: 20,
     marginTop: 4,
   },
   topicSummary: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background,
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
@@ -796,13 +798,14 @@ const styles = StyleSheet.create({
   },
   topicSummaryText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: Colors.text,
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   topicSummarySubtext: {
     fontSize: 12,
-    color: '#666',
+    color: Colors.textSecondary,
     fontStyle: 'italic',
   },
 });
