@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toastService } from '@/lib/toast';
+import { useTimezone } from '@/hooks/useTimezone';
+import { getCurrentDateInTimezone } from '@/lib/timezone';
 
 import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
@@ -67,10 +69,29 @@ export default function HomeScreen() {
 
   // Track when user is returning from recording to avoid unnecessary refresh
   const [lastRecordTime, setLastRecordTime] = useState<number>(0);
+  
+  // Add timezone support for daily reset
+  const { timezoneInfo, handleDailyResetCheck } = useTimezone();
 
   useFocusEffect(
     React.useCallback(() => {
       if (user?.id) {
+        // Set up daily reset check for count-based practices
+        if (timezoneInfo) {
+          handleDailyResetCheck(() => {
+            console.log('🌅 Daily reset triggered for count-based practices - resetting displays');
+            // Reset daily practices display to show 0 counts
+            setDailyPractices(prev => prev.map(practice => ({
+              ...practice,
+              current: 0,
+              progressPercent: 0,
+              status: 'pending' as const
+            })));
+            // Reload data from database (should be empty for new day)
+            loadDashboardData();
+          });
+        }
+        
         const now = Date.now();
         // Only refresh if it's been more than 2 seconds since last record
         // This prevents refresh when user just recorded something and came back
@@ -78,7 +99,7 @@ export default function HomeScreen() {
           loadDashboardData();
         }
       }
-    }, [user?.id, lastRecordTime])
+    }, [user?.id, lastRecordTime, timezoneInfo])
   );
 
   const loadDashboardData = async () => {
@@ -268,7 +289,11 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      const today = new Date().toISOString().split('T')[0];
+      // Use timezone-aware date for count-based practices
+      const today = timezoneInfo 
+        ? getCurrentDateInTimezone(timezoneInfo.timezone)
+        : new Date().toISOString().split('T')[0];
+      
       const practicesData: DailyPractice[] = [];
 
       for (const project of projects || []) {
@@ -325,13 +350,20 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      const today = new Date().toISOString().split('T')[0];
+      // Use timezone-aware date for weekly practices
+      const today = timezoneInfo 
+        ? getCurrentDateInTimezone(timezoneInfo.timezone)
+        : new Date().toISOString().split('T')[0];
 
       // Use Monday as week start for consistency with getCurrentWeekStart()
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-      const monday = new Date(now.setDate(diff));
+      // Calculate week start based on timezone-aware today
+      const todayDate = timezoneInfo 
+        ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
+        : new Date();
+      
+      const dayOfWeek = todayDate.getDay();
+      const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+      const monday = new Date(todayDate.setDate(diff));
       const weekStart = monday.toISOString().split('T')[0];
 
       const practicesData: WeeklyPractice[] = [];
@@ -621,6 +653,11 @@ export default function HomeScreen() {
   const recordQuickCompleteBackground = async (practice: any, amount: number) => {
     if (!user) return;
 
+    // Use timezone-aware date for recording
+    const recordDate = timezoneInfo 
+      ? getCurrentDateInTimezone(timezoneInfo.timezone)
+      : new Date().toISOString().split('T')[0];
+
     if (practice.type === 'time') {
       // For time-based practices, create a meditation record with target duration
       const { error } = await supabase
@@ -628,7 +665,7 @@ export default function HomeScreen() {
         .insert({
           user_id: user.id,
           practice_id: practice.practiceId,
-          record_date: new Date().toISOString().split('T')[0],
+          record_date: recordDate,
           duration_minutes: amount, // Use remaining amount as duration
           session_number: 1,
         });
@@ -641,7 +678,7 @@ export default function HomeScreen() {
         .insert({
           user_id: user.id,
           practice_project_id: practice.id,
-          record_date: new Date().toISOString().split('T')[0],
+          record_date: recordDate,
           count: amount,
           notes: '快速完成今日目标'
         });
