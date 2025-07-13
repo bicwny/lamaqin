@@ -44,8 +44,17 @@ export default function MindfulnessScreen() {
     try {
       console.log('🔄 Loading mindfulness records for user:', user.id);
 
-      // Use timezone-aware date
+      // Use timezone-aware date with validation
       const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+      
+      // Validate date format before proceeding
+      if (!today || !/^\d{4}-\d{2}-\d{2}$/.test(today)) {
+        console.error('❌ Invalid date format for mindfulness records:', today);
+        setTodayRecords([]);
+        setLoading(false);
+        return;
+      }
+      
       const records = await mindfulnessService.getTodayRecords(user.id, today);
 
       console.log('💝 Loaded mindfulness records:', records.length);

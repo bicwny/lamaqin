@@ -1,4 +1,3 @@
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
@@ -15,7 +14,7 @@ export async function detectUserTimezone(): Promise<TimezoneInfo> {
   try {
     // Try device/browser detection first
     let timezone: string;
-    
+
     if (Platform.OS === 'web') {
       // Web browser detection
       timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -60,7 +59,7 @@ export async function getUserTimezone(): Promise<TimezoneInfo> {
   try {
     // Check if we have a stored timezone preference
     const storedTimezone = await AsyncStorage.getItem('@user_timezone');
-    
+
     if (storedTimezone) {
       const timezoneInfo = JSON.parse(storedTimezone);
       console.log('🕒 Using stored timezone:', timezoneInfo.timezone);
@@ -70,10 +69,10 @@ export async function getUserTimezone(): Promise<TimezoneInfo> {
     // No stored preference, detect automatically
     console.log('🔍 No stored timezone found, detecting...');
     const detectedTimezone = await detectUserTimezone();
-    
+
     // Store the detected timezone for future use
     await saveUserTimezone(detectedTimezone);
-    
+
     return detectedTimezone;
   } catch (error) {
     console.error('❌ Error getting user timezone:', error);
@@ -103,12 +102,32 @@ export async function saveUserTimezone(timezoneInfo: TimezoneInfo): Promise<void
 export function getCurrentDateInTimezone(timezone: string): string {
   try {
     const now = new Date();
-    // Convert to user's timezone and get date string
-    const userDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-    return userDate.toISOString().split('T')[0];
+
+    // Use Intl.DateTimeFormat for more reliable timezone conversion
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+
+    const parts = formatter.formatToParts(now);
+    const year = parts.find(part => part.type === 'year')?.value;
+    const month = parts.find(part => part.type === 'month')?.value;
+    const day = parts.find(part => part.type === 'day')?.value;
+
+    if (year && month && day) {
+      return `${year}-${month}-${day}`;
+    }
+
+    // Fallback method
+    const utcDate = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
+    const targetDate = new Date(utcDate.toLocaleString('en-US', { timeZone: timezone }));
+
+    return targetDate.toISOString().split('T')[0];
   } catch (error) {
     console.error('❌ Error getting date in timezone:', error);
-    // Fallback to local date
+    // Fallback to UTC date
     return new Date().toISOString().split('T')[0];
   }
 }
@@ -128,17 +147,17 @@ export function getTimeUntilMidnight(timezone: string): { hours: number; minutes
   try {
     const now = new Date();
     const userTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-    
+
     // Calculate time until midnight
     const midnight = new Date(userTime);
     midnight.setHours(24, 0, 0, 0); // Next midnight
-    
+
     const timeUntilMidnight = midnight.getTime() - userTime.getTime();
-    
+
     const hours = Math.floor(timeUntilMidnight / (1000 * 60 * 60));
     const minutes = Math.floor((timeUntilMidnight % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeUntilMidnight % (1000 * 60)) / 1000);
-    
+
     return { hours, minutes, seconds };
   } catch (error) {
     console.error('❌ Error calculating time until midnight:', error);
@@ -156,23 +175,23 @@ export async function handleDailyReset(
   try {
     const timezoneInfo = await getUserTimezone();
     const currentDate = getCurrentDateInTimezone(timezoneInfo.timezone);
-    
+
     // Check last reset date
     const lastResetKey = `@daily_reset_${userId}`;
     const lastResetDate = await AsyncStorage.getItem(lastResetKey);
-    
+
     if (isNewDayInTimezone(timezoneInfo.timezone, lastResetDate || undefined)) {
       console.log('🌅 New day detected! Resetting daily counters...');
       console.log('🕒 Timezone:', timezoneInfo.timezone);
       console.log('📅 Current date:', currentDate);
       console.log('📅 Last reset:', lastResetDate || 'never');
-      
+
       // Execute reset callback
       onReset();
-      
+
       // Update last reset date
       await AsyncStorage.setItem(lastResetKey, currentDate);
-      
+
       console.log('✅ Daily reset completed');
     }
   } catch (error) {
@@ -184,13 +203,13 @@ export async function handleDailyReset(
 function getTimezoneFromOffset(offsetMinutes: number): string {
   // Simple offset to timezone mapping for common cases
   const offsetHours = offsetMinutes / 60;
-  
+
   if (offsetHours === 0) return 'UTC';
   if (offsetHours === 8) return 'Asia/Shanghai';
   if (offsetHours === 9) return 'Asia/Tokyo';
   if (offsetHours === -5) return 'America/New_York';
   if (offsetHours === -8) return 'America/Los_Angeles';
-  
+
   // Generic UTC offset format
   const sign = offsetHours >= 0 ? '+' : '';
   return `UTC${sign}${offsetHours}`;
@@ -200,7 +219,7 @@ function getTimezoneDisplayName(timezone: string, offsetMinutes: number): string
   const offsetHours = offsetMinutes / 60;
   const sign = offsetHours >= 0 ? '+' : '';
   const offsetStr = `GMT${sign}${offsetHours}`;
-  
+
   // Common timezone display names
   const displayNames: Record<string, string> = {
     'Asia/Shanghai': '北京时间',
@@ -212,7 +231,7 @@ function getTimezoneDisplayName(timezone: string, offsetMinutes: number): string
     'Europe/London': '伦敦时间',
     'UTC': 'UTC'
   };
-  
+
   const displayName = displayNames[timezone] || timezone;
   return `${displayName} (${offsetStr})`;
 }
@@ -224,7 +243,7 @@ export function convertUtcToLocalTime(utcTimeString: string, timezone: string): 
   try {
     // Create a date object with UTC time
     const utcDate = new Date(`1970-01-01T${utcTimeString}Z`);
-    
+
     // Convert to local time in specified timezone
     return utcDate.toLocaleTimeString('en-US', {
       timeZone: timezone,
@@ -270,6 +289,32 @@ export function formatPracticeTime(utcTimeString: string, timezone: string): str
   } catch (error) {
     console.error('❌ Error formatting practice time:', error);
     return '';
+  }
+}
+
+/**
+ * Check if it's midnight in user's timezone
+ */
+export function isMidnightInTimezone(timezone: string): boolean {
+  try {
+    const now = new Date();
+
+    // Use Intl.DateTimeFormat for more reliable timezone conversion
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const timeString = formatter.format(now);
+    const [hours, minutes] = timeString.split(':').map(Number);
+
+    // Consider it midnight if it's between 00:00 and 00:05
+    return hours === 0 && minutes < 5;
+  } catch (error) {
+    console.error('❌ Error checking midnight in timezone:', error);
+    return false;
   }
 }
 
