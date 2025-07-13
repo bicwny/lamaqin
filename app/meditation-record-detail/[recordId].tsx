@@ -13,7 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
@@ -206,17 +206,19 @@ export default function MeditationRecordDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <PageHeader 
-        title="观修详情"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        rightAction={{
-          text: "删除",
-          onPress: handleDeleteRecord,
-          color: '#dc3545'
-        }}
-      />
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="观修详情"
+          showBackButton={true}
+          onBackPress={() => router.back()}
+          rightAction={{
+            text: "删除",
+            onPress: handleDeleteRecord,
+            color: '#dc3545'
+          }}
+        />
 
       <KeyboardAvoidingView 
         style={styles.keyboardContainer}
@@ -342,6 +344,7 @@ export default function MeditationRecordDetailScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </>
   );
 }
 
