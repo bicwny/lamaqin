@@ -295,20 +295,23 @@ export default function PracticeScreen() {
           return (
             <View key={project.id} style={styles.practiceCard}>
 
-              <Text style={styles.practiceName}>
-                {project.practices.name}
-                {project.practices.type === 'time' && ` (${practiceDisplayType})`}
-                {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
-              </Text>
-
-              {/* Project Name Display */}
-              {(project.project_name || project.preset_project_id) && (
-                <View style={styles.projectNamePill}>
-                  <Text style={styles.projectNameText}>
-                    {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
-                  </Text>
-                </View>
-              )}
+              {/* Practice Name and Project Name Row */}
+              <View style={styles.practiceNameRow}>
+                <Text style={styles.practiceName}>
+                  {project.practices.name}
+                  {project.practices.type === 'time' && ` (${practiceDisplayType})`}
+                  {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
+                </Text>
+                
+                {/* Project Name Display */}
+                {(project.project_name || project.preset_project_id) && (
+                  <View style={styles.projectNamePill}>
+                    <Text style={styles.projectNameText}>
+                      {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
+                    </Text>
+                  </View>
+                )}
+              </View>
 
               <View style={styles.progressContainer}>
                 {project.practices.type === 'count' ? (
@@ -572,12 +575,20 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
     marginBottom: 12,
   },
+  practiceNameRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 12,
+  },
   practiceName: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.3,
-    marginBottom: 8,
+    flex: 1,
+    flexShrink: 1,
   },
   projectNamePill: {
     backgroundColor: Colors.primary,
@@ -585,7 +596,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
     alignSelf: 'flex-start',
-    marginBottom: 8,
+    flexShrink: 0,
   },
   projectNameText: {
     fontSize: 12,
