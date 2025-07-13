@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   projectNamePill: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.primaryLight,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
