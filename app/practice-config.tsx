@@ -39,7 +39,6 @@ export default function PracticeConfigScreen() {
   const [loading, setLoading] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [selectedPresetId, setSelectedPresetId] = useState(''); // Store UUID instead of name
-  const [usePresetName, setUsePresetName] = useState(false);
   const [presetProjectNames, setPresetProjectNames] = useState<Array<{
     id: string;
     name: string;
@@ -47,6 +46,12 @@ export default function PracticeConfigScreen() {
     display_order: number;
   }>>([]);
   const [loadingPresets, setLoadingPresets] = useState(true);
+  const [filteredPresets, setFilteredPresets] = useState<Array<{
+    id: string;
+    name: string;
+    category?: string;
+    display_order: number;
+  }>>([]);
 
   // Main configuration mode
   const [configMode, setConfigMode] = useState<'total' | 'daily' | 'topic_progress' | 'fixed_duration'>(
@@ -101,6 +106,27 @@ export default function PracticeConfigScreen() {
 
     fetchPresets();
   }, []);
+
+  const handleProjectNameChange = (text: string) => {
+    setProjectName(text);
+    setSelectedPresetId(''); // Clear preset selection when typing custom name
+    
+    // Filter presets based on input
+    if (text.length > 0) {
+      const filtered = presetProjectNames.filter(preset => 
+        preset.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredPresets(filtered);
+    } else {
+      setFilteredPresets([]);
+    }
+  };
+
+  const selectPreset = (preset: { id: string; name: string; category?: string; display_order: number }) => {
+    setProjectName(preset.name);
+    setSelectedPresetId(preset.id);
+    setFilteredPresets([]); // Hide dropdown
+  };
 
   const getDurationInDays = () => {
     const start = startDate;
@@ -702,91 +728,40 @@ export default function PracticeConfigScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>为这个修行项目起个名字</Text>
 
-            {/* Tab Interface */}
-            <View style={styles.tabContainer}>
-              <TouchableOpacity
+            {/* Single Input Field with Autocomplete */}
+            <View style={styles.autocompleteContainer}>
+              <TextInput
                 style={[
-                  styles.tabButton,
-                  usePresetName && styles.tabButtonActive,
+                  styles.autocompleteInput,
+                  filteredPresets.length > 0 && projectName.length > 0 && styles.autocompleteInputActive
                 ]}
-                onPress={() => {
-                  setUsePresetName(true);
-                  setProjectName('');
-                  setSelectedPresetId('');
-                }}
-              >
-                <Text style={[
-                  styles.tabButtonText,
-                  usePresetName && styles.tabButtonTextActive,
-                ]}>
-                  预设
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.tabButton,
-                  !usePresetName && styles.tabButtonActive,
-                ]}
-                onPress={() => {
-                  setUsePresetName(false);
-                  setProjectName('');
-                  setSelectedPresetId('');
-                }}
-              >
-                <Text style={[
-                  styles.tabButtonText,
-                  !usePresetName && styles.tabButtonTextActive,
-                ]}>
-                  自定义
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Tab Content */}
-            <View style={styles.tabContent}>
-              {usePresetName ? (
-                <View style={styles.presetContainer}>
-                  {loadingPresets ? (
-                    <Text style={styles.loadingText}>加载中...</Text>
-                  ) : (
-                    <ScrollView 
-                      style={styles.presetScrollView}
-                      showsVerticalScrollIndicator={false}
-                    >
-                      <View style={styles.presetGrid}>
-                        {presetProjectNames.map((preset) => (
-                          <TouchableOpacity
-                            key={preset.id}
-                            style={[
-                              styles.presetButton,
-                              selectedPresetId === preset.id && styles.presetButtonActive,
-                            ]}
-                            onPress={() => {
-                              setSelectedPresetId(preset.id);
-                            }}
-                          >
-                            <Text style={[
-                              styles.presetButtonText,
-                              selectedPresetId === preset.id && styles.presetButtonTextActive,
-                            ]}>
-                              {preset.name}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </ScrollView>
-                  )}
-                </View>
-              ) : (
-                <View style={styles.customContainer}>
-                  <Text style={styles.customLabel}>输入项目名称</Text>
-                  <TextInput
-                    style={styles.customInput}
-                    placeholder="例如：2025金刚萨埵法会、请水晶念珠等"
-                    value={projectName}
-                    onChangeText={setProjectName}
-                    multiline={false}
-                  />
+                placeholder="输入项目名称或选择预设..."
+                value={projectName}
+                onChangeText={handleProjectNameChange}
+                multiline={false}
+              />
+              
+              {/* Autocomplete Dropdown */}
+              {filteredPresets.length > 0 && projectName.length > 0 && (
+                <View style={styles.autocompleteDropdown}>
+                  <ScrollView 
+                    style={styles.autocompleteScrollView}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    {filteredPresets.map((preset) => (
+                      <TouchableOpacity
+                        key={preset.id}
+                        style={styles.autocompleteItem}
+                        onPress={() => selectPreset(preset)}
+                      >
+                        <Text style={styles.autocompleteItemText}>{preset.name}</Text>
+                        {preset.category && (
+                          <Text style={styles.autocompleteItemCategory}>{preset.category}</Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
               )}
             </View>
@@ -1131,90 +1106,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e9ecef',
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#f1f3f4',
-    borderRadius: 8,
-    padding: 2,
-    marginBottom: 16,
+  autocompleteContainer: {
+    position: 'relative',
+    zIndex: 1000,
   },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  tabButtonActive: {
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  tabButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#666',
-  },
-  tabButtonTextActive: {
-    color: '#333',
-    fontWeight: '600',
-  },
-  tabContent: {
-    minHeight: 120,
-  },
-  presetContainer: {
-    marginTop: 8,
-  },
-  presetScrollView: {
-    maxHeight: 200,
-  },
-  presetGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    gap: 8,
-  },
-  presetButton: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  presetButtonActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  presetButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  presetButtonTextActive: {
-    color: 'white',
-  },
-  loadingText: {
-    textAlign: 'center',
-    color: '#666',
-    fontSize: 14,
-    padding: 20,
-  },
-  customContainer: {
-    marginTop: 8,
-  },
-  customLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
-    marginBottom: 12,
-  },
-  customInput: {
+  autocompleteInput: {
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
     paddingHorizontal: 12,
@@ -1223,5 +1119,48 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: '#e9ecef',
+  },
+  autocompleteInputActive: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottomColor: 'transparent',
+  },
+  autocompleteDropdown: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: '#e9ecef',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    maxHeight: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1001,
+  },
+  autocompleteScrollView: {
+    flex: 1,
+  },
+  autocompleteItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f3f4',
+  },
+  autocompleteItemText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  autocompleteItemCategory: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
 });
