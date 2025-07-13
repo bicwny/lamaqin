@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { View, ScrollView, StyleSheet, StatusBar, Platform } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import PageHeader from './PageHeader';
 
@@ -35,6 +36,8 @@ export default function PageTemplate({
   contentContainerStyle,
   showHeader = true,
 }: PageTemplateProps) {
+  const insets = useSafeAreaInsets();
+  
   const content = (
     <View style={[styles.content, { padding }, contentContainerStyle]}>
       {children}
@@ -42,7 +45,7 @@ export default function PageTemplate({
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top', 'left', 'right']}>
       <StatusBar 
         barStyle="dark-content" 
         backgroundColor={backgroundColor}
@@ -75,7 +78,6 @@ export default function PageTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight || 0,
   },
   scrollView: {
     flex: 1,

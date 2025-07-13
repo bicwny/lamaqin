@@ -54,7 +54,6 @@ export default function PageHeader({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    paddingTop: Platform.OS === 'ios' ? 8 : 0,
   },
   header: {
     flexDirection: 'row',
