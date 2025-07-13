@@ -416,11 +416,12 @@ export default function StudyScreen() {
 
   if (loading) {
     return (
-      <PageTemplate>
-        <PageHeader 
-          title="闻思学习" 
-          subtitle="系统学习佛法课程"
-        />
+      <PageTemplate
+        title="闻思学习"
+        subtitle="系统学习佛法课程"
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
@@ -433,11 +434,13 @@ export default function StudyScreen() {
   if (viewMode === 'home') {
     if (userCourses.length === 0) {
       return (
-        <PageTemplate>
-          <PageHeader 
-            title="闻思学习" 
-            subtitle="系统学习佛法课程"
-          />
+        <PageTemplate
+          title="闻思学习"
+          subtitle="系统学习佛法课程"
+          scrollable={false}
+          backgroundColor={Colors.background}
+          padding={0}
+        >
           <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
             <View style={styles.emptyState}>
               <View style={styles.iconContainer}>
@@ -463,15 +466,17 @@ export default function StudyScreen() {
     }
 
     return (
-      <PageTemplate>
-        <PageHeader 
-          title="闻思学习" 
-          subtitle="系统学习佛法课程"
-          rightAction={{
-            text: "管理课程",
-            onPress: () => setViewMode('manage')
-          }}
-        />
+      <PageTemplate
+        title="闻思学习"
+        subtitle="系统学习佛法课程"
+        rightAction={{
+          text: "管理课程",
+          onPress: () => setViewMode('manage')
+        }}
+        scrollable={false}
+        backgroundColor={Colors.background}
+        padding={0}
+      >
         <ScrollView style={styles.scrollView}>
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -549,13 +554,15 @@ export default function StudyScreen() {
   // Course Management View
   if (viewMode === 'manage') {
     return (
-      <PageTemplate>
-        <PageHeader 
-          title="课程管理" 
-          subtitle="管理您的学习课程"
-          showBackButton={true}
-          onBackPress={() => setViewMode('home')}
-        />
+      <PageTemplate
+        title="课程管理"
+        subtitle="管理您的学习课程"
+        showBackButton={true}
+        onBackPress={() => setViewMode('home')}
+        scrollable={false}
+        backgroundColor={Colors.background}
+        padding={0}
+      >
         <ScrollView style={styles.scrollView}>
           {userCourses.length > 0 && (
             <View style={styles.section}>
@@ -657,13 +664,15 @@ export default function StudyScreen() {
     const lessons = courseLessons[selectedCourse.course_id] || [];
 
     return (
-      <PageTemplate>
-        <PageHeader 
-          title={selectedCourse.course.name}
-          subtitle="课程详情与学习记录"
-          showBackButton={true}
-          onBackPress={() => setViewMode('home')}
-        />
+      <PageTemplate
+        title={selectedCourse.course.name}
+        subtitle="课程详情与学习记录"
+        showBackButton={true}
+        onBackPress={() => setViewMode('home')}
+        scrollable={false}
+        backgroundColor={Colors.background}
+        padding={0}
+      >
         <ScrollView style={styles.scrollView}>
           <View style={styles.section}>
             <View style={styles.courseInfoCard}>
