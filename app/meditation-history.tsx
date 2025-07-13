@@ -346,7 +346,7 @@ export default function MeditationHistoryScreen() {
                       isDeleting && styles.recordCardDeleting
                     ]}
                     onPress={() => router.push({
-                      pathname: '/meditation-detail/[recordId]',
+                      pathname: '/meditation-record-detail/[recordId]',
                       params: { recordId: record.id }
                     })}
                     activeOpacity={0.7}

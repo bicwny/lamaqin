@@ -188,12 +188,11 @@ export default function PracticeScreen() {
     }
 
     if (project.practices.type === 'time') {
-      // For meditation practices, navigate to meditation history
+      // For meditation practices, navigate to meditation detail overview
       router.push({
-        pathname: '/meditation-history',
+        pathname: '/meditation-detail/[practiceId]',
         params: {
-          practiceId: project.practice_id,
-          practiceName: practiceName,
+          practiceId: projectId,
         },
       });
     } else {
