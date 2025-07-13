@@ -816,19 +816,22 @@ export default function HomeScreen() {
                       ]}
                       onPress={(e) => handleQuickComplete(e, practice)}
                     >
-                      <Text style={[
-                        styles.actionButtonText,
-                        practice.status === 'completed' && styles.checkButtonCompletedText
-                      ]}>
-                        {practice.status === 'completed' ? '✓' : '✓'}
-                      </Text>
+                      <Ionicons 
+                        name="checkmark-circle-outline" 
+                        size={20} 
+                        color={practice.status === 'completed' ? 'white' : '#10B981'} 
+                      />
                     </TouchableOpacity>
 
                     <TouchableOpacity 
                       style={[styles.actionButton, styles.addButton]}
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
-                      <Text style={styles.actionButtonText}>+</Text>
+                      <Ionicons 
+                        name="add-circle-outline" 
+                        size={20} 
+                        color={Colors.primary} 
+                      />
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -864,7 +867,11 @@ export default function HomeScreen() {
                       style={[styles.actionButton, styles.addButton]}
                       onPress={(e) => handleAddRecord(e, practice)}
                     >
-                      <Text style={styles.actionButtonText}>+</Text>
+                      <Ionicons 
+                        name="add-circle-outline" 
+                        size={20} 
+                        color={Colors.primary} 
+                      />
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -1130,14 +1137,6 @@ const styles = StyleSheet.create({
   addButton: {
     backgroundColor: '#f8f9fa',
     borderColor: Colors.primary,
-  },
-  actionButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#10B981',
-  },
-  checkButtonCompletedText: {
-    color: 'white',
   },
   weeklyProgress: {
     fontSize: 14,
