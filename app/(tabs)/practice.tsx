@@ -280,8 +280,7 @@ export default function PracticeScreen() {
       >
 
 
-        <View style={styles.practicesContainer}>
-          <Text style={styles.sectionTitle}>我的修行项目：</Text></View>
+        <Text style={styles.sectionTitle}>我的修行项目：</Text>
 
         {projects.map((project) => {
           const progress = calculateProgress(project);
@@ -296,51 +295,43 @@ export default function PracticeScreen() {
           return (
             <View key={project.id} style={styles.practiceCard}>
               <View style={styles.practiceHeader}>
-                <View style={styles.practiceTypeContainer}>
-                  <Text style={styles.practiceTypeText}>
-                    {project.practices.type === 'count' ? '计数类' : '计时类'}
-                    {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
-                  </Text>
-                </View>
-                <TouchableOpacity style={styles.removeButton}>
-                  <Text style={styles.removeButtonText}>remove</Text>
-                </TouchableOpacity>
+                <Text style={styles.practiceType}>
+                  {project.practices.type === 'count' ? '计数类' : '计时类'}
+                  {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
+                </Text>
               </View>
 
               <Text style={styles.practiceName}>
                 {project.practices.name}
+                {project.practices.type === 'time' && ` (${practiceDisplayType})`}
+                {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
               </Text>
 
               {/* Project Name Display */}
               {(project.project_name || project.preset_project_id) && (
-                <View style={styles.projectPillContainer}>
-                  <Text style={styles.projectLabel}>项目: </Text>
-                  <View style={styles.projectPill}>
-                    <Text style={styles.projectPillText}>
-                      {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
-                    </Text>
-                  </View>
-                </View>
+                <Text style={styles.projectName}>
+                  项目: {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
+                </Text>
               )}
 
-              <View style={styles.progressSection}>
+              <View style={styles.progressContainer}>
                 {project.practices.type === 'count' ? (
                   <View>
-                    <Text style={styles.progressText}>
+                    <Text style={styles.practiceInfo}>
                       {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
                     </Text>
-                    <Text style={styles.dailyTargetText}>
-                      每日：{project.daily_target.toLocaleString()} {project.practices.unit}
+                    <Text style={styles.practiceDetails}>
+                      每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
                     </Text>
                   </View>
                 ) : (
                   <View>
                     {project.target_period === 'weekly' ? (
-                      <Text style={styles.progressText}>
+                      <Text style={styles.practiceInfo}>
                         本周目标：{project.daily_target}座 (每周{project.daily_target}座)
                       </Text>
                     ) : (
-                      <Text style={styles.progressText}>
+                      <Text style={styles.practiceInfo}>
                         总进度：{progress.current}/{progress.target}天
                       </Text>
                     )}
@@ -353,18 +344,18 @@ export default function PracticeScreen() {
                 )}
               </View>
 
-              <View style={styles.actionButtons}>
+              <View style={styles.buttonRow}>
                 <TouchableOpacity
-                  style={styles.detailButton}
+                  style={styles.secondaryButton}
                   onPress={() => handleViewDetails(project.id, project.practices.name)}
                 >
-                  <Text style={styles.detailButtonText}>查看详情</Text>
+                  <Text style={styles.secondaryButtonText}>查看详情</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.recordButton}
+                  style={styles.primaryButton}
                   onPress={() => handleCustomRecord(project.id, project.practices.name)}
                 >
-                  <Text style={styles.recordButtonText}>
+                  <Text style={styles.buttonText}>
                     {project.practices.type === 'time' ? '记录观修' : '记录'}
                   </Text>
                 </TouchableOpacity>
