@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 
@@ -54,12 +54,14 @@ export default function PageHeader({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
+    paddingTop: Platform.OS === 'ios' ? 8 : 0,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
+    minHeight: 56,
   },
   backButton: {
     width: 24,
