@@ -52,9 +52,6 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
       <Text style={styles.lessonProgress}>
         听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
       </Text>
-      {isCompleted && (
-        <Text style={styles.completionCheck}>✅</Text>
-      )}
     </View>
   );
 };
@@ -383,10 +380,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     flex: 1,
   },
-  completionCheck: {
-    fontSize: 16,
-    marginLeft: 8,
-  },
+  
   lessonTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
