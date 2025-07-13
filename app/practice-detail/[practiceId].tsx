@@ -48,7 +48,6 @@ interface MeditationRecord {
   record_date: string;
   duration_minutes: number;
   session_number?: number;
-  notes?: string;
   created_at: string;
 }
 
@@ -143,7 +142,7 @@ export default function PracticeDetailScreen() {
       // Get today's records
       const { data: todayData, error: todayError } = await supabase
         .from('meditation_records')
-        .select('id, user_id, practice_id, record_date, duration_minutes, session_number, notes, created_at')
+        .select('*')
         .eq('user_id', user.id)
         .eq('practice_id', projectData.practice_id)
         .eq('record_date', today)
@@ -160,7 +159,7 @@ export default function PracticeDetailScreen() {
 
         const { data: weeklyData, error: weeklyError } = await supabase
           .from('meditation_records')
-          .select('id, user_id, practice_id, record_date, duration_minutes, session_number, notes, created_at')
+          .select('*')
           .eq('user_id', user.id)
           .eq('practice_id', projectData.practice_id)
           .gte('record_date', startOfWeek.toISOString().split('T')[0])
@@ -520,61 +519,6 @@ export default function PracticeDetailScreen() {
                 )}
               </View>
             ))}
-          </View>
-        )}
-
-        {/* Meditation History for Time-based Practices */}
-        {project.practices.type === 'time' && (todayRecords.length > 0 || weeklyRecords.length > 0) && (
-          <View style={styles.historyCard}>
-            <View style={styles.historyHeader}>
-              <Text style={styles.historyTitle}>观修记录</Text>
-              <TouchableOpacity
-                style={styles.viewAllButton}
-                onPress={handleViewHistory}
-              >
-                <Text style={styles.viewAllText}>查看全部</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
-              </TouchableOpacity>
-            </View>
-            
-            {/* Display recent meditation records */}
-            {(() => {
-              const allRecords = project.target_period === 'weekly' ? weeklyRecords : todayRecords;
-              const recentRecords = allRecords.slice(-5).reverse(); // Show last 5 records, most recent first
-              
-              return recentRecords.map((record) => (
-                <View key={record.id} style={styles.recordItem}>
-                  <View style={styles.recordHeader}>
-                    <Text style={styles.recordDate}>
-                      {new Date(record.record_date).toLocaleDateString('zh-CN', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        weekday: 'long'
-                      })}
-                    </Text>
-                    <Text style={styles.recordTime}>
-                      {new Date(record.created_at).toLocaleTimeString('zh-CN', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </Text>
-                  </View>
-                  
-                  <Text style={styles.recordCount}>
-                    时长: {record.duration_minutes} 分钟
-                    {record.session_number && ` (第${record.session_number}座)`}
-                  </Text>
-                  
-                  {record.notes && (
-                    <View style={styles.recordNotes}>
-                      <Text style={styles.notesLabel}>备注:</Text>
-                      <Text style={styles.notesText}>{record.notes}</Text>
-                    </View>
-                  )}
-                </View>
-              ));
-            })()}
           </View>
         )}
 
