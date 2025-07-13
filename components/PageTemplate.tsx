@@ -45,7 +45,7 @@ export default function PageTemplate({
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['left', 'right', 'bottom']}>
       <StatusBar 
         barStyle="dark-content" 
         backgroundColor={backgroundColor}
