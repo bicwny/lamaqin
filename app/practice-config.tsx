@@ -987,7 +987,7 @@ const styles = StyleSheet.create({
   },
   customButtonTextActive: {
     color: 'white',
-  },```text
+  },
   customInputContainer: {
     marginTop: 12,
     padding: 16,
