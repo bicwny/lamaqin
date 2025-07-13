@@ -683,54 +683,49 @@ export default function StudyScreen() {
               </View>
             </View>
           </View>
-
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>课程内容</Text>
             </View>
-
             {lessons.map(lesson => (
               <View key={lesson.id} style={styles.lessonItem}>
                 <View style={styles.lessonHeader}>
                   <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                  <LessonProgressDisplay 
+                  <LessonProgressDisplay
                     userId={user.id}
                     courseId={selectedCourse.course_id}
                     lessonId={lesson.id}
                     refreshTrigger={refreshTrigger}
                   />
                 </View>
-
                 <View style={styles.recordButtons}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[styles.recordButton, styles.listenButton]}
                     onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number, '听传承')}
                   >
                     <Text style={styles.recordButtonText}>听传承</Text>
                   </TouchableOpacity>
-
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[styles.recordButton, styles.readButton]}
                     onPress={() => recordStudy(selectedCourse.course_id, lesson.lesson_number, '看法本')}
                   >
                     <Text style={styles.recordButtonText}>看法本</Text>
                   </TouchableOpacity>
-
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[styles.recordButton, styles.viewButton]}
                     onPress={() => {
                       if (lesson.url) {
                         Linking.openURL(lesson.url).catch(err => {
                           console.error('Failed to open URL:', err);
-                          toastService.error({ 
-                            title: '无法打开链接', 
-                            message: '请检查网络连接或稍后重试' 
+                          toastService.error({
+                            title: '无法打开链接',
+                            message: '请检查网络连接或稍后重试'
                           });
                         });
                       } else {
-                        toastService.info({ 
-                          title: '暂无在线链接', 
-                          message: '该课程资源正在准备中' 
+                        toastService.info({
+                          title: '暂无在线链接',
+                          message: '该课程资源正在准备中'
                         });
                       }
                     }}
@@ -975,3 +970,112 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.2,
   },
+  lessonItem: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  lessonHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  lessonTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  lessonProgressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  lessonProgress: {
+    fontSize: 12,
+    color: '#777',
+    marginRight: 5,
+  },
+  completionCheck: {
+    fontSize: 14,
+    color: Colors.success,
+  },
+  recordButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  recordButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+  },
+  recordButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  listenButton: {
+    backgroundColor: Colors.accent,
+  },
+  readButton: {
+    backgroundColor: Colors.secondary,
+  },
+  viewButton: {
+    backgroundColor: Colors.tertiary,
+  },
+  courseSummary: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  courseSummaryText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  courseInfoCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  courseInfoTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+  courseInfoRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  courseInfoLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+    width: 80,
+  },
+  courseInfoValue: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+});
