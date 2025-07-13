@@ -389,7 +389,7 @@ export default function PracticeDetailScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Practice Info Card */}
+        {/* Combined Practice Info and Details Card */}
         <View style={styles.infoCard}>
           <View style={styles.practiceTypeContainer}>
             <Text style={styles.practiceType}>
@@ -434,10 +434,35 @@ export default function PracticeDetailScreen() {
               {progress.percentage.toFixed(1)}%
             </Text>
           </View>
-        </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actionContainer}>
+          {/* Project Details Section */}
+          <View style={styles.detailsSection}>
+            <Text style={styles.detailsSectionTitle}>项目详情</Text>
+            
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>开始日期：</Text>
+              <Text style={styles.detailValue}>{project.start_date}</Text>
+            </View>
+
+            {project.target_end_date && (
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>目标结束日期：</Text>
+                <Text style={styles.detailValue}>{project.target_end_date}</Text>
+              </View>
+            )}
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>项目状态：</Text>
+              <Text style={[
+                styles.detailValue,
+                progress.isCompleted ? styles.statusCompleted : styles.statusActive
+              ]}>
+                {progress.isCompleted ? '已完成' : '进行中'}
+              </Text>
+            </View>
+          </View>
+
+          {/* Primary Action Button */}
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleRecord}
@@ -446,14 +471,6 @@ export default function PracticeDetailScreen() {
             <Text style={styles.buttonText}>
               {project.practices.type === 'time' ? '记录观修' : '记录修行'}
             </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleViewHistory}
-          >
-            <Ionicons name="list-outline" size={24} color={Colors.primary} />
-            <Text style={styles.secondaryButtonText}>查看历史记录</Text>
           </TouchableOpacity>
         </View>
 
@@ -505,32 +522,7 @@ export default function PracticeDetailScreen() {
           </View>
         )}
 
-        {/* Project Details */}
-        <View style={styles.detailsCard}>
-          <Text style={styles.detailsTitle}>项目详情</Text>
-          
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>开始日期：</Text>
-            <Text style={styles.detailValue}>{project.start_date}</Text>
-          </View>
-
-          {project.target_end_date && (
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>目标结束日期：</Text>
-              <Text style={styles.detailValue}>{project.target_end_date}</Text>
-            </View>
-          )}
-
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>项目状态：</Text>
-            <Text style={[
-              styles.detailValue,
-              progress.isCompleted ? styles.statusCompleted : styles.statusActive
-            ]}>
-              {progress.isCompleted ? '已完成' : '进行中'}
-            </Text>
-          </View>
-        </View>
+        
       </ScrollView>
     </SafeAreaView>
   );
@@ -661,10 +653,6 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: 'right',
   },
-  actionContainer: {
-    marginHorizontal: 16,
-    gap: 12,
-  },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -673,6 +661,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 8,
+    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -685,41 +674,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.2,
   },
-  secondaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F2F2F7',
-    padding: 16,
-    borderRadius: 12,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 2,
+  detailsSection: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
   },
-  secondaryButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  detailsCard: {
-    backgroundColor: 'white',
-    margin: 16,
-    marginTop: 0,
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-  },
-  detailsTitle: {
+  detailsSectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1a1a1a',
