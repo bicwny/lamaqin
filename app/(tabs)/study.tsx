@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList, Linking, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -45,7 +46,7 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
       <Text style={styles.lessonProgress}>
         听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
       </Text>
-      {isCompleted && <Text style={styles.completionCheck}>已完成</Text>}
+      {isCompleted && <Text style={styles.completionCheck}>✅</Text>}
     </View>
   );
 };
@@ -82,6 +83,7 @@ interface CourseLesson {
   lesson_number: number;
   title: string;
   course_id: string;
+  url?: string;
 }
 
 type ViewMode = 'home' | 'manage' | 'courseDetail';
@@ -386,8 +388,6 @@ export default function StudyScreen() {
     }
   };
 
-
-
   const getCourseProgress = (courseId: string) => {
     return progress.find(p => p.courseId === courseId);
   };
@@ -416,12 +416,13 @@ export default function StudyScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <PageHeader 
           title="闻思学习" 
           subtitle="系统学习佛法课程"
         />
         <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </SafeAreaView>
@@ -432,16 +433,15 @@ export default function StudyScreen() {
   if (viewMode === 'home') {
     if (userCourses.length === 0) {
       return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
           <PageHeader 
             title="闻思学习" 
             subtitle="系统学习佛法课程"
           />
           <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-
             <View style={styles.emptyState}>
               <View style={styles.iconContainer}>
-                <Ionicons name="book-outline" size={80} color="#9CA3AF" />
+                <Ionicons name="ear-outline" size={80} color="#9CA3AF" />
               </View>
 
               <Text style={styles.emptyTitle}>还没有课程，开始学习吧</Text>
@@ -463,7 +463,7 @@ export default function StudyScreen() {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <PageHeader 
           title="闻思学习" 
           subtitle="系统学习佛法课程"
@@ -473,48 +473,75 @@ export default function StudyScreen() {
           }}
         />
         <ScrollView style={styles.scrollView}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>我的课程</Text>
+            </View>
 
-          <Text style={styles.sectionTitle}>我的课程：</Text>
+            {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
+              const courseProgress = getCourseProgress(userCourse.course_id);
+              const currentLesson = courseProgress?.currentLesson || 1;
+              const progressPercentage = userCourse.progress_percentage || 0;
 
-          {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
-            const courseProgress = getCourseProgress(userCourse.course_id);
-            const currentLesson = courseProgress?.currentLesson || 1;
-            const progressPercentage = userCourse.progress_percentage || 0;
-
-            return (
-              <TouchableOpacity 
-                key={userCourse.id} 
-                style={styles.courseCard}
-                onPress={() => {
-                  setSelectedCourse(userCourse);
-                  setViewMode('courseDetail');
-                }}
-              >
-                <Text style={styles.courseName}>{userCourse.course.name}</Text>
-                <Text style={styles.courseInfo}>
-                  {userCourse.course.total_lessons}课 | 完成 {progressPercentage.toFixed(1)}%
-                </Text>
-                <Text style={styles.lastStudied}>
-                  上次完成：第{currentLesson}课
-                </Text>
-
+              return (
                 <TouchableOpacity 
-                  style={styles.continueButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    router.push(`/course-detail/${userCourse.course_id}`);
+                  key={userCourse.id} 
+                  style={styles.courseCard}
+                  onPress={() => {
+                    setSelectedCourse(userCourse);
+                    setViewMode('courseDetail');
                   }}
                 >
-                  <Text style={styles.continueButtonText}>继续学习</Text>
+                  <View style={styles.courseHeader}>
+                    <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                    <Text style={styles.courseInfo}>
+                      {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+                    </Text>
+                  </View>
+
+                  <View style={styles.progressContainer}>
+                    <View style={styles.progressTextRow}>
+                      <Text style={styles.progressText}>
+                        完成进度：{progressPercentage.toFixed(1)}%
+                      </Text>
+                      <Text style={styles.currentLessonText}>
+                        上次完成：第{currentLesson}课
+                      </Text>
+                    </View>
+                    
+                    <View style={styles.progressBarContainer}>
+                      <View style={styles.progressBarBg}>
+                        <View 
+                          style={[
+                            styles.progressBarFill, 
+                            { width: `${Math.min(progressPercentage, 100)}%` }
+                          ]} 
+                        />
+                      </View>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity 
+                    style={styles.continueButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      router.push(`/course-detail/${userCourse.course_id}`);
+                    }}
+                  >
+                    <Text style={styles.continueButtonText}>继续学习</Text>
+                  </TouchableOpacity>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            );
-          })}
+              );
+            })}
+          </View>
 
           {/* Course Summary Footer */}
           <View style={styles.courseSummary}>
             <Text style={styles.courseSummaryText}>
-              {userCourses.length}门课程已加入，{userCourses.filter(uc => uc.status === 'paused').length}门课程已隐藏
+              {userCourses.length}门课程已加入
+              {userCourses.filter(uc => uc.status === 'paused').length > 0 && 
+                `，${userCourses.filter(uc => uc.status === 'paused').length}门课程已暂停`
+              }
             </Text>
           </View>
         </ScrollView>
@@ -525,7 +552,7 @@ export default function StudyScreen() {
   // Course Management View
   if (viewMode === 'manage') {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <PageHeader 
           title="课程管理" 
           subtitle="管理您的学习课程"
@@ -533,10 +560,12 @@ export default function StudyScreen() {
           onBackPress={() => setViewMode('home')}
         />
         <ScrollView style={styles.scrollView}>
-
           {userCourses.length > 0 && (
-            <>
-              <Text style={styles.sectionTitle}>我的课程：</Text>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>我的课程</Text>
+              </View>
+              
               {userCourses.map(userCourse => {
                 const courseProgress = getCourseProgress(userCourse.course_id);
                 const progressPercentage = userCourse.progress_percentage || 0;
@@ -545,10 +574,13 @@ export default function StudyScreen() {
                   <View key={userCourse.id} style={styles.manageCourseCard}>
                     <View style={styles.courseHeader}>
                       <Text style={styles.courseName}>
-                        {userCourse.course.name} {getStatusIcon(userCourse.status)}{getStatusText(userCourse.status)}
+                        {userCourse.course.name}
                       </Text>
                       <Text style={styles.courseDetails}>
-                        {userCourse.course.teacher} | {userCourse.course.total_lessons}课 | {progressPercentage.toFixed(1)}%完成
+                        {userCourse.course.teacher} • {userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
+                      </Text>
+                      <Text style={styles.statusText}>
+                        状态：{getStatusText(userCourse.status)}
                       </Text>
                     </View>
 
@@ -583,19 +615,25 @@ export default function StudyScreen() {
                   </View>
                 );
               })}
-            </>
+            </View>
           )}
 
           {availableCourses.length > 0 && (
-            <>
-              <Text style={styles.sectionTitle}>可加入课程：</Text>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>可加入课程</Text>
+              </View>
+              
               {availableCourses.map(course => (
                 <View key={course.id} style={styles.availableCourseCard}>
                   <View style={styles.courseHeader}>
                     <Text style={styles.courseName}>{course.name}</Text>
                     <Text style={styles.courseDetails}>
-                      {course.teacher} | {course.total_lessons}课
+                      {course.teacher} • {course.total_lessons}课
                     </Text>
+                    {course.description && (
+                      <Text style={styles.courseDescription}>{course.description}</Text>
+                    )}
                   </View>
 
                   <TouchableOpacity
@@ -612,10 +650,9 @@ export default function StudyScreen() {
                   </TouchableOpacity>
                 </View>
               ))}
-            </>
+            </View>
           )}
-
-          </ScrollView>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -626,7 +663,7 @@ export default function StudyScreen() {
     const lessons = courseLessons[selectedCourse.course_id] || [];
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <PageHeader 
           title={selectedCourse.course.name}
           subtitle="课程详情与学习记录"
@@ -634,32 +671,36 @@ export default function StudyScreen() {
           onBackPress={() => setViewMode('home')}
         />
         <ScrollView style={styles.scrollView}>
-
-          <View style={styles.courseInfoCard}>
-            <Text style={styles.courseInfoTitle}>课程信息：</Text>
-            <Text style={styles.courseInfoText}>授课老师：{selectedCourse.course.teacher}</Text>
-            <Text style={styles.courseInfoText}>总课数：{selectedCourse.course.total_lessons}课</Text>
-            <Text style={styles.courseInfoText}>
-              完成进度：{(selectedCourse.progress_percentage || 0).toFixed(1)}% 
-              ({Math.round((selectedCourse.progress_percentage || 0) * selectedCourse.course.total_lessons / 100)}/{selectedCourse.course.total_lessons}课)
-            </Text>
+          <View style={styles.section}>
+            <View style={styles.courseInfoCard}>
+              <Text style={styles.courseInfoTitle}>课程信息</Text>
+              <View style={styles.courseInfoRow}>
+                <Text style={styles.courseInfoLabel}>授课老师：</Text>
+                <Text style={styles.courseInfoValue}>{selectedCourse.course.teacher}</Text>
+              </View>
+              <View style={styles.courseInfoRow}>
+                <Text style={styles.courseInfoLabel}>总课数：</Text>
+                <Text style={styles.courseInfoValue}>{selectedCourse.course.total_lessons}课</Text>
+              </View>
+              <View style={styles.courseInfoRow}>
+                <Text style={styles.courseInfoLabel}>完成进度：</Text>
+                <Text style={styles.courseInfoValue}>
+                  {(selectedCourse.progress_percentage || 0).toFixed(1)}% 
+                  ({Math.round((selectedCourse.progress_percentage || 0) * selectedCourse.course.total_lessons / 100)}/{selectedCourse.course.total_lessons}课)
+                </Text>
+              </View>
+            </View>
           </View>
 
-          <Text style={styles.sectionTitle}>课程内容：</Text>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>课程内容</Text>
+            </View>
 
-          {lessons.map(lesson => {
-            const listenCount = courseProgress?.listenCount[lesson.lesson_number] || 0;
-            const kanfabenCount = courseProgress?.listenCount[lesson.lesson_number] || 0;
-            const isCompleted = listenCount > 0 && kanfabenCount > 0;
-
-            return (
+            {lessons.map(lesson => (
               <View key={lesson.id} style={styles.lessonItem}>
                 <View style={styles.lessonHeader}>
-                  <View style={styles.lessonTitleRow}>
-                    <Text style={styles.lessonTitle}>
-                      {lesson.title}
-                    </Text>
-                  </View>
+                  <Text style={styles.lessonTitle}>{lesson.title}</Text>
                   <LessonProgressDisplay 
                     userId={user.id}
                     courseId={selectedCourse.course_id}
@@ -687,7 +728,6 @@ export default function StudyScreen() {
                     style={[styles.recordButton, styles.viewButton]}
                     onPress={() => {
                       if (lesson.url) {
-                        // Open URL directly in user's default browser
                         Linking.openURL(lesson.url).catch(err => {
                           console.error('Failed to open URL:', err);
                           toastService.error({ 
@@ -707,10 +747,9 @@ export default function StudyScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-            );
-          })}
-
-          </ScrollView>
+            ))}
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -719,9 +758,13 @@ export default function StudyScreen() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -733,90 +776,152 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
   loadingText: {
-    fontSize: 16,
-    color: '#666',
     marginTop: 16,
+    fontSize: 16,
+    color: Colors.textSecondary,
+  },
+  section: {
+    marginBottom: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    paddingTop: 8,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 8,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
   },
   courseCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   manageCourseCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   availableCourseCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   courseHeader: {
     marginBottom: 12,
   },
   courseName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#1a1a1a',
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   courseInfo: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
+    fontWeight: '500',
   },
   courseDetails: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 4,
   },
-  lastStudied: {
-    fontSize: 14,
-    color: '#da4347',
-    marginBottom: 12,
+  courseDescription: {
+    fontSize: 13,
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  statusText: {
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  progressContainer: {
+    marginBottom: 16,
+  },
+  progressTextRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '500',
+  },
+  currentLessonText: {
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  progressBarContainer: {
+    marginBottom: 4,
+  },
+  progressBarBg: {
+    height: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 3,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 3,
   },
   continueButton: {
-    backgroundColor: '#da4347',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   continueButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -824,39 +929,50 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: '#da4347',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   secondaryButton: {
     flex: 1,
     backgroundColor: '#F2F2F7',
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     alignItems: 'center',
-  },
-  dangerButton: {
-    flex: 1,
-    backgroundColor: '#FF3B30',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
   },
   buttonText: {
     color: '#fff',
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   secondaryButtonText: {
-    color: '#da4347',
-    fontWeight: '600',
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   joinButton: {
-    backgroundColor: '#da4347',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
     alignSelf: 'flex-end',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   joinButtonLoading: {
     backgroundColor: '#9CA3AF',
@@ -864,49 +980,73 @@ const styles = StyleSheet.create({
   joinButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   courseInfoCard: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginHorizontal: 16,
-    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   courseInfoTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 12,
+    letterSpacing: -0.3,
   },
-  courseInfoText: {
+  courseInfoRow: {
+    flexDirection: 'row',
+    marginBottom: 6,
+  },
+  courseInfoLabel: {
     fontSize: 14,
-    marginBottom: 4,
+    color: '#666',
+    fontWeight: '500',
+    minWidth: 80,
+  },
+  courseInfoValue: {
+    fontSize: 14,
+    color: '#1a1a1a',
+    fontWeight: '600',
+    flex: 1,
   },
   lessonItem: {
-    backgroundColor: '#fff',
-    padding: 12,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 16,
     marginHorizontal: 16,
-    marginVertical: 2,
-    borderRadius: 8,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   lessonHeader: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   lessonTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    marginBottom: 4,
+    color: '#1a1a1a',
+    marginBottom: 6,
+    letterSpacing: -0.2,
   },
   lessonProgressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 2,
   },
   lessonProgress: {
     fontSize: 12,
@@ -914,17 +1054,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   completionCheck: {
-    fontSize: 16,
+    fontSize: 14,
     marginLeft: 8,
-  },
-  lessonTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  completedLesson: {
-    color: '#4CAF50',
-    fontWeight: '600',
   },
   recordButtons: {
     flexDirection: 'row',
@@ -932,24 +1063,30 @@ const styles = StyleSheet.create({
   },
   recordButton: {
     flex: 1,
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
+    borderRadius: 8,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   listenButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#10B981',
   },
   readButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: Colors.primary,
   },
   viewButton: {
-    backgroundColor: '#da4347',
+    backgroundColor: '#F59E0B',
   },
   recordButtonText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   emptyState: {
     flex: 1,
@@ -963,10 +1100,11 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 24,
-    fontWeight: '600',
-    color: '#374151',
+    fontWeight: '700',
+    color: '#1a1a1a',
     marginBottom: 12,
     textAlign: 'center',
+    letterSpacing: -0.3,
   },
   emptyDescription: {
     fontSize: 16,
@@ -979,25 +1117,31 @@ const styles = StyleSheet.create({
   browseButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#da4347',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   browseButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     marginLeft: 8,
+    letterSpacing: -0.2,
   },
   courseSummary: {
     padding: 16,
     alignItems: 'center',
-    backgroundColor: '#e9ecef',
-    marginTop: 16,
+    marginTop: 8,
   },
   courseSummaryText: {
     fontSize: 14,
     color: '#6c757d',
+    textAlign: 'center',
   },
 });
