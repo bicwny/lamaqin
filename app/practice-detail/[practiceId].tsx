@@ -61,6 +61,7 @@ export default function PracticeDetailScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
+  const [practiceRecords, setPracticeRecords] = useState<any[]>([]);
 
   useEffect(() => {
     if (user && practiceId) {
@@ -119,6 +120,8 @@ export default function PracticeDetailScreen() {
       // Load meditation records if it's a time-based practice
       if (practiceData.practices.type === 'time') {
         await loadMeditationRecords(practiceData);
+      } else if (practiceData.practices.type === 'count') {
+        await loadPracticeRecords(practiceData.id);
       }
 
     } catch (error) {
@@ -170,6 +173,25 @@ export default function PracticeDetailScreen() {
       setTodayRecords(todayData || []);
     } catch (error) {
       console.error('Error loading meditation records:', error);
+    }
+  };
+
+  const loadPracticeRecords = async (projectId: string) => {
+    if (!user?.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('daily_records')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('practice_project_id', projectId)
+        .order('record_date', { ascending: false })
+        .limit(10); // Show last 10 records
+
+      if (error) throw error;
+      setPracticeRecords(data || []);
+    } catch (error) {
+      console.error('Error loading practice records:', error);
     }
   };
 
@@ -435,6 +457,54 @@ export default function PracticeDetailScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Practice History for Count-based Practices */}
+        {project.practices.type === 'count' && practiceRecords.length > 0 && (
+          <View style={styles.historyCard}>
+            <View style={styles.historyHeader}>
+              <Text style={styles.historyTitle}>修行记录</Text>
+              <TouchableOpacity
+                style={styles.viewAllButton}
+                onPress={handleViewHistory}
+              >
+                <Text style={styles.viewAllText}>查看全部</Text>
+                <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
+            
+            {practiceRecords.slice(0, 5).map((record) => (
+              <View key={record.id} style={styles.recordItem}>
+                <View style={styles.recordHeader}>
+                  <Text style={styles.recordDate}>
+                    {new Date(record.record_date).toLocaleDateString('zh-CN', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      weekday: 'long'
+                    })}
+                  </Text>
+                  <Text style={styles.recordTime}>
+                    {new Date(record.created_at).toLocaleTimeString('zh-CN', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </Text>
+                </View>
+                
+                <Text style={styles.recordCount}>
+                  数量: {record.count.toLocaleString()} {project.practices.unit}
+                </Text>
+                
+                {record.notes && (
+                  <View style={styles.recordNotes}>
+                    <Text style={styles.notesLabel}>备注:</Text>
+                    <Text style={styles.notesText}>{record.notes}</Text>
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* Project Details */}
         <View style={styles.detailsCard}>
           <Text style={styles.detailsTitle}>项目详情</Text>
@@ -677,5 +747,88 @@ const styles = StyleSheet.create({
   },
   statusActive: {
     color: Colors.primary,
+  },
+  historyCard: {
+    backgroundColor: 'white',
+    margin: 16,
+    marginTop: 0,
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  historyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  viewAllText: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  recordItem: {
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  recordDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  recordTime: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  recordCount: {
+    fontSize: 16,
+    color: '#1a1a1a',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  recordNotes: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  notesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  notesText: {
+    fontSize: 14,
+    color: '#1a1a1a',
+    lineHeight: 20,
   },
 });
