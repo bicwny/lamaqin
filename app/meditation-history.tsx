@@ -16,7 +16,7 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
-import { PageHeader } from '@/components/PageHeader';
+import PageHeader from '@/components/PageHeader';
 
 export default function MeditationHistoryScreen() {
   const { user } = useAuth();
