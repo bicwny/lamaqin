@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -54,7 +53,7 @@ export default function PracticeConfigScreen() {
     practiceType === 'time' ? 'topic_progress' : 'total'
   );
 
-  
+
 
   // Count-based configuration
   const [totalTarget, setTotalTarget] = useState('');
@@ -217,8 +216,8 @@ export default function PracticeConfigScreen() {
         target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
         status: 'active',
         current_count: 0,
-        preset_project_id: usePresetName ? selectedPresetId : null, // Store UUID
-        project_name: !usePresetName ? projectName : null, // Only store custom names
+        preset_project_id: selectedPresetId || null,
+        project_name: selectedPresetId ? null : (projectName || null),
       };
 
       // Try to include goal_type, but handle cases where column doesn't exist yet
@@ -426,7 +425,7 @@ export default function PracticeConfigScreen() {
           </Text>
         </TouchableOpacity>
 
-        
+
 
         {durationMode === '自定义' && (
           <View style={styles.customInputContainer}>
@@ -629,8 +628,8 @@ export default function PracticeConfigScreen() {
           current_count: 0,
           status: 'active',
           goal_type: configMode,
-          preset_project_id: usePresetName ? selectedPresetId : null,
-          project_name: !usePresetName ? projectName : null,
+          preset_project_id: selectedPresetId || null,
+          project_name: selectedPresetId ? null : (projectName || null),
         };
       } else {
         // Count-based practice configuration
@@ -659,8 +658,8 @@ export default function PracticeConfigScreen() {
           status: 'active',
           target_period: 'daily',
           goal_type: configMode,
-          preset_project_id: usePresetName ? selectedPresetId : null,
-          project_name: !usePresetName ? projectName : null,
+          preset_project_id: selectedPresetId || null,
+          project_name: selectedPresetId ? null : (projectName || null),
         };
       }
 
@@ -702,7 +701,7 @@ export default function PracticeConfigScreen() {
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>为这个修行项目起个名字</Text>
-            
+
             {/* Tab Interface */}
             <View style={styles.tabContainer}>
               <TouchableOpacity
@@ -791,7 +790,7 @@ export default function PracticeConfigScreen() {
                 </View>
               )}
             </View>
-            
+
             <Text style={styles.helpText}>
               项目名称可以帮助您区分同一种修行的不同发愿或阶段
             </Text>
@@ -988,7 +987,7 @@ const styles = StyleSheet.create({
   },
   customButtonTextActive: {
     color: 'white',
-  },
+  },```text
   customInputContainer: {
     marginTop: 12,
     padding: 16,
@@ -1018,7 +1017,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  
+
   summaryContainer: {
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
