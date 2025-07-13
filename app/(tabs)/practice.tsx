@@ -294,12 +294,6 @@ export default function PracticeScreen() {
 
           return (
             <View key={project.id} style={styles.practiceCard}>
-              <View style={styles.practiceHeader}>
-                <Text style={styles.practiceType}>
-                  {project.practices.type === 'count' ? '计数类' : '计时类'}
-                  {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
-                </Text>
-              </View>
 
               <Text style={styles.practiceName}>
                 {project.practices.name}
