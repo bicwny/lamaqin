@@ -981,8 +981,7 @@ const styles = StyleSheet.create({
   },
   quickActionButton: {
     flex: 1,
-    paddingVertical: ```text
-12,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
     alignItems: 'center',
