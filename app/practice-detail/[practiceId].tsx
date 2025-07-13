@@ -469,7 +469,7 @@ export default function PracticeDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -482,7 +482,8 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: Colors.textSecondary,
+    fontWeight: '500',
   },
   emptyContainer: {
     flex: 1,
@@ -492,7 +493,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   infoCard: {
     backgroundColor: 'white',
@@ -501,9 +502,11 @@ const styles = StyleSheet.create({
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   practiceTypeContainer: {
     flexDirection: 'row',
@@ -513,7 +516,7 @@ const styles = StyleSheet.create({
   },
   practiceType: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   completedBadge: {
@@ -530,12 +533,13 @@ const styles = StyleSheet.create({
   practiceTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#333',
+    color: '#1a1a1a',
     marginBottom: 8,
+    letterSpacing: -0.3,
   },
   practiceDescription: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.textSecondary,
     lineHeight: 24,
     marginBottom: 16,
   },
@@ -547,18 +551,21 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#1a1a1a',
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   dailyTargetText: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
+    fontWeight: '500',
   },
   sessionDetails: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
     fontStyle: 'italic',
+    fontWeight: '500',
   },
   progressBarContainer: {
     flexDirection: 'row',
@@ -596,11 +603,17 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   secondaryButton: {
     flexDirection: 'row',
@@ -610,11 +623,17 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
   },
   secondaryButtonText: {
     color: Colors.primary,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   detailsCard: {
     backgroundColor: 'white',
@@ -624,15 +643,18 @@ const styles = StyleSheet.create({
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   detailsTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#1a1a1a',
     marginBottom: 16,
+    letterSpacing: -0.3,
   },
   detailRow: {
     flexDirection: 'row',
@@ -642,12 +664,13 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.textSecondary,
+    fontWeight: '500',
   },
   detailValue: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: '600',
+    color: '#1a1a1a',
   },
   statusCompleted: {
     color: '#2e7d32',
