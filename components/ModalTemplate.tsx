@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -49,7 +48,7 @@ export default function ModalTemplate({
         backgroundColor={backgroundColor}
         translucent={false}
       />
-      
+
       {/* Modal Header */}
       <View style={[styles.header, headerStyle]}>
         <View style={styles.headerLeft}>
@@ -62,11 +61,11 @@ export default function ModalTemplate({
             </TouchableOpacity>
           )}
         </View>
-        
+
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>{title}</Text>
         </View>
-        
+
         <View style={styles.headerRight}>
           {rightAction && (
             rightAction.component ? rightAction.component : (
@@ -103,54 +102,44 @@ export default function ModalTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: DesignSystem.colors.background,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
-    backgroundColor: 'white',
-  },
-  headerLeft: {
-    width: 60,
-    alignItems: 'flex-start',
-  },
-  headerCenter: {
-    flex: 1,
     alignItems: 'center',
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderBottomWidth: 1,
+    borderBottomColor: DesignSystem.colors.border,
   },
-  headerRight: {
-    width: 60,
-    alignItems: 'flex-end',
+  headerButton: {
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
-  closeButton: {
-    padding: 4,
+  headerButtonText: {
+    ...createStyles.body(),
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    textAlign: 'center',
+  cancelButtonText: {
+    color: DesignSystem.colors.textSecondary,
   },
-  actionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  saveButtonText: {
+    color: DesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
-  actionButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.primary,
+  saveButtonTextDisabled: {
+    color: DesignSystem.colors.textTertiary,
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
+  title: {
+    ...createStyles.heading('lg'),
   },
   content: {
     flex: 1,
+    padding: DesignSystem.spacing.lg,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
   },
 });

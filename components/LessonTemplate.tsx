@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 interface LessonTemplateProps {
   title?: string;
@@ -45,7 +45,7 @@ export default function LessonTemplate({
         backgroundColor={backgroundColor}
         translucent={false}
       />
-      
+
       <ThemedView style={[styles.content, contentContainerStyle]}>
         {children}
       </ThemedView>
@@ -56,9 +56,13 @@ export default function LessonTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: DesignSystem.colors.background,
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: DesignSystem.spacing.lg,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
   },
 });

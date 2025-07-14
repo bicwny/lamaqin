@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, StatusBar, Platform } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import PageHeader from './PageHeader';
+import { DesignSystem } from '@/designSystem';
 
 interface PageTemplateProps {
   title: string;
@@ -78,13 +79,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollView: {
+  content: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-  },
-  content: {
-    flex: 1,
+    padding: DesignSystem.spacing.lg,
   },
 });
