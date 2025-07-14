@@ -994,7 +994,7 @@ export default function PracticeConfigScreen() {
       onBackPress={() => router.back()}
       scrollable={true}
       backgroundColor={Colors.background}
-      padding={0}
+      padding={DesignSystem.spacing.lg}
     >
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
@@ -1041,19 +1041,21 @@ export default function PracticeConfigScreen() {
         {renderTimePlanning()}
         {renderSmartSummary()}
 
-        <TouchableOpacity
-          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-          onPress={handleConfirm}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>
-              {isEditMode ? "更新项目" : "确认添加项目"}
-            </Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.footerContainer}>
+          <TouchableOpacity
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleConfirm}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>
+                {isEditMode ? "更新项目" : "确认添加项目"}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
       {/* Project Selection Modal */}
       <Modal
@@ -1130,12 +1132,16 @@ export default function PracticeConfigScreen() {
 const styles = StyleSheet.create({
   section: {
     ...createStyles.card(),
-    margin: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   sectionTitle: {
     ...createStyles.heading('lg'),
     marginBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   segmentedControl: {
     flexDirection: "row",
@@ -1163,24 +1169,25 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
   },
   inputContainer: {
-    marginTop: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.md,
   },
   inputLabel: {
     ...createStyles.body('base'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.textPrimary,
-    marginBottom: DesignSystem.spacing.xs,
+    marginBottom: DesignSystem.spacing.sm,
   },
   inputHelper: {
     ...createStyles.body('xs'),
     color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.md,
     fontStyle: 'italic',
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     ...DesignSystem.components.input,
+    minHeight: 48,
   },
   inputPrefix: {
     ...createStyles.body(),
@@ -1190,6 +1197,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: DesignSystem.spacing.md,
     ...createStyles.body(),
+    minHeight: 48,
   },
   inputUnit: {
     ...createStyles.body(),
@@ -1323,11 +1331,14 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
+  footerContainer: {
+    paddingTop: DesignSystem.spacing['2xl'],
+    paddingBottom: DesignSystem.spacing['3xl'],
+    backgroundColor: DesignSystem.colors.background,
+  },
   saveButton: {
     ...createStyles.primaryButton(),
-    marginTop: DesignSystem.spacing['3xl'],
-    marginBottom: DesignSystem.spacing['4xl'],
-    marginHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.lg,
   },
   saveButtonDisabled: {
     backgroundColor: DesignSystem.colors.textTertiary,
@@ -1413,12 +1424,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     ...DesignSystem.components.input,
+    minHeight: 48,
   },
   simpleDateButtonText: {
     ...createStyles.body(),
   },
   dateButtonIcon: {
     ...createStyles.body(),
+    color: DesignSystem.colors.textSecondary,
   },
   quickDurationButtons: {
     flexDirection: "row",
@@ -1469,6 +1482,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...DesignSystem.components.input,
     flex: 1,
+    minHeight: 48,
   },
   daysInput: {
     flex: 1,
@@ -1484,6 +1498,7 @@ const styles = StyleSheet.create({
     ...createStyles.body('sm'),
     color: DesignSystem.colors.textTertiary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    paddingHorizontal: DesignSystem.spacing.xs,
   },
   endDatePickerButton: {
     flexDirection: "row",
@@ -1491,6 +1506,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.components.input,
     flex: 2,
     justifyContent: "space-between",
+    minHeight: 48,
   },
   endDatePickerButtonText: {
     ...createStyles.body(),
