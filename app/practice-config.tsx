@@ -1549,7 +1549,7 @@ const styles = StyleSheet.create({
   },
   autocompleteContainer: {
     position: "relative",
-    zIndex: 1000,
+    zIndex: 9999,
   },
   autocompleteInput: {
     backgroundColor: "#f8f9fa",
@@ -1582,8 +1582,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 5,
-    zIndex: 1001,
+    elevation: 10,
+    zIndex: 10000,
   },
   autocompleteScrollView: {
     flex: 1,
