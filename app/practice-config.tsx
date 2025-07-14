@@ -68,7 +68,7 @@ export default function PracticeConfigScreen() {
 
   const isEditMode = editMode === 'true';
   const [startDate, setStartDate] = useState(
-    isEditMode && currentStartDate ? currentStartDate : new Date().toISOString().split("T")[0]
+    isEditMode && currentStartDate ? new Date(currentStartDate) : new Date()
   );
   const [duration, setDuration] = useState(
     isEditMode && currentEndDate ? 
@@ -119,7 +119,7 @@ export default function PracticeConfigScreen() {
   // Time planning
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [customEndDate, setCustomEndDate] = useState(
-    new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+    new Date(new Date().getTime() + 60 * 24 * 60 * 60 * 1000),
   ); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
   const [customDays, setCustomDays] = useState("60"); // Default to 60 days
