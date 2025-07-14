@@ -499,6 +499,11 @@ export default function PracticeConfigScreen() {
                   formattedText = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
                 }
                 
+                // Update the input field value immediately
+                if (Platform.OS === 'web') {
+                  (event.target as any).value = formattedText;
+                }
+                
                 // Parse and validate date
                 const parts = formattedText.split('/');
                 if (parts.length === 3) {
@@ -602,6 +607,11 @@ export default function PracticeConfigScreen() {
                 if (formattedText.length >= 7 && formattedText.split('/').length === 2) {
                   const parts = formattedText.split('/');
                   formattedText = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
+                }
+                
+                // Update the input field value immediately
+                if (Platform.OS === 'web') {
+                  (event.target as any).value = formattedText;
                 }
                 
                 // Parse and validate date
@@ -1544,7 +1554,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     backgroundColor: 'transparent',
-    border: 'none',
-    outline: 'none',
+    ...(Platform.OS === 'web' && {
+      border: 'none',
+      outlineStyle: 'none',
+    }),
   },
 });
