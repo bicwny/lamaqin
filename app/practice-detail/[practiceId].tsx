@@ -643,7 +643,6 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     backgroundColor: 'white',
-    margin: 16,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -823,8 +822,6 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     backgroundColor: 'white',
-    margin: 16,
-    marginTop: 0,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',

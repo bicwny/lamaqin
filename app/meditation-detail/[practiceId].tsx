@@ -558,7 +558,6 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     backgroundColor: 'white',
-    margin: 16,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -622,8 +621,6 @@ const styles = StyleSheet.create({
   },
   progressCard: {
     backgroundColor: 'white',
-    margin: 16,
-    marginTop: 0,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -675,8 +672,6 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     backgroundColor: 'white',
-    margin: 16,
-    marginTop: 0,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -737,8 +732,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   actionButtons: {
-    margin: 16,
-    marginTop: 0,
+    padding: 20,
   },
   primaryButton: {
     flexDirection: 'row',
