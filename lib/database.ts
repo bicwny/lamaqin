@@ -395,13 +395,10 @@ export const meditationService = {
 
   async recordMeditation(record: Omit<MeditationRecord, 'id' | 'created_at'>): Promise<MeditationRecord> {
     const now = new Date();
-    const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
-
     const recordData: any = {
       user_id: record.user_id,
       practice_id: record.practice_id,
       record_date: record.record_date,
-      record_time: utcTime, // Store UTC time
       duration_minutes: record.duration_minutes,
       created_at: now.toISOString()
     };
@@ -455,15 +452,11 @@ export const meditationService = {
   }): Promise<MeditationRecord> {
     console.log('💾 Saving meditation record to Supabase:', record);
 
-    // Store UTC time
     const now = new Date();
-    const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
-
     const recordData: any = {
       user_id: record.user_id,
       practice_id: record.practice_id,
       record_date: record.record_date,
-      record_time: utcTime, // Store UTC time
       duration_minutes: record.duration_minutes,
       created_at: now.toISOString()
     };
