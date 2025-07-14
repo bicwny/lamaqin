@@ -352,7 +352,7 @@ export default function PracticeConfigScreen() {
       {/* Single input field for goal */}
       <View style={styles.goalInputContainer}>
         {configMode === 'total' ? (
-          <>
+          <View>
             <Text style={styles.goalInputLabel}>总目标数量</Text>
             <View style={styles.goalInputRow}>
               <TextInput
@@ -364,9 +364,9 @@ export default function PracticeConfigScreen() {
               />
               <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
             </View>
-          </>
+          </View>
         ) : (
-          <>
+          <View>
             <Text style={styles.goalInputLabel}>每日目标</Text>
             <View style={styles.goalInputRow}>
               <TextInput
@@ -378,7 +378,7 @@ export default function PracticeConfigScreen() {
               />
               <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
             </View>
-          </>
+          </View>
         )}
       </View>
     </View>
@@ -633,23 +633,23 @@ export default function PracticeConfigScreen() {
                 </Text>
 
                 {configMode === 'total' && totalTarget ? (
-                  <>
+                  <View>
                     <Text style={styles.previewDetailItem}>
-                      🎯 总目标: {parseInt(totalTarget).toLocaleString()} {practiceUnit}
+                      <Text>🎯 总目标: {parseInt(totalTarget).toLocaleString()} {practiceUnit}</Text>
                     </Text>
                     <Text style={styles.previewDetailItem}>
-                      📊 每日目标: {suggestedDaily.toLocaleString()} {practiceUnit}
+                      <Text>📊 每日目标: {suggestedDaily.toLocaleString()} {practiceUnit}</Text>
                     </Text>
-                  </>
+                  </View>
                 ) : configMode === 'daily' && dailyTarget ? (
-                  <>
+                  <View>
                     <Text style={styles.previewDetailItem}>
-                      🎯 每日目标: {parseInt(dailyTarget).toLocaleString()} {practiceUnit}
+                      <Text>🎯 每日目标: {parseInt(dailyTarget).toLocaleString()} {practiceUnit}</Text>
                     </Text>
                     <Text style={styles.previewDetailItem}>
-                      📊 预计总数: {projectedTotal.toLocaleString()} {practiceUnit}
+                      <Text>📊 预计总数: {projectedTotal.toLocaleString()} {practiceUnit}</Text>
                     </Text>
-                  </>
+                  </View>
                 ) : (
                   <Text style={styles.previewPlaceholder}>请设置目标以查看详情</Text>
                 )}
@@ -673,7 +673,7 @@ export default function PracticeConfigScreen() {
 
                 {sessionsTarget ? (
                   <Text style={styles.previewDetailItem}>
-                    🎯 每周目标: {sessionsTarget} 座
+                    <Text>🎯 每周目标: {sessionsTarget} 座</Text>
                   </Text>
                 ) : (
                   <Text style={styles.previewPlaceholder}>请设置目标以查看详情</Text>
