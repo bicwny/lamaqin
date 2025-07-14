@@ -384,7 +384,7 @@ export default function PracticeConfigScreen() {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>时间规划</Text>
 
-      {/* Start date - simplified */}
+      {/* Start date - always defaults to today, but editable */}
       <View style={styles.timeInputContainer}>
         <Text style={styles.timeInputLabel}>开始日期</Text>
         <TouchableOpacity
@@ -410,64 +410,64 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      {/* End date - simplified */}
+      {/* End date - simple duration or date picker */}
       <View style={styles.timeInputContainer}>
-        <Text style={styles.timeInputLabel}>结束日期</Text>
-        <View style={styles.endDateContainer}>
-          <View style={styles.quickDurationButtons}>
-            {['60天', '100天', '1年'].map((option) => (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.quickDurationButton,
-                  durationMode === option && styles.quickDurationButtonActive,
-                ]}
-                onPress={() => setDurationMode(option as any)}
-              >
-                <Text
-                  style={[
-                    styles.quickDurationButtonText,
-                    durationMode === option && styles.quickDurationButtonTextActive,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          
-          <TouchableOpacity
-            style={styles.customDatePickerButton}
-            onPress={() => setDurationMode('自定义')}
-          >
-            <Text style={styles.customDatePickerButtonText}>
-              {durationMode === '自定义' ? formatDate(customEndDate) : '自定义日期'}
-            </Text>
-            <Text style={styles.dateButtonIcon}>📅</Text>
-          </TouchableOpacity>
-
-          {durationMode === '自定义' && (
+        <Text style={styles.timeInputLabel}>持续时间</Text>
+        
+        {/* Quick duration buttons */}
+        <View style={styles.quickDurationButtons}>
+          {['60天', '100天', '1年'].map((option) => (
             <TouchableOpacity
-              style={styles.hiddenDatePicker}
-              onPress={() => setShowCustomDatePicker(true)}
-            />
-          )}
-
-          {showCustomDatePicker && (
-            <DateTimePicker
-              value={customEndDate}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
-              onChange={(event, selectedDate) => {
-                setShowCustomDatePicker(Platform.OS === 'ios');
-                if (selectedDate) {
-                  setCustomEndDate(selectedDate);
-                }
-              }}
-            />
-          )}
+              key={option}
+              style={[
+                styles.quickDurationButton,
+                durationMode === option && styles.quickDurationButtonActive,
+              ]}
+              onPress={() => setDurationMode(option as any)}
+            >
+              <Text
+                style={[
+                  styles.quickDurationButtonText,
+                  durationMode === option && styles.quickDurationButtonTextActive,
+                ]}
+              >
+                {option}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
+        
+        {/* Custom date option */}
+        <TouchableOpacity
+          style={[
+            styles.customDatePickerButton,
+            durationMode === '自定义' && styles.customDatePickerButtonActive,
+          ]}
+          onPress={() => {
+            setDurationMode('自定义');
+            setShowCustomDatePicker(true);
+          }}
+        >
+          <Text style={styles.customDatePickerButtonText}>
+            {durationMode === '自定义' ? `至 ${formatDate(customEndDate)}` : '选择结束日期'}
+          </Text>
+          <Text style={styles.dateButtonIcon}>📅</Text>
+        </TouchableOpacity>
+
+        {showCustomDatePicker && (
+          <DateTimePicker
+            value={customEndDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
+            onChange={(event, selectedDate) => {
+              setShowCustomDatePicker(Platform.OS === 'ios');
+              if (selectedDate) {
+                setCustomEndDate(selectedDate);
+              }
+            }}
+          />
+        )}
       </View>
     </View>
   );
@@ -1159,12 +1159,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  endDateContainer: {
-    gap: 12,
-  },
   quickDurationButtons: {
     flexDirection: 'row',
     gap: 8,
+    marginBottom: 8,
   },
   quickDurationButton: {
     paddingHorizontal: 16,
@@ -1193,17 +1191,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: '#e9ecef',
+    marginTop: 8,
+  },
+  customDatePickerButtonActive: {
+    backgroundColor: '#e8f4fd',
+    borderColor: Colors.primary,
   },
   customDatePickerButtonText: {
     fontSize: 16,
     color: '#333',
-  },
-  hiddenDatePicker: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
   // Preview card styles
   previewCard: {
