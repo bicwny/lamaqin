@@ -13,10 +13,11 @@ import {
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { Colors } from "@/constants/Colors";
+import PageTemplate from "@/components/PageTemplate";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getCurrentWeekStart } from "@/lib/topic-progress";
 import { practiceService, presetProjectNameService } from "@/lib/database";
@@ -986,22 +987,14 @@ export default function PracticeConfigScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>← 返回</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
-        </Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <PageTemplate
+      title={isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      scrollable={true}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
         {/* The problematic empty line that was here has been removed. */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
@@ -1061,7 +1054,6 @@ export default function PracticeConfigScreen() {
             </Text>
           )}
         </TouchableOpacity>
-      </ScrollView>
 
       {/* Project Selection Modal */}
       <Modal
@@ -1131,45 +1123,16 @@ export default function PracticeConfigScreen() {
           />
         </SafeAreaView>
       </Modal>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-  },
-  header: {
-    backgroundColor: "white",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#333",
-    textAlign: "center",
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
   section: {
     backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
+    margin: 16,
     marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

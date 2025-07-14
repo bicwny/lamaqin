@@ -8,15 +8,13 @@ import {
   Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
-  ScrollView
+  Platform
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
-import PageHeader from '@/components/PageHeader';
-import { ThemedView } from '@/components/ThemedView';
+import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import { toastService } from '@/lib/toast';
 
@@ -127,35 +125,36 @@ export default function EditProfileScreen() {
 
   if (initialLoading) {
     return (
-      <ThemedView style={styles.container}>
-        <PageHeader 
-          title="编辑个人资料"
-          subtitle="正在加载..."
-          showBackButton={true}
-          onBackPress={goBack}
-        />
+      <PageTemplate
+        title="编辑个人资料"
+        subtitle="正在加载..."
+        showBackButton={true}
+        onBackPress={goBack}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </ThemedView>
+      </PageTemplate>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <PageHeader 
-        title="编辑个人资料"
-        subtitle="更新您的个人信息"
-        showBackButton={true}
-        onBackPress={goBack}
-      />
-
+    <PageTemplate
+      title="编辑个人资料"
+      subtitle="更新您的个人信息"
+      showBackButton={true}
+      onBackPress={goBack}
+      scrollable={true}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.formContainer}>
 
             <View style={styles.inputGroup}>
@@ -237,21 +236,13 @@ export default function EditProfileScreen() {
             </TouchableOpacity>
 
           </View>
-        </ScrollView>
       </KeyboardAvoidingView>
-    </ThemedView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
   keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
     flex: 1,
   },
   loadingContainer: {

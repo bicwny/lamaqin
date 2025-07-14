@@ -1,14 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import Avatar from '@/components/Avatar';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -139,55 +137,52 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ThemedView style={styles.container}>
-          <PageHeader 
-            title="个人中心"
-            subtitle="正在加载..."
-            showBackButton={true}
-            onBackPress={() => router.back()}
-          />
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>加载中...</Text>
-          </View>
-        </ThemedView>
-      </SafeAreaView>
+      <PageTemplate
+        title="个人中心"
+        subtitle="正在加载..."
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>加载中...</Text>
+        </View>
+      </PageTemplate>
     );
   }
 
   if (error && !profile) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ThemedView style={styles.container}>
-          <PageHeader 
-            title="个人中心"
-            subtitle="加载失败"
-            showBackButton={true}
-            onBackPress={() => router.back()}
-          />
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
-              <Text style={styles.retryButtonText}>重试</Text>
-            </TouchableOpacity>
-          </View>
-        </ThemedView>
-      </SafeAreaView>
+      <PageTemplate
+        title="个人中心"
+        subtitle="加载失败"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
+            <Text style={styles.retryButtonText}>重试</Text>
+          </TouchableOpacity>
+        </View>
+      </PageTemplate>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ThemedView style={styles.container}>
-        <PageHeader 
-          title="个人中心"
-          subtitle="管理您的账户信息"
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
-        
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+    <PageTemplate
+      title="个人中心"
+      subtitle="管理您的账户信息"
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      scrollable={true}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
           {/* Network Error Banner */}
           {error && (
             <View style={styles.errorBanner}>
@@ -276,20 +271,11 @@ export default function ProfileScreen() {
               <Text style={[styles.actionButtonText, styles.signOutText]}>退出登录</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </ThemedView>
-    </SafeAreaView>
+        </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

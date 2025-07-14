@@ -8,7 +8,6 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  SafeAreaView,
   ToastAndroid,
   Platform,
 } from 'react-native';
@@ -17,7 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 
 interface DailyRecord {
   id: string;
@@ -242,33 +241,41 @@ export default function PracticeHistoryScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <PageTemplate
+        title={`📿 ${practiceName} - 详情`}
+        subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
+          `项目：${getDisplayProjectName(projectInfo)}` : undefined}
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>正在加载...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   const progress = calculateProgress();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <PageHeader 
-        title={`📿 ${practiceName} - 详情`}
-        subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
-          `项目：${getDisplayProjectName(projectInfo)}` : undefined}
-        showBackButton={true}
-        onBackPress={() => router.back()}
-      />
-
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
+    <PageTemplate
+      title={`📿 ${practiceName} - 详情`}
+      subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
+        `项目：${getDisplayProjectName(projectInfo)}` : undefined}
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      scrollable={true}
+      backgroundColor={Colors.background}
+      padding={0}
+      contentContainerStyle={{
+        refreshControl: (
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-      >
+        )
+      }}
+    >
         {/* Progress Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>总体进度</Text>
@@ -376,16 +383,11 @@ export default function PracticeHistoryScreen() {
             </View>
           )}
         </View>
-      </ScrollView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -395,9 +397,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: '#666',
-  },
-  scrollView: {
-    flex: 1,
   },
   summaryCard: {
     backgroundColor: 'white',
