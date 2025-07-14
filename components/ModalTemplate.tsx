@@ -99,7 +99,7 @@ export default function ModalTemplate({
   );
 }
 
-import { DesignSystem } from '@/constants/DesignSystem';
+import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 
 const styles = StyleSheet.create({
   container: {
@@ -116,32 +116,42 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border,
   },
-  headerButton: {
+  headerLeft: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  headerCenter: {
+    flex: 2,
+    alignItems: 'center',
+  },
+  headerRight: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  headerTitle: {
+    ...createStyles.heading('lg'),
+  },
+  closeButton: {
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
+  },
+  actionButton: {
     paddingVertical: DesignSystem.spacing.sm,
     paddingHorizontal: DesignSystem.spacing.md,
   },
-  headerButtonText: {
+  actionButtonText: {
     ...createStyles.body(),
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  cancelButtonText: {
-    color: DesignSystem.colors.textSecondary,
-  },
-  saveButtonText: {
-    color: DesignSystem.colors.primary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
-  saveButtonTextDisabled: {
-    color: DesignSystem.colors.textTertiary,
-  },
-  title: {
-    ...createStyles.heading('lg'),
+    color: DesignSystem.colors.primary,
   },
   content: {
     flex: 1,
-    padding: DesignSystem.spacing.lg,
   },
-  scrollViewContent: {
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     flexGrow: 1,
+    padding: DesignSystem.spacing.lg,
   },
 });
