@@ -1,58 +1,33 @@
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
+import PageTemplate from '@/components/PageTemplate';
+import { Colors } from '@/constants/Colors';
 
 export default function EmailVerificationScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
-  const [isResending, setIsResending] = useState(false);
-  const [countdown, setCountdown] = useState(60);
-  const [checkingStatus, setCheckingStatus] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const { signIn } = useAuth();
 
-  // Auto-check verification status every 3 seconds
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user?.email_confirmed_at) {
-          console.log('✅ Email verified, redirecting to app');
-          router.replace('/(tabs)');
-        }
-      } catch (error) {
-        console.error('Error checking verification status:', error);
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Countdown timer for resend button
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (countdown > 0) {
-        setCountdown(countdown - 1);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
   }, [countdown]);
 
-  useEffect(() => {
-    // Auto-check verification status every 5 seconds
-    const verificationCheck = setInterval(() => {
-      checkVerificationStatus();
-    }, 5000);
-
-    return () => clearInterval(verificationCheck);
-  }, []);
-
-  const handleResendVerification = async () => {
+  const handleResendEmail = async () => {
     if (!email) {
-      Alert.alert('错误', '邮箱地址丢失');
+      Alert.alert('错误', '邮箱地址缺失');
       return;
     }
 
-    setIsResending(true);
+    setLoading(true);
     try {
       const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -62,137 +37,180 @@ export default function EmailVerificationScreen() {
       if (error) {
         Alert.alert('发送失败', error.message);
       } else {
+        Alert.alert('发送成功', '验证邮件已重新发送，请检查您的邮箱');
         setCountdown(60);
-        Alert.alert('发送成功', '已重新发送验证邮件');
       }
     } catch (error) {
-      Alert.alert('发送失败', '网络错误，请稍后重试');
+      console.error('Resend error:', error);
+      Alert.alert('发送失败', '网络错误，请重试');
+    } finally {
+      setLoading(false);
     }
-    setIsResending(false);
   };
 
-  const checkVerificationStatus = async () => {
-    setCheckingStatus(true);
+  const handleCheckVerification = async () => {
+    setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        Alert.alert('检查失败', error.message);
+        return;
+      }
 
-      if (session?.user?.email_confirmed_at) {
+      if (data.session?.user) {
+        await signIn(data.session.user, data.session);
         router.replace('/(tabs)');
       } else {
-        Alert.alert('未验证', '邮箱尚未验证，请检查邮箱');
+        Alert.alert('提示', '请先点击邮件中的验证链接');
       }
     } catch (error) {
-      Alert.alert('检查失败', '无法检查验证状态');
+      console.error('Check verification error:', error);
+      Alert.alert('检查失败', '网络错误，请重试');
+    } finally {
+      setLoading(false);
     }
-    setCheckingStatus(false);
+  };
+
+  const handleBackToLogin = () => {
+    router.replace('/auth/login');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>📧 验证邮箱</Text>
-      <Text style={styles.subtitle}>
-        我们已向 {email} 发送验证邮件
-      </Text>
+    <PageTemplate 
+      title="邮箱验证"
+      variant="auth"
+      scrollable={false}
+      showBackButton={true}
+      onBackPress={handleBackToLogin}
+    >
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <View style={styles.iconContainer}>
+            <Text style={styles.icon}>📧</Text>
+          </View>
 
-      <View style={styles.steps}>
-        <Text style={styles.stepTitle}>📝 验证步骤：</Text>
-        <Text style={styles.step}>1. 检查邮箱(包括垃圾邮件文件夹)</Text>
-        <Text style={styles.step}>2. 点击邮件中的【验证邮箱】链接</Text>
-        <Text style={styles.step}>3. 验证成功后会自动跳转</Text>
+          <Text style={styles.title}>验证您的邮箱</Text>
+          
+          <Text style={styles.description}>
+            我们已向 {email} 发送了一封验证邮件。
+          </Text>
+          
+          <Text style={styles.description}>
+            请点击邮件中的链接来验证您的账户。
+          </Text>
+
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={handleCheckVerification}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? '检查中...' : '我已验证，继续'}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.resendContainer}>
+            <Text style={styles.resendText}>没有收到邮件？</Text>
+            <TouchableOpacity 
+              onPress={handleResendEmail}
+              disabled={loading || countdown > 0}
+              style={styles.resendButton}
+            >
+              <Text style={[
+                styles.resendButtonText,
+                (loading || countdown > 0) && styles.resendButtonTextDisabled
+              ]}>
+                {countdown > 0 ? `重新发送 (${countdown}s)` : '重新发送'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={handleBackToLogin}
+          >
+            <Text style={styles.backButtonText}>返回登录</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <TouchableOpacity 
-        style={[styles.button, (countdown > 0 || isResending) && styles.buttonDisabled]}
-        disabled={countdown > 0 || isResending}
-        onPress={handleResendVerification}
-      >
-        <Text style={styles.buttonText}>
-          {countdown > 0 ? `重新发送验证邮件 (${countdown}s)` : "重新发送验证邮件"}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity 
-        style={[styles.button, styles.outlineButton]}
-        onPress={checkVerificationStatus}
-        disabled={checkingStatus}
-      >
-        <Text style={[styles.buttonText, styles.outlineButtonText]}>
-          {checkingStatus ? '检查中...' : '手动检查验证状态'}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity 
-        style={[styles.button, styles.textButton]}
-        onPress={() => router.push('/auth/login')}
-      >
-        <Text style={[styles.buttonText, styles.textButtonText]}>返回登录</Text>
-      </TouchableOpacity>
-    </View>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  content: {
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  iconContainer: {
+    marginBottom: 24,
+  },
+  icon: {
+    fontSize: 64,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    color: Colors.text,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 16,
   },
-  subtitle: {
+  description: {
     fontSize: 16,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    color: '#666',
-    marginBottom: 30,
-  },
-  steps: {
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 30,
-  },
-  stepTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  step: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 5,
+    marginBottom: 8,
+    lineHeight: 24,
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    marginTop: 32,
+    marginBottom: 24,
+    minWidth: 200,
   },
   buttonText: {
-    color: '#fff',
-    textAlign: 'center',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
-  outlineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
+  resendContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
   },
-  outlineButtonText: {
-    color: '#007AFF',
+  resendText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 8,
   },
-  textButton: {
-    backgroundColor: 'transparent',
+  resendButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
   },
-  textButtonText: {
-    color: '#007AFF',
+  resendButtonText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  resendButtonTextDisabled: {
+    color: Colors.textSecondary,
+  },
+  backButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  backButtonText: {
+    color: Colors.textSecondary,
+    fontSize: 16,
   },
 });
