@@ -18,6 +18,7 @@ import { Colors } from '@/constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCurrentWeekStart } from '@/lib/topic-progress';
 import { practiceService, presetProjectNameService } from '@/lib/database';
+import ModalDatetimePicker from 'react-native-modal-datetime-picker';
 
 interface Practice {
   id: string;
@@ -85,6 +86,8 @@ export default function PracticeConfigScreen() {
   const [targetPeriod, setTargetPeriod] = useState<'daily' | 'weekly'>('weekly');
   const [goalType, setGoalType] = useState<'fixed_duration' | 'topic_progress'>('fixed_duration');
   const [weeklyTopicTarget, setWeeklyTopicTarget] = useState(2);
+  const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
+  const [isCustomDatePickerVisible, setCustomDatePickerVisibility] = useState(false);
 
 
   useEffect(() => {
@@ -130,7 +133,7 @@ export default function PracticeConfigScreen() {
   const handleProjectNameChange = (text: string) => {
     setProjectName(text);
     setSelectedPresetId(''); // Clear preset selection when typing custom name
-    
+
     // Filter presets based on input
     if (text.length > 0) {
       const filtered = presetProjectNames.filter(preset => 
@@ -307,7 +310,7 @@ export default function PracticeConfigScreen() {
   const renderCountBasedConfig = () => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>目标设置</Text>
-      
+
       {/* Simple toggle for goal type */}
       <View style={styles.goalTypeContainer}>
         <View style={styles.segmentedControl}>
@@ -400,6 +403,32 @@ export default function PracticeConfigScreen() {
     </>
   );
 
+  const showStartDatepicker = () => {
+    setStartDatePickerVisibility(true);
+  };
+
+  const hideStartDatePicker = () => {
+    setStartDatePickerVisibility(false);
+  };
+
+    const showCustomDatepicker = () => {
+    setCustomDatePickerVisibility(true);
+  };
+
+  const hideCustomDatePicker = () => {
+    setCustomDatePickerVisibility(false);
+  };
+
+  const handleStartDateConfirm = (date: Date) => {
+    setStartDate(date);
+    hideStartDatePicker();
+  };
+
+    const handleCustomDateConfirm = (date: Date) => {
+    setCustomEndDate(date);
+    hideCustomDatePicker();
+  };
+
   const renderTimePlanning = () => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>时间规划</Text>
@@ -409,11 +438,22 @@ export default function PracticeConfigScreen() {
         <Text style={styles.timeInputLabel}>开始日期</Text>
         <TouchableOpacity
           style={styles.simpleDateButton}
-          onPress={() => setShowStartDatePicker(true)}
+          onPress={showStartDatepicker}
         >
           <Text style={styles.simpleDateButtonText}>{formatDate(startDate)}</Text>
           <Text style={styles.dateButtonIcon}>📅</Text>
         </TouchableOpacity>
+
+        {/* DateTimePicker Modal */}
+        {practiceType === 'count' && (
+          <ModalDatetimePicker
+            isVisible={isStartDatePickerVisible}
+            mode="date"
+            onConfirm={handleStartDateConfirm}
+            onCancel={hideStartDatePicker}
+            value={startDate}
+          />
+        )}
 
         {showStartDatePicker && Platform.OS !== 'web' && (
           <DateTimePicker
@@ -448,7 +488,7 @@ export default function PracticeConfigScreen() {
       {/* End date - smart duration input */}
       <View style={styles.timeInputContainer}>
         <Text style={styles.timeInputLabel}>结束日期</Text>
-        
+
         {/* Smart duration input */}
         <View style={styles.smartDurationContainer}>
           <View style={styles.daysInputContainer}>
@@ -461,12 +501,12 @@ export default function PracticeConfigScreen() {
             />
             <Text style={styles.daysInputLabel}>天</Text>
           </View>
-          
+
           <Text style={styles.durationSeparator}>或</Text>
-          
+
           <TouchableOpacity
             style={styles.endDatePickerButton}
-            onPress={() => setShowCustomDatePicker(true)}
+            onPress={showCustomDatepicker}
           >
             <Text style={styles.endDatePickerButtonText}>
               {formatDate(customEndDate)}
@@ -474,13 +514,24 @@ export default function PracticeConfigScreen() {
             <Text style={styles.dateButtonIcon}>📅</Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Duration display */}
         <View style={styles.durationDisplay}>
           <Text style={styles.durationDisplayText}>
             {formatDate(startDate)} → {formatDate(customEndDate)} (共 {calculatedDays} 天)
           </Text>
         </View>
+
+          {/* DateTimePicker Modal */}
+        {practiceType === 'count' && (
+          <ModalDatetimePicker
+            isVisible={isCustomDatePickerVisible}
+            mode="date"
+            onConfirm={handleCustomDateConfirm}
+            onCancel={hideCustomDatePicker}
+            value={customEndDate}
+          />
+        )}
 
         {showCustomDatePicker && Platform.OS !== 'web' && (
           <DateTimePicker
@@ -565,12 +616,12 @@ export default function PracticeConfigScreen() {
                   </View>
                 )}
               </View>
-              
+
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
                   📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
                 </Text>
-                
+
                 {configMode === 'total' && totalTarget ? (
                   <>
                     <Text style={styles.previewDetailItem}>
@@ -604,12 +655,12 @@ export default function PracticeConfigScreen() {
                   </View>
                 )}
               </View>
-              
+
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
                   📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
                 </Text>
-                
+
                 {sessionsTarget ? (
                   <Text style={styles.previewDetailItem}>
                     🎯 每周目标: {sessionsTarget} 座
@@ -789,7 +840,7 @@ export default function PracticeConfigScreen() {
                 onChangeText={handleProjectNameChange}
                 multiline={false}
               />
-              
+
               {/* Autocomplete Dropdown */}
               {filteredPresets.length > 0 && projectName.length > 0 && (
                 <View style={styles.autocompleteDropdown}>
