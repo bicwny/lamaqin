@@ -285,9 +285,11 @@ export default function PracticeConfigScreen() {
   };
 
   const renderCountBasedConfig = () => (
-    <>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>1. 您想如何设定目标？</Text>
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>目标设置</Text>
+      
+      {/* Simple toggle for goal type */}
+      <View style={styles.goalTypeContainer}>
         <View style={styles.segmentedControl}>
           <TouchableOpacity
             style={[
@@ -302,7 +304,7 @@ export default function PracticeConfigScreen() {
                 configMode === 'total' && styles.segmentButtonTextActive,
               ]}
             >
-              按总数目标
+              总数目标
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -318,48 +320,45 @@ export default function PracticeConfigScreen() {
                 configMode === 'daily' && styles.segmentButtonTextActive,
               ]}
             >
-              按每日目标
+              每日目标
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>2. 目标详情</Text>
-        <View style={styles.inputContainer}>
-          {configMode === 'total' ? (
-            <>
-              <Text style={styles.inputLabel}>总目标数量</Text>
-              <View style={styles.inputRow}>
-                <TextInput
-                  style={styles.textInput}
-                  value={totalTarget}
-                  onChangeText={setTotalTarget}
-                  placeholder="例如: 400000"
-                  keyboardType="numeric"
-                />
-                <Text style={styles.inputUnit}>{practiceUnit}</Text>
-              </View>
-            </>
-          ) : (
-            <>
-              <Text style={styles.inputLabel}>每日目标</Text>
-              <View style={styles.inputRow}>
-                <Text style={styles.inputPrefix}>每日持诵</Text>
-                <TextInput
-                  style={styles.textInput}
-                  value={dailyTarget}
-                  onChangeText={setDailyTarget}
-                  placeholder="例如: 1000"
-                  keyboardType="numeric"
-                />
-                <Text style={styles.inputUnit}>{practiceUnit}</Text>
-              </View>
-            </>
-          )}
-        </View>
+      {/* Single input field for goal */}
+      <View style={styles.goalInputContainer}>
+        {configMode === 'total' ? (
+          <>
+            <Text style={styles.goalInputLabel}>总目标数量</Text>
+            <View style={styles.goalInputRow}>
+              <TextInput
+                style={styles.goalTextInput}
+                value={totalTarget}
+                onChangeText={setTotalTarget}
+                placeholder="例如: 400000"
+                keyboardType="numeric"
+              />
+              <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={styles.goalInputLabel}>每日目标</Text>
+            <View style={styles.goalInputRow}>
+              <TextInput
+                style={styles.goalTextInput}
+                value={dailyTarget}
+                onChangeText={setDailyTarget}
+                placeholder="例如: 1000"
+                keyboardType="numeric"
+              />
+              <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+            </View>
+          </>
+        )}
       </View>
-    </>
+    </View>
   );
 
   const renderTimeBasedConfig = () => (
@@ -383,15 +382,16 @@ export default function PracticeConfigScreen() {
 
   const renderTimePlanning = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>2. 时间规划</Text>
+      <Text style={styles.sectionTitle}>时间规划</Text>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>开始时间</Text>
+      {/* Start date - simplified */}
+      <View style={styles.timeInputContainer}>
+        <Text style={styles.timeInputLabel}>开始日期</Text>
         <TouchableOpacity
-          style={styles.dateButton}
+          style={styles.simpleDateButton}
           onPress={() => setShowStartDatePicker(true)}
         >
-          <Text style={styles.dateButtonText}>{formatDate(startDate)}</Text>
+          <Text style={styles.simpleDateButtonText}>{formatDate(startDate)}</Text>
           <Text style={styles.dateButtonIcon}>📅</Text>
         </TouchableOpacity>
 
@@ -410,76 +410,64 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>持续时间</Text>
-        <View style={styles.durationOptions}>
-          {['30天', '60天', '100天', '1年'].map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.durationButton,
-                durationMode === option && styles.durationButtonActive,
-              ]}
-              onPress={() => setDurationMode(option as any)}
-            >
-              <Text
+      {/* End date - simplified */}
+      <View style={styles.timeInputContainer}>
+        <Text style={styles.timeInputLabel}>结束日期</Text>
+        <View style={styles.endDateContainer}>
+          <View style={styles.quickDurationButtons}>
+            {['60天', '100天', '1年'].map((option) => (
+              <TouchableOpacity
+                key={option}
                 style={[
-                  styles.durationButtonText,
-                  durationMode === option && styles.durationButtonTextActive,
+                  styles.quickDurationButton,
+                  durationMode === option && styles.quickDurationButtonActive,
                 ]}
+                onPress={() => setDurationMode(option as any)}
               >
-                {option}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.customButton,
-            durationMode === '自定义' && styles.customButtonActive,
-          ]}
-          onPress={() => setDurationMode('自定义')}
-        >
-          <Text
-            style={[
-              styles.customButtonText,
-              durationMode === '自定义' && styles.customButtonTextActive,
-            ]}
-          >
-            自定义
-          </Text>
-        </TouchableOpacity>
-
-
-
-        {durationMode === '自定义' && (
-          <View style={styles.customInputContainer}>
-            <Text style={styles.customInputLabel}>选择结束日期</Text>
-            <TouchableOpacity
-              style={styles.customDateButton}
-              onPress={() => setShowCustomDatePicker(true)}
-            >
-              <Text style={styles.customDateButtonText}>{formatDate(customEndDate)}</Text>
-              <Text style={styles.dateButtonIcon}>📅</Text>
-            </TouchableOpacity>
-
-            {showCustomDatePicker && (
-              <DateTimePicker
-                value={customEndDate}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)} // At least one day after start
-                onChange={(event, selectedDate) => {
-                  setShowCustomDatePicker(Platform.OS === 'ios');
-                  if (selectedDate) {
-                    setCustomEndDate(selectedDate);
-                  }
-                }}
-              />
-            )}
+                <Text
+                  style={[
+                    styles.quickDurationButtonText,
+                    durationMode === option && styles.quickDurationButtonTextActive,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        )}
+          
+          <TouchableOpacity
+            style={styles.customDatePickerButton}
+            onPress={() => setDurationMode('自定义')}
+          >
+            <Text style={styles.customDatePickerButtonText}>
+              {durationMode === '自定义' ? formatDate(customEndDate) : '自定义日期'}
+            </Text>
+            <Text style={styles.dateButtonIcon}>📅</Text>
+          </TouchableOpacity>
+
+          {durationMode === '自定义' && (
+            <TouchableOpacity
+              style={styles.hiddenDatePicker}
+              onPress={() => setShowCustomDatePicker(true)}
+            />
+          )}
+
+          {showCustomDatePicker && (
+            <DateTimePicker
+              value={customEndDate}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
+              onChange={(event, selectedDate) => {
+                setShowCustomDatePicker(Platform.OS === 'ios');
+                if (selectedDate) {
+                  setCustomEndDate(selectedDate);
+                }
+              }}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
@@ -518,57 +506,74 @@ export default function PracticeConfigScreen() {
 
   const renderSmartSummary = () => {
     const days = calculatedDays;
-    const summary = calculateSummary();
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>4. 智能总结</Text>
-        <View style={styles.summaryContainer}>
-          <Text style={styles.summaryTitle}>📝 根据您的设置：</Text>
+        <Text style={styles.sectionTitle}>项目预览</Text>
+        <View style={styles.previewCard}>
           {practiceType === 'count' ? (
             <View>
-              <Text style={styles.summaryText}>
-                您需要在约 {days} 天内完成，
-              </Text>
-              {configMode === 'total' && totalTarget ? (
-                <View>
-                  <Text style={styles.summaryText}>
-                    总计 {parseInt(totalTarget).toLocaleString()} {practiceUnit}。
-                  </Text>
-                  <Text style={styles.summaryHighlight}>
-                    👉 建议每日持诵约 {suggestedDaily.toLocaleString()} {practiceUnit}。
-                  </Text>
-                </View>
-              ) : configMode === 'daily' && dailyTarget ? (
-                <View>
-                  <Text style={styles.summaryText}>
-                    每日 {parseInt(dailyTarget).toLocaleString()} {practiceUnit}。
-                  </Text>
-                  <Text style={styles.summaryHighlight}>
-                    👉 预计总计完成 {projectedTotal.toLocaleString()} {practiceUnit}。
-                  </Text>
-                </View>
-              ) : (
-                <Text style={styles.summaryText}>请设置目标数量以查看建议。</Text>
-              )}
+              <View style={styles.previewHeader}>
+                <Text style={styles.previewPracticeName}>{practiceName}</Text>
+                {projectName && (
+                  <View style={styles.previewProjectPill}>
+                    <Text style={styles.previewProjectPillText}>{projectName}</Text>
+                  </View>
+                )}
+              </View>
+              
+              <View style={styles.previewDetails}>
+                <Text style={styles.previewDetailItem}>
+                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
+                </Text>
+                
+                {configMode === 'total' && totalTarget ? (
+                  <>
+                    <Text style={styles.previewDetailItem}>
+                      🎯 总目标: {parseInt(totalTarget).toLocaleString()} {practiceUnit}
+                    </Text>
+                    <Text style={styles.previewDetailItem}>
+                      📊 每日目标: {suggestedDaily.toLocaleString()} {practiceUnit}
+                    </Text>
+                  </>
+                ) : configMode === 'daily' && dailyTarget ? (
+                  <>
+                    <Text style={styles.previewDetailItem}>
+                      🎯 每日目标: {parseInt(dailyTarget).toLocaleString()} {practiceUnit}
+                    </Text>
+                    <Text style={styles.previewDetailItem}>
+                      📊 预计总数: {projectedTotal.toLocaleString()} {practiceUnit}
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={styles.previewPlaceholder}>请设置目标以查看详情</Text>
+                )}
+              </View>
             </View>
           ) : (
             <View>
-              {sessionsTarget ? (
-                <View>
-                  <Text style={styles.summaryText}>
-                    🎯 在约 {days} 天内完成
+              <View style={styles.previewHeader}>
+                <Text style={styles.previewPracticeName}>{practiceName}</Text>
+                {projectName && (
+                  <View style={styles.previewProjectPill}>
+                    <Text style={styles.previewProjectPillText}>{projectName}</Text>
+                  </View>
+                )}
+              </View>
+              
+              <View style={styles.previewDetails}>
+                <Text style={styles.previewDetailItem}>
+                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
+                </Text>
+                
+                {sessionsTarget ? (
+                  <Text style={styles.previewDetailItem}>
+                    🎯 每周目标: {sessionsTarget} 座
                   </Text>
-                  <Text style={styles.summaryText}>
-                    📅 从 {formatDate(startDate)} 开始，每周 {sessionsTarget} 座观修
-                  </Text>
-                  <Text style={styles.summaryHighlight}>
-                    👉 预计总计完成约 {Math.ceil(days / 7) * parseInt(sessionsTarget)} 座观修
-                  </Text>
-                </View>
-              ) : (
-                <Text style={styles.summaryText}>请设置座数目标以查看建议。</Text>
-              )}
+                ) : (
+                  <Text style={styles.previewPlaceholder}>请设置目标以查看详情</Text>
+                )}
+              </View>
             </View>
           )}
         </View>
@@ -1094,6 +1099,154 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  // Simplified count-based config styles
+  goalTypeContainer: {
+    marginBottom: 20,
+  },
+  goalInputContainer: {
+    marginTop: 8,
+  },
+  goalInputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  goalInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  goalTextInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  goalInputUnit: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+  },
+  // Simplified time planning styles
+  timeInputContainer: {
+    marginBottom: 16,
+  },
+  timeInputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  simpleDateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  simpleDateButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  endDateContainer: {
+    gap: 12,
+  },
+  quickDurationButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  quickDurationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f1f3f4',
+    borderRadius: 20,
+  },
+  quickDurationButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  quickDurationButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+  },
+  quickDurationButtonTextActive: {
+    color: 'white',
+  },
+  customDatePickerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  customDatePickerButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  hiddenDatePicker: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  // Preview card styles
+  previewCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  previewPracticeName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  previewProjectPill: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  previewProjectPillText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: 'white',
+  },
+  previewDetails: {
+    gap: 6,
+  },
+  previewDetailItem: {
+    fontSize: 14,
+    color: '#555',
+    lineHeight: 20,
+  },
+  previewPlaceholder: {
+    fontSize: 14,
+    color: '#999',
     fontStyle: 'italic',
   },
   projectNameInput: {
