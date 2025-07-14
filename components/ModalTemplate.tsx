@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
+import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 
 interface ModalTemplateProps {
   title: string;
@@ -98,8 +99,6 @@ export default function ModalTemplate({
     </SafeAreaView>
   );
 }
-
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 
 const styles = StyleSheet.create({
   container: {
