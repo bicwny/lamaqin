@@ -69,16 +69,9 @@ export default function ProfileSetupScreen() {
         return;
       }
 
-      // For profile setup, we still navigate since it's initial setup
-      Alert.alert('保存成功', '个人资料已更新', [
-        {
-          text: '确定',
-          onPress: () => {
-            // Navigate to tabs - AuthContext will handle proper routing
-            router.replace('/(tabs)');
-          }
-        }
-      ]);
+      // For profile setup, navigate directly without alert to avoid staying on page
+      console.log('✅ Profile saved successfully, navigating to main app');
+      router.replace('/(tabs)');
     } catch (error) {
       console.error('Profile save error:', error);
       Alert.alert('保存失败', '网络错误，请稍后重试');
@@ -88,17 +81,8 @@ export default function ProfileSetupScreen() {
   };
 
   const handleSkip = () => {
-    Alert.alert(
-      '跳过设置',
-      '您可以稍后在个人资料页面完善信息',
-      [
-        { text: '继续设置', style: 'cancel' },
-        { 
-          text: '跳过', 
-          onPress: () => router.replace('/(tabs)') 
-        }
-      ]
-    );
+    console.log('⏭️ Skipping profile setup, navigating to main app');
+    router.replace('/(tabs)');
   };
 
   return (
