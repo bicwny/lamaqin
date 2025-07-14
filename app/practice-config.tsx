@@ -9,6 +9,8 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Modal,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, router, useLocalSearchParams } from "expo-router";
@@ -50,14 +52,8 @@ export default function PracticeConfigScreen() {
     }>
   >([]);
   const [loadingPresets, setLoadingPresets] = useState(true);
-  const [filteredPresets, setFilteredPresets] = useState<
-    Array<{
-      id: string;
-      name: string;
-      category?: string;
-      display_order: number;
-    }>
-  >([]);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   // Main configuration mode
   const [configMode, setConfigMode] = useState<
@@ -157,19 +153,9 @@ export default function PracticeConfigScreen() {
     fetchPresets();
   }, []);
 
-  const handleProjectNameChange = (text: string) => {
-    setProjectName(text);
-    setSelectedPresetId(""); // Clear preset selection when typing custom name
-
-    // Filter presets based on input
-    if (text.length > 0) {
-      const filtered = presetProjectNames.filter((preset) =>
-        preset.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredPresets(filtered);
-    } else {
-      setFilteredPresets([]);
-    }
+  const openProjectModal = () => {
+    setSearchText("");
+    setShowProjectModal(true);
   };
 
   const selectPreset = (preset: {
@@ -180,7 +166,22 @@ export default function PracticeConfigScreen() {
   }) => {
     setProjectName(preset.name);
     setSelectedPresetId(preset.id);
-    setFilteredPresets([]); // Hide dropdown
+    setShowProjectModal(false);
+  };
+
+  const selectCustomName = () => {
+    if (searchText.trim()) {
+      setProjectName(searchText.trim());
+      setSelectedPresetId("");
+      setShowProjectModal(false);
+    }
+  };
+
+  const getFilteredPresets = () => {
+    if (!searchText.trim()) return presetProjectNames;
+    return presetProjectNames.filter((preset) =>
+      preset.name.toLowerCase().includes(searchText.toLowerCase())
+    );
   };
 
   const getDurationInDays = () => {
@@ -947,46 +948,31 @@ export default function PracticeConfigScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>为这个修行项目起个名字</Text>
 
-            {/* Single Input Field with Autocomplete */}
-            <View style={styles.autocompleteContainer}>
-              <TextInput
-                style={[
-                  styles.autocompleteInput,
-                  filteredPresets.length > 0 &&
-                    projectName.length > 0 &&
-                    styles.autocompleteInputActive,
-                ]}
-                placeholder="输入项目名称或选择预设..."
-                value={projectName}
-                onChangeText={handleProjectNameChange}
-                multiline={false}
-              />
-
-              {/* Autocomplete Dropdown */}
-              {filteredPresets.length > 0 && projectName.length > 0 && (
-                <View style={styles.autocompleteDropdown}>
-                  <ScrollView
-                    style={styles.autocompleteScrollView}
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                  >
-                    {filteredPresets.map((preset) => (
-                      <TouchableOpacity
-                        key={preset.id}
-                        style={styles.autocompleteItem}
-                        onPress={() => selectPreset(preset)}
-                      >                        <Text style={styles.autocompleteItemText}>
-                          {preset.name}
-                        </Text>
-                        {preset.category && (
-                          <Text style={styles.autocompleteItemCategory}>
-                            {preset.category}
-                          </Text>
-                        )}
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
+            {/* Project Name Display and Selection Button */}
+            <View style={styles.projectNameContainer}>
+              <TouchableOpacity
+                style={styles.projectNameButton}
+                onPress={openProjectModal}
+              >
+                <Text style={[
+                  styles.projectNameButtonText,
+                  !projectName && styles.projectNamePlaceholder
+                ]}>
+                  {projectName || "点击选择或输入项目名称..."}
+                </Text>
+                <Text style={styles.projectNameButtonIcon}>▼</Text>
+              </TouchableOpacity>
+              
+              {projectName && (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={() => {
+                    setProjectName("");
+                    setSelectedPresetId("");
+                  }}
+                >
+                  <Text style={styles.clearButtonText}>✕</Text>
+                </TouchableOpacity>
               )}
             </View>
 
@@ -1014,6 +1000,75 @@ export default function PracticeConfigScreen() {
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Project Selection Modal */}
+      <Modal
+        visible={showProjectModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowProjectModal(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowProjectModal(false)}>
+              <Text style={styles.modalCancelButton}>取消</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>选择项目名称</Text>
+            <TouchableOpacity
+              onPress={selectCustomName}
+              disabled={!searchText.trim()}
+            >
+              <Text style={[
+                styles.modalConfirmButton,
+                !searchText.trim() && styles.modalConfirmButtonDisabled
+              ]}>
+                使用
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.modalSearchContainer}>
+            <TextInput
+              style={styles.modalSearchInput}
+              placeholder="搜索预设名称或输入自定义名称..."
+              value={searchText}
+              onChangeText={setSearchText}
+              autoFocus
+            />
+          </View>
+
+          <FlatList
+            data={getFilteredPresets()}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.modalPresetItem}
+                onPress={() => selectPreset(item)}
+              >
+                <View style={styles.modalPresetContent}>
+                  <Text style={styles.modalPresetName}>{item.name}</Text>
+                  {item.category && (
+                    <Text style={styles.modalPresetCategory}>{item.category}</Text>
+                  )}
+                </View>
+                <Text style={styles.modalPresetArrow}>→</Text>
+              </TouchableOpacity>
+            )}
+            style={styles.modalPresetList}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.modalEmptyState}>
+                <Text style={styles.modalEmptyText}>
+                  {searchText.trim() 
+                    ? `没有找到匹配的预设\n输入"${searchText}"作为自定义名称`
+                    : "加载预设名称中..."
+                  }
+                </Text>
+              </View>
+            }
+          />
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1547,11 +1602,88 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e9ecef",
   },
-  autocompleteContainer: {
+  projectNameContainer: {
     position: "relative",
-    zIndex: 9999,
   },
-  autocompleteInput: {
+  projectNameButton: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  projectNameButtonText: {
+    fontSize: 16,
+    color: "#333",
+    flex: 1,
+  },
+  projectNamePlaceholder: {
+    color: "#999",
+  },
+  projectNameButtonIcon: {
+    fontSize: 14,
+    color: "#666",
+    marginLeft: 8,
+  },
+  clearButton: {
+    position: "absolute",
+    right: 32,
+    top: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#dc3545",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  clearButtonText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "white",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e9ecef",
+  },
+  modalCancelButton: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  modalConfirmButton: {
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: "600",
+  },
+  modalConfirmButtonDisabled: {
+    color: "#ccc",
+  },
+  modalSearchContainer: {
+    padding: 16,
+    backgroundColor: "white",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e9ecef",
+  },
+  modalSearchInput: {
     backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
@@ -1561,48 +1693,47 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e9ecef",
   },
-  autocompleteInputActive: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    borderBottomColor: "transparent",
-  },
-  autocompleteDropdown: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: "#e9ecef",
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    maxHeight: 200,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
-    zIndex: 10000,
-  },
-  autocompleteScrollView: {
+  modalPresetList: {
     flex: 1,
+    backgroundColor: "white",
   },
-  autocompleteItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+  modalPresetItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#f1f3f4",
   },
-  autocompleteItemText: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
+  modalPresetContent: {
+    flex: 1,
   },
-  autocompleteItemCategory: {
+  modalPresetName: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
+  },
+  modalPresetCategory: {
     fontSize: 12,
     color: "#666",
     marginTop: 2,
+  },
+  modalPresetArrow: {
+    fontSize: 16,
+    color: "#ccc",
+  },
+  modalEmptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+    paddingHorizontal: 32,
+  },
+  modalEmptyText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 24,
   },
   webDatePicker: {
     backgroundColor: "#f8f9fa",
