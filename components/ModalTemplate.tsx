@@ -99,6 +99,8 @@ export default function ModalTemplate({
   );
 }
 
+import { DesignSystem } from '@/constants/DesignSystem';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
