@@ -1233,23 +1233,21 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textInverse,
   },
   customButton: {
+    ...createStyles.secondaryButton(),
     backgroundColor: DesignSystem.colors.warning,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingVertical: DesignSystem.spacing.md,
-    alignItems: "center",
     marginBottom: DesignSystem.spacing.md,
-    ...DesignSystem.shadow.sm,
   },
   customButtonActive: {
+    ...createStyles.secondaryButton(),
     backgroundColor: DesignSystem.colors.warning,
     ...DesignSystem.shadow.md,
   },
   customButtonText: {
-    ...createStyles.body(),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    ...DesignSystem.components.button.text.secondary,
     color: DesignSystem.colors.textInverse,
   },
   customButtonTextActive: {
+    ...DesignSystem.components.button.text.secondary,
     color: DesignSystem.colors.textInverse,
   },
   customInputContainer: {
@@ -1329,6 +1327,7 @@ const styles = StyleSheet.create({
     ...createStyles.primaryButton(),
     marginTop: DesignSystem.spacing['3xl'],
     marginBottom: DesignSystem.spacing['4xl'],
+    marginHorizontal: DesignSystem.spacing.lg,
   },
   saveButtonDisabled: {
     backgroundColor: DesignSystem.colors.textTertiary,
@@ -1453,6 +1452,7 @@ const styles = StyleSheet.create({
   customDatePickerButtonActive: {
     backgroundColor: DesignSystem.colors.backgroundTertiary,
     borderColor: DesignSystem.colors.primary,
+    borderWidth: 2,
   },
   customDatePickerButtonText: {
     ...createStyles.body(),
@@ -1606,10 +1606,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border,
+    ...DesignSystem.shadow.sm,
   },
   modalCancelButton: {
     ...createStyles.body(),
@@ -1685,11 +1686,13 @@ const styles = StyleSheet.create({
     marginTop: DesignSystem.spacing.sm,
     borderWidth: 1,
     borderColor: DesignSystem.colors.border,
+    ...DesignSystem.shadow.sm,
   },
   webDateInput: {
     ...createStyles.body(),
     backgroundColor: "transparent",
     borderWidth: 0,
     outlineWidth: 0,
+    color: DesignSystem.colors.textPrimary,
   },
 });
