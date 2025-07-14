@@ -483,13 +483,39 @@ export default function PracticeConfigScreen() {
           <View style={styles.webDatePicker}>
             <TextInput
               style={styles.webDateInput}
-              type="date"
-              value={startDate.toISOString().split('T')[0]}
-              onChange={(event) => {
-                const newDate = new Date(event.target.value);
-                setStartDate(newDate);
-                setShowStartDatePicker(false);
+              placeholder="YYYY/MM/DD"
+              value={`${startDate.getFullYear()}/${String(startDate.getMonth() + 1).padStart(2, '0')}/${String(startDate.getDate()).padStart(2, '0')}`}
+              onChangeText={(text) => {
+                // Allow only digits and forward slashes
+                const cleanText = text.replace(/[^\d/]/g, '');
+                
+                // Auto-format as user types
+                let formattedText = cleanText;
+                if (cleanText.length >= 4 && !cleanText.includes('/')) {
+                  formattedText = cleanText.slice(0, 4) + '/' + cleanText.slice(4);
+                }
+                if (formattedText.length >= 7 && formattedText.split('/').length === 2) {
+                  const parts = formattedText.split('/');
+                  formattedText = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
+                }
+                
+                // Parse and validate date
+                const parts = formattedText.split('/');
+                if (parts.length === 3) {
+                  const year = parseInt(parts[0]);
+                  const month = parseInt(parts[1]);
+                  const day = parseInt(parts[2]);
+                  
+                  if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                    const newDate = new Date(year, month - 1, day);
+                    if (newDate.getFullYear() === year && newDate.getMonth() === month - 1 && newDate.getDate() === day) {
+                      setStartDate(newDate);
+                      setShowStartDatePicker(false);
+                    }
+                  }
+                }
               }}
+              maxLength={10}
             />
           </View>
         )}
@@ -562,14 +588,41 @@ export default function PracticeConfigScreen() {
           <View style={styles.webDatePicker}>
             <TextInput
               style={styles.webDateInput}
-              type="date"
-              value={customEndDate.toISOString().split('T')[0]}
-              min={new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
-              onChange={(event) => {
-                const newDate = new Date(event.target.value);
-                handleEndDateChange(newDate);
-                setShowCustomDatePicker(false);
+              placeholder="YYYY/MM/DD"
+              value={`${customEndDate.getFullYear()}/${String(customEndDate.getMonth() + 1).padStart(2, '0')}/${String(customEndDate.getDate()).padStart(2, '0')}`}
+              onChangeText={(text) => {
+                // Allow only digits and forward slashes
+                const cleanText = text.replace(/[^\d/]/g, '');
+                
+                // Auto-format as user types
+                let formattedText = cleanText;
+                if (cleanText.length >= 4 && !cleanText.includes('/')) {
+                  formattedText = cleanText.slice(0, 4) + '/' + cleanText.slice(4);
+                }
+                if (formattedText.length >= 7 && formattedText.split('/').length === 2) {
+                  const parts = formattedText.split('/');
+                  formattedText = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
+                }
+                
+                // Parse and validate date
+                const parts = formattedText.split('/');
+                if (parts.length === 3) {
+                  const year = parseInt(parts[0]);
+                  const month = parseInt(parts[1]);
+                  const day = parseInt(parts[2]);
+                  
+                  if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                    const newDate = new Date(year, month - 1, day);
+                    const minDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+                    
+                    if (newDate.getFullYear() === year && newDate.getMonth() === month - 1 && newDate.getDate() === day && newDate >= minDate) {
+                      handleEndDateChange(newDate);
+                      setShowCustomDatePicker(false);
+                    }
+                  }
+                }
               }}
+              maxLength={10}
             />
           </View>
         )}
