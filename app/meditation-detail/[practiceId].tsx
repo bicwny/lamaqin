@@ -9,14 +9,13 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams, useFocusEffect, Stack } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { meditationService } from '@/lib/database';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 
 interface PracticeProject {
@@ -214,32 +213,34 @@ export default function MeditationDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="观修详情"
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
+      <PageTemplate
+        title="观修详情"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   if (!project) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="观修详情"
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
+      <PageTemplate
+        title="观修详情"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到观修项目</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
@@ -250,14 +251,13 @@ export default function MeditationDetailScreen() {
   const target = project.daily_target;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-      <PageHeader 
-        title="观修详情"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-      />
-
+    <PageTemplate
+      title="观修详情"
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
       <ScrollView 
         style={styles.scrollView}
         refreshControl={
@@ -355,7 +355,7 @@ export default function MeditationDetailScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
