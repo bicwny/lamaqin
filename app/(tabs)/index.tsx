@@ -745,7 +745,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-
+          
 
           {/* Study Section */}
           <View style={styles.section}>
@@ -756,50 +756,44 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {courseLessons.length > 0 ? (
-              courseLessons.map((nextLesson, index) => (
-                <View 
-                  key={index} 
-                  style={styles.studyCard}
-                >
-                  <View style={styles.studyCardHeader}>
-                    <View style={styles.studyCardTitleContainer}>
-                      <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
-                        <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.progressText}>{nextLesson.progress}</Text>
-                  <View style={styles.quickActionButtons}>
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.listenButton]}
-                      onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                    >
-                      <Text style={styles.quickActionButtonText}>听传承</Text>
+            {courseLessons.map((nextLesson, index) => (
+              <View 
+                key={index} 
+                style={styles.studyCard}
+              >
+                <View style={styles.studyCardHeader}>
+                  <View style={styles.studyCardTitleContainer}>
+                    <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
+                      <Text style={styles.courseName}>{nextLesson.courseName}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.readButton]}
-                      onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                    >
-                      <Text style={styles.quickActionButtonText}>看法本</Text>
-                    </TouchableOpacity>
-                    {nextLesson.url ? (
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.onlineButton]}
-                        onPress={() => Linking.openURL(nextLesson.url || '')}
-                      >
-                        <Text style={styles.quickActionButtonText}>在线课程</Text>
-                      </TouchableOpacity>
-                    ) : null}
+                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
                   </View>
                 </View>
-              ))
-            ) : (
-              <View style={styles.emptyStateCard}>
-                <Text style={styles.emptyStateText}>暂无课程</Text>
+                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                <View style={styles.quickActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.listenButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
+                  >
+                    <Text style={styles.quickActionButtonText}>听传承</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.readButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
+                  >
+                    <Text style={styles.quickActionButtonText}>看法本</Text>
+                  </TouchableOpacity>
+                  {nextLesson.url ? (
+                    <TouchableOpacity 
+                      style={[styles.quickActionButton, styles.onlineButton]}
+                      onPress={() => Linking.openURL(nextLesson.url || '')}
+                    >
+                      <Text style={styles.quickActionButtonText}>在线课程</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
               </View>
-            )}
+            ))}
           </View>
 
           {/* Practice Section */}
@@ -1032,27 +1026,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   onlineButton: {
-    backgroundColor: Colors.tertiary,
-  },
-  emptyStateCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-    alignItems: 'center',
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#9CA3AF',
-    fontWeight: '500',
+    backgroundColor: '#F59E0B',
   },
   quickActionButtonText: {
     color: '#fff',
