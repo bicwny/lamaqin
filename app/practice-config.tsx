@@ -629,7 +629,7 @@ export default function PracticeConfigScreen() {
 
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
+                  <Text>📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)</Text>
                 </Text>
 
                 {configMode === 'total' && totalTarget ? (
@@ -668,7 +668,7 @@ export default function PracticeConfigScreen() {
 
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
+                  <Text>📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)</Text>
                 </Text>
 
                 {sessionsTarget ? (
@@ -1491,7 +1491,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     backgroundColor: 'transparent',
-    border: 'none',
-    outline: 'none',
+      borderWidth: 0,
+      outlineWidth: 0,
   },
 });
