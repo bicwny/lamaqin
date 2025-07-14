@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -45,7 +44,7 @@ interface Practice {
 export default function MeditationDetailScreen() {
   const { user } = useAuth();
   const { recordId } = useLocalSearchParams<{ recordId: string }>();
-  
+
   const [record, setRecord] = useState<MeditationRecord | null>(null);
   const [practice, setPractice] = useState<Practice | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,7 +103,7 @@ export default function MeditationDetailScreen() {
 
       setRecord(updatedRecord);
       setIsEditing(false);
-      
+
       toastService.success({ 
         title: '✅ 保存成功', 
         message: '观后感已保存' 
@@ -135,7 +134,7 @@ export default function MeditationDetailScreen() {
           onPress: async () => {
             try {
               await meditationService.deleteMeditationRecord(record.id, user.id);
-              
+
               toastService.success({ 
                 title: '✅ 删除成功', 
                 message: '观修记录已删除' 
@@ -180,7 +179,7 @@ export default function MeditationDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor="#f8f9fa"
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -197,7 +196,7 @@ export default function MeditationDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor="#f8f9fa"
+        backgroundColor={Colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到观修记录</Text>
@@ -215,7 +214,7 @@ export default function MeditationDetailScreen() {
         text: "删除",
         onPress: handleDeleteRecord
       }}
-      backgroundColor="#f8f9fa"
+      backgroundColor={Colors.background}
       padding={0}
     >
       <KeyboardAvoidingView 
@@ -293,7 +292,7 @@ export default function MeditationDetailScreen() {
                   numberOfLines={6}
                   textAlignVertical="top"
                 />
-                
+
                 <View style={styles.editingActions}>
                   <TouchableOpacity
                     style={styles.cancelButton}
@@ -304,7 +303,7 @@ export default function MeditationDetailScreen() {
                   >
                     <Text style={styles.cancelButtonText}>取消</Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     style={[styles.saveButton, savingReflection && styles.disabledButton]}
                     onPress={handleSaveReflection}
@@ -462,7 +461,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     minHeight: 120,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.background,
   },
   editingActions: {
     flexDirection: 'row',

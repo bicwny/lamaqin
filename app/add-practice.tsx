@@ -27,7 +27,7 @@ export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
 
   useEffect(() => {
     loadPractices();
@@ -99,7 +99,7 @@ export default function AddPracticeScreen() {
     </View>
   );
 
-  
+
 
   if (loading) {
     return (
@@ -108,7 +108,7 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor="#f8f9fa"
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -125,7 +125,7 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor="#f8f9fa"
+        backgroundColor={Colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
@@ -148,7 +148,7 @@ export default function AddPracticeScreen() {
       title="添加修法"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor="#f8f9fa"
+      backgroundColor={Colors.background}
       padding={0}
     >
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.surface,
     alignItems: 'center',
   },
   cancelButtonText: {
