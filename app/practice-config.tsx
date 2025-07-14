@@ -110,10 +110,6 @@ export default function PracticeConfigScreen() {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // Count-based configuration
-  const [totalTarget, setTotalTarget] = useState("");
-  const [dailyTarget, setDailyTarget] = useState("");
-
   // Time-based configuration
   const [frequencyMode, setFrequencyMode] = useState<"weekly" | "daily">(
     "weekly",
