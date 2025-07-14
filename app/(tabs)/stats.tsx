@@ -21,42 +21,42 @@ export default function StatsScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.emptyState}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="bar-chart-outline" size={80} color="#9CA3AF" />
-          </View>
+            <View style={styles.iconContainer}>
+              <Ionicons name="bar-chart-outline" size={80} color="#9CA3AF" />
+            </View>
 
-          <Text style={styles.emptyTitle}>还没有统计数据</Text>
-          <Text style={styles.emptyDescription}>
-            开始记录修行和学习，就能看到详细的进展统计了
-          </Text>
+            <Text style={styles.emptyTitle}>开始你的统计之旅</Text>
+            <Text style={styles.emptyDescription}>
+              添加你的第一个记录，开始查看详细的进展统计
+            </Text>
 
-          <TouchableOpacity style={styles.startButton} onPress={handleStartTracking}>
-            <Ionicons name="play" size={24} color="#FFFFFF" />
-            <Text style={styles.startButtonText}>开始记录</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.startButton} onPress={handleStartTracking}>
+              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.startButtonText}>开始记录</Text>
+            </TouchableOpacity>
 
-          <View style={styles.featureContainer}>
-            <Text style={styles.featureTitle}>即将看到的统计：</Text>
-            <View style={styles.features}>
-              <View style={styles.featureItem}>
-                <Ionicons name="trending-up" size={20} color="#059669" />
-                <Text style={styles.featureText}>修行进度趋势</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="calendar" size={20} color="#3B82F6" />
-                <Text style={styles.featureText}>每日完成情况</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="trophy" size={20} color="#F59E0B" />
-                <Text style={styles.featureText}>里程碑成就</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Ionicons name="time" size={20} color="#8B5CF6" />
-                <Text style={styles.featureText}>学习时长统计</Text>
+            <View style={styles.featureContainer}>
+              <Text style={styles.featureTitle}>即将看到的统计：</Text>
+              <View style={styles.features}>
+                <View style={styles.featureItem}>
+                  <Ionicons name="trending-up" size={20} color="#059669" />
+                  <Text style={styles.featureText}>修行进度趋势</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="calendar" size={20} color="#3B82F6" />
+                  <Text style={styles.featureText}>每日完成情况</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="trophy" size={20} color="#F59E0B" />
+                  <Text style={styles.featureText}>里程碑成就</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="time" size={20} color="#8B5CF6" />
+                  <Text style={styles.featureText}>学习时长统计</Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
       </ScrollView>
     </PageTemplate>
   );
