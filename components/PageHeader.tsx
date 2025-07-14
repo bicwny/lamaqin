@@ -54,40 +54,43 @@ export default function PageHeader({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    backgroundColor: 'white',
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 16,
     minHeight: 56,
   },
   backButton: {
-    padding: 8,
-    marginRight: 8,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholder: {
+    width: 24,
   },
   titleContainer: {
     flex: 1,
     alignItems: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '600',
-    color: Colors.text,
+    color: '#333',
+    textAlign: 'center',
   },
-  rightAction: {
-    padding: 8,
-    marginLeft: 8,
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 4,
   },
   rightActionText: {
-    fontSize: 16,
     color: Colors.primary,
+    fontSize: 16,
     fontWeight: '500',
-  },
-  placeholder: {
-    width: 40,
   },
 });
