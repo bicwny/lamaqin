@@ -114,7 +114,6 @@ export default function PracticeConfigScreen() {
   const [frequencyMode, setFrequencyMode] = useState<"weekly" | "daily">(
     "weekly",
   );
-  const [sessionsTarget, setSessionsTarget] = useState("4"); // Default 4 sessions per week
   const [weeklyGoal, setWeeklyGoal] = useState("");
 
   // Time planning
