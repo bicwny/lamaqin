@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
@@ -472,7 +471,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const dbOperation = async () => {
         // First test basic connectivity with a simple health check
         console.log('🏥 AuthContext: Testing database health...');
-        
+
         try {
           const { data: healthCheck, error: healthError } = await supabase
             .from('users')
@@ -488,7 +487,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
             throw new Error(`Database connection failed: ${healthError.message}`);
           }
-          
+
           console.log('✅ AuthContext: Database health check passed');
         } catch (fetchError) {
           console.error('❌ AuthContext: Network fetch error during health check:', fetchError);
