@@ -31,18 +31,73 @@ interface Practice {
 }
 
 export default function PracticeConfigScreen() {
-  const { practiceId, practiceName, practiceType, practiceUnit } =
-    useLocalSearchParams<{
-      practiceId: string;
-      practiceName: string;
-      practiceType: string;
-      practiceUnit: string;
-    }>();
-
   const { user } = useAuth();
+  const {
+    practiceId,
+    practiceName,
+    practiceType,
+    practiceUnit,
+    practiceDescription,
+    editMode,
+    projectId,
+    currentTargetCount,
+    currentDailyTarget,
+    currentStartDate,
+    currentEndDate,
+    currentTargetPeriod,
+    currentGoalType,
+    currentProjectName,
+    currentPresetId,
+  } = useLocalSearchParams<{
+    practiceId: string;
+    practiceName: string;
+    practiceType: string;
+    practiceUnit: string;
+    practiceDescription: string;
+    editMode?: string;
+    projectId?: string;
+    currentTargetCount?: string;
+    currentDailyTarget?: string;
+    currentStartDate?: string;
+    currentEndDate?: string;
+    currentTargetPeriod?: string;
+    currentGoalType?: string;
+    currentProjectName?: string;
+    currentPresetId?: string;
+  }>();
+
+  const isEditMode = editMode === 'true';
+  const [startDate, setStartDate] = useState(
+    isEditMode && currentStartDate ? currentStartDate : new Date().toISOString().split("T")[0]
+  );
+  const [duration, setDuration] = useState(
+    isEditMode && currentEndDate ? 
+      Math.ceil((new Date(currentEndDate).getTime() - new Date(currentStartDate || '').getTime()) / (1000 * 60 * 60 * 24)).toString() : 
+      "30"
+  );
+  const [totalTarget, setTotalTarget] = useState(
+    isEditMode && currentTargetCount ? currentTargetCount : ""
+  );
+  const [dailyTarget, setDailyTarget] = useState(
+    isEditMode && currentDailyTarget ? currentDailyTarget : ""
+  );
+  const [sessionsTarget, setSessionsTarget] = useState(
+    isEditMode && currentDailyTarget ? currentDailyTarget : "1"
+  );
   const [loading, setLoading] = useState(false);
-  const [projectName, setProjectName] = useState("");
-  const [selectedPresetId, setSelectedPresetId] = useState(""); // Store UUID instead of name
+  const [showPresetModal, setShowPresetModal] = useState(false);
+  const [selectedPresetId, setSelectedPresetId] = useState<string>(
+    isEditMode && currentPresetId ? currentPresetId : ""
+  );
+  const [projectName, setProjectName] = useState(
+    isEditMode && currentProjectName ? currentProjectName : ""
+  );
+  const [durationMode, setDurationMode] = useState<"持续进行" | "固定时长">(
+    isEditMode && !currentEndDate ? "持续进行" : "固定时长"
+  );
+  const [configMode, setConfigMode] = useState<"total" | "daily">(
+    isEditMode && currentGoalType ? currentGoalType as "total" | "daily" : "total"
+  );
   const [presetProjectNames, setPresetProjectNames] = useState<
     Array<{
       id: string;
@@ -908,17 +963,34 @@ export default function PracticeConfigScreen() {
         };
       }
 
-      const { data, error } = await supabase
-        .from("user_practice_projects")
-        .insert([projectData])
-        .select();
+      if (isEditMode && projectId) {
+        // Update existing project
+        const { data, error } = await supabase
+          .from("user_practice_projects")
+          .update(projectData)
+          .eq('id', projectId)
+          .select();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      console.log("✅ Practice project created:", data);
-      Alert.alert("成功", "修行项目已添加！", [
-        { text: "确定", onPress: () => router.push("/(tabs)/practice") },
-      ]);
+        console.log("✅ Practice project updated:", data);
+        Alert.alert("成功", "修行项目已更新！", [
+          { text: "确定", onPress: () => router.push("/(tabs)/practice") },
+        ]);
+      } else {
+        // Create new project
+        const { data, error } = await supabase
+          .from("user_practice_projects")
+          .insert([projectData])
+          .select();
+
+        if (error) throw error;
+
+        console.log("✅ Practice project created:", data);
+        Alert.alert("成功", "修行项目已添加！", [
+          { text: "确定", onPress: () => router.push("/(tabs)/practice") },
+        ]);
+      }
     } catch (error) {
       console.error("❌ Error creating practice project:", error);
       Alert.alert("错误", "创建修行项目失败");
@@ -938,7 +1010,9 @@ export default function PracticeConfigScreen() {
         >
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>配置"{practiceName}"</Text>
+        <Text style={styles.headerTitle}>
+          {isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
+        </Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -962,7 +1036,7 @@ export default function PracticeConfigScreen() {
                 </Text>
                 <Text style={styles.projectNameButtonIcon}>▼</Text>
               </TouchableOpacity>
-              
+
               {projectName && (
                 <TouchableOpacity
                   style={styles.clearButton}
@@ -996,7 +1070,9 @@ export default function PracticeConfigScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>确认添加项目</Text>
+            <Text style={styles.saveButtonText}>
+              {isEditMode ? "更新项目" : "确认添加项目"}
+            </Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -1059,7 +1135,7 @@ export default function PracticeConfigScreen() {
             ListEmptyComponent={
               <View style={styles.modalEmptyState}>
                 <Text style={styles.modalEmptyText}>
-                  {searchText.trim() 
+                  {searchText.trim()
                     ? `没有找到匹配的预设\n输入"${searchText}"作为自定义名称`
                     : "加载预设名称中..."
                   }

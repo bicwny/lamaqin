@@ -273,6 +273,31 @@ export default function PracticeDetailScreen() {
     }
   };
 
+  const handleEditPractice = () => {
+    if (!project) return;
+
+    router.push({
+      pathname: '/practice-config',
+      params: {
+        practiceId: project.practice_id,
+        practiceName: project.practices.name,
+        practiceType: project.practices.type,
+        practiceUnit: project.practices.unit,
+        practiceDescription: project.practices.description || '',
+        editMode: 'true',
+        projectId: project.id,
+        currentTargetCount: project.target_count.toString(),
+        currentDailyTarget: project.daily_target.toString(),
+        currentStartDate: project.start_date,
+        currentEndDate: project.target_end_date || '',
+        currentTargetPeriod: project.target_period,
+        currentGoalType: project.goal_type || 'total',
+        currentProjectName: project.project_name || '',
+        currentPresetId: project.preset_project_id || '',
+      },
+    });
+  };
+
   const getDisplayProjectName = () => {
     if (!project) return '';
     return project.project_name || presetProjectName || '预设项目';
@@ -463,16 +488,26 @@ export default function PracticeDetailScreen() {
             </View>
           </View>
 
-          {/* Primary Action Button */}
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleRecord}
-          >
-            <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-            <Text style={styles.buttonText}>
-              {project.practices.type === 'time' ? '记录观修' : '记录修行'}
-            </Text>
-          </TouchableOpacity>
+          {/* Action Buttons */}
+          <View style={styles.actionButtonsContainer}>
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleEditPractice}
+            >
+              <Ionicons name="create-outline" size={20} color={Colors.primary} />
+              <Text style={styles.secondaryButtonText}>编辑项目</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleRecord}
+            >
+              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.buttonText}>
+                {project.practices.type === 'time' ? '记录观修' : '记录修行'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Practice History for Count-based Practices */}
@@ -709,7 +744,13 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: 'right',
   },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 20,
+  },
   primaryButton: {
+    flex: 2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -717,12 +758,34 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 8,
-    marginTop: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  secondaryButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 12,
+    gap: 6,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  secondaryButtonText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: -0.1,
   },
   buttonText: {
     color: '#FFFFFF',
