@@ -110,11 +110,6 @@ export default function PracticeConfigScreen() {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [searchText, setSearchText] = useState("");
 
-  // Main configuration mode
-  const [configMode, setConfigMode] = useState<
-    "total" | "daily" | "topic_progress" | "fixed_duration"
-  >(practiceType === "time" ? "topic_progress" : "total");
-
   // Count-based configuration
   const [totalTarget, setTotalTarget] = useState("");
   const [dailyTarget, setDailyTarget] = useState("");
