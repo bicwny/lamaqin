@@ -1372,6 +1372,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
+  dateButtonIcon: {
+    fontSize: 16,
+  },
   quickDurationButtons: {
     flexDirection: "row",
     gap: 8,
