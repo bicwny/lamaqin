@@ -415,7 +415,7 @@ export default function PracticeConfigScreen() {
           <Text style={styles.dateButtonIcon}>📅</Text>
         </TouchableOpacity>
 
-        {showStartDatePicker && (
+        {showStartDatePicker && Platform.OS !== 'web' && (
           <DateTimePicker
             value={startDate}
             mode="date"
@@ -427,6 +427,21 @@ export default function PracticeConfigScreen() {
               }
             }}
           />
+        )}
+
+        {showStartDatePicker && Platform.OS === 'web' && (
+          <View style={styles.webDatePicker}>
+            <TextInput
+              style={styles.webDateInput}
+              type="date"
+              value={startDate.toISOString().split('T')[0]}
+              onChange={(event) => {
+                const newDate = new Date(event.target.value);
+                setStartDate(newDate);
+                setShowStartDatePicker(false);
+              }}
+            />
+          </View>
         )}
       </View>
 
@@ -467,7 +482,7 @@ export default function PracticeConfigScreen() {
           </Text>
         </View>
 
-        {showCustomDatePicker && (
+        {showCustomDatePicker && Platform.OS !== 'web' && (
           <DateTimePicker
             value={customEndDate}
             mode="date"
@@ -480,6 +495,22 @@ export default function PracticeConfigScreen() {
               }
             }}
           />
+        )}
+
+        {showCustomDatePicker && Platform.OS === 'web' && (
+          <View style={styles.webDatePicker}>
+            <TextInput
+              style={styles.webDateInput}
+              type="date"
+              value={customEndDate.toISOString().split('T')[0]}
+              min={new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+              onChange={(event) => {
+                const newDate = new Date(event.target.value);
+                handleEndDateChange(newDate);
+                setShowCustomDatePicker(false);
+              }}
+            />
+          </View>
         )}
       </View>
     </View>
@@ -1386,5 +1417,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginTop: 2,
+  },
+  webDatePicker: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  webDateInput: {
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: 'transparent',
+    border: 'none',
+    outline: 'none',
   },
 });
