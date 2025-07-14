@@ -8,12 +8,12 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
-  SafeAreaView,
 } from 'react-native';
-import { router, Stack } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import PageTemplate from '@/components/PageTemplate';
 
 interface Practice {
   id: string;
@@ -103,20 +103,30 @@ export default function AddPracticeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
+      <PageTemplate
+        title="添加修法"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor="#f8f9fa"
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   if (practices.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
+      <PageTemplate
+        title="添加修法"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor="#f8f9fa"
+      >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
           <Text style={styles.emptyDescription}>
@@ -129,26 +139,26 @@ export default function AddPracticeScreen() {
             <Text style={styles.backButtonText}>返回</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
-
+    <PageTemplate
+      title="添加修法"
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      backgroundColor="#f8f9fa"
+      padding={0}
+    >
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {renderPracticeSelector()}
       </ScrollView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
   content: {
     flex: 1,
     paddingTop: 16,

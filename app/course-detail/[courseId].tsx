@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 
@@ -169,45 +168,47 @@ export default function CourseDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="课程详情" 
-          subtitle="加载中..."
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
+      <PageTemplate
+        title="课程详情" 
+        subtitle="加载中..."
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   if (!userCourse) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="课程详情" 
-          subtitle="课程未找到"
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
+      <PageTemplate
+        title="课程详情" 
+        subtitle="课程未找到"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>课程未找到</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <PageHeader 
-        title={userCourse.course.name}
-        subtitle="课程详情与学习记录"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-      />
-      <ScrollView style={styles.scrollView}>
+    <PageTemplate
+      title={userCourse.course.name}
+      subtitle="课程详情与学习记录"
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
 
         <View style={styles.courseInfoCard}>
           <Text style={styles.courseInfoTitle}>课程信息：</Text>
@@ -281,19 +282,11 @@ export default function CourseDetailScreen() {
           </View>
         ))}
 
-      </ScrollView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

@@ -9,14 +9,13 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
-import PageHeader from '@/components/PageHeader';
+import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 
 interface PracticeProject {
@@ -364,32 +363,34 @@ export default function PracticeDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="修行详情"
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
+      <PageTemplate
+        title="修行详情"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
   if (!project) {
     return (
-      <SafeAreaView style={styles.container}>
-        <PageHeader 
-          title="修行详情"
-          showBackButton={true}
-          onBackPress={() => router.back()}
-        />
+      <PageTemplate
+        title="修行详情"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        scrollable={false}
+        backgroundColor={Colors.background}
+      >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到修行项目</Text>
         </View>
-      </SafeAreaView>
+      </PageTemplate>
     );
   }
 
@@ -400,17 +401,16 @@ export default function PracticeDetailScreen() {
     : null;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <PageHeader 
-        title={project.practices.name}
-        subtitle={project.project_name || project.preset_project_id ? 
-          `项目：${getDisplayProjectName()}` : undefined}
-        showBackButton={true}
-        onBackPress={() => router.back()}
-      />
-
+    <PageTemplate
+      title={project.practices.name}
+      subtitle={project.project_name || project.preset_project_id ? 
+        `项目：${getDisplayProjectName()}` : undefined}
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      backgroundColor={Colors.background}
+      padding={0}
+    >
       <ScrollView
-        style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -615,18 +615,11 @@ export default function PracticeDetailScreen() {
 
         
       </ScrollView>
-    </SafeAreaView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
