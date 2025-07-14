@@ -7,17 +7,15 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  ScrollView,
   Platform,
-  SafeAreaView,
-  KeyboardAvoidingView,
 } from 'react-native';
-import { useLocalSearchParams, Stack, router } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
 import { toastService } from '@/lib/toast';
 import TopicSelectionModal from '@/components/TopicSelectionModal';
+import ModalTemplate from '@/components/ModalTemplate';
 
 export default function MeditationRecordScreen() {
   const { user } = useAuth();
@@ -175,31 +173,19 @@ export default function MeditationRecordScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      {/* Custom Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          if (router.canGoBack()) {
-            router.back();
-          } else {
-            router.replace('/(tabs)/practice');
-          }
-        }} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          📝 {isEditing ? '编辑观修记录' : '记录新的观修'}
-        </Text>
-      </View>
-
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoidingView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-      >
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <ModalTemplate
+      title={isEditing ? '编辑观修记录' : '记录新的观修'}
+      onClose={() => {
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace('/(tabs)/practice');
+        }
+      }}
+      scrollable={true}
+      showCloseButton={true}
+      keyboardAvoidingView={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
         <View style={styles.formContainer}>
           <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
 
@@ -269,62 +255,21 @@ export default function MeditationRecordScreen() {
             )}
           </TouchableOpacity>
         </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-
-      {/* Topic Selection Modal */}
-      <TopicSelectionModal
-        visible={showTopicModal}
-        onClose={() => setShowTopicModal(false)}
-        onSelect={handleTopicSelect}
-        topics={meditationTopics}
-        selectedTopicNumber={selectedTopic?.topic_number}
-        loading={loadingTopics}
-      />
-    </SafeAreaView>
+        
+        {/* Topic Selection Modal */}
+        <TopicSelectionModal
+          visible={showTopicModal}
+          onClose={() => setShowTopicModal(false)}
+          onSelect={handleTopicSelect}
+          topics={meditationTopics}
+          selectedTopicNumber={selectedTopic?.topic_number}
+          loading={loadingTopics}
+        />
+    </ModalTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa'
-  },
-  keyboardAvoidingView: {
-    flex: 1
-  },
-  header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500'
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 4
-  },
-  content: {
-    flex: 1,
-    padding: 16
-  },
   formContainer: {
     backgroundColor: 'white',
     borderRadius: 12,

@@ -8,13 +8,13 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
 } from 'react-native';
-import { useLocalSearchParams, Stack, router } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { toastService } from '@/lib/toast';
+import ModalTemplate from '@/components/ModalTemplate';
 
 export default function CustomRecordScreen() {
   const { user } = useAuth();
@@ -198,26 +198,18 @@ export default function CustomRecordScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      {/* Custom Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          if (router.canGoBack()) {
-            router.back();
-          } else {
-            router.replace('/(tabs)/practice');
-          }
-        }} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← 返回</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          📝 {isEditing ? '编辑修行记录' : '记录修行数量'}
-        </Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+    <ModalTemplate
+      title={isEditing ? '编辑修行记录' : '记录修行数量'}
+      onClose={() => {
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace('/(tabs)/practice');
+        }
+      }}
+      scrollable={true}
+      showCloseButton={true}
+    >
         {loadingRecord ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.primary} />
@@ -275,48 +267,11 @@ export default function CustomRecordScreen() {
           </TouchableOpacity>
         </View>
         )}
-      </ScrollView>
-    </SafeAreaView>
+    </ModalTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa'
-  },
-  header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
-  backButton: {
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500'
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 4
-  },
-  content: {
-    flex: 1,
-    padding: 16
-  },
   formContainer: {
     backgroundColor: 'white',
     borderRadius: 12,
