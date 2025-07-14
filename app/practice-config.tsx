@@ -117,11 +117,7 @@ export default function PracticeConfigScreen() {
   const [weeklyGoal, setWeeklyGoal] = useState("");
 
   // Time planning
-  const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [durationMode, setDurationMode] = useState<
-    "30天" | "60天" | "100天" | "1年" | "自定义"
-  >("60天");
   const [customEndDate, setCustomEndDate] = useState(
     new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
   ); // Default to 60 days from now
