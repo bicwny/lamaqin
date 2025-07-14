@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,16 +9,16 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { getCurrentWeekStart } from '@/lib/topic-progress';
-import { practiceService, presetProjectNameService } from '@/lib/database';
-import ModalDatetimePicker from 'react-native-modal-datetime-picker';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Stack, router, useLocalSearchParams } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { Colors } from "@/constants/Colors";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { getCurrentWeekStart } from "@/lib/topic-progress";
+import { practiceService, presetProjectNameService } from "@/lib/database";
+import ModalDatetimePicker from "react-native-modal-datetime-picker";
 
 interface Practice {
   id: string;
@@ -29,88 +29,113 @@ interface Practice {
 }
 
 export default function PracticeConfigScreen() {
-  const { practiceId, practiceName, practiceType, practiceUnit } = useLocalSearchParams<{
-    practiceId: string;
-    practiceName: string;
-    practiceType: string;
-    practiceUnit: string;
-  }>();
+  const { practiceId, practiceName, practiceType, practiceUnit } =
+    useLocalSearchParams<{
+      practiceId: string;
+      practiceName: string;
+      practiceType: string;
+      practiceUnit: string;
+    }>();
 
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [projectName, setProjectName] = useState('');
-  const [selectedPresetId, setSelectedPresetId] = useState(''); // Store UUID instead of name
-  const [presetProjectNames, setPresetProjectNames] = useState<Array<{
-    id: string;
-    name: string;
-    category?: string;
-    display_order: number;
-  }>>([]);
+  const [projectName, setProjectName] = useState("");
+  const [selectedPresetId, setSelectedPresetId] = useState(""); // Store UUID instead of name
+  const [presetProjectNames, setPresetProjectNames] = useState<
+    Array<{
+      id: string;
+      name: string;
+      category?: string;
+      display_order: number;
+    }>
+  >([]);
   const [loadingPresets, setLoadingPresets] = useState(true);
-  const [filteredPresets, setFilteredPresets] = useState<Array<{
-    id: string;
-    name: string;
-    category?: string;
-    display_order: number;
-  }>>([]);
+  const [filteredPresets, setFilteredPresets] = useState<
+    Array<{
+      id: string;
+      name: string;
+      category?: string;
+      display_order: number;
+    }>
+  >([]);
 
   // Main configuration mode
-  const [configMode, setConfigMode] = useState<'total' | 'daily' | 'topic_progress' | 'fixed_duration'>(
-    practiceType === 'time' ? 'topic_progress' : 'total'
-  );
-
-
+  const [configMode, setConfigMode] = useState<
+    "total" | "daily" | "topic_progress" | "fixed_duration"
+  >(practiceType === "time" ? "topic_progress" : "total");
 
   // Count-based configuration
-  const [totalTarget, setTotalTarget] = useState('');
-  const [dailyTarget, setDailyTarget] = useState('');
+  const [totalTarget, setTotalTarget] = useState("");
+  const [dailyTarget, setDailyTarget] = useState("");
 
   // Time-based configuration
-  const [frequencyMode, setFrequencyMode] = useState<'weekly' | 'daily'>('weekly');
-  const [sessionsTarget, setSessionsTarget] = useState('4'); // Default 4 sessions per week
-    const [weeklyGoal, setWeeklyGoal] = useState('');
+  const [frequencyMode, setFrequencyMode] = useState<"weekly" | "daily">(
+    "weekly",
+  );
+  const [sessionsTarget, setSessionsTarget] = useState("4"); // Default 4 sessions per week
+  const [weeklyGoal, setWeeklyGoal] = useState("");
 
   // Time planning
   const [startDate, setStartDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
-  const [customEndDate, setCustomEndDate] = useState(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)); // Default to 60 days from now
+  const [durationMode, setDurationMode] = useState<
+    "30天" | "60天" | "100天" | "1年" | "自定义"
+  >("60天");
+  const [customEndDate, setCustomEndDate] = useState(
+    new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+  ); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const [customDays, setCustomDays] = useState('60'); // Default to 60 days
+  const [customDays, setCustomDays] = useState("60"); // Default to 60 days
 
   // Calculated values
   const [suggestedDaily, setSuggestedDaily] = useState(0);
   const [projectedTotal, setProjectedTotal] = useState(0);
   const [calculatedDays, setCalculatedDays] = useState(0);
 
-  const [targetPeriod, setTargetPeriod] = useState<'daily' | 'weekly'>('weekly');
-  const [goalType, setGoalType] = useState<'fixed_duration' | 'topic_progress'>('fixed_duration');
+  const [targetPeriod, setTargetPeriod] = useState<"daily" | "weekly">(
+    "weekly",
+  );
+  const [goalType, setGoalType] = useState<"fixed_duration" | "topic_progress">(
+    "fixed_duration",
+  );
   const [weeklyTopicTarget, setWeeklyTopicTarget] = useState(2);
-  const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
-  const [isCustomDatePickerVisible, setCustomDatePickerVisibility] = useState(false);
-
+  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
+    useState(false);
+  const [isCustomDatePickerVisible, setCustomDatePickerVisibility] =
+    useState(false);
 
   useEffect(() => {
     calculateSuggestions();
-  }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, configMode]);
+  }, [
+    totalTarget,
+    dailyTarget,
+    startDate,
+    durationMode,
+    customEndDate,
+    configMode,
+  ]);
 
   // Handle days input change - auto update end date
   const handleDaysInputChange = (text: string) => {
     setCustomDays(text);
     const days = parseInt(text);
     if (!isNaN(days) && days > 0) {
-      const newEndDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+      const newEndDate = new Date(
+        startDate.getTime() + days * 24 * 60 * 60 * 1000,
+      );
       setCustomEndDate(newEndDate);
-      setDurationMode('自定义');
+      setDurationMode("自定义");
     }
   };
 
   // Handle end date change - auto update days
   const handleEndDateChange = (selectedDate: Date) => {
     setCustomEndDate(selectedDate);
-    const daysDiff = Math.ceil((selectedDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+    const daysDiff = Math.ceil(
+      (selectedDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
+    );
     setCustomDays(daysDiff.toString());
-    setDurationMode('自定义');
+    setDurationMode("自定义");
   };
 
   useEffect(() => {
@@ -120,8 +145,8 @@ export default function PracticeConfigScreen() {
         const presets = await presetProjectNameService.getPresetProjectNames();
         setPresetProjectNames(presets);
       } catch (error) {
-        console.error('Failed to fetch preset project names:', error);
-        Alert.alert('错误', 'Failed to load preset project names.');
+        console.error("Failed to fetch preset project names:", error);
+        Alert.alert("错误", "Failed to load preset project names.");
       } finally {
         setLoadingPresets(false);
       }
@@ -132,12 +157,12 @@ export default function PracticeConfigScreen() {
 
   const handleProjectNameChange = (text: string) => {
     setProjectName(text);
-    setSelectedPresetId(''); // Clear preset selection when typing custom name
+    setSelectedPresetId(""); // Clear preset selection when typing custom name
 
     // Filter presets based on input
     if (text.length > 0) {
-      const filtered = presetProjectNames.filter(preset => 
-        preset.name.toLowerCase().includes(text.toLowerCase())
+      const filtered = presetProjectNames.filter((preset) =>
+        preset.name.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredPresets(filtered);
     } else {
@@ -145,7 +170,12 @@ export default function PracticeConfigScreen() {
     }
   };
 
-  const selectPreset = (preset: { id: string; name: string; category?: string; display_order: number }) => {
+  const selectPreset = (preset: {
+    id: string;
+    name: string;
+    category?: string;
+    display_order: number;
+  }) => {
     setProjectName(preset.name);
     setSelectedPresetId(preset.id);
     setFilteredPresets([]); // Hide dropdown
@@ -156,19 +186,19 @@ export default function PracticeConfigScreen() {
     let end: Date;
 
     switch (durationMode) {
-      case '30天':
+      case "30天":
         end = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
         break;
-      case '60天':
+      case "60天":
         end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
         break;
-      case '100天':
+      case "100天":
         end = new Date(start.getTime() + 100 * 24 * 60 * 60 * 1000);
         break;
-      case '1年':
+      case "1年":
         end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
         break;
-      case '自定义':
+      case "自定义":
         end = customEndDate;
         break;
       default:
@@ -182,12 +212,12 @@ export default function PracticeConfigScreen() {
     const days = getDurationInDays();
     setCalculatedDays(days);
 
-    if (practiceType === 'count') {
-      if (configMode === 'total' && totalTarget) {
+    if (practiceType === "count") {
+      if (configMode === "total" && totalTarget) {
         const total = parseInt(totalTarget);
         const suggested = Math.ceil(total / days);
         setSuggestedDaily(suggested);
-      } else if (configMode === 'daily' && dailyTarget) {
+      } else if (configMode === "daily" && dailyTarget) {
         const daily = parseInt(dailyTarget);
         const projected = daily * days;
         setProjectedTotal(projected);
@@ -197,23 +227,23 @@ export default function PracticeConfigScreen() {
 
   const handleSave = async () => {
     if (!user) {
-      Alert.alert('错误', '用户未登录');
+      Alert.alert("错误", "用户未登录");
       return;
     }
 
     // Validation
-    if (practiceType === 'count') {
-      if (configMode === 'total' && !totalTarget) {
-        Alert.alert('错误', '请输入总目标数量');
+    if (practiceType === "count") {
+      if (configMode === "total" && !totalTarget) {
+        Alert.alert("错误", "请输入总目标数量");
         return;
       }
-      if (configMode === 'daily' && !dailyTarget) {
-        Alert.alert('错误', '请输入每日目标数量');
+      if (configMode === "daily" && !dailyTarget) {
+        Alert.alert("错误", "请输入每日目标数量");
         return;
       }
     } else {
       if (!sessionsTarget) {
-        Alert.alert('错误', '请输入每周目标座数');
+        Alert.alert("错误", "请输入每周目标座数");
         return;
       }
     }
@@ -226,12 +256,12 @@ export default function PracticeConfigScreen() {
       let endDate: Date | null = null;
       let targetPeriod: string;
 
-      if (practiceType === 'count') {
+      if (practiceType === "count") {
         const days = getDurationInDays();
         endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-        targetPeriod = 'daily';
+        targetPeriod = "daily";
 
-        if (configMode === 'total') {
+        if (configMode === "total") {
           finalTotalTarget = parseInt(totalTarget);
           finalDailyTarget = Math.ceil(finalTotalTarget / days);
         } else {
@@ -241,9 +271,9 @@ export default function PracticeConfigScreen() {
       } else {
         // Time-based practices - unified approach
         finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
-        targetPeriod = 'weekly';
+        targetPeriod = "weekly";
 
-        if (durationMode === '持续进行') {
+        if (durationMode === "持续进行") {
           // Ongoing practice - no end date
           endDate = null;
           finalTotalTarget = 0; // 0 indicates ongoing
@@ -261,26 +291,26 @@ export default function PracticeConfigScreen() {
         target_count: finalTotalTarget,
         daily_target: finalDailyTarget,
         target_period: targetPeriod,
-        start_date: startDate.toISOString().split('T')[0],
-        target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
-        status: 'active',
+        start_date: startDate.toISOString().split("T")[0],
+        target_end_date: endDate ? endDate.toISOString().split("T")[0] : null,
+        status: "active",
         current_count: 0,
         preset_project_id: selectedPresetId || null,
-        project_name: selectedPresetId ? null : (projectName || null),
+        project_name: selectedPresetId ? null : projectName || null,
       };
 
       // Try to include goal_type, but handle cases where column doesn't exist yet
       try {
         const { error } = await supabase
-          .from('user_practice_projects')
+          .from("user_practice_projects")
           .insert({ ...projectData, goal_type: configMode });
 
         if (error) throw error;
       } catch (error: any) {
         // If goal_type column doesn't exist, try without it
-        if (error?.message?.includes('goal_type')) {
+        if (error?.message?.includes("goal_type")) {
           const { error: fallbackError } = await supabase
-            .from('user_practice_projects')
+            .from("user_practice_projects")
             .insert(projectData);
 
           if (fallbackError) throw fallbackError;
@@ -289,15 +319,15 @@ export default function PracticeConfigScreen() {
         }
       }
 
-      Alert.alert('成功', '修行项目已添加', [
+      Alert.alert("成功", "修行项目已添加", [
         {
-          text: '确定',
-          onPress: () => router.replace('/(tabs)/practice'),
+          text: "确定",
+          onPress: () => router.replace("/(tabs)/practice"),
         },
       ]);
     } catch (error) {
-      console.error('Error saving practice project:', error);
-      Alert.alert('错误', '保存失败，请重试');
+      console.error("Error saving practice project:", error);
+      Alert.alert("错误", "保存失败，请重试");
     } finally {
       setLoading(false);
     }
@@ -317,14 +347,14 @@ export default function PracticeConfigScreen() {
           <TouchableOpacity
             style={[
               styles.segmentButton,
-              configMode === 'total' && styles.segmentButtonActive,
+              configMode === "total" && styles.segmentButtonActive,
             ]}
-            onPress={() => setConfigMode('total')}
+            onPress={() => setConfigMode("total")}
           >
             <Text
               style={[
                 styles.segmentButtonText,
-                configMode === 'total' && styles.segmentButtonTextActive,
+                configMode === "total" && styles.segmentButtonTextActive,
               ]}
             >
               总数目标
@@ -333,14 +363,14 @@ export default function PracticeConfigScreen() {
           <TouchableOpacity
             style={[
               styles.segmentButton,
-              configMode === 'daily' && styles.segmentButtonActive,
+              configMode === "daily" && styles.segmentButtonActive,
             ]}
-            onPress={() => setConfigMode('daily')}
+            onPress={() => setConfigMode("daily")}
           >
             <Text
               style={[
                 styles.segmentButtonText,
-                configMode === 'daily' && styles.segmentButtonTextActive,
+                configMode === "daily" && styles.segmentButtonTextActive,
               ]}
             >
               每日目标
@@ -351,7 +381,7 @@ export default function PracticeConfigScreen() {
 
       {/* Single input field for goal */}
       <View style={styles.goalInputContainer}>
-        {configMode === 'total' ? (
+        {configMode === "total" ? (
           <View>
             <Text style={styles.goalInputLabel}>总目标数量</Text>
             <View style={styles.goalInputRow}>
@@ -404,7 +434,7 @@ export default function PracticeConfigScreen() {
   );
 
   const showStartDatepicker = () => {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       setShowStartDatePicker(true);
     } else {
       setStartDatePickerVisibility(true);
@@ -416,8 +446,8 @@ export default function PracticeConfigScreen() {
     setShowStartDatePicker(false);
   };
 
-    const showCustomDatepicker = () => {
-    if (Platform.OS === 'web') {
+  const showCustomDatepicker = () => {
+    if (Platform.OS === "web") {
       setShowCustomDatePicker(true);
     } else {
       setCustomDatePickerVisibility(true);
@@ -434,7 +464,7 @@ export default function PracticeConfigScreen() {
     hideStartDatePicker();
   };
 
-    const handleCustomDateConfirm = (date: Date) => {
+  const handleCustomDateConfirm = (date: Date) => {
     setCustomEndDate(date);
     hideCustomDatePicker();
   };
@@ -450,12 +480,14 @@ export default function PracticeConfigScreen() {
           style={styles.simpleDateButton}
           onPress={showStartDatepicker}
         >
-          <Text style={styles.simpleDateButtonText}>{formatDate(startDate)}</Text>
+          <Text style={styles.simpleDateButtonText}>
+            {formatDate(startDate)}
+          </Text>
           <Text style={styles.dateButtonIcon}>📅</Text>
         </TouchableOpacity>
 
         {/* DateTimePicker Modal */}
-        {practiceType === 'count' && (
+        {practiceType === "count" && (
           <ModalDatetimePicker
             isVisible={isStartDatePickerVisible}
             mode="date"
@@ -465,13 +497,13 @@ export default function PracticeConfigScreen() {
           />
         )}
 
-        {showStartDatePicker && Platform.OS !== 'web' && (
+        {showStartDatePicker && Platform.OS !== "web" && (
           <DateTimePicker
             value={startDate}
             mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={(event, selectedDate) => {
-              setShowStartDatePicker(Platform.OS === 'ios');
+              setShowStartDatePicker(Platform.OS === "ios");
               if (selectedDate) {
                 setStartDate(selectedDate);
               }
@@ -479,12 +511,12 @@ export default function PracticeConfigScreen() {
           />
         )}
 
-        {showStartDatePicker && Platform.OS === 'web' && (
+        {showStartDatePicker && Platform.OS === "web" && (
           <View style={styles.webDatePicker}>
             <TextInput
               style={styles.webDateInput}
               type="date"
-              value={startDate.toISOString().split('T')[0]}
+              value={startDate.toISOString().split("T")[0]}
               onChange={(event) => {
                 const newDate = new Date(event.target.value);
                 setStartDate(newDate);
@@ -528,12 +560,13 @@ export default function PracticeConfigScreen() {
         {/* Duration display */}
         <View style={styles.durationDisplay}>
           <Text style={styles.durationDisplayText}>
-            {formatDate(startDate)} → {formatDate(customEndDate)} (共 {calculatedDays} 天)
+            {formatDate(startDate)} → {formatDate(customEndDate)} (共{" "}
+            {calculatedDays} 天)
           </Text>
         </View>
 
-          {/* DateTimePicker Modal */}
-        {practiceType === 'count' && (
+        {/* DateTimePicker Modal */}
+        {practiceType === "count" && (
           <ModalDatetimePicker
             isVisible={isCustomDatePickerVisible}
             mode="date"
@@ -543,14 +576,14 @@ export default function PracticeConfigScreen() {
           />
         )}
 
-        {showCustomDatePicker && Platform.OS !== 'web' && (
+        {showCustomDatePicker && Platform.OS !== "web" && (
           <DateTimePicker
             value={customEndDate}
             mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
             minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
             onChange={(event, selectedDate) => {
-              setShowCustomDatePicker(Platform.OS === 'ios');
+              setShowCustomDatePicker(Platform.OS === "ios");
               if (selectedDate) {
                 handleEndDateChange(selectedDate);
               }
@@ -558,13 +591,17 @@ export default function PracticeConfigScreen() {
           />
         )}
 
-        {showCustomDatePicker && Platform.OS === 'web' && (
+        {showCustomDatePicker && Platform.OS === "web" && (
           <View style={styles.webDatePicker}>
             <TextInput
               style={styles.webDateInput}
               type="date"
-              value={customEndDate.toISOString().split('T')[0]}
-              min={new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+              value={customEndDate.toISOString().split("T")[0]}
+              min={
+                new Date(startDate.getTime() + 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .split("T")[0]
+              }
               onChange={(event) => {
                 const newDate = new Date(event.target.value);
                 handleEndDateChange(newDate);
@@ -578,7 +615,7 @@ export default function PracticeConfigScreen() {
   );
 
   const calculateSummary = () => {
-    if (practiceType === 'time') {
+    if (practiceType === "time") {
       // Time-based practice summary
       const weeks = calculateWeeks();
       const totalSessions = parseInt(sessionsTarget) * weeks;
@@ -589,7 +626,7 @@ export default function PracticeConfigScreen() {
       };
     } else {
       // Count-based practice summary
-      if (configMode === 'total') {
+      if (configMode === "total") {
         const days = calculateDays();
         const dailyAmount = Math.ceil(parseInt(totalTarget) / days);
         return {
@@ -616,42 +653,79 @@ export default function PracticeConfigScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>项目预览</Text>
         <View style={styles.previewCard}>
-          {practiceType === 'count' ? (
+          {practiceType === "count" ? (
             <View>
               <View style={styles.previewHeader}>
                 <Text style={styles.previewPracticeName}>{practiceName}</Text>
                 {projectName && (
                   <View style={styles.previewProjectPill}>
-                    <Text style={styles.previewProjectPillText}>{projectName}</Text>
+                    <Text style={styles.previewProjectPillText}>
+                      {projectName}
+                    </Text>
                   </View>
                 )}
               </View>
 
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
+                  <Text>
+                    📅 {formatDate(startDate)} →{" "}
+                    {formatDate(
+                      durationMode === "自定义"
+                        ? customEndDate
+                        : new Date(
+                            startDate.getTime() +
+                              (durationMode === "60天"
+                                ? 60
+                                : durationMode === "100天"
+                                  ? 100
+                                  : durationMode === "1年"
+                                    ? 365
+                                    : 60) *
+                                24 *
+                                60 *
+                                60 *
+                                1000,
+                          ),
+                    )}{" "}
+                    ({days} 天)
+                  </Text>
                 </Text>
 
-                {configMode === 'total' && totalTarget ? (
+                {configMode === "total" && totalTarget ? (
                   <View>
                     <Text style={styles.previewDetailItem}>
-                      <Text>🎯 总目标: {parseInt(totalTarget).toLocaleString()} {practiceUnit}</Text>
+                      <Text>
+                        🎯 总目标: {parseInt(totalTarget).toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
                     </Text>
                     <Text style={styles.previewDetailItem}>
-                      <Text>📊 每日目标: {suggestedDaily.toLocaleString()} {practiceUnit}</Text>
+                      <Text>
+                        📊 每日目标: {suggestedDaily.toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
                     </Text>
                   </View>
-                ) : configMode === 'daily' && dailyTarget ? (
+                ) : configMode === "daily" && dailyTarget ? (
                   <View>
                     <Text style={styles.previewDetailItem}>
-                      <Text>🎯 每日目标: {parseInt(dailyTarget).toLocaleString()} {practiceUnit}</Text>
+                      <Text>
+                        🎯 每日目标: {parseInt(dailyTarget).toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
                     </Text>
                     <Text style={styles.previewDetailItem}>
-                      <Text>📊 预计总数: {projectedTotal.toLocaleString()} {practiceUnit}</Text>
+                      <Text>
+                        📊 预计总数: {projectedTotal.toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
                     </Text>
                   </View>
                 ) : (
-                  <Text style={styles.previewPlaceholder}>请设置目标以查看详情</Text>
+                  <Text style={styles.previewPlaceholder}>
+                    请设置目标以查看详情
+                  </Text>
                 )}
               </View>
             </View>
@@ -661,14 +735,37 @@ export default function PracticeConfigScreen() {
                 <Text style={styles.previewPracticeName}>{practiceName}</Text>
                 {projectName && (
                   <View style={styles.previewProjectPill}>
-                    <Text style={styles.previewProjectPillText}>{projectName}</Text>
+                    <Text style={styles.previewProjectPillText}>
+                      {projectName}
+                    </Text>
                   </View>
                 )}
               </View>
 
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
+                  <Text>
+                    📅 {formatDate(startDate)} →{" "}
+                    {formatDate(
+                      durationMode === "自定义"
+                        ? customEndDate
+                        : new Date(
+                            startDate.getTime() +
+                              (durationMode === "60天"
+                                ? 60
+                                : durationMode === "100天"
+                                  ? 100
+                                  : durationMode === "1年"
+                                    ? 365
+                                    : 60) *
+                                24 *
+                                60 *
+                                60 *
+                                1000,
+                          ),
+                    )}{" "}
+                    ({days} 天)
+                  </Text>
                 </Text>
 
                 {sessionsTarget ? (
@@ -676,7 +773,9 @@ export default function PracticeConfigScreen() {
                     <Text>🎯 每周目标: {sessionsTarget} 座</Text>
                   </Text>
                 ) : (
-                  <Text style={styles.previewPlaceholder}>请设置目标以查看详情</Text>
+                  <Text style={styles.previewPlaceholder}>
+                    请设置目标以查看详情
+                  </Text>
                 )}
               </View>
             </View>
@@ -691,19 +790,19 @@ export default function PracticeConfigScreen() {
     let end: Date;
 
     switch (durationMode) {
-      case '30天':
+      case "30天":
         end = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
         break;
-      case '60天':
+      case "60天":
         end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
         break;
-      case '100天':
+      case "100天":
         end = new Date(start.getTime() + 100 * 24 * 60 * 60 * 1000);
         break;
-      case '1年':
+      case "1年":
         end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
         break;
-      case '自定义':
+      case "自定义":
         end = customEndDate;
         break;
       default:
@@ -721,20 +820,20 @@ export default function PracticeConfigScreen() {
     if (!user) return;
 
     // Validation
-    if (practiceType === 'time') {
+    if (practiceType === "time") {
       if (!sessionsTarget || parseInt(sessionsTarget) <= 0) {
-        Alert.alert('错误', '请输入有效的座数');
+        Alert.alert("错误", "请输入有效的座数");
         return;
       }
     } else {
-      if (configMode === 'total') {
+      if (configMode === "total") {
         if (!totalTarget || parseInt(totalTarget) <= 0) {
-          Alert.alert('错误', '请输入有效的总目标数量');
+          Alert.alert("错误", "请输入有效的总目标数量");
           return;
         }
       } else {
         if (!dailyTarget || parseInt(dailyTarget) <= 0) {
-          Alert.alert('错误', '请输入有效的每日目标数量');
+          Alert.alert("错误", "请输入有效的每日目标数量");
           return;
         }
       }
@@ -745,27 +844,27 @@ export default function PracticeConfigScreen() {
     try {
       let projectData;
 
-      if (practiceType === 'time') {
+      if (practiceType === "time") {
         // Time-based practice configuration
         const startDateObj = new Date(startDate);
         const weeks = calculateWeeks();
         const endDate = new Date(startDateObj);
-        endDate.setDate(startDateObj.getDate() + (weeks * 7));
+        endDate.setDate(startDateObj.getDate() + weeks * 7);
         const targetCount = parseInt(sessionsTarget) * weeks;
 
         projectData = {
           user_id: user.id,
           practice_id: practiceId,
-          target_period: 'weekly',
+          target_period: "weekly",
           daily_target: parseInt(sessionsTarget),
-          start_date: startDateObj.toISOString().split('T')[0],
-          target_end_date: endDate.toISOString().split('T')[0],
+          start_date: startDateObj.toISOString().split("T")[0],
+          target_end_date: endDate.toISOString().split("T")[0],
           target_count: targetCount,
           current_count: 0,
-          status: 'active',
+          status: "active",
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
-          project_name: selectedPresetId ? null : (projectName || null),
+          project_name: selectedPresetId ? null : projectName || null,
         };
       } else {
         // Count-based practice configuration
@@ -775,7 +874,7 @@ export default function PracticeConfigScreen() {
         endDate.setDate(startDateObj.getDate() + days);
         let finalTargetCount, finalDailyTarget;
 
-        if (configMode === 'total') {
+        if (configMode === "total") {
           finalTargetCount = parseInt(totalTarget);
           finalDailyTarget = Math.ceil(finalTargetCount / days);
         } else {
@@ -788,32 +887,31 @@ export default function PracticeConfigScreen() {
           practice_id: practiceId,
           target_count: finalTargetCount,
           daily_target: finalDailyTarget,
-          start_date: startDateObj.toISOString().split('T')[0],
-          target_end_date: endDate.toISOString().split('T')[0],
+          start_date: startDateObj.toISOString().split("T")[0],
+          target_end_date: endDate.toISOString().split("T")[0],
           current_count: 0,
-          status: 'active',
-          target_period: 'daily',
+          status: "active",
+          target_period: "daily",
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
-          project_name: selectedPresetId ? null : (projectName || null),
+          project_name: selectedPresetId ? null : projectName || null,
         };
       }
 
       const { data, error } = await supabase
-        .from('user_practice_projects')
+        .from("user_practice_projects")
         .insert([projectData])
         .select();
 
       if (error) throw error;
 
-      console.log('✅ Practice project created:', data);
-      Alert.alert('成功', '修行项目已添加！', [
-        { text: '确定', onPress: () => router.push('/(tabs)/practice') }
+      console.log("✅ Practice project created:", data);
+      Alert.alert("成功", "修行项目已添加！", [
+        { text: "确定", onPress: () => router.push("/(tabs)/practice") },
       ]);
-
     } catch (error) {
-      console.error('❌ Error creating practice project:', error);
-      Alert.alert('错误', '创建修行项目失败');
+      console.error("❌ Error creating practice project:", error);
+      Alert.alert("错误", "创建修行项目失败");
     } finally {
       setLoading(false);
     }
@@ -824,15 +922,17 @@ export default function PracticeConfigScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <Text style={styles.backButtonText}>← 返回</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>配置"{practiceName}"</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-
-
+        {/* The problematic empty line that was here has been removed. */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
@@ -843,7 +943,9 @@ export default function PracticeConfigScreen() {
               <TextInput
                 style={[
                   styles.autocompleteInput,
-                  filteredPresets.length > 0 && projectName.length > 0 && styles.autocompleteInputActive
+                  filteredPresets.length > 0 &&
+                    projectName.length > 0 &&
+                    styles.autocompleteInputActive,
                 ]}
                 placeholder="输入项目名称或选择预设..."
                 value={projectName}
@@ -854,7 +956,7 @@ export default function PracticeConfigScreen() {
               {/* Autocomplete Dropdown */}
               {filteredPresets.length > 0 && projectName.length > 0 && (
                 <View style={styles.autocompleteDropdown}>
-                  <ScrollView 
+                  <ScrollView
                     style={styles.autocompleteScrollView}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
@@ -865,9 +967,13 @@ export default function PracticeConfigScreen() {
                         style={styles.autocompleteItem}
                         onPress={() => selectPreset(preset)}
                       >
-                        <Text style={styles.autocompleteItemText}>{preset.name}</Text>
+                        <Text style={styles.autocompleteItemText}>
+                          {preset.name}
+                        </Text>
                         {preset.category && (
-                          <Text style={styles.autocompleteItemCategory}>{preset.category}</Text>
+                          <Text style={styles.autocompleteItemCategory}>
+                            {preset.category}
+                          </Text>
                         )}
                       </TouchableOpacity>
                     ))}
@@ -882,7 +988,9 @@ export default function PracticeConfigScreen() {
           </View>
         </View>
 
-        {practiceType === 'count' ? renderCountBasedConfig() : renderTimeBasedConfig()}
+        {practiceType === "count"
+          ? renderCountBasedConfig()
+          : renderTimeBasedConfig()}
         {renderTimePlanning()}
         {renderSmartSummary()}
 
@@ -905,14 +1013,14 @@ export default function PracticeConfigScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: "#e9ecef",
   },
   backButton: {
     paddingVertical: 8,
@@ -921,24 +1029,24 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: Colors.primary,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
   },
   content: {
     flex: 1,
     padding: 16,
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -946,13 +1054,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 16,
   },
   segmentedControl: {
-    flexDirection: 'row',
-    backgroundColor: '#f1f3f4',
+    flexDirection: "row",
+    backgroundColor: "#f1f3f4",
     borderRadius: 8,
     padding: 4,
   },
@@ -961,11 +1069,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 6,
-    alignItems: 'center',
+    alignItems: "center",
   },
   segmentButtonActive: {
-    backgroundColor: 'white',
-    shadowColor: '#000',
+    backgroundColor: "white",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -973,73 +1081,73 @@ const styles = StyleSheet.create({
   },
   segmentButtonText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#666',
+    fontWeight: "500",
+    color: "#666",
   },
   segmentButtonTextActive: {
-    color: '#333',
+    color: "#333",
   },
   inputContainer: {
     marginTop: 16,
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   inputPrefix: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginRight: 8,
   },
   textInput: {
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   inputUnit: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginLeft: 8,
   },
   dateButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   dateButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   dateButtonIcon: {
     fontSize: 16,
   },
   durationOptions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 12,
   },
   durationButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f1f3f4',
+    backgroundColor: "#f1f3f4",
     borderRadius: 20,
     marginRight: 8,
     marginBottom: 8,
@@ -1049,62 +1157,62 @@ const styles = StyleSheet.create({
   },
   durationButtonText: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontWeight: "500",
+    color: "#666",
   },
   durationButtonTextActive: {
-    color: 'white',
+    color: "white",
   },
   customButton: {
-    backgroundColor: '#d4af37',
+    backgroundColor: "#d4af37",
     borderRadius: 8,
     paddingVertical: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 12,
   },
   customButtonActive: {
-    backgroundColor: '#b8941f',
+    backgroundColor: "#b8941f",
   },
   customButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
+    fontWeight: "600",
+    color: "white",
   },
   customButtonTextActive: {
-    color: 'white',
+    color: "white",
   },
   customInputContainer: {
     marginTop: 12,
     padding: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: "#007AFF",
   },
   customInputLabel: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: "500",
+    color: "#333",
     marginBottom: 8,
   },
   customDateButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "white",
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   customDateButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
 
   summaryContainer: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     padding: 16,
     borderLeftWidth: 4,
@@ -1112,99 +1220,99 @@ const styles = StyleSheet.create({
   },
   summaryTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 12,
   },
   summaryText: {
     fontSize: 15,
-    color: '#555',
+    color: "#555",
     lineHeight: 22,
     marginBottom: 4,
   },
   summaryHighlight: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.primary,
     lineHeight: 22,
     marginTop: 8,
   },
   topicProgressInfo: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: "#f0f8ff",
     borderRadius: 8,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#4a90e2',
+    borderLeftColor: "#4a90e2",
     marginTop: 8,
   },
   topicProgressText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#2c3e50',
+    fontWeight: "600",
+    color: "#2c3e50",
     marginBottom: 8,
   },
   topicProgressSubtext: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: "#7f8c8d",
     lineHeight: 20,
   },
   saveButton: {
     backgroundColor: Colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 24,
     marginBottom: 32,
   },
   saveButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
   saveButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   specialSection: {
     marginTop: 24,
     padding: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
   },
   topicProgressConfig: {
     marginTop: 16,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   configLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 4,
   },
   configDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   numberInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     minWidth: 60,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   helpText: {
     fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    fontStyle: 'italic',
+    color: "#666",
+    textAlign: "center",
+    fontStyle: "italic",
   },
   // Simplified count-based config styles
   goalTypeContainer: {
@@ -1215,28 +1323,28 @@ const styles = StyleSheet.create({
   },
   goalInputLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   goalInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   goalTextInput: {
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   goalInputUnit: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginLeft: 8,
   },
   // Simplified time planning styles
@@ -1245,34 +1353,34 @@ const styles = StyleSheet.create({
   },
   timeInputLabel: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   simpleDateButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   simpleDateButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   quickDurationButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginBottom: 8,
   },
   quickDurationButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#f1f3f4',
+    backgroundColor: "#f1f3f4",
     borderRadius: 20,
   },
   quickDurationButtonActive: {
@@ -1280,84 +1388,84 @@ const styles = StyleSheet.create({
   },
   quickDurationButtonText: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontWeight: "500",
+    color: "#666",
   },
   quickDurationButtonTextActive: {
-    color: 'white',
+    color: "white",
   },
   customDatePickerButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
     marginTop: 8,
   },
   customDatePickerButtonActive: {
-    backgroundColor: '#e8f4fd',
+    backgroundColor: "#e8f4fd",
     borderColor: Colors.primary,
   },
   customDatePickerButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   // Smart duration input styles
   smartDurationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     marginBottom: 12,
   },
   daysInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
     flex: 1,
   },
   daysInput: {
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
+    color: "#333",
+    textAlign: "center",
   },
   daysInputLabel: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginLeft: 4,
   },
   durationSeparator: {
     fontSize: 14,
-    color: '#999',
-    fontWeight: '500',
+    color: "#999",
+    fontWeight: "500",
   },
   endDatePickerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
     flex: 2,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   endDatePickerButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   durationDisplay: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: "#f0f8ff",
     borderRadius: 6,
     padding: 8,
     borderLeftWidth: 3,
@@ -1365,28 +1473,28 @@ const styles = StyleSheet.create({
   },
   durationDisplayText: {
     fontSize: 14,
-    color: '#555',
-    textAlign: 'center',
+    color: "#555",
+    textAlign: "center",
   },
   // Preview card styles
   previewCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     padding: 16,
     borderLeftWidth: 4,
     borderLeftColor: Colors.primary,
   },
   previewHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
     gap: 8,
   },
   previewPracticeName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   previewProjectPill: {
     backgroundColor: Colors.primary,
@@ -1396,64 +1504,64 @@ const styles = StyleSheet.create({
   },
   previewProjectPillText: {
     fontSize: 12,
-    fontWeight: '500',
-    color: 'white',
+    fontWeight: "500",
+    color: "white",
   },
   previewDetails: {
     gap: 6,
   },
   previewDetailItem: {
     fontSize: 14,
-    color: '#555',
+    color: "#555",
     lineHeight: 20,
   },
   previewPlaceholder: {
     fontSize: 14,
-    color: '#999',
-    fontStyle: 'italic',
+    color: "#999",
+    fontStyle: "italic",
   },
   projectNameInput: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   autocompleteContainer: {
-    position: 'relative',
+    position: "relative",
     zIndex: 1000,
   },
   autocompleteInput: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   autocompleteInputActive: {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    borderBottomColor: 'transparent',
+    borderBottomColor: "transparent",
   },
   autocompleteDropdown: {
-    position: 'absolute',
-    top: '100%',
+    position: "absolute",
+    top: "100%",
     left: 0,
     right: 0,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderWidth: 1,
     borderTopWidth: 0,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
     maxHeight: 200,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -1467,31 +1575,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f3f4',
+    borderBottomColor: "#f1f3f4",
   },
   autocompleteItemText: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
   autocompleteItemCategory: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginTop: 2,
   },
   webDatePicker: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     padding: 12,
     marginTop: 8,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   webDateInput: {
     fontSize: 16,
-    color: '#333',
-    backgroundColor: 'transparent',
-      borderWidth: 0,
-      outlineWidth: 0,
+    color: "#333",
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    outlineWidth: 0,
   },
 });
