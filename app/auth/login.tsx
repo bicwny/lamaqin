@@ -1,74 +1,95 @@
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import PageTemplate from '@/components/PageTemplate';
 import { Colors } from '@/constants/Colors';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [otpSent, setOtpSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const { signInWithOTP, verifyOTP, signUpWithOTP } = useAuth();
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('错误', '请输入邮箱和密码');
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  const handleSendOTP = async () => {
+    if (!email) {
+      Alert.alert('错误', '请输入邮箱');
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (error) {
-        Alert.alert('登录失败', error.message);
+      const result = await signInWithOTP(email.trim());
+      
+      if (result.error) {
+        Alert.alert('发送失败', result.error);
         return;
       }
 
-      if (data.user) {
-        await signIn(data.user, data.session);
-        router.replace('/(tabs)');
-      }
+      setOtpSent(true);
+      setCountdown(60);
+      Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
     } catch (error) {
-      console.error('Login error:', error);
-      Alert.alert('登录失败', '网络错误，请重试');
+      console.error('Send OTP error:', error);
+      Alert.alert('发送失败', '网络错误，请重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!email || !otp) {
+      Alert.alert('错误', '请输入邮箱和验证码');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await verifyOTP(email.trim(), otp.trim());
+      
+      if (result.error) {
+        Alert.alert('验证失败', result.error);
+        return;
+      }
+
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      Alert.alert('验证失败', '网络错误，请重试');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSignUp = async () => {
-    if (!email || !password) {
-      Alert.alert('错误', '请输入邮箱和密码');
+    if (!email) {
+      Alert.alert('错误', '请输入邮箱');
       return;
     }
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-      });
-
-      if (error) {
-        Alert.alert('注册失败', error.message);
+      const result = await signUpWithOTP(email.trim());
+      
+      if (result.error) {
+        Alert.alert('注册失败', result.error);
         return;
       }
 
-      if (data.user && !data.user.email_confirmed_at) {
-        router.push({
-          pathname: '/auth/email-verification',
-          params: { email: email.trim() }
-        });
-      } else if (data.user) {
-        await signIn(data.user, data.session);
-        router.replace('/(tabs)');
-      }
+      setOtpSent(true);
+      setCountdown(60);
+      Alert.alert('验证码已发送', '请检查您的邮箱并输入验证码');
     } catch (error) {
       console.error('Sign up error:', error);
       Alert.alert('注册失败', '网络错误，请重试');
@@ -77,68 +98,119 @@ export default function LoginScreen() {
     }
   };
 
+  const handleResendOTP = async () => {
+    if (countdown > 0) return;
+    await handleSendOTP();
+  };
+
+  const handleBackToEmail = () => {
+    setOtpSent(false);
+    setOtp('');
+    setCountdown(0);
+  };
+
   return (
     <PageTemplate 
       title="佛教修行追踪"
       variant="auth"
       scrollable={false}
+      showBackButton={otpSent}
+      onBackPress={otpSent ? handleBackToEmail : undefined}
     >
       <View style={styles.container}>
         <View style={styles.form}>
-          <Text style={styles.title}>欢迎回来</Text>
-          <Text style={styles.subtitle}>请登录您的账户</Text>
+          {!otpSent ? (
+            <>
+              <Text style={styles.title}>欢迎回来</Text>
+              <Text style={styles.subtitle}>请输入邮箱获取验证码</Text>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>邮箱</Text>
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="请输入邮箱"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>邮箱</Text>
+                <TextInput
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="请输入邮箱"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>密码</Text>
-            <TextInput
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="请输入密码"
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
+              <TouchableOpacity 
+                style={[styles.button, loading && styles.buttonDisabled]} 
+                onPress={handleSendOTP}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? '发送中...' : '发送验证码'}
+                </Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.button, loading && styles.buttonDisabled]} 
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? '登录中...' : '登录'}
-            </Text>
-          </TouchableOpacity>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>新用户?</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>或</Text>
-            <View style={styles.dividerLine} />
-          </View>
+              <TouchableOpacity 
+                style={[styles.button, styles.secondaryButton, loading && styles.buttonDisabled]} 
+                onPress={handleSignUp}
+                disabled={loading}
+              >
+                <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+                  {loading ? '创建中...' : '创建新账户'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.title}>输入验证码</Text>
+              <Text style={styles.subtitle}>
+                我们已向 {email} 发送验证码
+              </Text>
 
-          <TouchableOpacity 
-            style={[styles.button, styles.secondaryButton, loading && styles.buttonDisabled]} 
-            onPress={handleSignUp}
-            disabled={loading}
-          >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-              {loading ? '注册中...' : '创建新账户'}
-            </Text>
-          </TouchableOpacity>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>验证码</Text>
+                <TextInput
+                  style={styles.input}
+                  value={otp}
+                  onChangeText={setOtp}
+                  placeholder="请输入6位验证码"
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.button, loading && styles.buttonDisabled]} 
+                onPress={handleVerifyOTP}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>
+                  {loading ? '验证中...' : '验证并登录'}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.resendContainer}>
+                <Text style={styles.resendText}>没有收到验证码？</Text>
+                <TouchableOpacity 
+                  onPress={handleResendOTP}
+                  disabled={loading || countdown > 0}
+                  style={styles.resendButton}
+                >
+                  <Text style={[
+                    styles.resendButtonText,
+                    (loading || countdown > 0) && styles.resendButtonTextDisabled
+                  ]}>
+                    {countdown > 0 ? `重新发送 (${countdown}s)` : '重新发送'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </View>
       </View>
     </PageTemplate>
@@ -223,5 +295,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     color: Colors.textSecondary,
     fontSize: 14,
+  },
+  resendContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  resendText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  resendButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  resendButtonText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  resendButtonTextDisabled: {
+    color: Colors.textSecondary,
   },
 });
