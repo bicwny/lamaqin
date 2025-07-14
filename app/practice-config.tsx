@@ -75,6 +75,7 @@ export default function PracticeConfigScreen() {
   const [durationMode, setDurationMode] = useState<'30天' | '60天' | '100天' | '1年' | '自定义'>('60天');
   const [customEndDate, setCustomEndDate] = useState(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)); // Default to 60 days from now
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  const [customDays, setCustomDays] = useState('60'); // Default to 60 days
 
   // Calculated values
   const [suggestedDaily, setSuggestedDaily] = useState(0);
@@ -89,6 +90,25 @@ export default function PracticeConfigScreen() {
   useEffect(() => {
     calculateSuggestions();
   }, [totalTarget, dailyTarget, startDate, durationMode, customEndDate, configMode]);
+
+  // Handle days input change - auto update end date
+  const handleDaysInputChange = (text: string) => {
+    setCustomDays(text);
+    const days = parseInt(text);
+    if (!isNaN(days) && days > 0) {
+      const newEndDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+      setCustomEndDate(newEndDate);
+      setDurationMode('自定义');
+    }
+  };
+
+  // Handle end date change - auto update days
+  const handleEndDateChange = (selectedDate: Date) => {
+    setCustomEndDate(selectedDate);
+    const daysDiff = Math.ceil((selectedDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
+    setCustomDays(daysDiff.toString());
+    setDurationMode('自定义');
+  };
 
   useEffect(() => {
     const fetchPresets = async () => {
@@ -410,49 +430,42 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      {/* End date - simple duration or date picker */}
+      {/* End date - smart duration input */}
       <View style={styles.timeInputContainer}>
-        <Text style={styles.timeInputLabel}>持续时间</Text>
+        <Text style={styles.timeInputLabel}>结束日期</Text>
         
-        {/* Quick duration buttons */}
-        <View style={styles.quickDurationButtons}>
-          {['60天', '100天', '1年'].map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.quickDurationButton,
-                durationMode === option && styles.quickDurationButtonActive,
-              ]}
-              onPress={() => setDurationMode(option as any)}
-            >
-              <Text
-                style={[
-                  styles.quickDurationButtonText,
-                  durationMode === option && styles.quickDurationButtonTextActive,
-                ]}
-              >
-                {option}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        {/* Smart duration input */}
+        <View style={styles.smartDurationContainer}>
+          <View style={styles.daysInputContainer}>
+            <TextInput
+              style={styles.daysInput}
+              value={customDays}
+              onChangeText={handleDaysInputChange}
+              placeholder="天数"
+              keyboardType="numeric"
+            />
+            <Text style={styles.daysInputLabel}>天</Text>
+          </View>
+          
+          <Text style={styles.durationSeparator}>或</Text>
+          
+          <TouchableOpacity
+            style={styles.endDatePickerButton}
+            onPress={() => setShowCustomDatePicker(true)}
+          >
+            <Text style={styles.endDatePickerButtonText}>
+              {formatDate(customEndDate)}
+            </Text>
+            <Text style={styles.dateButtonIcon}>📅</Text>
+          </TouchableOpacity>
         </View>
         
-        {/* Custom date option */}
-        <TouchableOpacity
-          style={[
-            styles.customDatePickerButton,
-            durationMode === '自定义' && styles.customDatePickerButtonActive,
-          ]}
-          onPress={() => {
-            setDurationMode('自定义');
-            setShowCustomDatePicker(true);
-          }}
-        >
-          <Text style={styles.customDatePickerButtonText}>
-            {durationMode === '自定义' ? `至 ${formatDate(customEndDate)}` : '选择结束日期'}
+        {/* Duration display */}
+        <View style={styles.durationDisplay}>
+          <Text style={styles.durationDisplayText}>
+            {formatDate(startDate)} → {formatDate(customEndDate)} (共 {calculatedDays} 天)
           </Text>
-          <Text style={styles.dateButtonIcon}>📅</Text>
-        </TouchableOpacity>
+        </View>
 
         {showCustomDatePicker && (
           <DateTimePicker
@@ -463,7 +476,7 @@ export default function PracticeConfigScreen() {
             onChange={(event, selectedDate) => {
               setShowCustomDatePicker(Platform.OS === 'ios');
               if (selectedDate) {
-                setCustomEndDate(selectedDate);
+                handleEndDateChange(selectedDate);
               }
             }}
           />
@@ -1200,6 +1213,68 @@ const styles = StyleSheet.create({
   customDatePickerButtonText: {
     fontSize: 16,
     color: '#333',
+  },
+  // Smart duration input styles
+  smartDurationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  daysInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    flex: 1,
+  },
+  daysInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+  },
+  daysInputLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 4,
+  },
+  durationSeparator: {
+    fontSize: 14,
+    color: '#999',
+    fontWeight: '500',
+  },
+  endDatePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    flex: 2,
+    justifyContent: 'space-between',
+  },
+  endDatePickerButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  durationDisplay: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 6,
+    padding: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  durationDisplayText: {
+    fontSize: 14,
+    color: '#555',
+    textAlign: 'center',
   },
   // Preview card styles
   previewCard: {
