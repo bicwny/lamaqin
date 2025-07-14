@@ -37,7 +37,7 @@ export default function AddPracticeScreen() {
     try {
       console.log('🔄 Loading available practices...');
 
-      // Get all practices that user doesn't already have
+      // Get all practices - no filtering, allow multiple projects for same practice
       const { data: allPractices, error: practicesError } = await supabase
         .from('practices')
         .select('*')
@@ -45,22 +45,9 @@ export default function AddPracticeScreen() {
 
       if (practicesError) throw practicesError;
 
-      // Get user's existing practice projects
-      const { data: userProjects, error: projectsError } = await supabase
-        .from('user_practice_projects')
-        .select('practice_id')
-        .eq('user_id', user?.id);
-
-      if (projectsError) throw projectsError;
-
-      // Filter out practices user already has
-      const existingPracticeIds = new Set(userProjects?.map(p => p.practice_id) || []);
-      const availablePractices = allPractices?.filter(p => !existingPracticeIds.has(p.id)) || [];
-
-      console.log('📋 Available practices:', availablePractices.length);
-      console.log('🔍 Available practice names:', availablePractices.map(p => p.name));
-      console.log('🚫 Existing practice IDs:', Array.from(existingPracticeIds));
-      setPractices(availablePractices);
+      console.log('📋 Available practices:', allPractices?.length || 0);
+      console.log('🔍 Available practice names:', allPractices?.map(p => p.name) || []);
+      setPractices(allPractices || []);
     } catch (error) {
       console.error('Error loading practices:', error);
       Alert.alert('错误', '加载修行项目失败');
@@ -130,9 +117,9 @@ export default function AddPracticeScreen() {
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>😊 您已添加所有修行项目</Text>
+          <Text style={styles.emptyTitle}>🔄 加载中...</Text>
           <Text style={styles.emptyDescription}>
-            目前没有新的修行项目可以添加
+            正在加载修行项目
           </Text>
           <TouchableOpacity
             style={styles.backButton}

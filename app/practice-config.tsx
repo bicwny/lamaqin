@@ -975,8 +975,7 @@ export default function PracticeConfigScreen() {
                         key={preset.id}
                         style={styles.autocompleteItem}
                         onPress={() => selectPreset(preset)}
-                      >
-                        <Text style={styles.autocompleteItemText}>
+                      >                        <Text style={styles.autocompleteItemText}>
                           {preset.name}
                         </Text>
                         {preset.category && (
@@ -1101,9 +1100,15 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#333",
+    marginBottom: 4,
+  },
+  inputHelper: {
+    fontSize: 12,
+    color: Colors.textSecondary,
     marginBottom: 8,
+    fontStyle: 'italic',
   },
   inputRow: {
     flexDirection: "row",
