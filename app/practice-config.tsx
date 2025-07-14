@@ -478,7 +478,7 @@ export default function PracticeConfigScreen() {
             }}
           />
         )}
-
+        {/* DateTimePicker Modal */}
         {showStartDatePicker && Platform.OS === 'web' && (
           <View style={styles.webDatePicker}>
             <TextInput
@@ -488,7 +488,7 @@ export default function PracticeConfigScreen() {
               onChangeText={(text) => {
                 // Allow only digits and forward slashes
                 const cleanText = text.replace(/[^\d/]/g, '');
-                
+
                 // Auto-format as user types
                 let formattedText = cleanText;
                 if (cleanText.length >= 4 && !cleanText.includes('/')) {
@@ -498,19 +498,19 @@ export default function PracticeConfigScreen() {
                   const parts = formattedText.split('/');
                   formattedText = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
                 }
-                
+
                 // Update the input field value immediately
                 if (Platform.OS === 'web') {
                   (event.target as any).value = formattedText;
                 }
-                
+
                 // Parse and validate date
                 const parts = formattedText.split('/');
                 if (parts.length === 3) {
                   const year = parseInt(parts[0]);
                   const month = parseInt(parts[1]);
                   const day = parseInt(parts[2]);
-                  
+
                   if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
                     const newDate = new Date(year, month - 1, day);
                     if (newDate.getFullYear() === year && newDate.getMonth() === month - 1 && newDate.getDate() === day) {
@@ -588,7 +588,7 @@ export default function PracticeConfigScreen() {
             }}
           />
         )}
-
+        {/* DateTimePicker Modal */}
         {showCustomDatePicker && Platform.OS === 'web' && (
           <View style={styles.webDatePicker}>
             <TextInput
@@ -598,7 +598,7 @@ export default function PracticeConfigScreen() {
               onChangeText={(text) => {
                 // Allow only digits and forward slashes
                 const cleanText = text.replace(/[^\d/]/g, '');
-                
+
                 // Auto-format as user types
                 let formattedText = cleanText;
                 if (cleanText.length >= 4 && !cleanText.includes('/')) {
@@ -608,23 +608,23 @@ export default function PracticeConfigScreen() {
                   const parts = formattedText.split('/');
                   formattedText = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
                 }
-                
+
                 // Update the input field value immediately
                 if (Platform.OS === 'web') {
                   (event.target as any).value = formattedText;
                 }
-                
+
                 // Parse and validate date
                 const parts = formattedText.split('/');
                 if (parts.length === 3) {
                   const year = parseInt(parts[0]);
                   const month = parseInt(parts[1]);
                   const day = parseInt(parts[2]);
-                  
+
                   if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
                     const newDate = new Date(year, month - 1, day);
                     const minDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
-                    
+
                     if (newDate.getFullYear() === year && newDate.getMonth() === month - 1 && newDate.getDate() === day && newDate >= minDate) {
                       handleEndDateChange(newDate);
                       setShowCustomDatePicker(false);
