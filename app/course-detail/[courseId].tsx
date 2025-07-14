@@ -219,8 +219,8 @@ export default function CourseDetailScreen() {
 
         <Text style={styles.sectionTitle}>课程内容：</Text>
 
-        {lessons.map(lesson => (
-          <View key={lesson.id} style={styles.lessonItem}>
+        {lessons.map((lesson, index) => (
+          <View key={lesson.id} style={[styles.lessonItem, index > 0 && styles.lessonItemSpacing]}>
             <View style={styles.lessonHeader}>
               <View style={styles.lessonTitleRow}>
                 <Text style={styles.lessonTitle}>
@@ -311,6 +311,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -402,5 +403,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: -0.2,
+  },
+  lessonItemSpacing: {
+    marginTop: 12,
   },
 });
