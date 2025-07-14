@@ -125,6 +125,8 @@ export default function PracticeConfigScreen() {
       );
       setCustomEndDate(newEndDate);
       setDurationMode("自定义");
+    } else if (!isNaN(days) && days <= 0) {
+      Alert.alert("输入错误", "天数必须大于0");
     }
   };
 
@@ -465,6 +467,12 @@ export default function PracticeConfigScreen() {
   };
 
   const handleCustomDateConfirm = (date: Date) => {
+    // Ensure end date is not before start date
+    const minDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    if (date < minDate) {
+      Alert.alert("日期错误", "结束日期不能早于开始日期");
+      return;
+    }
     setCustomEndDate(date);
     hideCustomDatePicker();
   };
@@ -573,6 +581,7 @@ export default function PracticeConfigScreen() {
             onConfirm={handleCustomDateConfirm}
             onCancel={hideCustomDatePicker}
             value={customEndDate}
+            minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
           />
         )}
 
