@@ -12,12 +12,12 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
 import { toastService } from '@/lib/toast';
+import TopicSelectionModal from '@/components/TopicSelectionModal';
 
 export default function MeditationRecordScreen() {
   const { user } = useAuth();
@@ -43,6 +43,12 @@ export default function MeditationRecordScreen() {
     title: string;
     description?: string;
   }>>([]);
+  const [showTopicModal, setShowTopicModal] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState<{
+    topic_number: number;
+    title: string;
+    description?: string;
+  } | null>(null);
 
   const isEditing = !!editRecordId;
 
@@ -58,6 +64,15 @@ export default function MeditationRecordScreen() {
       console.log('🔄 Loading meditation topics for practice:', practiceId);
       const topics = await meditationService.getMeditationTopics(practiceId);
       setMeditationTopics(topics);
+      
+      // Set initial selected topic
+      if (topics.length > 0) {
+        const initialTopicNumber = parseInt(sessionNumber);
+        const initialTopic = topics.find(t => t.topic_number === initialTopicNumber) || topics[0];
+        setSelectedTopic(initialTopic);
+        setSessionNumber(initialTopic.topic_number.toString());
+      }
+      
       console.log('📚 Loaded meditation topics:', topics.length);
     } catch (error) {
       console.error('❌ Error loading meditation topics:', error);
@@ -75,6 +90,14 @@ export default function MeditationRecordScreen() {
         setDuration(record.duration_minutes.toString());
         setSessionNumber(record.session_number?.toString() || '1');
         setReflection(record.reflection || '');
+        
+        // Set selected topic after topics are loaded
+        if (meditationTopics.length > 0) {
+          const topic = meditationTopics.find(t => t.topic_number === record.session_number);
+          if (topic) {
+            setSelectedTopic(topic);
+          }
+        }
       }
     } catch (error) {
       console.error('❌ Error loading existing record:', error);
@@ -146,7 +169,10 @@ export default function MeditationRecordScreen() {
     }
   };
 
-  const selectedTopic = meditationTopics.find(t => t.topic_number === parseInt(sessionNumber));
+  const handleTopicSelect = (topic: { topic_number: number; title: string; description?: string }) => {
+    setSelectedTopic(topic);
+    setSessionNumber(topic.topic_number.toString());
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -197,32 +223,16 @@ export default function MeditationRecordScreen() {
               {loadingTopics ? (
                 <ActivityIndicator style={styles.loadingIndicator} />
               ) : meditationTopics.length > 0 ? (
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={parseInt(sessionNumber)}
-                    onValueChange={(value) => setSessionNumber(value.toString())}
-                    style={styles.picker}
-                  >
-                    {meditationTopics.map((topic) => (
-                      <Picker.Item 
-                        key={topic.topic_number} 
-                        label={`第${topic.topic_number}座 - ${topic.title}`} 
-                        value={topic.topic_number} 
-                      />
-                    ))}
-                  </Picker>
-                </View>
+                <TouchableOpacity
+                  style={styles.topicSelector}
+                  onPress={() => setShowTopicModal(true)}
+                >
+                  <Text style={styles.topicSelectorText}>
+                    {selectedTopic ? selectedTopic.title : '请选择观修内容'}
+                  </Text>
+                  <Text style={styles.topicSelectorArrow}>›</Text>
+                </TouchableOpacity>
               ) : null}
-            </View>
-          )}
-
-          {/* Topic Description - only show if topics exist and there's a selected topic */}
-          {meditationTopics.length > 0 && selectedTopic?.description && (
-            <View style={styles.topicDescription}>
-              <Text style={styles.topicDescriptionLabel}>观修要点：</Text>
-              <Text style={styles.topicDescriptionText}>
-                {selectedTopic.description}
-              </Text>
             </View>
           )}
 
@@ -261,6 +271,16 @@ export default function MeditationRecordScreen() {
         </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Topic Selection Modal */}
+      <TopicSelectionModal
+        visible={showTopicModal}
+        onClose={() => setShowTopicModal(false)}
+        onSelect={handleTopicSelect}
+        topics={meditationTopics}
+        selectedTopicNumber={selectedTopic?.topic_number}
+        loading={loadingTopics}
+      />
     </SafeAreaView>
   );
 }
@@ -356,42 +376,26 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 12,
   },
-  pickerContainer: {
+  topicSelector: {
     borderWidth: 1,
     borderColor: '#ced4da',
     borderRadius: 8,
     backgroundColor: 'white',
-    overflow: 'hidden',
-    ...(Platform.OS === 'ios' && {
-      minHeight: 200,
-      paddingHorizontal: 0,
-    }),
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  picker: {
-    height: 50,
+  topicSelectorText: {
+    fontSize: 16,
     color: '#333',
-    ...(Platform.OS === 'android' && {
-      backgroundColor: 'white',
-    }),
+    flex: 1,
   },
-  topicDescription: {
-    backgroundColor: '#fff3cd',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffc107'
-  },
-  topicDescriptionLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#856404',
-    marginBottom: 6
-  },
-  topicDescriptionText: {
-    fontSize: 14,
-    color: '#856404',
-    lineHeight: 20
+  topicSelectorArrow: {
+    fontSize: 18,
+    color: '#999',
+    marginLeft: 8,
   },
   characterCount: {
     fontSize: 12,
