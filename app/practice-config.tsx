@@ -130,7 +130,7 @@ export default function PracticeConfigScreen() {
   const handleProjectNameChange = (text: string) => {
     setProjectName(text);
     setSelectedPresetId(''); // Clear preset selection when typing custom name
-
+    
     // Filter presets based on input
     if (text.length > 0) {
       const filtered = presetProjectNames.filter(preset => 
@@ -307,7 +307,7 @@ export default function PracticeConfigScreen() {
   const renderCountBasedConfig = () => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>目标设置</Text>
-
+      
       {/* Simple toggle for goal type */}
       <View style={styles.goalTypeContainer}>
         <View style={styles.segmentedControl}>
@@ -448,7 +448,7 @@ export default function PracticeConfigScreen() {
       {/* End date - smart duration input */}
       <View style={styles.timeInputContainer}>
         <Text style={styles.timeInputLabel}>结束日期</Text>
-
+        
         {/* Smart duration input */}
         <View style={styles.smartDurationContainer}>
           <View style={styles.daysInputContainer}>
@@ -461,9 +461,9 @@ export default function PracticeConfigScreen() {
             />
             <Text style={styles.daysInputLabel}>天</Text>
           </View>
-
+          
           <Text style={styles.durationSeparator}>或</Text>
-
+          
           <TouchableOpacity
             style={styles.endDatePickerButton}
             onPress={() => setShowCustomDatePicker(true)}
@@ -474,7 +474,7 @@ export default function PracticeConfigScreen() {
             <Text style={styles.dateButtonIcon}>📅</Text>
           </TouchableOpacity>
         </View>
-
+        
         {/* Duration display */}
         <View style={styles.durationDisplay}>
           <Text style={styles.durationDisplayText}>
@@ -565,12 +565,12 @@ export default function PracticeConfigScreen() {
                   </View>
                 )}
               </View>
-
+              
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
                   📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
                 </Text>
-
+                
                 {configMode === 'total' && totalTarget ? (
                   <>
                     <Text style={styles.previewDetailItem}>
@@ -604,12 +604,12 @@ export default function PracticeConfigScreen() {
                   </View>
                 )}
               </View>
-
+              
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
                   📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} ({days} 天)
                 </Text>
-
+                
                 {sessionsTarget ? (
                   <Text style={styles.previewDetailItem}>
                     🎯 每周目标: {sessionsTarget} 座
@@ -789,7 +789,7 @@ export default function PracticeConfigScreen() {
                 onChangeText={handleProjectNameChange}
                 multiline={false}
               />
-
+              
               {/* Autocomplete Dropdown */}
               {filteredPresets.length > 0 && projectName.length > 0 && (
                 <View style={styles.autocompleteDropdown}>
