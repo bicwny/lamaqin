@@ -537,7 +537,7 @@ export default function PracticeConfigScreen() {
 
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} (<Text>{days}</Text> <Text>天</Text>)
+                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} (共 {days} 天)
                 </Text>
 
                 {configMode === 'total' && totalTarget ? (
@@ -576,7 +576,7 @@ export default function PracticeConfigScreen() {
 
               <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} (<Text>{days}</Text> <Text>天</Text>)
+                  📅 {formatDate(startDate)} → {formatDate(durationMode === '自定义' ? customEndDate : new Date(startDate.getTime() + (durationMode === '60天' ? 60 : durationMode === '100天' ? 100 : durationMode === '1年' ? 365 : 60) * 24 * 60 * 60 * 1000))} (共 {days} 天)
                 </Text>
 
                 {sessionsTarget ? (
@@ -929,7 +929,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    borderWidth: 1,The provided changes are redundant and do not address the issue of "Unexpected text node". The core issue is the presence of raw text within `<View>` components. I will review the code and add Text components where necessary to resolve this issue.    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   dateButtonText: {
     fontSize: 16,
