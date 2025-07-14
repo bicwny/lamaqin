@@ -10,12 +10,12 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+import PageTemplate from '@/components/PageTemplate';
 
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
@@ -102,17 +102,19 @@ export default function ProfileSetupScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <PageTemplate
+      title="完善个人资料"
+      subtitle="帮助我们更好地了解您的修行情况"
+      showBackButton={false}
+      scrollable={true}
+      backgroundColor={Colors.background}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <KeyboardAvoidingView 
+        style={styles.container} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <View style={styles.header}>
           <Text style={styles.logo}>🌸</Text>
-          <Text style={styles.title}>完善个人资料</Text>
-          <Text style={styles.subtitle}>
-            帮助我们更好地了解您的修行情况
-          </Text>
         </View>
 
         <View style={styles.form}>
@@ -200,20 +202,14 @@ export default function ProfileSetupScreen() {
             </Text>
           </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </PageTemplate>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
   },
   header: {
     alignItems: 'center',
@@ -222,18 +218,6 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 48,
     marginBottom: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.primary,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
   },
   form: {
     width: '100%',

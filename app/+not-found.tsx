@@ -1,20 +1,24 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
 
+import { Link } from 'expo-router';
+import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet } from 'react-native';
 
 export default function NotFoundScreen() {
   return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
+    <PageTemplate
+      title="页面未找到"
+      showBackButton={false}
+      scrollable={false}
+    >
       <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen does not exist.</ThemedText>
+        <ThemedText type="title">这个页面不存在</ThemedText>
         <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
+          <ThemedText type="link">返回首页</ThemedText>
         </Link>
       </ThemedView>
-    </>
+    </PageTemplate>
   );
 }
 
