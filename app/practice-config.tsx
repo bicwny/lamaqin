@@ -404,19 +404,29 @@ export default function PracticeConfigScreen() {
   );
 
   const showStartDatepicker = () => {
-    setStartDatePickerVisibility(true);
+    if (Platform.OS === 'web') {
+      setShowStartDatePicker(true);
+    } else {
+      setStartDatePickerVisibility(true);
+    }
   };
 
   const hideStartDatePicker = () => {
     setStartDatePickerVisibility(false);
+    setShowStartDatePicker(false);
   };
 
     const showCustomDatepicker = () => {
-    setCustomDatePickerVisibility(true);
+    if (Platform.OS === 'web') {
+      setShowCustomDatePicker(true);
+    } else {
+      setCustomDatePickerVisibility(true);
+    }
   };
 
   const hideCustomDatePicker = () => {
     setCustomDatePickerVisibility(false);
+    setShowCustomDatePicker(false);
   };
 
   const handleStartDateConfirm = (date: Date) => {
