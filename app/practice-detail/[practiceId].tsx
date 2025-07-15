@@ -646,25 +646,26 @@ const styles = StyleSheet.create({
   },
   mainCard: {
     ...ComponentTokens.card.practice,
-    margin: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.md,
+    //margin: DesignSystem.spacing.lg,
+    //marginBottom: DesignSystem.spacing.md,
   },
   practiceHeader: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.lg,
+    //paddingHorizontal: DesignSystem.spacing.xl,
+    //paddingTop: DesignSystem.spacing.xl,
+    //paddingBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   practiceTypeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.sm,
   },
   practiceType: {
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textSecondary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-    textTransform: 'uppercase',
+    //textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   completedBadge: {
@@ -675,7 +676,6 @@ const styles = StyleSheet.create({
   },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
-    marginBottom: DesignSystem.spacing.md,
     lineHeight: DesignSystem.typography.lineHeight.tight * DesignSystem.typography.fontSize['2xl'],
   },
   practiceDescription: {
@@ -684,18 +684,18 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
   },
   progressSection: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingVertical: DesignSystem.spacing.lg,
-    backgroundColor: DesignSystem.colors.background,
-    marginHorizontal: DesignSystem.spacing.xl,
-    borderRadius: DesignSystem.borderRadius.lg,
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  progressDetails: {
+    //paddingHorizontal: DesignSystem.spacing.xl,
+    //paddingVertical: DesignSystem.spacing.lg,
+    //backgroundColor: DesignSystem.colors.background,
+    //marginHorizontal: DesignSystem.spacing.xl,
+    //borderRadius: DesignSystem.borderRadius.lg,
     marginBottom: DesignSystem.spacing.md,
   },
+  progressDetails: {
+    //marginBottom: DesignSystem.spacing.md,
+  },
   progressText: {
-    ...Typography.styles.subheading('lg'),
+    ...Typography.styles.subheading('md'),
     marginBottom: DesignSystem.spacing.xs,
   },
   dailyTargetText: {
@@ -731,21 +731,21 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   projectDetails: {
-    paddingHorizontal: DesignSystem.spacing.xl,
+    //paddingHorizontal: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   projectDetailsTitle: {
     ...Typography.styles.subheading('lg'),
-    marginBottom: DesignSystem.spacing.lg,
+    //marginBottom: DesignSystem.spacing.lg,
   },
   detailsGrid: {
-    gap: DesignSystem.spacing.md,
+    //gap: DesignSystem.spacing.md,
   },
   detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   detailLabel: {
     ...Typography.styles.body('base'),
@@ -766,8 +766,8 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     gap: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.xl,
+    //paddingHorizontal: DesignSystem.spacing.xl,
+    //paddingBottom: DesignSystem.spacing.xl,
   },
   primaryButton: {
     ...ComponentTokens.button.primary,
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: DesignSystem.spacing.xs,
+    gap: DesignSystem.spacing.sm,
   },
   secondaryButtonText: {
     ...ComponentTextStyles.button.secondary,
