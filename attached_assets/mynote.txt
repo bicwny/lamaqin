@@ -1,1 +1,174 @@
-观修
+Phase 1: Foundation & Discovery (Week 1)
+Step 1: Comprehensive Style Audit (Days 1-2)
+1.1 Create Style Inventory Spreadsheet
+
+Document every hardcoded style value across the entire app
+Create categories: Typography, Colors, Spacing, Shadows, BorderRadius
+Track which files use which patterns
+1.2 Typography Audit
+
+Scan all files for fontSize values: 12, 14, 16, 18, 20, 24, 32px
+Document fontWeight usage: '400', '500', '600', '700', 'bold'
+Find letterSpacing values: -0.3, -0.2, -0.1, 0, 0.1
+Identify lineHeight patterns: 20, 24, 28, 32
+1.3 Color Usage Audit
+
+Find all Colors.ts imports vs DesignSystem.colors usage
+Document hardcoded hex values: '#1a1a1a', '#ffffff', '#f8f9fa'
+Map Buddhist semantic colors to design tokens
+Identify inconsistent color applications
+1.4 Spacing Pattern Analysis
+
+Document all padding/margin values: 4, 8, 12, 16, 20, 24, 32, 40px
+Find gap values in flexbox layouts
+Identify component-specific spacing patterns
+1.5 Component Style Duplication Analysis
+
+Document repeated button styles across files
+Find duplicated card styling patterns
+Identify similar progress bar implementations
+Map shadow configurations used throughout app
+Step 2: Expand DesignSystem.ts (Days 2-3)
+2.1 Add Missing Typography Scales
+
+// Add these to existing DesignSystem.typography.fontSize:
+'xs': 12,    // Currently used in practice-detail
+'4xl': 32,   // For large headings
+'5xl': 40,   // If found in audit
+2.2 Expand Color Semantic Mapping
+
+// Add Buddhist-specific semantic colors:
+meditation: '#da4347',      // Your primary red
+compassion: '#e66a6d',      // Primary light
+wisdom: '#b8393d',          // Primary dark
+progress: '#2e7d32',        // Success green
+reflection: '#666666',      // Text secondary
+2.3 Add Missing Spacing Values
+
+// Based on practice-detail usage:
+'6xl': 56,   // If found in audit
+'7xl': 64,   // If found in audit
+2.4 Create Component-Specific Tokens
+
+// Add to DesignSystem.components:
+practiceCard: {
+  backgroundColor: '#ffffff',
+  borderRadius: 12,
+  padding: 20,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 4,
+  borderWidth: 0.5,
+  borderColor: 'rgba(0,0,0,0.04)',
+}
+Step 3: Create Migration Utilities (Day 3)
+3.1 Style Mapping Functions
+
+// Create migration helper functions:
+export const legacyStyleMap = {
+  // Map old hardcoded values to design tokens
+  fontSize: {
+    12: DesignSystem.typography.fontSize.xs,
+    14: DesignSystem.typography.fontSize.sm,
+    16: DesignSystem.typography.fontSize.base,
+    // ... etc
+  },
+  colors: {
+    '#1a1a1a': DesignSystem.colors.textPrimary,
+    '#666666': DesignSystem.colors.textSecondary,
+    // ... etc
+  }
+};
+3.2 Component Migration Templates
+
+// Pre-built replacement patterns:
+export const migrationTemplates = {
+  practiceTitle: () => createStyles.heading('2xl'),
+  practiceDescription: () => createStyles.body('base'),
+  practiceCard: () => createStyles.card('xl'),
+  // ... etc
+};
+Step 4: Document Current vs Target State (Day 4)
+4.1 Create Migration Map
+
+File: practice-detail/[practiceId].tsx
+Current: fontSize: 24, fontWeight: '700'
+Target: createStyles.heading('2xl')
+Risk Level: Low (isolated component)
+4.2 Identify High-Risk Areas
+
+Shared components (ThemedText, ThemedView)
+Layout files (_layout.tsx)
+Components with complex styling interactions
+4.3 Create Rollback Plan
+
+Document how to revert each change
+Identify dependencies between style changes
+Plan incremental testing approach
+Step 5: Test Infrastructure Setup (Day 5)
+5.1 Create Style Testing Components
+
+// Visual regression testing component
+export function StyleMigrationTest() {
+  return (
+    <View>
+      {/* Test all typography combinations */}
+      {/* Test all color combinations */}
+      {/* Test all spacing combinations */}
+    </View>
+  );
+}
+5.2 Before/After Comparison Setup
+
+Screenshot key screens before migration
+Create side-by-side comparison method
+Document visual differences acceptance criteria
+5.3 Performance Baseline
+
+Measure current StyleSheet.create usage
+Document bundle size before migration
+Set up performance monitoring for createStyles usage
+Step 6: Priority Order Planning (Day 5)
+6.1 Migration Sequence
+
+Least Risky First: practice-detail/[practiceId].tsx (isolated screen)
+Medium Risk: Modal components (contained scope)
+High Risk: Shared components (affects entire app)
+Highest Risk: Layout files (affects navigation)
+6.2 Validation Checkpoints
+
+After each file migration: Visual comparison
+After each category: Full app functionality test
+After each phase: Performance regression test
+Step 7: Team Communication Plan (Day 5)
+7.1 Documentation
+
+Create migration progress tracker
+Document known issues and workarounds
+Create "what to do if..." troubleshooting guide
+7.2 Testing Protocol
+
+Define what constitutes "working during transition"
+Create checklist for each migration step
+Plan rollback triggers and procedures
+Key Deliverables from Phase 1:
+Complete Style Inventory - Every hardcoded value catalogued
+Enhanced DesignSystem.ts - Covers 100% of app's style patterns
+Migration Utilities - Helper functions for safe transitions
+Risk Assessment - Prioritized migration order
+Testing Infrastructure - Visual regression and performance monitoring
+Rollback Plan - Safety net for each change
+Success Criteria for Phase 1:
+✅ Zero new hardcoded styles added during audit
+✅ DesignSystem.ts covers every pattern found in codebase
+✅ Migration utilities tested and validated
+✅ Clear go/no-go criteria for Phase 2
+✅ App continues functioning normally throughout
+This foundation phase ensures that when we start actual code migration in Phase 2, we have:
+
+Complete coverage of all style patterns
+Safe migration path with rollback options
+Clear success metrics for each change
+Minimal risk to app functionality
