@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Alert
 } from 'react-native';
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import { COMMON_TIMEZONES, saveUserTimezone, type TimezoneInfo } from '@/lib/timezone';
 
 interface TimezoneSelectorProps {

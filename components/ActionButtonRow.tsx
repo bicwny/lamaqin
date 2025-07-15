@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 
 interface ActionButton {
   text: string;

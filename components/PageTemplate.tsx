@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, StatusBar, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/Colors';
 import PageHeader from './PageHeader';
 import { DesignSystem } from '@/constants/DesignSystem';
 

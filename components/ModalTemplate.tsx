@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Text } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 
 interface ModalTemplateProps {
@@ -57,7 +58,7 @@ export default function ModalTemplate({
               style={styles.closeButton}
               onPress={onClose}
             >
-              <Ionicons name="close" size={24} color={DesignSystem.colors.textPrimary} />
+              <Ionicons name="close" size={24} color={Colors.text} />
             </TouchableOpacity>
           )}
         </View>

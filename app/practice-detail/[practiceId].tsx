@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -12,7 +13,7 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
@@ -53,7 +54,7 @@ interface MeditationRecord {
 export default function PracticeDetailScreen() {
   const { user } = useAuth();
   const { practiceId } = useLocalSearchParams<{ practiceId: string }>();
-
+  
   const [project, setProject] = useState<PracticeProject | null>(null);
   const [presetProjectName, setPresetProjectName] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -398,7 +399,7 @@ export default function PracticeDetailScreen() {
     } else {
       const todayCount = todayRecords.length;
       const target = project.daily_target;
-
+      
       // Format session details for today
       const todayDetails = todayRecords.map((record, index) =>
         `第${index + 1}座${record.duration_minutes}分钟`
@@ -444,10 +445,10 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -461,7 +462,7 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到修行项目</Text>
@@ -483,7 +484,7 @@ export default function PracticeDetailScreen() {
         `项目：${getDisplayProjectName()}` : undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={DesignSystem.colors.background}
+      backgroundColor={Colors.background}
       padding={0}
     >
       <ScrollView
@@ -520,7 +521,7 @@ export default function PracticeDetailScreen() {
           {/* Project Details Section */}
           <View style={styles.detailsSection}>
             <Text style={styles.detailsSectionTitle}>项目详情</Text>
-
+            
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>开始日期：</Text>
               <Text style={styles.detailValue}>{project.start_date}</Text>
@@ -547,7 +548,7 @@ export default function PracticeDetailScreen() {
           {/* Progress Section */}
           <View style={styles.progressContainer}>
             {renderProgressDetails()}
-
+            
             {project.practices.type === 'count' && (
               <View style={styles.progressBarContainer}>
                 <View style={styles.progressBar}>
@@ -571,7 +572,7 @@ export default function PracticeDetailScreen() {
               style={styles.secondaryButton}
               onPress={handleEditPractice}
             >
-              <Ionicons name="create-outline" size={20} color={DesignSystem.colors.primary} />
+              <Ionicons name="create-outline" size={20} color={Colors.primary} />
               <Text style={styles.secondaryButtonText}>编辑项目</Text>
             </TouchableOpacity>
 
@@ -596,7 +597,7 @@ export default function PracticeDetailScreen() {
               onPress={handleViewHistory}
             >
               <Text style={styles.viewAllText}>查看全部</Text>
-              <Ionicons name="chevron-forward" size={16} color={DesignSystem.colors.primary} />
+              <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
             </TouchableOpacity>
           </View>
 
@@ -616,7 +617,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   emptyContainer: {
@@ -627,7 +628,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   infoCard: {
     backgroundColor: 'white',
@@ -651,7 +652,7 @@ const styles = StyleSheet.create({
   },
   practiceType: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   completedBadge: {
@@ -674,7 +675,7 @@ const styles = StyleSheet.create({
   },
   practiceDescription: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     lineHeight: 24,
     marginBottom: 16,
   },
@@ -693,12 +694,12 @@ const styles = StyleSheet.create({
   },
   dailyTargetText: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   sessionDetails: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontStyle: 'italic',
     fontWeight: '500',
   },
@@ -716,13 +717,13 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     borderRadius: 4,
   },
   progressPercentage: {
     fontSize: 16,
     fontWeight: '600',
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     minWidth: 50,
     textAlign: 'right',
   },
@@ -736,7 +737,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     padding: 16,
     borderRadius: 12,
     gap: 8,
@@ -756,7 +757,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 6,
     borderWidth: 1.5,
-    borderColor: DesignSystem.colors.primary,
+    borderColor: Colors.primary,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -764,7 +765,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   secondaryButtonText: {
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: -0.1,
@@ -796,7 +797,7 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   detailValue: {
@@ -808,11 +809,11 @@ const styles = StyleSheet.create({
     color: '#2e7d32',
   },
   statusActive: {
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
   },
   noRecordsText: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
     fontStyle: 'italic',
@@ -850,7 +851,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontWeight: '600',
   },
   recordItem: {
@@ -872,7 +873,7 @@ const styles = StyleSheet.create({
   },
   recordTime: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   recordCount: {
@@ -887,12 +888,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 8,
     borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.primary,
+    borderLeftColor: Colors.primary,
   },
   notesLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   notesText: {
@@ -901,4 +902,3 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
-// This code replaces all instances of Colors.background with DesignSystem.colors.background and Colors.primary with DesignSystem.colors.primary, and add DesignSystem import.

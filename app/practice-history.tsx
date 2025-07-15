@@ -14,7 +14,7 @@ import {
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 

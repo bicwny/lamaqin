@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { DesignSystem } from "@/constants/DesignSystem";
+import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
@@ -17,8 +17,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: DesignSystem.colors.primary,
-        tabBarInactiveTintColor: DesignSystem.colors.textTertiary,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -26,7 +26,7 @@ export default function TabLayout() {
           ios: {
             backgroundColor: "rgba(255, 255, 255, 0.95)",
             borderTopWidth: 0.5,
-            borderTopColor: DesignSystem.colors.border,
+            borderTopColor: Colors.border,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
             shadowOpacity: 0.1,
@@ -38,7 +38,7 @@ export default function TabLayout() {
           default: {
             backgroundColor: "#fff",
             borderTopWidth: 0.5,
-            borderTopColor: DesignSystem.colors.border,
+            borderTopColor: Colors.border,
             elevation: 8,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
@@ -54,8 +54,6 @@ export default function TabLayout() {
           fontWeight: "600",
           marginTop: 2,
         },
-        activeTintColor: DesignSystem.colors.tabIconSelected,
-        inactiveTintColor: DesignSystem.colors.tabIconDefault,
       }}
       initialRouteName="index"
     >

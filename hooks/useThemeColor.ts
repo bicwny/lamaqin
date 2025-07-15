@@ -1,13 +1,14 @@
+
 /**
  * Enhanced theme color hook with better TypeScript support
  */
 
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof DesignSystem.colors
+  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
   const theme = useColorScheme() ?? 'light';
   const colorFromProps = props[theme];
@@ -15,33 +16,27 @@ export function useThemeColor(
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    // Map common color names to DesignSystem colors
-    const colorMap: { [key: string]: string } = {
-      text: DesignSystem.colors.textPrimary,
-      background: DesignSystem.colors.background,
-      tint: DesignSystem.colors.primary,
-      tabIconDefault: DesignSystem.colors.textSecondary,
-      tabIconSelected: DesignSystem.colors.primary,
-    };
-    return colorMap[colorName] || DesignSystem.colors.textPrimary;
+    return Colors[theme][colorName];
   }
 }
 
 // New hook for getting primary color variants
 export function usePrimaryColor() {
+  const theme = useColorScheme() ?? 'light';
   return {
-    primary: DesignSystem.colors.primary,
-    light: DesignSystem.colors.primaryLight,
-    dark: DesignSystem.colors.primaryDark,
+    primary: Colors[theme].primary,
+    light: Colors.primaryLight,
+    dark: Colors.primaryDark,
   };
 }
 
 // Hook for getting status colors
 export function useStatusColors() {
+  const theme = useColorScheme() ?? 'light';
   return {
-    success: DesignSystem.colors.success,
-    warning: DesignSystem.colors.warning,
-    error: DesignSystem.colors.error,
-    info: DesignSystem.colors.info,
+    success: Colors[theme].success,
+    warning: Colors[theme].warning,
+    error: Colors[theme].error,
+    info: Colors[theme].info,
   };
 }

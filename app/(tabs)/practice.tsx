@@ -13,10 +13,10 @@ import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
-import { DesignSystem } from '@/constants/DesignSystem';
 
 interface PracticeProject {
   id: string;
@@ -204,7 +204,7 @@ export default function PracticeScreen() {
           onPress: handleAddPractice
         }}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
@@ -222,7 +222,7 @@ export default function PracticeScreen() {
           onPress: handleAddPractice
         }}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -259,7 +259,7 @@ export default function PracticeScreen() {
           onPress: handleAddPractice
         }}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
         padding={0}
       >
         <ScrollView 
@@ -499,7 +499,7 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -516,12 +516,12 @@ const styles = StyleSheet.create({
 
   loadingText: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
     marginTop: 16,
   },
   manageButton: {
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.2,
@@ -554,13 +554,13 @@ const styles = StyleSheet.create({
   },
   practiceType: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
     marginBottom: 8,
   },
   totalSessions: {
     fontSize: 14,
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontWeight: '700',
     letterSpacing: -0.2,
     marginBottom: 12,
@@ -590,19 +590,19 @@ const styles = StyleSheet.create({
   },
   projectNameText: {
     fontSize: 12,
-    color: DesignSystem.colors.textPrimary,
+    color: Colors.textPrimary,
     fontWeight: '600',
     letterSpacing: -0.1,
   },
   practiceInfo: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
     marginBottom: 4,
   },
   practiceDetails: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   progressContainer: {
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
   },
   weeklyProgressSubtext: {
     fontSize: 12,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   buttonRow: {
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 10,
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   secondaryButtonText: {
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.2,
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
   },
   emptyDescription: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
     textAlign: 'center',
     lineHeight: 24,
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
   browseButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,

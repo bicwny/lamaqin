@@ -7,7 +7,7 @@ import { toastService } from '@/lib/toast';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import PageTemplate from '@/components/PageTemplate';
 import { ConnectionTest } from '@/components/ConnectionTest';
 import { ThemedText } from '@/components/ThemedText';
@@ -717,10 +717,10 @@ export default function HomeScreen() {
           onPress: navigateToProfile
         }}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -736,7 +736,7 @@ export default function HomeScreen() {
         onPress: navigateToProfile
       }}
       scrollable={false}
-      backgroundColor={DesignSystem.colors.background}
+      backgroundColor={Colors.background}
       padding={0}
     >
         <ScrollView 
@@ -745,7 +745,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-
+          
 
           {/* Study Section */}
           <View style={styles.section}>
@@ -867,7 +867,7 @@ export default function HomeScreen() {
                       <Ionicons 
                         name="add-circle-outline" 
                         size={24} 
-                        color={DesignSystem.colors.primary} 
+                        color={Colors.primary} 
                       />
                     </TouchableOpacity>
                   </View>
@@ -906,7 +906,7 @@ export default function HomeScreen() {
                       <Ionicons 
                         name="add-circle-outline" 
                         size={24} 
-                        color={DesignSystem.colors.primary} 
+                        color={Colors.primary} 
                       />
                     </TouchableOpacity>
                   </View>
@@ -914,7 +914,7 @@ export default function HomeScreen() {
               ))}
             </View>
 
-
+            
 
             {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
               <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
@@ -939,7 +939,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   section: {
     marginBottom: 16,
@@ -960,7 +960,7 @@ const styles = StyleSheet.create({
   },
   viewMoreText: {
     fontSize: 14,
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontWeight: '600',
   },
   studyCard: {
@@ -1025,7 +1025,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
   },
   readButton: {
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
   },
   onlineButton: {
     backgroundColor: '#F59E0B',
@@ -1038,7 +1038,7 @@ const styles = StyleSheet.create({
   },
   noStudyText: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
   },
@@ -1089,22 +1089,22 @@ const styles = StyleSheet.create({
   practiceName: {
     fontSize: 16,
     fontWeight: '600',
-    color: DesignSystem.colors.text,
+    color: Colors.text,
     flex: 1,
   },
   practiceNameColumn: {
     fontSize: 14,
     fontWeight: '600',
-    color: DesignSystem.colors.text,
+    color: Colors.text,
     flex: 1,
   },
   practiceCount: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   practiceCountColumn: {
     fontSize: 12,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   countPercentageRow: {
     flexDirection: 'row',
@@ -1121,12 +1121,12 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     borderRadius: 3,
   },
   progressPercent: {
     fontSize: 12,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   practiceActions: {
     flexDirection: 'row',
@@ -1138,29 +1138,29 @@ const styles = StyleSheet.create({
   },
   weeklyProgress: {
     fontSize: 14,
-    color: DesignSystem.colors.text,
+    color: Colors.text,
     marginBottom: 4,
   },
   weeklyProgressColumn: {
     fontSize: 11,
-    color: DesignSystem.colors.text,
+    color: Colors.text,
     marginBottom: 2,
   },
   todayDetailsColumn: {
     fontSize: 9,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: 2,
   },
   noPracticeText: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
   },
   noStudyText: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
   },

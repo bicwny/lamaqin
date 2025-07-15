@@ -1,5 +1,5 @@
 
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 /**
@@ -7,8 +7,8 @@ import { useColorScheme } from '@/hooks/useColorScheme';
  */
 
 // Get theme-aware color
-export function getThemeColor(colorName: keyof typeof DesignSystem.colors, colorScheme: 'light' | 'dark' = 'light') {
-  return DesignSystem.colors[colorName];
+export function getThemeColor(colorName: keyof typeof Colors.light, colorScheme: 'light' | 'dark' = 'light') {
+  return Colors[colorScheme][colorName] || Colors.light[colorName];
 }
 
 // Add opacity to any color
@@ -26,7 +26,7 @@ export function getContrastColor(backgroundColor: string): string {
   const b = parseInt(hex.substr(4, 2), 16);
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   
-  return brightness > 128 ? DesignSystem.colors.textPrimary : '#FFFFFF';
+  return brightness > 128 ? Colors.textPrimary : '#FFFFFF';
 }
 
 // Color variants generator
@@ -42,39 +42,39 @@ export function getColorVariants(baseColor: string) {
 // Predefined color combinations
 export const COLOR_COMBINATIONS = {
   primary: {
-    background: DesignSystem.colors.primary,
+    background: Colors.primary,
     text: '#FFFFFF',
-    border: DesignSystem.colors.primaryDark,
+    border: Colors.primaryDark,
   },
   primaryLight: {
-    background: DesignSystem.colors.primaryLight,
+    background: Colors.primaryLight,
     text: '#FFFFFF',
-    border: DesignSystem.colors.primary,
+    border: Colors.primary,
   },
   secondary: {
-    background: DesignSystem.colors.surface,
-    text: DesignSystem.colors.textPrimary,
-    border: DesignSystem.colors.border,
+    background: Colors.surface,
+    text: Colors.textPrimary,
+    border: Colors.border,
   },
   success: {
-    background: DesignSystem.colors.success,
+    background: Colors.success,
     text: '#FFFFFF',
     border: '#059669',
   },
   warning: {
-    background: DesignSystem.colors.warning,
+    background: Colors.warning,
     text: '#FFFFFF',
     border: '#D97706',
   },
   error: {
-    background: DesignSystem.colors.error,
+    background: Colors.error,
     text: '#FFFFFF',
     border: '#DC2626',
   },
   dharma: {
-    background: DesignSystem.colors.primary,
+    background: Colors.primary,
     text: '#FFFFFF',
-    border: DesignSystem.colors.primaryDark,
+    border: Colors.primaryDark,
   },
 };
 
@@ -84,20 +84,20 @@ export const ColorUtils = {
   getContrastText: (backgroundColor: string): string => {
     // Simple contrast calculation - in real app you might want a more sophisticated method
     const isLight = backgroundColor === '#FFFFFF' || backgroundColor.includes('F8F9FA');
-    return isLight ? DesignSystem.colors.textPrimary : '#FFFFFF';
+    return isLight ? Colors.textPrimary : '#FFFFFF';
   },
   
   // Get hover state color
   getHoverColor: (baseColor: string): string => {
-    if (baseColor === DesignSystem.colors.primary) return DesignSystem.colors.primaryLight;
-    if (baseColor === DesignSystem.colors.primaryLight) return DesignSystem.colors.primary;
+    if (baseColor === Colors.primary) return Colors.primaryLight;
+    if (baseColor === Colors.primaryLight) return Colors.primary;
     return baseColor;
   },
   
   // Get pressed state color
   getPressedColor: (baseColor: string): string => {
-    if (baseColor === DesignSystem.colors.primary) return DesignSystem.colors.primaryDark;
-    if (baseColor === DesignSystem.colors.primaryLight) return DesignSystem.colors.primary;
+    if (baseColor === Colors.primary) return Colors.primaryDark;
+    if (baseColor === Colors.primaryLight) return Colors.primary;
     return baseColor;
   },
 };

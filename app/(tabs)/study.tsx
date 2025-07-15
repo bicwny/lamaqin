@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import PageHeader from '@/components/PageHeader';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -420,10 +420,10 @@ export default function StudyScreen() {
         title="闻思学习"
         subtitle="系统学习佛法课程"
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -438,7 +438,7 @@ export default function StudyScreen() {
           title="闻思学习"
           subtitle="系统学习佛法课程"
           scrollable={false}
-          backgroundColor={DesignSystem.colors.background}
+          backgroundColor={Colors.background}
           padding={0}
         >
           <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -474,7 +474,7 @@ export default function StudyScreen() {
           onPress: () => setViewMode('manage')
         }}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -560,7 +560,7 @@ export default function StudyScreen() {
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -670,7 +670,7 @@ export default function StudyScreen() {
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -758,11 +758,11 @@ export default function StudyScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   section: {
     marginBottom: 16,
@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 13,
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontWeight: '600',
     marginTop: 4,
   },
@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
   },
   currentLessonText: {
     fontSize: 13,
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontWeight: '600',
   },
   progressBarContainer: {
@@ -900,11 +900,11 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     borderRadius: 3,
   },
   continueButton: {
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
@@ -955,13 +955,13 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   secondaryButtonText: {
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: -0.2,
   },
   joinButton: {
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
@@ -1017,7 +1017,7 @@ const styles = StyleSheet.create({
   },
   completionCheck: {
     fontSize: 14,
-    color: DesignSystem.colors.success,
+    color: Colors.success,
   },
   recordButtons: {
     flexDirection: 'row',
@@ -1037,13 +1037,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   listenButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: Colors.accent,
   },
   readButton: {
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.secondary,
   },
   viewButton: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: Colors.tertiary,
   },
   courseSummary: {
     padding: 20,
@@ -1051,7 +1051,7 @@ const styles = StyleSheet.create({
   },
   courseSummaryText: {
     fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
   },
   courseInfoCard: {
     backgroundColor: 'white',
@@ -1109,7 +1109,7 @@ const styles = StyleSheet.create({
   },
   emptyDescription: {
     fontSize: 16,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     fontWeight: '500',
     textAlign: 'center',
     lineHeight: 24,
@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
   browseButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
