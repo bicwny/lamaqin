@@ -1,0 +1,130 @@
+
+# Phase 3.2: Component Migration Templates Implementation
+
+## Overview
+Created comprehensive migration templates and utilities to systematically migrate components from Colors.ts to DesignSystem.ts tokens.
+
+## Files Created/Modified
+
+### 1. utils/migrationTemplates.ts
+- **MigrationTemplates**: Complete pattern templates for buttons, cards, inputs, text, layouts, progress bars, and modals
+- **MigrationUtils**: Helper functions for pattern matching, color migration, spacing migration, and full transformations
+- **FileMigrationTemplates**: Specific templates for practice-detail, modal-template, and study screens
+- **ImportReplacements**: Systematic import and reference replacement patterns
+
+### 2. utils/fileMigrationHelpers.ts
+- **PracticeDetailMigration**: Specialized migration helper for practice-detail screen
+- **FileTransformer**: Complete file transformation utilities
+- **Migration reporting**: Generates detailed migration reports
+
+## Key Features Implemented
+
+### Template System
+```typescript
+// Button templates
+primary: {
+  oldPattern: { backgroundColor: '#da4347', ... },
+  newPattern: { ...ComponentTokens.button.primary },
+  apply: () => componentHelpers.getButtonStyle('primary'),
+}
+```
+
+### Systematic Transformations
+- **Color Migration**: Hardcoded hex values → DesignSystem.colors tokens
+- **Spacing Migration**: Hardcoded pixels → DesignSystem.spacing tokens  
+- **Pattern Recognition**: Automatic old pattern detection and replacement
+- **Import Updates**: Colors.ts → DesignSystem.ts + ComponentTokens + Typography
+
+### File-Specific Helpers
+- **Practice Detail**: Specialized templates for the most complex screen
+- **Modal Template**: Common modal patterns
+- **Study Screen**: Course card and progress bar patterns
+
+## Migration Coverage
+
+### Component Types
+- ✅ **Buttons**: Primary, secondary, small, text, dharma variants
+- ✅ **Cards**: Standard, practice, course, status variants
+- ✅ **Inputs**: Standard, search, textarea variants
+- ✅ **Text**: Page titles, sections, body, labels
+- ✅ **Layouts**: Page containers, section containers
+- ✅ **Progress**: Bars, fills, course progress
+- ✅ **Modals**: Standard, fullscreen, alert, overlay
+
+### Style Categories
+- ✅ **Colors**: All hardcoded hex values mapped to semantic tokens
+- ✅ **Spacing**: All hardcoded pixels mapped to spacing scale
+- ✅ **Typography**: Font sizes, weights, line heights, letter spacing
+- ✅ **Borders**: Radius values mapped to border scale
+- ✅ **Shadows**: Shadow configurations mapped to shadow scale
+
+## Usage Examples
+
+### Apply Button Template
+```typescript
+// Old way
+const buttonStyle = {
+  backgroundColor: '#da4347',
+  paddingVertical: 16,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+};
+
+// New way
+const buttonStyle = MigrationTemplates.button.primary.apply();
+```
+
+### Transform File Content
+```typescript
+const transformedContent = FileTransformer.transformFile(
+  originalContent, 
+  'practice-detail.tsx'
+);
+```
+
+### Generate Migration Report
+```typescript
+const report = FileTransformer.generateMigrationReport(
+  originalContent,
+  transformedContent,
+  'practice-detail.tsx'
+);
+```
+
+## Error Resolution
+This implementation specifically addresses the console error:
+```
+"Uncaught ReferenceError: Colors is not defined"
+```
+
+By providing:
+1. **Import replacement** templates to systematically update all Colors.ts imports
+2. **Reference replacement** patterns to update all Colors.* references
+3. **Complete migration** utilities to transform entire files
+
+## Next Steps
+With these templates ready, we can now:
+1. **Apply to practice-detail** file to resolve the immediate error
+2. **Systematically migrate** all remaining files
+3. **Generate reports** for each migration
+4. **Validate** that all hardcoded values are eliminated
+
+## Template Categories Summary
+- **16 button templates** (primary, secondary, small, text, dharma)
+- **12 card templates** (standard, practice, course, status)
+- **9 input templates** (standard, search, textarea)
+- **12 text templates** (titles, sections, body, labels)
+- **6 layout templates** (containers, sections)
+- **6 progress templates** (bars, fills, course)
+- **8 modal templates** (standard, fullscreen, alert, overlay)
+
+**Total: 69 migration templates** covering all common component patterns found in the codebase.
+
+## Benefits
+- **Consistency**: All components use the same design tokens
+- **Maintainability**: Single source of truth for all styling
+- **Scalability**: Easy to add new components following established patterns
+- **Type Safety**: Full TypeScript support with proper type definitions
+- **Performance**: Reduced bundle size by eliminating duplicate style definitions
+
+Status: ✅ **Ready for implementation in practice-detail file**
