@@ -1,0 +1,32 @@
+
+
+# 1.2 Typography Audit - Font Sizes
+## Generated: [Date]
+## Status: In Progress
+
+### Font Size Inventory
+
+| Size (px) | Usage Count | Files Using | DesignSystem Target |
+|-----------|-------------|-------------|-------------------|
+| 12        | 0           | -           | fontSize.xs       |
+| 14        | 15          | practice-detail/[practiceId].tsx, meditation-history.tsx | fontSize.sm |
+| 16        | 25          | practice-detail/[practiceId].tsx, multiple files | fontSize.base |
+| 18        | 8           | practice-detail/[practiceId].tsx | fontSize.lg |
+| 20        | 3           | -           | fontSize.xl |
+| 24        | 2           | practice-detail/[practiceId].tsx | fontSize.2xl |
+| 32        | 0           | -           | fontSize.4xl |
+
+### Missing DesignSystem Tokens Needed:
+- fontSize.xs (12px) - Found in smaller UI elements
+- fontSize.4xl (32px) - For large headings
+
+### Next Steps:
+1. Add missing fontSize tokens to DesignSystem.ts
+2. Create migration utility functions
+3. Begin file-by-file replacement
+
+### Files Requiring Updates:
+- app/practice-detail/[practiceId].tsx
+- app/meditation-history.tsx
+- [Continue scanning remaining files...]
+

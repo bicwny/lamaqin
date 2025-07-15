@@ -1,0 +1,52 @@
+
+
+# 1.2 Typography Audit - Letter Spacing
+## Generated: [Date]
+## Status: Completed
+
+### Letter Spacing Values Found in practice-detail/[practiceId].tsx
+
+| Value | Usage Count | Element Types | DesignSystem Target |
+|-------|-------------|---------------|-------------------|
+| -0.3  | 4           | Large headings, titles | letterSpacing.tight |
+| -0.2  | 1           | Primary button text | letterSpacing.tighter (NEW) |
+| -0.1  | 1           | Secondary button text | letterSpacing.normal (CLOSEST) |
+| 0     | Default     | Most text elements | letterSpacing.normal |
+
+### Specific Usage Patterns:
+
+#### -0.3 (Tight) - 4 instances:
+- practiceTitle (24px, weight 700)
+- progressText (18px, weight 700) 
+- detailsSectionTitle (18px, weight 700)
+- historyTitle (18px, weight 700)
+
+#### -0.2 (Tighter) - 1 instance:
+- buttonText (16px, weight 700)
+
+#### -0.1 (Slightly tight) - 1 instance:
+- secondaryButtonText (14px, weight 600)
+
+### Required DesignSystem Expansions:
+```typescript
+// Current DesignSystem.typography.letterSpacing:
+tight: -0.3,    // ✅ Already exists
+normal: 0,      // ✅ Already exists  
+wide: 0.1,      // ✅ Already exists
+
+// MISSING - Need to add:
+tighter: -0.2,  // 🆕 For button text
+```
+
+### Migration Strategy:
+```
+-0.3 → DesignSystem.typography.letterSpacing.tight
+-0.2 → DesignSystem.typography.letterSpacing.tighter (ADD TO DESIGN SYSTEM)
+-0.1 → DesignSystem.typography.letterSpacing.normal (closest match)
+```
+
+### Semantic Patterns Identified:
+- **Large Headings**: -0.3 letterSpacing for better readability
+- **Action Buttons**: -0.2 letterSpacing for compact appearance
+- **Secondary Actions**: -0.1 letterSpacing for subtle emphasis
+
