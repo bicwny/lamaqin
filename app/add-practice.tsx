@@ -12,8 +12,8 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
 import PageTemplate from '@/components/PageTemplate';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 interface Practice {
   id: string;
@@ -108,10 +108,10 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
         </View>
       </PageTemplate>
@@ -125,7 +125,7 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
@@ -148,7 +148,7 @@ export default function AddPracticeScreen() {
       title="添加修法"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: Colors.text,
+    color: DesignSystem.colors.text,
   },
   emptyContainer: {
     flex: 1,
@@ -182,18 +182,18 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: Colors.text,
+    color: DesignSystem.colors.text,
     marginBottom: 16,
     textAlign: 'center',
   },
   emptyDescription: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
     marginBottom: 32,
   },
   backButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.text,
+    color: DesignSystem.colors.text,
     marginBottom: 12,
     paddingHorizontal: 16,
   },
@@ -231,17 +231,17 @@ const styles = StyleSheet.create({
   practiceName: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: DesignSystem.colors.text,
     marginBottom: 4,
   },
   practiceType: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     marginBottom: 2,
   },
   practiceDescription: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   practiceChevron: {
     marginLeft: 12,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.text,
+    color: DesignSystem.colors.text,
     marginBottom: 8,
   },
   input: {
@@ -287,13 +287,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedPeriodButton: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
+    borderColor: DesignSystem.colors.primary,
   },
   periodButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.text,
+    color: DesignSystem.colors.text,
   },
   selectedPeriodButtonText: {
     color: 'white',
@@ -311,20 +311,20 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: Colors.surface,
+    backgroundColor: DesignSystem.colors.surface,
     alignItems: 'center',
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: DesignSystem.colors.text,
   },
   saveButton: {
     flex: 1,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     alignItems: 'center',
   },
   disabledButton: {
