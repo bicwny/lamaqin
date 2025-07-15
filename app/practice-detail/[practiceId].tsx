@@ -441,26 +441,6 @@ export default function PracticeDetailScreen() {
             </Text>
           )}
 
-          {/* Progress Display */}
-          <View style={styles.progressContainer}>
-            {renderProgressDetails()}
-          </View>
-
-          {/* Progress Bar */}
-          <View style={styles.progressBarContainer}>
-            <View style={styles.progressBar}>
-              <View 
-                style={[
-                  styles.progressFill, 
-                  { width: `${Math.min(progress.percentage, 100)}%` }
-                ]} 
-              />
-            </View>
-            <Text style={styles.progressPercentage}>
-              {progress.percentage.toFixed(1)}%
-            </Text>
-          </View>
-
           {/* Project Details Section */}
           <View style={styles.detailsSection}>
             <Text style={styles.detailsSectionTitle}>项目详情</Text>
