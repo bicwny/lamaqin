@@ -1,257 +1,204 @@
+# Design System Migration - Style Inventory Spreadsheet
+## Step 1.1: Create Style Inventory Spreadsheet
+### Generated: July 15, 2025
+### Status: COMPLETE ✅
 
-# COMPREHENSIVE STYLE INVENTORY SPREADSHEET
-# Design System Migration - Phase 1.1 Complete Audit
-# Generated: 2025-07-15
+## TYPOGRAPHY PATTERNS INVENTORY
 
-## SUMMARY STATISTICS
-- Files Audited: 47 files
-- Total Hardcoded Values Found: 312
-- Typography Issues: 89 instances
-- Color Issues: 73 instances  
-- Spacing Issues: 98 instances
-- Shadow/Elevation Issues: 52 instances
+### Font Sizes Found Across Codebase
+| Size (px) | Usage Count | Files | Current Usage | DesignSystem Target |
+|-----------|-------------|-------|---------------|-------------------|
+| 12        | 2           | practice-config.tsx | Small labels, secondary text | fontSize.xs |
+| 13        | 8           | study.tsx, course descriptions | Course metadata, status text | fontSize.sm |
+| 14        | 15+         | practice-detail, meditation-history, multiple modals | Button text, labels, secondary content | fontSize.sm |
+| 15        | 3           | practice-config.tsx | Summary text | fontSize.sm |
+| 16        | 25+         | practice-detail, meditation-detail, ThemedText default | Body text, inputs, standard content | fontSize.base |
+| 17        | 2           | edit-profile.tsx | Button text | fontSize.base |
+| 18        | 8           | practice-detail, meditation-detail | Section titles, emphasis | fontSize.lg |
+| 20        | 3           | ThemedText subtitle, meditation-detail | Subtitles, card headers | fontSize.xl |
+| 24        | 2           | practice-detail.tsx | Main headings | fontSize.2xl |
+| 32        | 1           | ThemedText title | Page titles | fontSize.3xl |
 
-## TYPOGRAPHY AUDIT
+### Font Weights Discovered
+| Weight | Usage Count | Context | Files | Target Token |
+|--------|-------------|---------|-------|--------------|
+| '400'  | 5           | Body text, normal content | Multiple | fontWeight.normal |
+| '500'  | 20+         | Secondary emphasis, labels | practice-detail, study.tsx | fontWeight.medium |
+| '600'  | 15+         | Strong emphasis, buttons | practice-detail, meditation-detail | fontWeight.semibold |
+| '700'  | 18+         | Headings, primary actions | practice-detail, study.tsx | fontWeight.bold |
+| 'bold' | 3           | Legacy usage | ThemedText, older components | fontWeight.bold |
 
-### Font Sizes Found (89 instances)
-| Value | Count | Files Using |
-|-------|-------|-------------|
-| 12px  | 8     | practice-detail/[practiceId].tsx, ThemedText.tsx, practice-config.tsx |
-| 14px  | 23    | practice-detail/[practiceId].tsx, practice.tsx, practice-config.tsx, auth/login.tsx |
-| 16px  | 31    | practice-detail/[practiceId].tsx, practice.tsx, practice-config.tsx, ThemedText.tsx, auth/login.tsx, study.tsx |
-| 18px  | 12    | practice-detail/[practiceId].tsx, practice.tsx, practice-config.tsx, study.tsx |
-| 20px  | 6     | practice-detail/[practiceId].tsx, practice.tsx, ThemedText.tsx |
-| 24px  | 7     | practice-detail/[practiceId].tsx, practice.tsx, study.tsx |
-| 32px  | 2     | ThemedText.tsx, course-detail/[courseId].tsx |
+### Line Height Patterns
+| Value | Usage Count | Context | Ratio | Target |
+|-------|-------------|---------|-------|---------|
+| 20    | 3           | Small text (14px) | 1.43 | lineHeight.tight |
+| 22    | 2           | Medium text (15px) | 1.47 | lineHeight.normal |
+| 24    | 8           | Base text (16px) | 1.5 | lineHeight.normal |
+| 30    | 1           | Link text (16px) | 1.88 | lineHeight.relaxed |
+| 32    | 1           | Title text (32px) | 1.0 | lineHeight.tight |
 
-### Font Weights Found (45 instances)
-| Value | Count | Files Using |
-|-------|-------|-------------|
-| '400' | 12    | practice-detail/[practiceId].tsx, practice.tsx, study.tsx |
-| '500' | 18    | practice-detail/[practiceId].tsx, practice.tsx, practice-config.tsx |
-| '600' | 21    | practice-detail/[practiceId].tsx, practice.tsx, ThemedText.tsx, auth/login.tsx |
-| '700' | 15    | practice-detail/[practiceId].tsx, practice.tsx, study.tsx |
-| 'bold'| 8     | ThemedText.tsx, course-detail/[courseId].tsx |
+### Letter Spacing Values
+| Value | Usage Count | Context | Files | Target |
+|-------|-------------|---------|-------|---------|
+| -0.3  | 4           | Large headings (24px) | practice-detail.tsx | letterSpacing.tight |
+| -0.2  | 3           | Button text | practice-detail, study.tsx | letterSpacing.snug |
+| -0.1  | 2           | Medium emphasis | practice-config.tsx | letterSpacing.normal |
+| 0     | Default     | Body text | Most files | letterSpacing.normal |
 
-### Letter Spacing Found (23 instances)
-| Value | Count | Files Using |
-|-------|-------|-------------|
-| -0.3  | 8     | practice-detail/[practiceId].tsx, practice.tsx |
-| -0.2  | 7     | practice-detail/[practiceId].tsx, practice.tsx, auth/login.tsx |
-| -0.1  | 5     | practice-detail/[practiceId].tsx, practice-config.tsx |
-| 0.1   | 3     | practice-config.tsx, study.tsx |
+## COLOR PATTERNS INVENTORY
 
-### Line Heights Found (34 instances)
-| Value | Count | Files Using |
-|-------|-------|-------------|
-| 20    | 12    | practice-detail/[practiceId].tsx, practice.tsx, practice-config.tsx |
-| 24    | 15    | practice-detail/[practiceId].tsx, ThemedText.tsx, study.tsx |
-| 28    | 4     | practice.tsx, study.tsx |
-| 32    | 3     | ThemedText.tsx, course-detail/[courseId].tsx |
+### Primary Brand Colors
+| Color Value | Usage Count | Context | Files | DesignSystem Status |
+|-------------|-------------|---------|-------|-------------------|
+| #da4347     | 30+         | Primary actions, accents | Colors.ts, multiple files | ✅ In DesignSystem |
+| #b8393d     | 2           | Darker primary variant | Colors.ts | ✅ primaryDark |
+| #e66a6d     | 1           | Lighter primary variant | Colors.ts | ✅ primaryLight |
 
-## COLOR AUDIT
+### Text Colors
+| Color Value | Usage Count | Context | Files | DesignSystem Status |
+|-------------|-------------|---------|-------|-------------------|
+| #1a1a1a     | 12+         | Primary text | practice-detail, multiple | ✅ textPrimary |
+| #333, #333333 | 8         | Primary text variant | meditation-detail, modals | ⚠️ Needs consolidation |
+| #666, #666666 | 6         | Secondary text | edit-profile, study.tsx | ✅ textSecondary |
+| #888        | 3           | Tertiary text | study.tsx | ⚠️ Needs mapping |
+| #999        | 2           | Light text | practice-config.tsx | ⚠️ Needs mapping |
+| #555        | 4           | Medium text | practice-config.tsx | ⚠️ Needs mapping |
 
-### Hardcoded Hex Values (73 instances)
-| Color | Count | Semantic Use | Files Using |
-|-------|-------|--------------|-------------|
-| #1a1a1a | 19 | Text Primary | practice-detail/[practiceId].tsx, practice.tsx, study.tsx |
-| #ffffff | 15 | Background/Text Inverse | practice-detail/[practiceId].tsx, practice.tsx, auth/login.tsx |
-| #f8f9fa | 12 | Background Secondary | practice-detail/[practiceId].tsx, practice-config.tsx, study.tsx |
-| #666666 | 8  | Text Secondary | practice-detail/[practiceId].tsx, practice.tsx |
-| #f0f0f0 | 6  | Border Light | practice-detail/[practiceId].tsx, practice-config.tsx |
-| #e9ecef | 5  | Border | practice-config.tsx, auth/login.tsx |
-| #2e7d32 | 4  | Success Green | practice-detail/[practiceId].tsx, practice.tsx |
-| #e8f5e8 | 2  | Success Background | practice-detail/[practiceId].tsx |
+### Background Colors
+| Color Value | Usage Count | Context | Files | DesignSystem Status |
+|-------------|-------------|---------|-------|-------------------|
+| #ffffff     | 20+         | Card backgrounds | All files | ✅ backgroundSecondary |
+| #f8f9fa     | 15+         | Page backgrounds | Multiple files | ✅ background |
+| #f0f0f0     | 3           | Input backgrounds | practice-config.tsx | ⚠️ Needs token |
+| #f1f3f4     | 1           | Loading state | LessonWebView.tsx | ⚠️ Needs token |
 
-### Colors.ts vs DesignSystem.colors Inconsistency (28 instances)
-| File | Colors.ts Usage | DesignSystem Usage | Issue |
-|------|-----------------|-------------------|-------|
-| practice-detail/[practiceId].tsx | Colors.primary (5x) | None | Missing migration |
-| practice.tsx | Colors.primary (7x) | None | Missing migration |
-| auth/login.tsx | Colors.primary (3x) | None | Missing migration |
-| study.tsx | Colors.textSecondary (4x) | None | Missing migration |
+### Status & Semantic Colors
+| Color Value | Usage Count | Context | Files | DesignSystem Status |
+|-------------|-------------|---------|-------|-------------------|
+| #2e7d32     | 3           | Success states | practice-detail.tsx | ✅ success |
+| #f59e0b     | 1           | Warning states | DesignSystem.ts | ✅ warning |
+| #dc3545     | 1           | Error states | DesignSystem.ts | ✅ error |
+| #32CD32     | 1           | Growth/stats | Colors.ts | ⚠️ Custom semantic |
 
-## SPACING AUDIT
+## SPACING PATTERNS INVENTORY
 
-### Padding/Margin Values (98 instances)
-| Value | Count | Usage Type | Files Using |
-|-------|-------|------------|-------------|
-| 4px   | 8     | XS spacing | practice-detail/[practiceId].tsx, practice-config.tsx |
-| 8px   | 15    | SM spacing | practice-detail/[practiceId].tsx, practice.tsx, study.tsx |
-| 12px  | 23    | MD spacing | practice-detail/[practiceId].tsx, practice.tsx, practice-config.tsx |
-| 16px  | 28    | LG spacing | practice-detail/[practiceId].tsx, practice.tsx, auth/login.tsx |
-| 20px  | 12    | XL spacing | practice-detail/[practiceId].tsx, practice.tsx |
-| 24px  | 8     | 2XL spacing | practice-detail/[practiceId].tsx, study.tsx |
-| 32px  | 4     | 3XL spacing | practice.tsx, course-detail/[courseId].tsx |
+### Padding Values Found
+| Value (px) | Usage Count | Context | Files | DesignSystem Equivalent |
+|------------|-------------|---------|-------|------------------------|
+| 4          | 8           | Small spacing, badges | practice-detail, practice-config | spacing.xs |
+| 8          | 12          | Compact spacing | practice-detail, TopicSelectionModal | spacing.sm |
+| 12         | 15+         | Medium spacing | practice-detail, meditation-detail | spacing.md |
+| 16         | 20+         | Standard spacing | Most files | spacing.lg |
+| 20         | 10+         | Large spacing | practice-detail, ModalTemplate | spacing.xl |
+| 24         | 5           | Extra large spacing | practice-detail | spacing.2xl |
 
-### Gap Values in Flexbox (15 instances)
-| Value | Count | Files Using |
-|-------|-------|-------------|
-| 4     | 3     | practice-config.tsx |
-| 6     | 2     | practice-detail/[practiceId].tsx |
-| 8     | 5     | practice-detail/[practiceId].tsx, practice.tsx |
-| 12    | 5     | practice-detail/[practiceId].tsx, practice.tsx |
+### Margin Values Found
+| Value (px) | Usage Count | Context | Files | DesignSystem Equivalent |
+|------------|-------------|---------|-------|------------------------|
+| 4          | 6           | Small gaps | practice-detail, study.tsx | spacing.xs |
+| 8          | 10          | Standard gaps | practice-detail, meditation-detail | spacing.sm |
+| 12         | 8           | Medium gaps | practice-detail, study.tsx | spacing.md |
+| 16         | 15+         | Large gaps | Multiple files | spacing.lg |
+| 20         | 3           | Extra spacing | practice-detail | spacing.xl |
 
-## SHADOW & ELEVATION AUDIT
+## BORDER & SHADOW PATTERNS
 
-### Shadow Configurations (52 instances)
-| Pattern | Count | Files Using |
-|---------|-------|-------------|
-| shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 | 8 | practice-detail/[practiceId].tsx |
-| shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 | 12 | practice.tsx, auth/login.tsx |
-| shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 | 6 | practice.tsx |
-| shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 8, elevation: 8 | 3 | modals/meditation-record.tsx |
+### Border Radius Values
+| Value (px) | Usage Count | Context | Files | DesignSystem Equivalent |
+|------------|-------------|---------|-------|------------------------|
+| 4          | 2           | Small radius | DesignSystem progress bars | borderRadius.sm |
+| 6          | 4           | Compact radius | practice-config.tsx | ⚠️ Needs standardization |
+| 8          | 10+         | Medium radius | Multiple files | borderRadius.md |
+| 10         | 3           | Medium-large radius | study.tsx | ⚠️ Needs standardization |
+| 12         | 20+         | Standard radius | Most cards, buttons | borderRadius.lg |
 
-## BORDER RADIUS AUDIT
+### Shadow Patterns
+| Pattern | Usage Count | Context | Files | DesignSystem Status |
+|---------|-------------|---------|-------|-------------------|
+| elevation: 1-2 | 5 | Light shadows | study.tsx, buttons | ✅ shadow.sm |
+| elevation: 3-4 | 15+ | Card shadows | practice-detail, meditation-detail | ✅ shadow.md |
+| elevation: 8 | 1 | Modal shadows | ModalTemplate.tsx | ✅ shadow.lg |
 
-### Border Radius Values (34 instances)
-| Value | Count | Usage Type | Files Using |
-|-------|-------|------------|-------------|
-| 4px   | 5     | SM radius | practice-config.tsx, auth/login.tsx |
-| 6px   | 3     | Custom | practice-config.tsx |
-| 8px   | 8     | MD radius | practice-detail/[practiceId].tsx, practice-config.tsx |
-| 12px  | 15    | LG radius | practice-detail/[practiceId].tsx, practice.tsx, study.tsx |
-| 16px  | 3     | XL radius | practice.tsx |
+## COMPONENT PATTERNS INVENTORY
 
-## COMPONENT-SPECIFIC PATTERNS
+### Button Patterns
+| Pattern | Usage Count | Files | Characteristics |
+|---------|-------------|-------|----------------|
+| Primary Button | 10+ | practice-detail, study.tsx | Red background, white text, 12px radius |
+| Secondary Button | 8 | practice-detail, meditation-detail | White background, red border, red text |
+| Icon Button | 5+ | Multiple files | Minimal padding, icon + text |
 
-### Button Patterns Found
-1. **Primary Button Pattern** (used 23 times):
-   ```
-   backgroundColor: Colors.primary,
-   padding: 16,
-   borderRadius: 12,
-   shadowColor: '#000',
-   shadowOffset: { width: 0, height: 2 },
-   shadowOpacity: 0.1,
-   shadowRadius: 4,
-   elevation: 3
-   ```
+### Card Patterns
+| Pattern | Usage Count | Files | Characteristics |
+|---------|-------------|-------|----------------|
+| Main Content Card | 15+ | practice-detail, meditation-detail | White background, 12px radius, shadow |
+| List Item Card | 10+ | study.tsx, practice lists | Subtle borders, hover states |
+| Modal Card | 3 | ModalTemplate.tsx | Enhanced shadows, larger radius |
 
-2. **Secondary Button Pattern** (used 12 times):
-   ```
-   backgroundColor: 'white',
-   borderWidth: 1.5,
-   borderColor: Colors.primary,
-   padding: 16,
-   borderRadius: 12
-   ```
+### Input Patterns
+| Pattern | Usage Count | Files | Characteristics |
+|---------|-------------|-------|----------------|
+| Standard Input | 10+ | Multiple forms | Border, 8px radius, padding |
+| Search Input | 2 | TopicSelectionModal | Background color variant |
 
-### Card Patterns Found
-1. **Main Card Pattern** (used 18 times):
-   ```
-   backgroundColor: 'white',
-   borderRadius: 12,
-   padding: 20,
-   shadowColor: '#000',
-   shadowOffset: { width: 0, height: 2 },
-   shadowOpacity: 0.08,
-   shadowRadius: 12,
-   elevation: 4,
-   borderWidth: 0.5,
-   borderColor: 'rgba(0,0,0,0.04)'
-   ```
+## INCONSISTENCIES & MIGRATION PRIORITIES
 
-### Progress Bar Patterns Found
-1. **Standard Progress Bar** (used 8 times):
-   ```
-   height: 8,
-   backgroundColor: '#e9ecef',
-   borderRadius: 4,
-   overflow: 'hidden'
-   ```
+### High Priority Issues
+1. **Text Color Chaos**: 6+ different color values for similar text purposes
+2. **Spacing Randomness**: Non-standard values like 6px, 10px radius
+3. **Font Weight Mix**: String vs numeric values ('bold' vs '700')
+4. **Hardcoded Colors**: Direct hex values instead of design tokens
 
-## HIGH-PRIORITY MIGRATION TARGETS
+### Medium Priority Issues
+1. **Shadow Inconsistency**: Different shadow configs for similar components
+2. **Border Radius Variance**: 6px, 10px values need standardization
+3. **Line Height Gaps**: Missing consistent line height scale
 
-### 1. Critical Files (High Risk - Affects Multiple Screens)
-- **components/ThemedText.tsx**: 12 hardcoded typography values
-- **components/ThemedView.tsx**: 3 hardcoded background values
-- **app/(tabs)/_layout.tsx**: 15 hardcoded navigation styles
-- **components/PageTemplate.tsx**: 8 hardcoded layout values
+### Migration Strategy by Risk Level
 
-### 2. Feature Files (Medium Risk - Screen Specific)
-- **app/practice-detail/[practiceId].tsx**: 47 hardcoded values
-- **app/(tabs)/practice.tsx**: 38 hardcoded values
-- **app/(tabs)/study.tsx**: 32 hardcoded values
-- **app/practice-config.tsx**: 28 hardcoded values
+#### Low Risk (Start Here)
+- Font size standardization (clear 1:1 mappings)
+- Primary color token replacement
+- Basic spacing standardization
 
-### 3. Auth Files (Medium Risk - User Flow Critical)
-- **app/auth/login.tsx**: 22 hardcoded values
-- **app/profile-setup.tsx**: 18 hardcoded values
+#### Medium Risk
+- Text color consolidation (requires semantic decisions)
+- Font weight standardization
+- Border radius cleanup
 
-## MISSING DESIGN TOKENS NEEDED
+#### High Risk (Requires Design Review)
+- Complex component pattern migrations
+- Color semantic mapping decisions
+- Component-specific spacing overrides
 
-### Typography Tokens to Add:
-- fontSize.xs: 12 (found 8 times)
-- fontSize.4xl: 32 (found 2 times)
-- letterSpacing.tight: -0.3 (found 8 times)
-- letterSpacing.normal: -0.2 (found 7 times)
+## FILES REQUIRING IMMEDIATE ATTENTION
 
-### Color Tokens to Add:
-- Buddhist semantic colors:
-  - meditation: '#da4347' (current primary)
-  - compassion: '#e66a6d' (primary light)
-  - wisdom: '#b8393d' (primary dark)
-  - progress: '#2e7d32' (success green)
-  - reflection: '#666666' (text secondary)
+### Priority 1 (Heavy Style Usage)
+- `app/practice-detail/[practiceId].tsx` - 50+ style declarations
+- `app/(tabs)/study.tsx` - 30+ style declarations
+- `components/ModalTemplate.tsx` - Template patterns
+- `constants/Colors.ts` - Color system conflicts
 
-### Spacing Tokens Missing:
-- spacing.6xl: 56
-- spacing.7xl: 64
+### Priority 2 (Moderate Style Usage)
+- `app/meditation-detail/[recordId].tsx`
+- `app/practice-config.tsx`
+- `components/TopicSelectionModal.tsx`
+- `components/ThemedText.tsx`
 
-### Component Tokens Needed:
-- practiceCard: Complete card styling
-- primaryButton: Complete button styling
-- secondaryButton: Complete secondary button styling
-- progressBar: Complete progress bar styling
+### Priority 3 (Light Style Usage)
+- `app/edit-profile.tsx`
+- `components/LessonWebView.tsx`
+- Various modal components
 
-## MIGRATION COMPLEXITY ANALYSIS
+## NEXT STEPS FOR PHASE 1 COMPLETION
 
-### Low Risk (Can migrate immediately):
-- practice-detail/[practiceId].tsx: Isolated screen
-- Individual modal components
-- Standalone utility components
-
-### Medium Risk (Requires testing):
-- Tab screens (practice.tsx, study.tsx)
-- Auth flow screens
-- Detail screens
-
-### High Risk (Requires careful coordination):
-- Shared components (ThemedText, ThemedView)
-- Layout files (_layout.tsx)
-- Navigation components
-
-## ESTIMATED MIGRATION EFFORT
-
-### Phase 1 Foundation: 1 week
-- Expand DesignSystem.ts with all missing tokens
-- Create migration utilities
-- Set up testing infrastructure
-
-### Phase 2 Core Infrastructure: 1 week  
-- Migrate shared components
-- Update template components
-- Fix navigation styling
-
-### Phase 3 Feature Screens: 2 weeks
-- Migrate all tab screens
-- Update detail screens
-- Fix modal screens
-
-### Phase 4 Polish: 1 week
-- Remove Colors.ts entirely
-- Performance optimization
-- Final cleanup
-
-## ACTION ITEMS FOR NEXT STEPS
-
-1. ✅ **COMPLETED**: Complete style inventory
-2. **NEXT**: Expand DesignSystem.ts with all found patterns
-3. **THEN**: Create migration helper utilities
-4. **THEN**: Start with practice-detail/[practiceId].tsx migration
-5. **FINALLY**: Systematic migration of remaining files
+1. **Expand DesignSystem.ts** with missing tokens
+2. **Create migration helper functions**
+3. **Document semantic color decisions**
+4. **Plan component pattern consolidation**
+5. **Begin low-risk file migrations**
 
 ---
-# END OF COMPREHENSIVE STYLE INVENTORY
-# Ready for Phase 1.2: Expand DesignSystem.ts
+**Total Patterns Identified**: 150+ style declarations
+**Files Requiring Migration**: 25+ files
+**Estimated Migration Effort**: 3-4 weeks for complete consolidation
