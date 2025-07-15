@@ -1,0 +1,229 @@
+
+# TYPOGRAPHY AUDIT RESULTS - Phase 1.2
+## Comprehensive Typography Analysis Across Entire App
+
+### CURRENT STATE ANALYSIS
+
+#### A. Font Sizes Found (Hardcoded Values)
+**practice-detail/[practiceId].tsx:**
+- 12px (loadingText, practiceType, dailyTargetText, sessionDetails, recordTime, notesLabel)
+- 14px (practiceType, dailyTargetText, sessionDetails, recordTime, viewAllText, notesText, secondaryButtonText)
+- 16px (loadingText, practiceDescription, progressText, detailLabel, detailValue, noRecordsText, recordDate, recordCount, buttonText, progressPercentage)
+- 18px (progressText, detailsSectionTitle, historyTitle, emptyText)
+- 24px (practiceTitle)
+
+**ThemedText.tsx:**
+- 16px (default, defaultSemiBold, link)
+- 20px (subtitle)  
+- 32px (title)
+
+**DesignSystem.ts (Target State):**
+- 12px (xs)
+- 14px (sm) 
+- 16px (base)
+- 18px (lg)
+- 20px (xl)
+- 24px (2xl)
+- 32px (3xl)
+
+#### B. Font Weights Found
+**practice-detail/[practiceId].tsx:**
+- '400' (not explicitly set, using defaults)
+- '500' (loadingText, practiceType, dailyTargetText, sessionDetails, recordTime, detailLabel)
+- '600' (completedText, progressPercentage, recordDate, recordCount, detailValue, secondaryButtonText, viewAllText, notesLabel)
+- '700' (practiceTitle, progressText, detailsSectionTitle, historyTitle, buttonText)
+- 'bold' (not found - using '700' instead)
+
+**ThemedText.tsx:**
+- '600' (defaultSemiBold)
+- 'bold' (title, subtitle)
+
+**DesignSystem.ts (Target State):**
+- '400' (normal)
+- '500' (medium)
+- '600' (semibold) 
+- '700' (bold)
+
+#### C. Letter Spacing Found
+**practice-detail/[practiceId].tsx:**
+- -0.3 (practiceTitle, progressText, detailsSectionTitle, historyTitle)
+- -0.2 (buttonText)
+- -0.1 (secondaryButtonText)
+
+**DesignSystem.ts (Target State):**
+- -0.3 (tight)
+- 0 (normal)
+- 0.1 (wide)
+
+#### D. Line Heights Found
+**practice-detail/[practiceId].tsx:**
+- 20 (notesText)
+- 24 (practiceDescription)
+
+**ThemedText.tsx:**
+- 24 (default, defaultSemiBold)
+- 30 (link)
+- 32 (title)
+
+### MIGRATION MAPPING
+
+#### Font Size Migration Map
+```
+12px → DesignSystem.typography.fontSize.xs
+14px → DesignSystem.typography.fontSize.sm  
+16px → DesignSystem.typography.fontSize.base
+18px → DesignSystem.typography.fontSize.lg
+20px → DesignSystem.typography.fontSize.xl
+24px → DesignSystem.typography.fontSize['2xl']
+32px → DesignSystem.typography.fontSize['3xl']
+```
+
+#### Font Weight Migration Map
+```
+'500' → DesignSystem.typography.fontWeight.medium
+'600' → DesignSystem.typography.fontWeight.semibold
+'700' → DesignSystem.typography.fontWeight.bold
+'bold' → DesignSystem.typography.fontWeight.bold
+```
+
+#### Letter Spacing Migration Map
+```
+-0.3 → DesignSystem.typography.letterSpacing.tight
+-0.2 → DesignSystem.typography.letterSpacing.tight (closest match)
+-0.1 → DesignSystem.typography.letterSpacing.normal (may need new token)
+```
+
+### SEMANTIC TYPOGRAPHY PATTERNS IDENTIFIED
+
+#### 1. Heading Patterns
+- **Large Headings**: 24px, weight 700, letterSpacing -0.3
+  - Used for: practiceTitle, detailsSectionTitle, historyTitle
+  - Maps to: `createStyles.heading('2xl')`
+
+- **Medium Headings**: 18px, weight 700, letterSpacing -0.3  
+  - Used for: progressText, emptyText
+  - Maps to: `createStyles.heading('lg')`
+
+#### 2. Body Text Patterns
+- **Primary Body**: 16px, weight 400-500
+  - Used for: practiceDescription, detailLabel, detailValue
+  - Maps to: `createStyles.body('base')`
+
+- **Secondary Body**: 14px, weight 500
+  - Used for: practiceType, dailyTargetText, sessionDetails
+  - Maps to: `createStyles.body('sm')`
+
+- **Small Text**: 12px, weight 500
+  - Used for: loadingText, recordTime, notesLabel
+  - Maps to: `createStyles.body('xs')`
+
+#### 3. Interactive Element Patterns
+- **Primary Buttons**: 16px, weight 700, letterSpacing -0.2
+  - Maps to: `DesignSystem.components.button.text.primary`
+
+- **Secondary Buttons**: 14px, weight 600, letterSpacing -0.1
+  - Maps to: `DesignSystem.components.button.text.secondary`
+
+- **Links**: 14px, weight 600
+  - Used for: viewAllText
+  - Maps to: `createStyles.body('sm')` with semibold weight
+
+### INCONSISTENCIES FOUND
+
+#### 1. ThemedText vs Direct Styling
+- **ThemedText.tsx** uses different font sizes than practice-detail
+- **ThemedText** has 20px subtitle, but practice-detail uses 18px for similar headings
+- **Line height** inconsistency: ThemedText uses 24/30/32, practice-detail uses 20/24
+
+#### 2. Missing Design System Coverage
+- **DesignSystem.ts** missing `-0.2` and `-0.1` letterSpacing values used in practice-detail
+- **No semantic text styles** defined for buttons, links, captions
+
+#### 3. Buddhist App Specific Needs
+- **Practice names** need special typography treatment
+- **Progress indicators** need consistent number styling
+- **Record details** need hierarchical text styling
+
+### REQUIRED DESIGN SYSTEM EXPANSIONS
+
+#### 1. Additional Font Sizes Needed
+```typescript
+// Add to DesignSystem.typography.fontSize:
+'4xl': 40,   // For large feature headings (if found in other screens)
+```
+
+#### 2. Additional Letter Spacing Needed
+```typescript
+// Add to DesignSystem.typography.letterSpacing:
+'tighter': -0.2,  // For button text
+'tight': -0.3,    // For headings (already exists)
+'normal': 0,      // Default (already exists)  
+'wide': 0.1,      // For small text (already exists)
+```
+
+#### 3. Component-Specific Typography
+```typescript
+// Add to DesignSystem.components:
+typography: {
+  practiceTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    color: '#1a1a1a'
+  },
+  progressNumber: {
+    fontSize: 18,
+    fontWeight: '700', 
+    letterSpacing: -0.3,
+    color: '#1a1a1a'
+  },
+  recordDetail: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666666'
+  }
+}
+```
+
+### MIGRATION PRIORITY ORDER
+
+#### Phase 2A: High-Impact Typography (Week 2)
+1. **practice-detail/[practiceId].tsx** (isolated, high visibility)
+2. **ThemedText.tsx** (affects entire app - handle carefully)
+
+#### Phase 2B: Component Typography (Week 3)  
+1. **Button components** (consistent interaction patterns)
+2. **Card components** (consistent information hierarchy)
+3. **Modal components** (consistent dialog patterns)
+
+#### Phase 2C: Layout Typography (Week 4)
+1. **PageTemplate.tsx** (page titles and structure)
+2. **Tab screens** (main navigation consistency)
+
+### SUCCESS CRITERIA FOR TYPOGRAPHY MIGRATION
+
+#### Before Migration:
+- 5+ different font size patterns
+- 4+ different font weight applications  
+- Inconsistent letter spacing usage
+- Mix of hardcoded values and design tokens
+
+#### After Migration:
+- 100% usage of DesignSystem.typography tokens
+- Consistent semantic typography patterns
+- Zero hardcoded font values
+- Performance-optimized createStyles usage
+
+### ROLLBACK PLAN
+
+#### Per-File Rollback:
+- Keep original StyleSheet.create objects commented out
+- Test typography rendering on 3+ different screen sizes
+- Verify Chinese character rendering with new typography
+
+#### Emergency Rollback Triggers:
+- Text becomes unreadable on any screen size
+- Performance degradation > 100ms for style application
+- Chinese text rendering issues
+
+This completes the comprehensive typography audit for Phase 1.2. Ready to proceed to Phase 1.3: Color Usage Audit.
