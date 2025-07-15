@@ -213,57 +213,25 @@ export const ComponentTokens = {
     section: 'section' as const, // Maps to Header context="section"
   },
 
-  // Buddhist-specific tokens with DesignSystem references
-  buddhist: {
-    dharmaCard: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
+  // Semantic color variants for Buddhist theming
+  semantic: {
+    // Semantic colors for Buddhist themes
+    dharma: DesignSystem.colors.dharmaRed,        // For dharma-related elements
+    meditation: DesignSystem.colors.meditationBlue, // For meditation-related elements
+    wisdom: DesignSystem.colors.wisdomGold,       // For wisdom/achievement elements
+    success: DesignSystem.colors.practiceComplete, // For completion/success elements
+  },
+
+  // Badge component tokens
+  badge: {
+    small: {
       borderRadius: DesignSystem.borderRadius.lg,
-      padding: DesignSystem.spacing.xl,
-      marginHorizontal: DesignSystem.spacing.lg,
-      marginVertical: DesignSystem.spacing.sm,
-      borderLeftWidth: 4,
-      borderLeftColor: DesignSystem.colors.dharmaRed,
-      shadowColor: DesignSystem.colors.cardShadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 12,
-      elevation: 4,
-    },
-    
-    meditationCard: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      borderRadius: DesignSystem.borderRadius.xl,
-      padding: DesignSystem.spacing.xl,
-      marginHorizontal: DesignSystem.spacing.lg,
-      marginVertical: DesignSystem.spacing.sm,
-      borderWidth: 2,
-      borderColor: DesignSystem.colors.meditationBlue,
-      shadowColor: DesignSystem.colors.meditationBlue,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    
-    wisdomBadge: {
-      backgroundColor: DesignSystem.colors.wisdomGold,
-      borderRadius: DesignSystem.spacing.xl,
       paddingHorizontal: DesignSystem.spacing.md,
       paddingVertical: DesignSystem.spacing.xs,
-      shadowColor: DesignSystem.colors.wisdomGold,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
       shadowRadius: 4,
       elevation: 3,
-    },
-    
-    completionBadge: {
-      backgroundColor: DesignSystem.colors.successBackground,
-      borderRadius: DesignSystem.borderRadius.lg,
-      paddingHorizontal: DesignSystem.spacing.md,
-      paddingVertical: DesignSystem.spacing.xs,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.practiceComplete,
     },
   },
 };
@@ -335,7 +303,8 @@ export const ComponentTextStyles = {
     section: 'section' as const,
   },
   
-  buddhist: {
+  // Semantic text styles (consolidated from Buddhist-specific)
+  semantic: {
     dharmaTitle: {
       fontSize: DesignSystem.typography.fontSize['2xl'],
       fontWeight: DesignSystem.typography.fontWeight.bold,
@@ -349,12 +318,12 @@ export const ComponentTextStyles = {
       color: DesignSystem.colors.textPrimary,
       lineHeight: DesignSystem.typography.lineHeight.relaxed,
     },
-    completionText: {
+    successText: {
       fontSize: DesignSystem.typography.fontSize.sm,
       fontWeight: DesignSystem.typography.fontWeight.semibold,
       color: DesignSystem.colors.practiceComplete,
     },
-    wisdomText: {
+    accentText: {
       fontSize: DesignSystem.typography.fontSize.sm,
       fontWeight: DesignSystem.typography.fontWeight.semibold,
       color: DesignSystem.colors.textInverse,
@@ -392,13 +361,39 @@ export const componentHelpers = {
   getHeaderContext: (variant: keyof typeof ComponentTokens.header) => 
     ComponentTokens.header[variant],
   
-  // Get Buddhist-specific styles
-  getBuddhistStyle: (variant: keyof typeof ComponentTokens.buddhist) => 
-    ComponentTokens.buddhist[variant],
+  // Get semantic color (replaces Buddhist-specific styles)
+  getSemanticColor: (variant: keyof typeof ComponentTokens.semantic) => 
+    ComponentTokens.semantic[variant],
   
-  // Get Buddhist text styles
-  getBuddhistTextStyle: (variant: keyof typeof ComponentTextStyles.buddhist) => 
-    ComponentTextStyles.buddhist[variant],
+  // Get badge style with semantic color
+  getBadgeStyle: (size: keyof typeof ComponentTokens.badge, semanticColor?: keyof typeof ComponentTokens.semantic) => {
+    const baseStyle = ComponentTokens.badge[size];
+    if (semanticColor) {
+      return {
+        ...baseStyle,
+        backgroundColor: ComponentTokens.semantic[semanticColor],
+        shadowColor: ComponentTokens.semantic[semanticColor],
+      };
+    }
+    return baseStyle;
+  },
+  
+  // Get card style with semantic accent color
+  getCardWithAccent: (variant: keyof typeof ComponentTokens.card, accentColor?: keyof typeof ComponentTokens.semantic) => {
+    const baseCard = ComponentTokens.card[variant];
+    if (accentColor) {
+      return {
+        ...baseCard,
+        borderLeftWidth: 4,
+        borderLeftColor: ComponentTokens.semantic[accentColor],
+      };
+    }
+    return baseCard;
+  },
+  
+  // Get semantic text styles
+  getSemanticTextStyle: (variant: keyof typeof ComponentTextStyles.semantic) => 
+    ComponentTextStyles.semantic[variant],
 };
 
 export default ComponentTokens;
