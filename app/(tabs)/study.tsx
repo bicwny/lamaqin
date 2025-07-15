@@ -758,7 +758,7 @@ export default function StudyScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
   },
   container: {
     flex: 1,
@@ -968,7 +968,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-```
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
