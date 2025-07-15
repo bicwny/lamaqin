@@ -420,7 +420,7 @@ export default function StudyScreen() {
         title="闻思学习"
         subtitle="系统学习佛法课程"
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -438,7 +438,7 @@ export default function StudyScreen() {
           title="闻思学习"
           subtitle="系统学习佛法课程"
           scrollable={false}
-          backgroundColor={Colors.background}
+          backgroundColor={DesignSystem.colors.background}
           padding={0}
         >
           <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -474,7 +474,7 @@ export default function StudyScreen() {
           onPress: () => setViewMode('manage')
         }}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -560,7 +560,7 @@ export default function StudyScreen() {
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -670,7 +670,7 @@ export default function StudyScreen() {
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -968,6 +968,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
+```
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -206,7 +206,7 @@ export default function StatsScreen() {
     return (
       <PageTemplate title="📊 统计分析" subtitle="查看您的修行进展" scrollable={false}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>正在加载统计数据...</Text>
         </View>
       </PageTemplate>

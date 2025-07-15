@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 
 import { mindfulnessService } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTimezone } from '@/hooks/useTimezone';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { toastService } from '@/lib/toast';
@@ -136,7 +136,7 @@ export default function MindfulnessScreen() {
         title="心性观察" 
         subtitle="观察内心善恶念头"
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text>加载中...</Text>
@@ -150,7 +150,7 @@ export default function MindfulnessScreen() {
       title="心性观察" 
       subtitle="观察内心善恶念头"
       scrollable={false}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <ScrollView style={styles.scrollView}>
@@ -228,7 +228,7 @@ export default function MindfulnessScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
   },
   scrollView: {
     flex: 1,
@@ -272,12 +272,12 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     letterSpacing: -0.3,
   },
   statLabel: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontWeight: '500',
     marginTop: 6,
   },
@@ -355,13 +355,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     letterSpacing: -0.3,
     marginBottom: 8,
   },
   timezoneDisplay: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontWeight: '500',
     textAlign: 'center',
     marginBottom: 12,

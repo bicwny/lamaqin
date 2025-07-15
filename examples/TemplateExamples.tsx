@@ -4,7 +4,7 @@ import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 import ModalTemplate from '@/components/ModalTemplate';
 import LessonTemplate from '@/components/LessonTemplate';
 import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
