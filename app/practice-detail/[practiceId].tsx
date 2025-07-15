@@ -889,5 +889,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default function PracticeDetailScreen() {
