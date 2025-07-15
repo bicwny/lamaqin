@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -17,6 +16,7 @@ import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 interface PracticeProject {
   id: string;
@@ -54,7 +54,7 @@ interface MeditationRecord {
 export default function PracticeDetailScreen() {
   const { user } = useAuth();
   const { practiceId } = useLocalSearchParams<{ practiceId: string }>();
-  
+
   const [project, setProject] = useState<PracticeProject | null>(null);
   const [presetProjectName, setPresetProjectName] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -399,7 +399,7 @@ export default function PracticeDetailScreen() {
     } else {
       const todayCount = todayRecords.length;
       const target = project.daily_target;
-      
+
       // Format session details for today
       const todayDetails = todayRecords.map((record, index) =>
         `第${index + 1}座${record.duration_minutes}分钟`
@@ -445,7 +445,7 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -462,7 +462,7 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到修行项目</Text>
@@ -484,7 +484,7 @@ export default function PracticeDetailScreen() {
         `项目：${getDisplayProjectName()}` : undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <ScrollView
@@ -521,7 +521,7 @@ export default function PracticeDetailScreen() {
           {/* Project Details Section */}
           <View style={styles.detailsSection}>
             <Text style={styles.detailsSectionTitle}>项目详情</Text>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>开始日期：</Text>
               <Text style={styles.detailValue}>{project.start_date}</Text>
@@ -548,7 +548,7 @@ export default function PracticeDetailScreen() {
           {/* Progress Section */}
           <View style={styles.progressContainer}>
             {renderProgressDetails()}
-            
+
             {project.practices.type === 'count' && (
               <View style={styles.progressBarContainer}>
                 <View style={styles.progressBar}>
