@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Typography } from '@/utils/typography';
+import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 
 export function DesignTokenPreview() {
   return (
@@ -110,6 +111,204 @@ export function DesignTokenPreview() {
           ))}
         </View>
       </View>
+
+      {/* Component Tokens Previews */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Component Tokens</Text>
+
+        {/* Button Components */}
+        <Text style={styles.subSectionTitle}>Buttons</Text>
+        <View style={styles.componentGrid}>
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Primary Button</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('primary')}>
+              <Text style={componentHelpers.getButtonTextStyle('primary')}>Primary Button</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Secondary Button</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('secondary')}>
+              <Text style={componentHelpers.getButtonTextStyle('secondary')}>Secondary Button</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Small Button</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('small')}>
+              <Text style={ComponentTextStyles.button.small}>Small Button</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Text Button</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('text')}>
+              <Text style={componentHelpers.getButtonTextStyle('text')}>Text Button</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Dharma Button</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('dharma')}>
+              <Text style={ComponentTextStyles.button.dharma}>Dharma Button</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Card Components */}
+        <Text style={styles.subSectionTitle}>Cards</Text>
+        <View style={styles.componentGrid}>
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Standard Card</Text>
+            <View style={[componentHelpers.getCardStyle('standard'), styles.cardPreview]}>
+              <Text style={componentHelpers.getCardTextStyle('title')}>Card Title</Text>
+              <Text style={componentHelpers.getCardTextStyle('body')}>This is a standard card with sample content to show the styling.</Text>
+              <Text style={componentHelpers.getCardTextStyle('metadata')}>Metadata • Info</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Practice Card</Text>
+            <View style={[componentHelpers.getCardStyle('practice'), styles.cardPreview]}>
+              <Text style={componentHelpers.getCardTextStyle('subtitle')}>Practice Card</Text>
+              <Text style={componentHelpers.getCardTextStyle('body')}>Practice session content and details.</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Course Card</Text>
+            <View style={[componentHelpers.getCardStyle('course'), styles.cardPreview]}>
+              <Text style={componentHelpers.getCardTextStyle('title')}>Course Title</Text>
+              <Text style={componentHelpers.getCardTextStyle('body')}>Course description and learning materials.</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Status Card</Text>
+            <View style={[componentHelpers.getCardStyle('status'), styles.cardPreview]}>
+              <Text style={ComponentTextStyles.buddhist.completionText}>✅ Completed</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Input Components */}
+        <Text style={styles.subSectionTitle}>Inputs</Text>
+        <View style={styles.componentGrid}>
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Standard Input</Text>
+            <TextInput 
+              style={ComponentTokens.input.standard}
+              placeholder="Standard input field"
+              placeholderTextColor={DesignSystem.colors.textSecondary}
+            />
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Search Input</Text>
+            <TextInput 
+              style={ComponentTokens.input.search}
+              placeholder="Search..."
+              placeholderTextColor={DesignSystem.colors.textSecondary}
+            />
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Textarea Input</Text>
+            <TextInput 
+              style={ComponentTokens.input.textarea}
+              placeholder="Enter multiple lines of text..."
+              placeholderTextColor={DesignSystem.colors.textSecondary}
+              multiline
+            />
+          </View>
+        </View>
+
+        {/* Progress Components */}
+        <Text style={styles.subSectionTitle}>Progress Bars</Text>
+        <View style={styles.componentGrid}>
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Standard Progress (60%)</Text>
+            <View style={ComponentTokens.progress.bar.container}>
+              <View style={[ComponentTokens.progress.bar.fill, { width: '60%' }]} />
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Course Progress (75%)</Text>
+            <View style={ComponentTokens.progress.course.container}>
+              <View style={[ComponentTokens.progress.course.fill, { width: '75%' }]} />
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Practice Progress (45%)</Text>
+            <View style={ComponentTokens.progress.practice.container}>
+              <View style={[ComponentTokens.progress.practice.fill, { width: '45%' }]} />
+            </View>
+          </View>
+        </View>
+
+        {/* Modal Components */}
+        <Text style={styles.subSectionTitle}>Modal Styles</Text>
+        <View style={styles.componentGrid}>
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Standard Modal</Text>
+            <View style={[componentHelpers.getModalStyle('standard'), styles.modalPreview]}>
+              <Text style={ComponentTextStyles.header.section}>Modal Title</Text>
+              <Text style={ComponentTextStyles.card.body}>Modal content goes here...</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Alert Modal</Text>
+            <View style={[componentHelpers.getModalStyle('alert'), styles.modalPreview]}>
+              <Text style={ComponentTextStyles.header.section}>Alert!</Text>
+              <Text style={ComponentTextStyles.card.body}>Important message</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Modal Overlay</Text>
+            <View style={[componentHelpers.getModalStyle('overlay'), styles.overlayPreview]}>
+              <Text style={[ComponentTextStyles.card.body, { color: DesignSystem.colors.textInverse }]}>Overlay Background</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Buddhist Components */}
+        <Text style={styles.subSectionTitle}>Buddhist Components</Text>
+        <View style={styles.componentGrid}>
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Dharma Card</Text>
+            <View style={[componentHelpers.getBuddhistStyle('dharmaCard'), styles.cardPreview]}>
+              <Text style={componentHelpers.getBuddhistTextStyle('dharmaTitle')}>Dharma Practice</Text>
+              <Text style={componentHelpers.getBuddhistTextStyle('practiceText')}>Buddhist practice content with special styling.</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Meditation Card</Text>
+            <View style={[componentHelpers.getBuddhistStyle('meditationCard'), styles.cardPreview]}>
+              <Text style={ComponentTextStyles.card.subtitle}>Meditation Session</Text>
+              <Text style={componentHelpers.getBuddhistTextStyle('practiceText')}>Deep contemplation practice.</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Wisdom Badge</Text>
+            <View style={componentHelpers.getBuddhistStyle('wisdomBadge')}>
+              <Text style={componentHelpers.getBuddhistTextStyle('wisdomText')}>Wisdom</Text>
+            </View>
+          </View>
+          
+          <View style={styles.componentItem}>
+            <Text style={styles.componentLabel}>Completion Badge</Text>
+            <View style={componentHelpers.getBuddhistStyle('completionBadge')}>
+              <Text style={componentHelpers.getBuddhistTextStyle('completionText')}>Completed</Text>
+            </View>
+          </View>
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -164,9 +363,22 @@ const styles = StyleSheet.create({
   inputPlaceholder: {
     color: DesignSystem.colors.textSecondary,
   },
+  cardPreview: {
+    marginHorizontal: 0,
+    marginVertical: 0,
+    maxWidth: '100%',
+  },
   modalPreview: {
     minHeight: 80,
     maxWidth: '90%',
+    margin: 0,
+  },
+  overlayPreview: {
+    minHeight: 60,
+    maxWidth: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: DesignSystem.borderRadius.md,
   },
 
   // Typography Styles Grid
