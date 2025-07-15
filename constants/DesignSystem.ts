@@ -161,83 +161,367 @@ export const DesignSystem = {
     },
   },
   
-  // Component-specific styles
+  // Component-specific design tokens
   components: {
-    // Button styles
+    // Button component tokens
     button: {
+      // Primary buttons (main actions)
       primary: {
-        backgroundColor: '#da4347',
-        paddingVertical: 16,
-        paddingHorizontal: 20,
-        borderRadius: 12,
+        backgroundColor: '#da4347',  // Will reference colors.primary
+        paddingVertical: 16,         // Will reference spacing.lg
+        paddingHorizontal: 20,       // Will reference spacing.xl
+        borderRadius: 12,            // Will reference borderRadius.lg
         minHeight: 48,
+        fontSize: 16,                // Will reference typography.fontSize.base
+        fontWeight: '700',           // Will reference typography.fontWeight.bold
+        color: '#ffffff',            // Will reference colors.textInverse
+        letterSpacing: -0.2,         // Will reference typography.letterSpacing.tighter
       },
+      
+      // Secondary buttons (outline style)
       secondary: {
-        backgroundColor: '#f2f2f7',
-        paddingVertical: 16,
-        paddingHorizontal: 20,
-        borderRadius: 12,
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        paddingVertical: 16,         // Will reference spacing.lg
+        paddingHorizontal: 20,       // Will reference spacing.xl
+        borderRadius: 12,            // Will reference borderRadius.lg
+        borderWidth: 1.5,
+        borderColor: '#da4347',      // Will reference colors.primary
         minHeight: 48,
+        fontSize: 14,                // Will reference typography.fontSize.sm
+        fontWeight: '600',           // Will reference typography.fontWeight.semibold
+        color: '#da4347',            // Will reference colors.primary
+        letterSpacing: -0.1,         // Will reference typography.letterSpacing.normal
+      },
+      
+      // Small action buttons (secondary actions)
+      small: {
+        backgroundColor: '#f8f9fa',  // Will reference colors.background
+        paddingVertical: 10,         // Will reference spacing.base
+        paddingHorizontal: 12,       // Will reference spacing.md
+        borderRadius: 8,             // Will reference borderRadius.md
         borderWidth: 1,
-        borderColor: '#e9ecef',
+        borderColor: '#e9ecef',      // Will reference colors.border
+        minHeight: 36,
+        fontSize: 14,                // Will reference typography.fontSize.sm
+        fontWeight: '500',           // Will reference typography.fontWeight.medium
+        color: '#666666',            // Will reference colors.textSecondary
       },
+      
+      // Text-only buttons (links, minimal actions)
       text: {
-        primary: {
-          fontSize: 16,
-          fontWeight: '600',
-          color: '#ffffff',
+        backgroundColor: 'transparent',
+        paddingVertical: 8,          // Will reference spacing.sm
+        paddingHorizontal: 12,       // Will reference spacing.md
+        borderRadius: 6,             // Will reference spacing.xxs
+        fontSize: 14,                // Will reference typography.fontSize.sm
+        fontWeight: '600',           // Will reference typography.fontWeight.semibold
+        color: '#da4347',            // Will reference colors.primary
+      },
+      
+      // Buddhist practice specific buttons
+      dharma: {
+        backgroundColor: '#da4347',  // dharmaRed
+        paddingVertical: 16,         // Will reference spacing.lg
+        paddingHorizontal: 24,       // Will reference spacing.2xl
+        borderRadius: 12,            // Will reference borderRadius.lg
+        minHeight: 48,
+        fontSize: 16,                // Will reference typography.fontSize.base
+        fontWeight: '700',           // Will reference typography.fontWeight.bold
+        color: '#ffffff',            // Will reference colors.textInverse
+        letterSpacing: -0.2,         // Will reference typography.letterSpacing.tighter
+      },
+    },
+
+    // Card component tokens
+    card: {
+      // Standard content cards
+      standard: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 12,            // Will reference borderRadius.lg
+        padding: 20,                 // Will reference spacing.xl
+        marginHorizontal: 16,        // Will reference spacing.lg
+        marginVertical: 8,           // Will reference spacing.sm
+        shadowColor: '#000',         // Will reference colors.cardShadow
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
+        borderWidth: 0.5,
+        borderColor: 'rgba(0,0,0,0.04)',
+      },
+      
+      // Practice project cards
+      practice: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 12,            // Will reference borderRadius.lg
+        padding: 16,                 // Will reference spacing.lg
+        marginHorizontal: 16,        // Will reference spacing.lg
+        marginVertical: 6,           // Will reference spacing.xxs
+        shadowColor: '#000',         // Will reference colors.cardShadow
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: '#f0f0f0',      // Will reference colors.borderLight
+      },
+      
+      // Course cards
+      course: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 16,            // Will reference borderRadius.xl
+        padding: 20,                 // Will reference spacing.xl
+        marginHorizontal: 16,        // Will reference spacing.lg
+        marginVertical: 8,           // Will reference spacing.sm
+        shadowColor: '#000',         // Will reference colors.cardShadow
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 6,
+        borderWidth: 1,
+        borderColor: '#f8f9fa',      // Will reference colors.background
+      },
+      
+      // Status/completion cards
+      status: {
+        backgroundColor: '#e8f5e8',  // Will reference colors.successBackground
+        borderRadius: 12,            // Will reference borderRadius.lg
+        padding: 12,                 // Will reference spacing.md
+        marginHorizontal: 16,        // Will reference spacing.lg
+        marginVertical: 4,           // Will reference spacing.xs
+        borderWidth: 1,
+        borderColor: '#2e7d32',      // Will reference colors.practiceComplete
+      },
+    },
+
+    // Input component tokens
+    input: {
+      // Standard text inputs
+      standard: {
+        borderWidth: 1,
+        borderColor: '#e9ecef',      // Will reference colors.border
+        borderRadius: 8,             // Will reference borderRadius.md
+        paddingHorizontal: 12,       // Will reference spacing.md
+        paddingVertical: 12,         // Will reference spacing.md
+        fontSize: 16,                // Will reference typography.fontSize.base
+        fontWeight: '400',           // Will reference typography.fontWeight.normal
+        color: '#1a1a1a',            // Will reference colors.textPrimary
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        minHeight: 48,
+        lineHeight: 24,              // Will reference typography.lineHeight.normal * fontSize
+      },
+      
+      // Search inputs
+      search: {
+        borderWidth: 1,
+        borderColor: '#f0f0f0',      // Will reference colors.borderLight
+        borderRadius: 12,            // Will reference borderRadius.lg
+        paddingHorizontal: 16,       // Will reference spacing.lg
+        paddingVertical: 10,         // Will reference spacing.base
+        fontSize: 16,                // Will reference typography.fontSize.base
+        fontWeight: '400',           // Will reference typography.fontWeight.normal
+        color: '#1a1a1a',            // Will reference colors.textPrimary
+        backgroundColor: '#f8f9fa',  // Will reference colors.background
+        minHeight: 44,
+      },
+      
+      // Multiline text areas
+      textarea: {
+        borderWidth: 1,
+        borderColor: '#e9ecef',      // Will reference colors.border
+        borderRadius: 8,             // Will reference borderRadius.md
+        paddingHorizontal: 12,       // Will reference spacing.md
+        paddingVertical: 12,         // Will reference spacing.md
+        fontSize: 16,                // Will reference typography.fontSize.base
+        fontWeight: '400',           // Will reference typography.fontWeight.normal
+        color: '#1a1a1a',            // Will reference colors.textPrimary
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        minHeight: 80,
+        lineHeight: 24,              // Will reference typography.lineHeight.normal * fontSize
+        textAlignVertical: 'top',
+      },
+    },
+
+    // Progress component tokens
+    progress: {
+      // Standard progress bars
+      bar: {
+        container: {
+          height: 8,                 // Will reference spacing.sm
+          backgroundColor: '#e9ecef', // Will reference colors.border
+          borderRadius: 4,           // Will reference borderRadius.sm
+          overflow: 'hidden',
         },
-        secondary: {
-          fontSize: 16,
-          fontWeight: '600',
-          color: '#da4347',
+        fill: {
+          height: '100%',
+          backgroundColor: '#da4347', // Will reference colors.primary
+          borderRadius: 4,           // Will reference borderRadius.sm
+        },
+      },
+      
+      // Course progress (thicker)
+      course: {
+        container: {
+          height: 12,                // Will reference spacing.md
+          backgroundColor: '#f0f0f0', // Will reference colors.borderLight
+          borderRadius: 6,           // Will reference spacing.xxs
+          overflow: 'hidden',
+        },
+        fill: {
+          height: '100%',
+          backgroundColor: '#4A90E2', // Will reference colors.studyProgress
+          borderRadius: 6,           // Will reference spacing.xxs
+        },
+      },
+      
+      // Buddhist practice progress (special styling)
+      practice: {
+        container: {
+          height: 10,                // Will reference spacing.base
+          backgroundColor: '#f8f9fa', // Will reference colors.background
+          borderRadius: 5,
+          overflow: 'hidden',
+          borderWidth: 1,
+          borderColor: '#e9ecef',    // Will reference colors.border
+        },
+        fill: {
+          height: '100%',
+          backgroundColor: '#da4347', // Will reference colors.dharmaRed
+          borderRadius: 4,           // Will reference borderRadius.sm
         },
       },
     },
-    
-    // Card styles
-    card: {
-      backgroundColor: '#ffffff',
-      borderRadius: 12,
-      padding: 16,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    
-    // Input styles
-    input: {
-      borderWidth: 1,
-      borderColor: '#e9ecef',
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 12,
-      fontSize: 16,
-      backgroundColor: '#ffffff',
-      minHeight: 48,
-    },
-    
-    // Progress bar styles
-    progressBar: {
-      height: 8,
-      backgroundColor: '#e9ecef',
-      borderRadius: 4,
-      overflow: 'hidden',
-    },
-    
-    // Modal styles
+
+    // Modal component tokens
     modal: {
-      backgroundColor: '#ffffff',
-      borderRadius: 12,
-      padding: 20,
-      margin: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.25,
-      shadowRadius: 8,
-      elevation: 8,
+      // Standard modals
+      standard: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 12,            // Will reference borderRadius.lg
+        padding: 20,                 // Will reference spacing.xl
+        margin: 20,                  // Will reference spacing.xl
+        shadowColor: '#000',         // Will reference colors.cardShadow
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        elevation: 8,
+      },
+      
+      // Full-screen modals
+      fullscreen: {
+        backgroundColor: '#f8f9fa',  // Will reference colors.background
+        borderRadius: 0,
+        padding: 0,
+      },
+      
+      // Alert/confirmation modals
+      alert: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 16,            // Will reference borderRadius.xl
+        padding: 24,                 // Will reference spacing.2xl
+        margin: 24,                  // Will reference spacing.2xl
+        shadowColor: '#000',         // Will reference colors.cardShadow
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+        elevation: 12,
+      },
+      
+      // Modal overlay
+      overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Will reference colors.overlayDark
+      },
+    },
+
+    // Header component tokens
+    header: {
+      // Page headers
+      page: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0', // Will reference colors.borderLight
+        paddingHorizontal: 16,       // Will reference spacing.lg
+        paddingVertical: 12,         // Will reference spacing.md
+        minHeight: 60,
+      },
+      
+      // Modal headers
+      modal: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderBottomWidth: 1,
+        borderBottomColor: '#e9ecef', // Will reference colors.border
+        paddingHorizontal: 16,       // Will reference spacing.lg
+        paddingVertical: 12,         // Will reference spacing.md
+        minHeight: 56,
+      },
+      
+      // Section headers
+      section: {
+        backgroundColor: 'transparent',
+        paddingHorizontal: 0,
+        paddingVertical: 8,          // Will reference spacing.sm
+        marginBottom: 16,            // Will reference spacing.lg
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0', // Will reference colors.borderLight
+      },
+    },
+
+    // Buddhist-specific component tokens
+    buddhist: {
+      // Dharma practice cards
+      dharmaCard: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 12,            // Will reference borderRadius.lg
+        padding: 20,                 // Will reference spacing.xl
+        marginHorizontal: 16,        // Will reference spacing.lg
+        marginVertical: 8,           // Will reference spacing.sm
+        borderLeftWidth: 4,
+        borderLeftColor: '#da4347',  // Will reference colors.dharmaRed
+        shadowColor: '#000',         // Will reference colors.cardShadow
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
+      },
+      
+      // Meditation session cards
+      meditationCard: {
+        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
+        borderRadius: 16,            // Will reference borderRadius.xl
+        padding: 20,                 // Will reference spacing.xl
+        marginHorizontal: 16,        // Will reference spacing.lg
+        marginVertical: 8,           // Will reference spacing.sm
+        borderWidth: 2,
+        borderColor: '#4A90E2',      // Will reference colors.meditationBlue
+        shadowColor: '#4A90E2',      // Will reference colors.meditationBlue
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 4,
+      },
+      
+      // Wisdom achievement badges
+      wisdomBadge: {
+        backgroundColor: '#D4AF37',  // Will reference colors.wisdomGold
+        borderRadius: 20,            // Will reference spacing.xl
+        paddingHorizontal: 12,       // Will reference spacing.md
+        paddingVertical: 4,          // Will reference spacing.xs
+        shadowColor: '#D4AF37',      // Will reference colors.wisdomGold
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      
+      // Completion status indicators
+      completionBadge: {
+        backgroundColor: '#e8f5e8',  // Will reference colors.successBackground
+        borderRadius: 12,            // Will reference borderRadius.lg
+        paddingHorizontal: 12,       // Will reference spacing.md
+        paddingVertical: 4,          // Will reference spacing.xs
+        borderWidth: 1,
+        borderColor: '#2e7d32',      // Will reference colors.practiceComplete
+      },
     },
   },
 };
