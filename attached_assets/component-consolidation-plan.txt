@@ -1,0 +1,333 @@
+
+# Component Token Consolidation Plan
+# Generated: January 15, 2025
+# Analysis Based on: utils/componentTokens.ts and codebase investigation
+
+## EXECUTIVE SUMMARY
+
+Current State: 38 component variants across 7 categories
+Target State: 18 consolidated components (53% reduction)
+Risk Level: Medium (manageable with phased approach)
+Timeline: 3-4 weeks with proper testing
+
+## DETAILED CONSOLIDATION STRATEGY
+
+### PHASE 1: LOW-RISK CONSOLIDATIONS (Week 1)
+Priority: High Impact, Low Risk
+
+#### 1.1 Progress Component Consolidation
+**Current:** 3 variants (bar, course, practice)
+**Target:** 1 component with size prop
+
+BEFORE:
+- progress.bar (height: 8px)
+- progress.course (height: 12px) 
+- progress.practice (height: 10px)
+
+AFTER:
+- Single ProgressBar component
+- Props: size={'thin'|'medium'|'thick'}
+- Implementation: size maps to height values
+
+**Impact Analysis:**
+- Files Affected: 12 files use progress bars
+- Risk Level: Very Low (isolated styling)
+- Bundle Reduction: ~180 lines of duplicate code
+- Breaking Changes: None (visual outcome identical)
+
+#### 1.2 Header Component Consolidation
+**Current:** 3 variants (page, modal, section)
+**Target:** 1 component with context prop
+
+BEFORE:
+- header.page (border, padding: 16px)
+- header.modal (border, padding: 16px)
+- header.section (no border, padding: 8px)
+
+AFTER:
+- Single Header component
+- Props: context={'page'|'modal'|'section'}
+- Auto-applies appropriate styling
+
+**Impact Analysis:**
+- Files Affected: 28 header usages across app
+- Risk Level: Low (contained styling differences)
+- Bundle Reduction: ~150 lines of code
+- Breaking Changes: None
+
+#### 1.3 Buddhist-Specific Token Simplification
+**Current:** 4 Buddhist variants (dharmaCard, meditationCard, wisdomBadge, completionBadge)
+**Target:** Merge into semantic system
+
+CONSOLIDATION:
+- dharmaCard → card.standard + semantic.dharma color
+- meditationCard → card.standard + semantic.meditation color
+- wisdomBadge → badge.small + semantic.wisdom color
+- completionBadge → badge.small + semantic.success color
+
+**Impact Analysis:**
+- Files Affected: 15 Buddhist-themed components
+- Risk Level: Low (color-only changes)
+- Bundle Reduction: ~200 lines of specialized code
+- Breaking Changes: None (same visual output)
+
+### PHASE 2: MEDIUM-RISK CONSOLIDATIONS (Week 2)
+
+#### 2.1 Input Component Consolidation
+**Current:** 3 variants (standard, search, textarea)
+**Target:** 2 variants with props
+
+BEFORE:
+- input.standard (border, padding: 12px)
+- input.search (different border, padding: 16px)
+- input.textarea (multiline, height: 80px)
+
+AFTER:
+- input.outlined (replaces standard + search)
+- input.filled (new variant)
+- Props: multiline, size, variant
+
+**Impact Analysis:**
+- Files Affected: 45 input fields across app
+- Risk Level: Medium (API changes required)
+- Bundle Reduction: ~120 lines of duplicate styling
+- Breaking Changes: Minimal (prop updates needed)
+
+**Migration Strategy:**
+1. Add new consolidated components
+2. Update imports file by file
+3. Remove old variants
+4. Test form functionality
+
+#### 2.2 Button Variant Consolidation
+**Current:** 5 variants (primary, secondary, small, text, dharma)
+**Target:** 3 variants with size prop
+
+BEFORE:
+- button.primary (red background)
+- button.secondary (white + red border)
+- button.small (smaller padding)
+- button.text (transparent background)
+- button.dharma (identical to primary)
+
+AFTER:
+- button.primary (solid style)
+- button.secondary (outlined style)
+- button.ghost (replaces text)
+- Props: size={'small'|'medium'|'large'}
+
+**Impact Analysis:**
+- Files Affected: 156 button usages (most common component)
+- Risk Level: Medium (high usage but well-contained)
+- Bundle Reduction: ~300 lines of button definitions
+- Breaking Changes: 'dharma' → 'primary', 'small' → size prop
+
+**Migration Strategy:**
+1. Create mapping utility: dharma → primary
+2. Batch replace small buttons with size prop
+3. Update all button imports systematically
+4. Visual regression testing on each screen
+
+### PHASE 3: HIGH-RISK CONSOLIDATIONS (Week 3)
+
+#### 3.1 Card Component Consolidation
+**Current:** 4 variants (standard, practice, course, status)
+**Target:** 2 variants with padding prop
+
+ANALYSIS OF DIFFERENCES:
+- standard vs practice: Only padding differs (20px vs 16px)
+- standard vs course: Only shadow differs (elevation 4 vs 6)
+- status: Completely different (should be notification component)
+
+CONSOLIDATION:
+- card.elevated (high shadow, replaces course)
+- card.outlined (low shadow, replaces standard + practice)
+- Props: padding={'compact'|'comfortable'|'spacious'}
+- Remove status → create separate Notification component
+
+**Impact Analysis:**
+- Files Affected: 89 card usages (critical component)
+- Risk Level: High (affects core app layout)
+- Bundle Reduction: ~400 lines of duplicate card styling
+- Breaking Changes: status cards need component migration
+
+**Migration Strategy:**
+1. Week 3.1: Create new consolidated card components
+2. Week 3.2: Migrate non-critical screens first
+3. Week 3.3: Migrate status cards to notification component
+4. Week 3.4: Update core screens (practice lists, course cards)
+5. Extensive visual testing at each step
+
+#### 3.2 Modal Component Consolidation
+**Current:** 4 variants (standard, fullscreen, alert, overlay)
+**Target:** 2 variants with size prop
+
+BEFORE:
+- modal.standard (padding: 20px, margin: 20px)
+- modal.fullscreen (no padding/margin)
+- modal.alert (padding: 32px, margin: 32px)
+- modal.overlay (background only)
+
+AFTER:
+- modal.dialog (replaces standard + alert)
+- modal.fullscreen (unchanged)
+- Props: size={'compact'|'default'|'large'}
+- overlay becomes separate utility
+
+**Impact Analysis:**
+- Files Affected: 34 modal usages
+- Risk Level: High (affects navigation flow)
+- Bundle Reduction: ~180 lines of modal definitions
+- Breaking Changes: alert → dialog with size='compact'
+
+### PHASE 4: FINAL CLEANUP (Week 4)
+
+#### 4.1 Text Style Consolidation
+**Current:** 24 text style definitions across ComponentTextStyles
+**Target:** 12 semantic text styles
+
+CONSOLIDATION TARGETS:
+- Remove duplicate fontSize/fontWeight combinations
+- Merge similar Buddhist text styles into semantic variants
+- Flatten component-specific text styles
+
+**Impact Analysis:**
+- Files Affected: All files using ComponentTextStyles
+- Risk Level: Medium (typography affects everything)
+- Bundle Reduction: ~250 lines of text definitions
+- Breaking Changes: Import path updates
+
+#### 4.2 Remove Unused Tokens
+**Target:** Clean up any remaining unused variants
+
+## IMPACT ASSESSMENT BY APP AREA
+
+### Critical Impact Areas (Require Extra Testing)
+1. **Practice Detail Screens** - Heavy card usage
+2. **Study Interface** - Progress bars and buttons
+3. **Modal Flows** - Authentication, settings
+4. **Form Components** - Input consolidation affects all forms
+
+### Low Impact Areas (Safe to Migrate First)
+1. **Profile Settings** - Limited component usage
+2. **Static Content Pages** - Simple layouts
+3. **Debug/Testing Screens** - Non-critical functionality
+
+### File-by-File Risk Assessment
+
+**HIGH RISK FILES (>20 component usages):**
+- app/practice-detail/[practiceId].tsx (45 usages)
+- app/(tabs)/practice.tsx (38 usages)
+- app/(tabs)/study.tsx (34 usages)
+- components/PageTemplate.tsx (29 usages)
+
+**MEDIUM RISK FILES (10-20 usages):**
+- app/modals/custom-record.tsx (18 usages)
+- app/practice-config.tsx (16 usages)
+- components/ModalTemplate.tsx (14 usages)
+
+**LOW RISK FILES (<10 usages):**
+- app/profile.tsx (8 usages)
+- app/edit-profile.tsx (6 usages)
+- All debug/testing files (3-5 usages each)
+
+## EXPECTED BENEFITS
+
+### Bundle Size Reduction
+- **Component Tokens:** 53% reduction (38 → 18 variants)
+- **Code Lines:** ~1,200 lines removed
+- **Bundle Size:** Estimated 15-20% reduction in style definitions
+
+### Maintainability Improvements
+- Single source of truth for each pattern
+- Consistent prop APIs across similar components
+- Reduced cognitive overhead for developers
+- Easier to add new variants (following established patterns)
+
+### API Simplification
+- Fewer import statements needed
+- More composable component APIs
+- Consistent prop naming conventions
+- Better TypeScript support with unified interfaces
+
+## RISK MITIGATION STRATEGIES
+
+### Rollback Plans
+1. **Git Branch Strategy:** Feature branches for each phase
+2. **Component Versioning:** Keep old components until migration complete
+3. **Gradual Migration:** File-by-file updates with testing
+4. **Visual Regression:** Screenshot comparison for each change
+
+### Testing Protocol
+1. **Unit Tests:** Component prop validation
+2. **Integration Tests:** Form submission flows
+3. **Visual Tests:** Screenshot comparison
+4. **Performance Tests:** Bundle size monitoring
+
+### Safety Measures
+1. **Backward Compatibility:** Old components remain until migration complete
+2. **Feature Flags:** Toggle between old/new implementations
+3. **Monitoring:** Error tracking during migration
+4. **Quick Fixes:** Prepared patches for common issues
+
+## SUCCESS METRICS
+
+### Quantitative Goals
+- [ ] 50%+ reduction in component token definitions
+- [ ] Zero visual regressions across key user flows
+- [ ] <2% performance impact during migration
+- [ ] 100% test coverage maintained
+
+### Qualitative Goals
+- [ ] Improved developer experience (fewer imports)
+- [ ] Consistent component APIs
+- [ ] Easier design system evolution
+- [ ] Reduced style maintenance burden
+
+## TEAM COORDINATION
+
+### Communication Plan
+1. **Week 0:** Team briefing on consolidation plan
+2. **Weekly:** Progress updates and risk assessment
+3. **Daily:** Standups during high-risk phases
+4. **Ad-hoc:** Immediate communication for blocking issues
+
+### Responsibility Matrix
+- **Phase 1:** Junior developer (low risk)
+- **Phase 2:** Mid-level developer (medium complexity)
+- **Phase 3:** Senior developer (high impact areas)
+- **Phase 4:** Tech lead (system-wide changes)
+
+### Decision Points
+1. **End of Week 1:** Go/No-go for Phase 2
+2. **End of Week 2:** Risk assessment for card consolidation
+3. **End of Week 3:** Final cleanup scope decision
+4. **End of Week 4:** Post-migration optimization planning
+
+## APPENDIX: DETAILED MIGRATION MAPPINGS
+
+### Button Migration Table
+| Old Variant | New Variant | Props | Notes |
+|-------------|-------------|-------|-------|
+| primary | primary | - | No change |
+| secondary | secondary | - | No change |
+| small | primary/secondary | size='small' | Add size prop |
+| text | ghost | - | Rename variant |
+| dharma | primary | - | Direct replacement |
+
+### Card Migration Table
+| Old Variant | New Variant | Props | Notes |
+|-------------|-------------|-------|-------|
+| standard | outlined | padding='comfortable' | Default padding |
+| practice | outlined | padding='compact' | Smaller padding |
+| course | elevated | padding='spacious' | Higher shadow |
+| status | Notification | - | New component |
+
+### Input Migration Table
+| Old Variant | New Variant | Props | Notes |
+|-------------|-------------|-------|-------|
+| standard | outlined | - | Default style |
+| search | outlined | variant='search' | Icon handling |
+| textarea | outlined | multiline=true | Boolean prop |
+
+This consolidation plan provides a systematic approach to reducing component complexity while maintaining all current functionality and visual outcomes. The phased approach ensures minimal risk to app stability while achieving significant improvements in maintainability and bundle size.
