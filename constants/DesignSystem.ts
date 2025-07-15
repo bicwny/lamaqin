@@ -526,15 +526,15 @@ export const DesignSystem = {
   },
 };
 
-// Helper functions for consistent styling
+// Helper functions for consistent styling with automatic line heights
 export const createStyles = {
-  // Text styles
+  // Text styles with automatic line height calculations
   heading: (size: keyof typeof DesignSystem.typography.fontSize = 'xl') => ({
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
     letterSpacing: DesignSystem.typography.letterSpacing.tight,
-    lineHeight: DesignSystem.typography.lineHeight.tight,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
   }),
   
   subheading: (size: keyof typeof DesignSystem.typography.fontSize = 'lg') => ({
@@ -542,59 +542,61 @@ export const createStyles = {
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.textPrimary,
     letterSpacing: DesignSystem.typography.letterSpacing.tight,
-    lineHeight: DesignSystem.typography.lineHeight.snug,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.snug,
   }),
   
   body: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textSecondary,
-    lineHeight: DesignSystem.typography.lineHeight.normal,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.normal,
   }),
   
   label: (size: keyof typeof DesignSystem.typography.fontSize = 'sm') => ({
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.textSecondary,
-    lineHeight: DesignSystem.typography.lineHeight.snug,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.snug,
   }),
   
   caption: () => ({
     fontSize: DesignSystem.typography.fontSize.xs,
     fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textTertiary,
-    lineHeight: DesignSystem.typography.lineHeight.tight,
+    lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
   }),
   
-  // Buddhist semantic text styles
+  // Buddhist semantic text styles with automatic line heights
   dharmaTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
     letterSpacing: DesignSystem.typography.letterSpacing.tight,
-    lineHeight: DesignSystem.typography.lineHeight.tight,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
   }),
   
-  practiceText: () => ({
-    fontSize: DesignSystem.typography.fontSize.base,
+  practiceText: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.textPrimary,
-    lineHeight: DesignSystem.typography.lineHeight.relaxed,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.relaxed,
   }),
   
-  // Interactive text styles
+  // Interactive text styles with automatic line heights
   buttonText: (variant: 'primary' | 'secondary' = 'primary') => ({
     fontSize: DesignSystem.typography.fontSize.base,
     fontWeight: DesignSystem.typography.fontWeight.bold,
     letterSpacing: DesignSystem.typography.letterSpacing.tighter,
     color: variant === 'primary' ? DesignSystem.colors.textInverse : DesignSystem.colors.primary,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
   }),
   
-  linkText: () => ({
-    fontSize: DesignSystem.typography.fontSize.base,
+  linkText: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.primary,
     letterSpacing: DesignSystem.typography.letterSpacing.normal,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
   }),
   
   // Layout styles

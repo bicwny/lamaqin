@@ -9,8 +9,85 @@ export const Typography = {
   lineHeight: DesignSystem.typography.lineHeight,
   letterSpacing: DesignSystem.typography.letterSpacing,
 
-  // Pre-built text styles for common use cases
-  styles: createStyles,
+  // Enhanced pre-built text styles with automatic line heights
+  styles: {
+    // Headings with tight line height for impact
+    heading: (size: keyof typeof DesignSystem.typography.fontSize = 'xl') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.bold,
+      color: DesignSystem.colors.textPrimary,
+      letterSpacing: DesignSystem.typography.letterSpacing.tight,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
+    }),
+    
+    // Subheadings with snug line height for hierarchy
+    subheading: (size: keyof typeof DesignSystem.typography.fontSize = 'lg') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.semibold,
+      color: DesignSystem.colors.textPrimary,
+      letterSpacing: DesignSystem.typography.letterSpacing.tight,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.snug,
+    }),
+    
+    // Body text with normal line height for reading comfort
+    body: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.normal,
+      color: DesignSystem.colors.textSecondary,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.normal,
+    }),
+    
+    // Labels with snug line height for compact UI
+    label: (size: keyof typeof DesignSystem.typography.fontSize = 'sm') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.medium,
+      color: DesignSystem.colors.textSecondary,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.snug,
+    }),
+    
+    // Captions with tight line height for small text
+    caption: () => ({
+      fontSize: DesignSystem.typography.fontSize.xs,
+      fontWeight: DesignSystem.typography.fontWeight.normal,
+      color: DesignSystem.colors.textTertiary,
+      lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
+    }),
+    
+    // Buddhist semantic text styles with optimized line heights
+    dharmaTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.bold,
+      color: DesignSystem.colors.textPrimary,
+      letterSpacing: DesignSystem.typography.letterSpacing.tight,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
+    }),
+    
+    // Practice text with relaxed line height for better readability
+    practiceText: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.medium,
+      color: DesignSystem.colors.textPrimary,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.relaxed,
+    }),
+    
+    // Interactive text styles with tight line height for UI precision
+    buttonText: (variant: 'primary' | 'secondary' = 'primary') => ({
+      fontSize: DesignSystem.typography.fontSize.base,
+      fontWeight: DesignSystem.typography.fontWeight.bold,
+      letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+      color: variant === 'primary' ? DesignSystem.colors.textInverse : DesignSystem.colors.primary,
+      lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+    }),
+    
+    // Link text with tight line height for inline usage
+    linkText: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+      fontSize: DesignSystem.typography.fontSize[size],
+      fontWeight: DesignSystem.typography.fontWeight.semibold,
+      color: DesignSystem.colors.primary,
+      letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
+    }),
+  },
 
   // Migration helpers - map old hardcoded values to new tokens
   migrationMap: {
@@ -54,45 +131,155 @@ export const Typography = {
     },
   },
 
-  // Component-specific typography patterns
+  // Component-specific typography patterns with automatic line heights
   components: {
     // Practice detail screen patterns
     practiceDetail: {
-      title: createStyles.dharmaTitle('2xl'),
-      subtitle: createStyles.subheading('lg'),
-      description: createStyles.body('base'),
-      sectionTitle: createStyles.subheading('lg'),
-      label: createStyles.label('sm'),
-      value: createStyles.body('base'),
-      metadata: createStyles.caption(),
-      button: createStyles.buttonText('primary'),
-      secondaryButton: createStyles.buttonText('secondary'),
+      title: {
+        fontSize: DesignSystem.typography.fontSize['2xl'],
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        color: DesignSystem.colors.textPrimary,
+        letterSpacing: DesignSystem.typography.letterSpacing.tight,
+        lineHeight: DesignSystem.typography.fontSize['2xl'] * DesignSystem.typography.lineHeight.tight,
+      },
+      subtitle: {
+        fontSize: DesignSystem.typography.fontSize.lg,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        color: DesignSystem.colors.textPrimary,
+        letterSpacing: DesignSystem.typography.letterSpacing.tight,
+        lineHeight: DesignSystem.typography.fontSize.lg * DesignSystem.typography.lineHeight.snug,
+      },
+      description: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
+      },
+      sectionTitle: {
+        fontSize: DesignSystem.typography.fontSize.lg,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        color: DesignSystem.colors.textPrimary,
+        letterSpacing: DesignSystem.typography.letterSpacing.tight,
+        lineHeight: DesignSystem.typography.fontSize.lg * DesignSystem.typography.lineHeight.snug,
+      },
+      label: {
+        fontSize: DesignSystem.typography.fontSize.sm,
+        fontWeight: DesignSystem.typography.fontWeight.medium,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
+      },
+      value: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+      },
+      metadata: {
+        fontSize: DesignSystem.typography.fontSize.xs,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textTertiary,
+        lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
+      },
+      button: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+        color: DesignSystem.colors.textInverse,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
+      secondaryButton: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+        color: DesignSystem.colors.primary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
     },
 
-    // Card patterns
+    // Card patterns with automatic line heights
     card: {
-      title: createStyles.subheading('lg'),
-      subtitle: createStyles.label('sm'),
-      content: createStyles.body('base'),
-      caption: createStyles.caption(),
+      title: {
+        fontSize: DesignSystem.typography.fontSize.lg,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        color: DesignSystem.colors.textPrimary,
+        letterSpacing: DesignSystem.typography.letterSpacing.tight,
+        lineHeight: DesignSystem.typography.fontSize.lg * DesignSystem.typography.lineHeight.snug,
+      },
+      subtitle: {
+        fontSize: DesignSystem.typography.fontSize.sm,
+        fontWeight: DesignSystem.typography.fontWeight.medium,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
+      },
+      content: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+      },
+      caption: {
+        fontSize: DesignSystem.typography.fontSize.xs,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textTertiary,
+        lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
+      },
     },
 
-    // Modal patterns
+    // Modal patterns with automatic line heights
     modal: {
-      title: createStyles.heading('xl'),
-      subtitle: createStyles.body('base'),
-      content: createStyles.body('base'),
-      button: createStyles.buttonText('primary'),
+      title: {
+        fontSize: DesignSystem.typography.fontSize.xl,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        color: DesignSystem.colors.textPrimary,
+        letterSpacing: DesignSystem.typography.letterSpacing.tight,
+        lineHeight: DesignSystem.typography.fontSize.xl * DesignSystem.typography.lineHeight.tight,
+      },
+      subtitle: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+      },
+      content: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+      },
+      button: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+        color: DesignSystem.colors.textInverse,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
     },
 
-    // Form patterns
+    // Form patterns with automatic line heights
     form: {
-      label: createStyles.label('base'),
-      input: createStyles.body('base'),
-      helper: createStyles.caption(),
+      label: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.medium,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.snug,
+      },
+      input: {
+        fontSize: DesignSystem.typography.fontSize.base,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textSecondary,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+      },
+      helper: {
+        fontSize: DesignSystem.typography.fontSize.xs,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
+        color: DesignSystem.colors.textTertiary,
+        lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
+      },
       error: {
-        ...createStyles.caption(),
+        fontSize: DesignSystem.typography.fontSize.xs,
+        fontWeight: DesignSystem.typography.fontWeight.normal,
         color: DesignSystem.colors.error,
+        lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
       },
     },
   },
@@ -104,7 +291,7 @@ export type FontWeightKey = keyof typeof DesignSystem.typography.fontWeight;
 export type LineHeightKey = keyof typeof DesignSystem.typography.lineHeight;
 export type LetterSpacingKey = keyof typeof DesignSystem.typography.letterSpacing;
 
-// Utility function to quickly get a complete text style
+// Enhanced utility function with automatic line height calculation
 export function getTextStyle(
   size: FontSizeKey = 'base',
   weight: FontWeightKey = 'normal',
@@ -114,13 +301,17 @@ export function getTextStyle(
     letterSpacing?: LetterSpacingKey;
   }
 ) {
+  // Default line height based on text size for optimal readability
+  const defaultLineHeight = size === 'xs' || size === 'sm' ? 'tight' : 
+                           size === 'lg' || size === 'xl' ? 'snug' : 
+                           size === '2xl' || size === '3xl' || size === '4xl' || size === '5xl' ? 'tight' : 
+                           'normal';
+
   return {
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight[weight],
     color,
-    ...(options?.lineHeight && {
-      lineHeight: DesignSystem.typography.lineHeight[options.lineHeight],
-    }),
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight[options?.lineHeight || defaultLineHeight],
     ...(options?.letterSpacing && {
       letterSpacing: DesignSystem.typography.letterSpacing[options.letterSpacing],
     }),
