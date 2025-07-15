@@ -54,6 +54,8 @@ export default function TabLayout() {
           fontWeight: "600",
           marginTop: 2,
         },
+        activeTintColor: DesignSystem.colors.tabIconSelected,
+        inactiveTintColor: DesignSystem.colors.tabIconDefault,
       }}
       initialRouteName="index"
     >

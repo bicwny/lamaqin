@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 // Error types for better categorization
 enum ErrorType {
@@ -601,7 +601,7 @@ export default function UnifiedAuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -619,12 +619,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 8,
     fontWeight: '500',
   },
@@ -646,8 +646,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 15,
     fontSize: 16,
-    backgroundColor: Colors.surface,
-    color: Colors.text,
+    backgroundColor: DesignSystem.colors.surface,
+    color: DesignSystem.colors.textPrimary,
   },
   emailDisplay: {
     flexDirection: 'row',
@@ -661,16 +661,16 @@ const styles = StyleSheet.create({
   },
   emailText: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     flex: 1,
   },
   changeEmailText: {
     fontSize: 16,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '500',
   },
   primaryButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   primaryButtonText: {
-    color: Colors.surface,
+    color: DesignSystem.colors.surface,
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -698,12 +698,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   resendButtonText: {
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontSize: 16,
     textDecorationLine: 'underline',
   },
   resendButtonTextDisabled: {
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     textDecorationLine: 'none',
   },
   helpSection: {
@@ -717,12 +717,12 @@ const styles = StyleSheet.create({
   helpTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 10,
   },
   helpText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     lineHeight: 20,
   },
   errorStatus: {
