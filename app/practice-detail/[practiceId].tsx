@@ -653,7 +653,8 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.tight,
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xs,
   },
   practiceDescription: {
     fontSize: DesignSystem.typography.fontSize.base,
@@ -663,7 +664,8 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xl,
   },
   progressContainer: {
-    marginBottom: DesignSystem.spacing['2xl'],
+    marginBottom: DesignSystem.spacing['3xl'],
+    paddingBottom: DesignSystem.spacing.md,
   },
   progressDetails: {
     marginBottom: DesignSystem.spacing.md,
@@ -702,8 +704,10 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
     gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing['3xl'],
-    paddingTop: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing['4xl'],
+    paddingTop: DesignSystem.spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: DesignSystem.colors.borderLight,
   },
   primaryButton: {
     ...ComponentTokens.button.primary,
@@ -732,8 +736,8 @@ const styles = StyleSheet.create({
     letterSpacing: DesignSystem.typography.letterSpacing.tighter,
   },
   detailsSection: {
-    marginTop: DesignSystem.spacing['2xl'],
-    paddingTop: DesignSystem.spacing['2xl'],
+    marginTop: DesignSystem.spacing['3xl'],
+    paddingTop: DesignSystem.spacing['3xl'],
     borderTopWidth: 1,
     borderTopColor: DesignSystem.colors.borderLight,
   },
