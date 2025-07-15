@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -547,7 +546,7 @@ export default function PracticeDetailScreen() {
           {/* Project Details */}
           <View style={styles.projectDetails}>
             <Text style={styles.projectDetailsTitle}>项目详情</Text>
-            
+
             <View style={styles.detailsGrid}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>开始日期</Text>
@@ -875,4 +874,20 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
+  // TEMP DEBUG STYLES - REMOVE LATER
+  debugLabel: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    color: 'white',
+    fontSize: 10,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 1000,
+    fontWeight: 'bold',
+  },
 });
+
+export default function PracticeDetailScreen() {
