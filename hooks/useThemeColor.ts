@@ -15,7 +15,15 @@ export function useThemeColor(
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return DesignSystem.colors[colorName];
+    // Map common color names to DesignSystem colors
+    const colorMap: { [key: string]: string } = {
+      text: DesignSystem.colors.textPrimary,
+      background: DesignSystem.colors.background,
+      tint: DesignSystem.colors.primary,
+      tabIconDefault: DesignSystem.colors.textSecondary,
+      tabIconSelected: DesignSystem.colors.primary,
+    };
+    return colorMap[colorName] || DesignSystem.colors.textPrimary;
   }
 }
 
