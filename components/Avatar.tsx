@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 interface AvatarProps {
   dharmaName: string;

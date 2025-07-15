@@ -1,4 +1,3 @@
-
 /**
  * Enhanced theme color hook with better TypeScript support
  */

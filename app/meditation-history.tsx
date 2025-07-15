@@ -14,7 +14,7 @@ import {
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 
 export default function MeditationHistoryScreen() {
@@ -274,10 +274,10 @@ export default function MeditationHistoryScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>正在加载记录...</Text>
         </View>
       </PageTemplate>
@@ -290,7 +290,7 @@ export default function MeditationHistoryScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       {/* View Mode Toggle */}
@@ -423,7 +423,7 @@ export default function MeditationHistoryScreen() {
                   disabled={loadingMore}
                 >
                   {loadingMore ? (
-                    <ActivityIndicator color={Colors.primary} />
+                    <ActivityIndicator color={DesignSystem.colors.primary} />
                   ) : (
                     <Text style={styles.loadMoreText}>加载更多</Text>
                   )}
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   viewToggleContainer: {
     padding: 16,
@@ -510,12 +510,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     opacity: 0.7,
   },
   recordsList: {
@@ -546,12 +546,12 @@ const styles = StyleSheet.create({
   recordDate: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     letterSpacing: -0.3,
   },
   recordTime: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   recordContent: {
     marginBottom: 12,
@@ -559,38 +559,38 @@ const styles = StyleSheet.create({
   recordDuration: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 4,
     letterSpacing: -0.3,
   },
   recordSession: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     marginBottom: 4,
   },
   recordMethod: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     marginBottom: 8,
   },
   reflectionContainer: {
     marginTop: 8,
     padding: 12,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: DesignSystem.colors.primary,
   },
   reflectionLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 4,
     letterSpacing: -0.3,
   },
   reflectionText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     lineHeight: 20,
   },
   recordActions: {
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   editButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.04)',
   },
   loadMoreText: {
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.3,
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
   },
   viewToggle: {
     flexDirection: 'row',
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
     borderRadius: 8,
     padding: 2,
     marginTop: 12,
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleButtonActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
   },
   toggleButtonText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontWeight: '700',
     letterSpacing: -0.3,
   },
@@ -738,15 +738,15 @@ const styles = StyleSheet.create({
   topicTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     flex: 1,
     marginRight: 8,
     letterSpacing: -0.3,
   },
   topicNumber: {
     fontSize: 12,
-    color: Colors.textSecondary,
-    backgroundColor: Colors.background,
+    color: DesignSystem.colors.textSecondary,
+    backgroundColor: DesignSystem.colors.background,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -759,43 +759,43 @@ const styles = StyleSheet.create({
   },
   topicCount: {
     fontSize: 14,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '700',
     letterSpacing: -0.3,
   },
   topicDuration: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   topicLatest: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   topicDescription: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     opacity: 0.8,
     lineHeight: 20,
     marginTop: 4,
   },
   topicSummary: {
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: DesignSystem.colors.primary,
   },
   topicSummaryText: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 4,
     letterSpacing: -0.3,
   },
   topicSummarySubtext: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontStyle: 'italic',
   },
 });

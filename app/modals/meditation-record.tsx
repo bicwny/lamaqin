@@ -12,7 +12,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { toastService } from '@/lib/toast';
 import TopicSelectionModal from '@/components/TopicSelectionModal';
 import ModalTemplate from '@/components/ModalTemplate';
@@ -62,7 +62,7 @@ export default function MeditationRecordScreen() {
       console.log('🔄 Loading meditation topics for practice:', practiceId);
       const topics = await meditationService.getMeditationTopics(practiceId);
       setMeditationTopics(topics);
-      
+
       // Set initial selected topic
       if (topics.length > 0) {
         const initialTopicNumber = parseInt(sessionNumber);
@@ -70,7 +70,7 @@ export default function MeditationRecordScreen() {
         setSelectedTopic(initialTopic);
         setSessionNumber(initialTopic.topic_number.toString());
       }
-      
+
       console.log('📚 Loaded meditation topics:', topics.length);
     } catch (error) {
       console.error('❌ Error loading meditation topics:', error);
@@ -88,7 +88,7 @@ export default function MeditationRecordScreen() {
         setDuration(record.duration_minutes.toString());
         setSessionNumber(record.session_number?.toString() || '1');
         setReflection(record.reflection || '');
-        
+
         // Set selected topic after topics are loaded
         if (meditationTopics.length > 0) {
           const topic = meditationTopics.find(t => t.topic_number === record.session_number);
@@ -255,7 +255,7 @@ export default function MeditationRecordScreen() {
             )}
           </TouchableOpacity>
         </View>
-        
+
         {/* Topic Selection Modal */}
         <TopicSelectionModal
           visible={showTopicModal}

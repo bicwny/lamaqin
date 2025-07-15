@@ -7,7 +7,7 @@ import { toastService } from '@/lib/toast';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 
-import { DesignSystem } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { ConnectionTest } from '@/components/ConnectionTest';
 import { ThemedText } from '@/components/ThemedText';

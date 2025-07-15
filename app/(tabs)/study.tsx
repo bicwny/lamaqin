@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageHeader from '@/components/PageHeader';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -423,7 +423,7 @@ export default function StudyScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -762,7 +762,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
   },
   scrollView: {
     flex: 1,
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   section: {
     marginBottom: 16,
@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 13,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '600',
     marginTop: 4,
   },
@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
   },
   currentLessonText: {
     fontSize: 13,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '600',
   },
   progressBarContainer: {
@@ -900,11 +900,11 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     borderRadius: 3,
   },
   continueButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
@@ -927,7 +927,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
@@ -955,13 +955,13 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   secondaryButtonText: {
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: -0.2,
   },
   joinButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
@@ -1018,7 +1018,7 @@ const styles = StyleSheet.create({
   },
   completionCheck: {
     fontSize: 14,
-    color: Colors.success,
+    color: DesignSystem.colors.success,
   },
   recordButtons: {
     flexDirection: 'row',
@@ -1038,13 +1038,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   listenButton: {
-    backgroundColor: Colors.accent,
+    backgroundColor: '#10B981',
   },
   readButton: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: DesignSystem.colors.primary,
   },
   viewButton: {
-    backgroundColor: Colors.tertiary,
+    backgroundColor: '#F59E0B',
   },
   courseSummary: {
     padding: 20,
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
   },
   courseSummaryText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   courseInfoCard: {
     backgroundColor: 'white',
@@ -1110,7 +1110,7 @@ const styles = StyleSheet.create({
   },
   emptyDescription: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontWeight: '500',
     textAlign: 'center',
     lineHeight: 24,
@@ -1120,7 +1120,7 @@ const styles = StyleSheet.create({
   browseButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
