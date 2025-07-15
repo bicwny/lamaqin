@@ -302,6 +302,91 @@ export default function PracticeDetailScreen() {
     return project.project_name || presetProjectName || '预设项目';
   };
 
+  const renderRecentRecords = () => {
+    if (!project) return null;
+
+    if (project.practices.type === 'time') {
+      // Show recent meditation records
+      const recentRecords = [...todayRecords, ...weeklyRecords]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 5);
+
+      if (recentRecords.length === 0) {
+        return (
+          <Text style={styles.noRecordsText}>暂无观修记录</Text>
+        );
+      }
+
+      return recentRecords.map((record) => (
+        <TouchableOpacity
+          key={record.id}
+          style={styles.recordItem}
+          onPress={() => router.push({
+            pathname: '/meditation-detail/[recordId]',
+            params: { recordId: record.id }
+          })}
+        >
+          <View style={styles.recordHeader}>
+            <Text style={styles.recordDate}>
+              {new Date(record.record_date).toLocaleDateString('zh-CN')}
+            </Text>
+            <Text style={styles.recordTime}>
+              {new Date(record.created_at).toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </Text>
+          </View>
+          <Text style={styles.recordCount}>
+            第{record.session_number || 1}座 · {record.duration_minutes}分钟
+          </Text>
+          {record.notes && (
+            <View style={styles.recordNotes}>
+              <Text style={styles.notesLabel}>备注:</Text>
+              <Text style={styles.notesText} numberOfLines={2}>
+                {record.notes}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      ));
+    } else {
+      // Show recent count-based records
+      if (practiceRecords.length === 0) {
+        return (
+          <Text style={styles.noRecordsText}>暂无修行记录</Text>
+        );
+      }
+
+      return practiceRecords.slice(0, 5).map((record) => (
+        <View key={record.id} style={styles.recordItem}>
+          <View style={styles.recordHeader}>
+            <Text style={styles.recordDate}>
+              {new Date(record.record_date).toLocaleDateString('zh-CN')}
+            </Text>
+            <Text style={styles.recordTime}>
+              {new Date(record.created_at).toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </Text>
+          </View>
+          <Text style={styles.recordCount}>
+            +{record.count.toLocaleString()} {project.practices.unit}
+          </Text>
+          {record.notes && (
+            <View style={styles.recordNotes}>
+              <Text style={styles.notesLabel}>备注:</Text>
+              <Text style={styles.notesText} numberOfLines={2}>
+                {record.notes}
+              </Text>
+            </View>
+          )}
+        </View>
+      ));
+    }
+  };
+
   const renderProgressDetails = () => {
     if (!project) return null;
 
@@ -468,6 +553,27 @@ export default function PracticeDetailScreen() {
             </View>
           </View>
 
+          {/* Progress Section */}
+          <View style={styles.progressContainer}>
+            {renderProgressDetails()}
+            
+            {project.practices.type === 'count' && (
+              <View style={styles.progressBarContainer}>
+                <View style={styles.progressBar}>
+                  <View 
+                    style={[
+                      styles.progressFill, 
+                      { width: `${Math.min(progress.percentage, 100)}%` }
+                    ]} 
+                  />
+                </View>
+                <Text style={styles.progressPercentage}>
+                  {Math.round(progress.percentage)}%
+                </Text>
+              </View>
+            )}
+          </View>
+
           {/* Action Buttons */}
           <View style={styles.actionButtonsContainer}>
             <TouchableOpacity
@@ -490,9 +596,21 @@ export default function PracticeDetailScreen() {
           </View>
         </View>
 
-        
+        {/* Recent Records Section */}
+        <View style={styles.historyCard}>
+          <View style={styles.historyHeader}>
+            <Text style={styles.historyTitle}>最近记录</Text>
+            <TouchableOpacity
+              style={styles.viewAllButton}
+              onPress={handleViewHistory}
+            >
+              <Text style={styles.viewAllText}>查看全部</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+            </TouchableOpacity>
+          </View>
 
-        
+          {renderRecentRecords()}
+        </View>
       </ScrollView>
     </PageTemplate>
   );
@@ -524,6 +642,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
+    marginHorizontal: 16,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -699,10 +819,19 @@ const styles = StyleSheet.create({
   statusActive: {
     color: Colors.primary,
   },
+  noRecordsText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 20,
+    fontStyle: 'italic',
+  },
   historyCard: {
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
+    marginHorizontal: 16,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
