@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { DesignSystem } from '@/constants/DesignSystem';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { useAuth } from '@/contexts/AuthContext';
 import PageTemplate from '@/components/PageTemplate';
@@ -132,10 +131,10 @@ export default function EditProfileScreen() {
         showBackButton={true}
         onBackPress={goBack}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -149,7 +148,7 @@ export default function EditProfileScreen() {
       showBackButton={true}
       onBackPress={goBack}
       scrollable={true}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <KeyboardAvoidingView 
