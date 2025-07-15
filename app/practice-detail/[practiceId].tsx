@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.md,
     ...Typography.styles.body('base'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
@@ -632,7 +632,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: DesignSystem.spacing.lg,
+    padding: DesignSystem.spacing['4xl'],
   },
   emptyText: {
     ...Typography.styles.subheading('lg'),
@@ -642,16 +642,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   mainCard: {
     ...ComponentTokens.card.practice,
     margin: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.md,
   },
   practiceHeader: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   practiceTypeRow: {
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.md,
     lineHeight: DesignSystem.typography.lineHeight.tight * DesignSystem.typography.fontSize['2xl'],
   },
   practiceDescription: {
@@ -684,15 +684,15 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
   },
   progressSection: {
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.background,
-    marginHorizontal: DesignSystem.spacing.lg,
+    marginHorizontal: DesignSystem.spacing.xl,
     borderRadius: DesignSystem.borderRadius.lg,
     marginBottom: DesignSystem.spacing.lg,
   },
   progressDetails: {
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.md,
   },
   progressText: {
     ...Typography.styles.subheading('lg'),
@@ -708,13 +708,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.textSecondary,
-    marginTop: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.xs,
   },
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.lg,
-    marginTop: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.sm,
   },
   progressBar: {
     ...ComponentTokens.progress.practice.container,
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   projectDetails: {
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   projectDetailsTitle: {
@@ -739,13 +739,13 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.lg,
   },
   detailsGrid: {
-    gap: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.md,
   },
   detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   detailLabel: {
     ...Typography.styles.body('base'),
@@ -765,9 +765,9 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: DesignSystem.spacing.lg,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingBottom: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   primaryButton: {
     ...ComponentTokens.button.primary,
@@ -775,7 +775,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.sm,
   },
   secondaryButton: {
     ...ComponentTokens.button.secondary,
@@ -783,7 +783,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.xs,
   },
   secondaryButtonText: {
     ...ComponentTextStyles.button.secondary,
@@ -800,8 +800,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   recordsTitle: {
@@ -810,7 +810,7 @@ const styles = StyleSheet.create({
   viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.xs,
   },
   viewAllText: {
     ...Typography.styles.label('sm'),
@@ -818,8 +818,8 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   recordsList: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   noRecordsText: {
     ...Typography.styles.body('base'),
@@ -838,7 +838,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.sm,
   },
   recordDate: {
     ...Typography.styles.body('base'),
@@ -854,13 +854,13 @@ const styles = StyleSheet.create({
     ...Typography.styles.body('base'),
     color: DesignSystem.colors.textPrimary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xs,
   },
   recordNotes: {
     backgroundColor: DesignSystem.colors.background,
-    padding: DesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.md,
     borderRadius: DesignSystem.borderRadius.md,
-    marginTop: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.sm,
     borderLeftWidth: 3,
     borderLeftColor: DesignSystem.colors.primary,
   },
@@ -868,7 +868,7 @@ const styles = StyleSheet.create({
     ...Typography.styles.label('sm'),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xs,
   },
   notesText: {
     ...Typography.styles.label('sm'),
