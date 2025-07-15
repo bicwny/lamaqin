@@ -13,7 +13,9 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
+import { Typography } from '@/utils/typography';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
@@ -387,7 +389,7 @@ export default function PracticeDetailScreen() {
 
     if (project.practices.type === 'count') {
       return (
-        <View style={styles.progressDetails}>
+        <View style={styles.progressContainer}>
           <Text style={styles.progressText}>
             {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
           </Text>
@@ -410,7 +412,7 @@ export default function PracticeDetailScreen() {
         const weeklyTarget = project.daily_target;
 
         return (
-          <View style={styles.progressDetails}>
+          <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
               本周进度：{weeklyCount}/{weeklyTarget}座{weeklyCount >= weeklyTarget ? ' ✅' : ''}
             </Text>
@@ -423,7 +425,7 @@ export default function PracticeDetailScreen() {
         );
       } else {
         return (
-          <View style={styles.progressDetails}>
+          <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
               今日进度：{todayCount}/{target}座{todayCount >= target ? ' ✅' : ''}
             </Text>
@@ -445,10 +447,10 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -462,7 +464,7 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到修行项目</Text>
@@ -484,7 +486,7 @@ export default function PracticeDetailScreen() {
         `项目：${getDisplayProjectName()}` : undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <ScrollView
@@ -572,7 +574,7 @@ export default function PracticeDetailScreen() {
               style={styles.secondaryButton}
               onPress={handleEditPractice}
             >
-              <Ionicons name="create-outline" size={20} color={Colors.primary} />
+              <Ionicons name="create-outline" size={20} color={DesignSystem.colors.primary} />
               <Text style={styles.secondaryButtonText}>编辑项目</Text>
             </TouchableOpacity>
 
@@ -580,7 +582,7 @@ export default function PracticeDetailScreen() {
               style={styles.primaryButton}
               onPress={handleRecord}
             >
-              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Ionicons name="add-circle-outline" size={24} color={DesignSystem.colors.textInverse} />
               <Text style={styles.buttonText}>
                 {project.practices.type === 'time' ? '记录观修' : '记录修行'}
               </Text>
@@ -597,7 +599,7 @@ export default function PracticeDetailScreen() {
               onPress={handleViewHistory}
             >
               <Text style={styles.viewAllText}>查看全部</Text>
-              <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+              <Ionicons name="chevron-forward" size={16} color={DesignSystem.colors.primary} />
             </TouchableOpacity>
           </View>
 
@@ -615,290 +617,216 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...Typography.styles.body('base'),
+    marginTop: DesignSystem.spacing.md,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: DesignSystem.spacing['4xl'],
   },
   emptyText: {
-    fontSize: 18,
-    color: Colors.textSecondary,
+    ...Typography.styles.subheading('lg'),
+    color: DesignSystem.colors.textSecondary,
   },
-  infoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-  },
+  infoCard: ComponentTokens.card.practice,
   practiceTypeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.md,
   },
   practiceType: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...Typography.styles.label('sm'),
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
-  completedBadge: {
-    backgroundColor: '#e8f5e8',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
+  completedBadge: ComponentTokens.buddhist.completionBadge,
   completedText: {
-    fontSize: 14,
-    color: '#2e7d32',
-    fontWeight: '600',
+    ...Typography.styles.label('sm'),
+    color: DesignSystem.colors.practiceComplete,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   practiceTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 8,
-    letterSpacing: -0.3,
+    ...Typography.components.practiceDetail.title,
+    marginBottom: DesignSystem.spacing.sm,
   },
   practiceDescription: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    lineHeight: 24,
-    marginBottom: 16,
+    ...Typography.components.practiceDetail.description,
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressContainer: {
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressDetails: {
-    marginBottom: 8,
+    marginBottom: DesignSystem.spacing.sm,
   },
   progressText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 4,
-    letterSpacing: -0.3,
+    ...Typography.styles.subheading('lg'),
+    marginBottom: DesignSystem.spacing.xs,
   },
   dailyTargetText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...Typography.styles.label('sm'),
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   sessionDetails: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    ...Typography.styles.label('sm'),
     fontStyle: 'italic',
-    fontWeight: '500',
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: DesignSystem.spacing.md,
   },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#e9ecef',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.primary,
-    borderRadius: 4,
-  },
+  progressBar: ComponentTokens.progress.bar.container,
+  progressFill: ComponentTokens.progress.bar.fill,
   progressPercentage: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.primary,
+    ...Typography.styles.body('base'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
     minWidth: 50,
     textAlign: 'right',
   },
   actionButtonsContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
+    gap: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.xl,
   },
   primaryButton: {
+    ...ComponentTokens.button.primary,
     flex: 2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.primary,
-    padding: 16,
-    borderRadius: 12,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    gap: DesignSystem.spacing.sm,
+    ...DesignSystem.shadow.md,
   },
   secondaryButton: {
+    ...ComponentTokens.button.secondary,
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-    gap: 6,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    gap: DesignSystem.spacing.xxs,
+    ...DesignSystem.shadow.sm,
   },
   secondaryButtonText: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-    letterSpacing: -0.1,
+    ...ComponentTextStyles.button.secondary,
+    letterSpacing: DesignSystem.typography.letterSpacing.normal,
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    ...ComponentTextStyles.button.primary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tighter,
   },
   detailsSection: {
-    marginTop: 20,
-    paddingTop: 20,
+    marginTop: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: DesignSystem.colors.borderLight,
   },
   detailsSectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 16,
-    letterSpacing: -0.3,
+    ...Typography.styles.subheading('lg'),
+    marginBottom: DesignSystem.spacing.lg,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.md,
   },
   detailLabel: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...Typography.styles.body('base'),
+    color: DesignSystem.colors.textSecondary,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   detailValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    ...Typography.styles.body('base'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
   },
   statusCompleted: {
-    color: '#2e7d32',
+    color: DesignSystem.colors.practiceComplete,
   },
   statusActive: {
-    color: Colors.primary,
+    color: DesignSystem.colors.practiceActive,
   },
   noRecordsText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
+    ...Typography.styles.body('base'),
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
-    paddingVertical: 20,
+    paddingVertical: DesignSystem.spacing.xl,
     fontStyle: 'italic',
   },
   historyCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.practice,
+    marginTop: DesignSystem.spacing.sm,
   },
   historyHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.lg,
   },
   historyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
+    ...Typography.styles.subheading('lg'),
   },
   viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: DesignSystem.spacing.xs,
   },
   viewAllText: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '600',
+    ...Typography.styles.label('sm'),
+    color: DesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   recordItem: {
-    marginBottom: 16,
-    paddingBottom: 16,
+    marginBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   recordHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: DesignSystem.spacing.sm,
   },
   recordDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    ...Typography.styles.body('base'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
   },
   recordTime: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...Typography.styles.label('sm'),
+    color: DesignSystem.colors.textSecondary,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   recordCount: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    fontWeight: '600',
-    marginBottom: 4,
+    ...Typography.styles.body('base'),
+    color: DesignSystem.colors.textPrimary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.xs,
   },
   recordNotes: {
-    backgroundColor: '#f8f9fa',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    backgroundColor: DesignSystem.colors.background,
+    padding: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    marginTop: DesignSystem.spacing.sm,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: DesignSystem.colors.primary,
   },
   notesLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 4,
+    ...Typography.styles.label('sm'),
+    color: DesignSystem.colors.textSecondary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.xs,
   },
   notesText: {
-    fontSize: 14,
-    color: '#1a1a1a',
+    ...Typography.styles.body('sm'),
+    color: DesignSystem.colors.textPrimary,
     lineHeight: 20,
   },
 });
