@@ -1,7 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Header, { HeaderContext } from './Header';
 
 interface PageHeaderProps {
   title: string;
@@ -13,83 +10,25 @@ interface PageHeaderProps {
     component?: React.ReactNode;
     onPress: () => void;
   };
+  context?: HeaderContext;
 }
 
 export default function PageHeader({ 
   title, 
+  subtitle,
   showBackButton = false, 
   onBackPress, 
   rightAction,
-  subtitle 
+  context = 'page'
 }: PageHeaderProps) {
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        {showBackButton ? (
-          <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.placeholder} />
-        )}
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-        </View>
-
-        {rightAction ? (
-          <TouchableOpacity onPress={rightAction.onPress} style={styles.rightAction}>
-            {rightAction.component ? rightAction.component : (
-              <Text style={styles.rightActionText}>{rightAction.text}</Text>
-            )}
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.placeholder} />
-        )}
-      </View>
-    </View>
+    <Header
+      title={title}
+      subtitle={subtitle}
+      context={context}
+      showBackButton={showBackButton}
+      onBackPress={onBackPress}
+      rightAction={rightAction}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    minHeight: 56,
-  },
-  backButton: {
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholder: {
-    width: 24,
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  rightActionText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-});

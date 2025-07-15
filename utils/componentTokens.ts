@@ -205,34 +205,12 @@ export const ComponentTokens = {
     },
   },
 
-  // Header tokens with DesignSystem references
+  // Header tokens - consolidated into single Header component with context variants
   header: {
-    page: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      borderBottomWidth: 1,
-      borderBottomColor: DesignSystem.colors.borderLight,
-      paddingHorizontal: DesignSystem.spacing.lg,
-      paddingVertical: DesignSystem.spacing.md,
-      minHeight: 60,
-    },
-    
-    modal: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      borderBottomWidth: 1,
-      borderBottomColor: DesignSystem.colors.border,
-      paddingHorizontal: DesignSystem.spacing.lg,
-      paddingVertical: DesignSystem.spacing.md,
-      minHeight: 56,
-    },
-    
-    section: {
-      backgroundColor: 'transparent',
-      paddingHorizontal: 0,
-      paddingVertical: DesignSystem.spacing.sm,
-      marginBottom: DesignSystem.spacing.lg,
-      borderBottomWidth: 1,
-      borderBottomColor: DesignSystem.colors.borderLight,
-    },
+    // Legacy support - maps to new Header component contexts
+    page: 'page' as const,     // Maps to Header context="page"
+    modal: 'modal' as const,   // Maps to Header context="modal"
+    section: 'section' as const, // Maps to Header context="section"
   },
 
   // Buddhist-specific tokens with DesignSystem references
@@ -351,18 +329,10 @@ export const ComponentTextStyles = {
   },
   
   header: {
-    page: {
-      fontSize: DesignSystem.typography.fontSize.xl,
-      fontWeight: DesignSystem.typography.fontWeight.bold,
-      color: DesignSystem.colors.textPrimary,
-      letterSpacing: DesignSystem.typography.letterSpacing.tight,
-    },
-    section: {
-      fontSize: DesignSystem.typography.fontSize.lg,
-      fontWeight: DesignSystem.typography.fontWeight.bold,
-      color: DesignSystem.colors.textPrimary,
-      letterSpacing: DesignSystem.typography.letterSpacing.tight,
-    },
+    // Legacy support - text styles are now handled by Header component internally
+    page: 'page' as const,
+    modal: 'modal' as const,
+    section: 'section' as const,
   },
   
   buddhist: {
@@ -417,6 +387,10 @@ export const componentHelpers = {
   // Get modal style
   getModalStyle: (variant: keyof typeof ComponentTokens.modal) => 
     ComponentTokens.modal[variant],
+  
+  // Get header context (for new Header component)
+  getHeaderContext: (variant: keyof typeof ComponentTokens.header) => 
+    ComponentTokens.header[variant],
   
   // Get Buddhist-specific styles
   getBuddhistStyle: (variant: keyof typeof ComponentTokens.buddhist) => 
