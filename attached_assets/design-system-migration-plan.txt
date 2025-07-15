@@ -1,0 +1,205 @@
+
+# Design System Migration Plan
+佛教修行追踪App - 统一设计系统迁移计划
+
+## 项目概述
+目标：将现有混合的样式系统迁移到统一的 DesignSystem.ts，确保应用在迁移过程中保持功能性
+
+## 当前状态分析
+
+### 设计系统基础设施
+✅ DesignSystem.ts - 完整的设计系统基础
+✅ createStyles 辅助函数 - 预构建的样式工厂
+❌ Colors.ts - 冗余的颜色定义（需要逐步移除）
+
+### 组件使用现状
+- ModalTemplate.tsx: ✅ 已使用 createStyles.heading('lg') 和 createStyles.body()
+- edit-profile.tsx: ✅ 已使用 createStyles.primaryButton() 和 createStyles.body()
+- practice-detail/[practiceId].tsx: ❌ 大量内联样式和 Colors.ts 导入
+
+### 关键问题
+1. 颜色分散：Colors.primary vs DesignSystem.colors.primary
+2. 佛教主题色彩：wisdomGold, compassionOrange 分散在各文件
+3. 内联十六进制值：#1a1a1a, #f8f9fa
+4. 字体样式不一致：直接 fontSize/fontWeight vs createStyles.heading()
+5. 组件样式重复：按钮、卡片阴影和边框重复定义
+
+## 分阶段迁移策略
+
+### 第一阶段：基础增强 (第1周)
+目标：扩展 DesignSystem.ts 覆盖所有缺失模式，不破坏现有功能
+
+行动项：
+- [ ] 添加缺失的语义颜色到 DesignSystem.colors
+- [ ] 创建佛教特定颜色标记（wisdom, compassion, mindfulness）
+- [ ] 添加组件特定辅助函数到 createStyles
+- [ ] 扩展 spacing 和 typography 标记
+- [ ] 添加状态颜色和渐变
+
+建议的佛教颜色标记：
+```typescript
+colors: {
+  wisdom: '#D4AF37',      // 智慧金
+  compassion: '#FF6B35',   // 慈悲橙
+  mindfulness: '#da4347',  // 正念红（主色）
+  devotion: '#8B4513',     // 虔诚棕
+  purity: '#F8F9FA'        // 清净灰
+}
+```
+
+风险：无 - 纯增量变更
+
+### 第二阶段：核心基础设施 (第2周)
+目标：更新其他屏幕依赖的基础组件
+
+优先组件：
+- [ ] PageTemplate.tsx - 所有屏幕使用
+- [ ] ModalTemplate.tsx - 模态框使用
+- [ ] PageHeader.tsx - 共享头部组件
+- [ ] CardContainer.tsx - 可重用卡片包装器
+
+迁移策略：
+- [ ] 将所有 Colors.ts 导入替换为 DesignSystem.colors
+- [ ] 使用 createStyles 辅助函数处理字体
+- [ ] 实现一致的间距标记
+- [ ] 保持现有属性接口不变
+
+### 第三阶段：高影响屏幕 (第3周)
+目标：转换具有复杂样式的屏幕
+
+目标文件：
+- [ ] practice-detail/[practiceId].tsx - 最复杂的样式
+- [ ] practice-config.tsx - 表单重度使用自定义样式
+- [ ] add-practice.tsx - 创建流程
+- [ ] edit-profile.tsx - 已部分迁移
+
+重点领域：
+- [ ] 用 createStyles 辅助函数替换内联样式
+- [ ] 标准化按钮和卡片模式
+- [ ] 实现一致的表单样式
+- [ ] 使用设计系统阴影和边框
+
+### 第四阶段：标签页屏幕 (第4周)
+目标：更新主导航屏幕
+
+目标文件：
+- [ ] (tabs)/practice.tsx
+- [ ] (tabs)/study.tsx
+- [ ] (tabs)/mindfulness.tsx
+- [ ] (tabs)/stats.tsx
+
+策略：
+- [ ] 关注标签页屏幕间的一致性
+- [ ] 实现共享组件模式
+- [ ] 标准化列表项和卡片样式
+
+### 第五阶段：模态框和详情屏幕 (第5周)
+目标：转换剩余屏幕并清理
+
+目标文件：
+- [ ] modals/custom-record.tsx
+- [ ] modals/meditation-record.tsx
+- [ ] meditation-history.tsx
+- [ ] practice-history.tsx
+- [ ] course-detail/[courseId].tsx
+
+### 第六阶段：清理和优化 (第6周)
+目标：移除冗余代码并优化
+
+行动项：
+- [ ] 删除 Colors.ts 文件
+- [ ] 移除未使用的颜色导入
+- [ ] 审核剩余内联样式
+- [ ] 性能优化
+- [ ] 文档更新
+
+## 持续功能策略
+
+### 向后兼容方法
+1. 双导入模式：保留 Colors.ts 直到第6阶段
+2. 渐进式替换：逐文件替换使用，而非逐颜色替换
+3. 回退值：确保设计系统颜色匹配现有 Colors.ts 值
+4. 测试门禁：每次迁移后测试组件
+
+### 所需设计系统增强
+
+1. 组件辅助函数：
+```typescript
+createStyles: {
+  practiceCard: (variant) => ({...}),
+  progressBar: (color) => ({...}),
+  statusBadge: (status) => ({...}),
+  actionButton: (type) => ({...})
+}
+```
+
+2. 响应式间距：
+```typescript
+spacing: {
+  xs: 4, sm: 8, md: 12, lg: 16, xl: 20, 
+  '2xl': 24, '3xl': 32, '4xl': 40, '5xl': 48
+}
+```
+
+## 测试策略
+
+### 每阶段测试：
+1. 视觉回归：比较前后截图
+2. 组件隔离：独立测试每个迁移的组件
+3. 集成测试：确保导航和状态管理工作
+4. 设备测试：验证响应式行为
+
+### 回滚计划：
+- 保持 git 提交原子化（每组件一个）
+- 为主要变更维护功能开关
+- 记录破坏性变更
+- 快速回退程序
+
+## 成功指标
+
+### 技术指标：
+- [ ] 减少样式相关代码 30%
+- [ ] 消除所有 Colors.ts 导入
+- [ ] 100% createStyles 采用率
+- [ ] 零硬编码颜色/间距
+
+### 维护指标：
+- [ ] 颜色的单一真相来源
+- [ ] 一致的组件模式
+- [ ] 更快的新功能开发
+- [ ] 更容易的主题切换能力
+
+## 重点文件迁移清单
+
+### practice-detail/[practiceId].tsx 具体迁移项：
+当前问题：
+- ❌ import { Colors } from '@/constants/Colors'
+- ❌ 大量内联 fontSize, fontWeight, color 值
+- ❌ 硬编码颜色：'#1a1a1a', '#f8f9fa', '#e9ecef'
+- ❌ 重复的阴影和边框定义
+- ❌ 不一致的间距值
+
+迁移后：
+- ✅ import { DesignSystem, createStyles } from '@/constants/DesignSystem'
+- ✅ createStyles.heading(), createStyles.body() 用于文本
+- ✅ DesignSystem.colors.* 用于所有颜色
+- ✅ DesignSystem.spacing.* 用于所有间距
+- ✅ createStyles.card(), createStyles.primaryButton() 用于组件
+
+估计工作量：2-3小时精细迁移
+
+## 注意事项
+- 应用必须在整个迁移过程中保持功能
+- 每个阶段构建在前一个阶段之上，降低风险
+- 保持开发速度，确保系统性向统一设计系统迁移
+
+## 完成时间线
+总计：6周
+- 基础设施增强：1周
+- 核心组件：1周  
+- 主要屏幕：1周
+- 标签页：1周
+- 模态框/详情：1周
+- 清理优化：1周
+
+备注：此计划确保应用在迁移到统一设计系统的过程中保持功能性和开发速度。
