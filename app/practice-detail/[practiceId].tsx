@@ -498,11 +498,8 @@ export default function PracticeDetailScreen() {
       >
         {/* Main Practice Info Card */}
         <View style={styles.mainCard}>
-          {/* TEMPORARY: Container Label */}
-          <Text style={styles.tempLabel}>MAIN CARD (mainCard)</Text>
           {/* Practice Type and Status Header */}
-          <View style={[styles.practiceHeader, styles.tempOutline]}>
-            <Text style={styles.tempLabel}>PRACTICE HEADER (practiceHeader)</Text>
+          <View style={styles.practiceHeader}>
             <View style={styles.practiceTypeRow}>
               <Text style={styles.practiceType}>
                 {project.practices.type === 'count' ? '计数类' : '计时类'}
@@ -527,8 +524,7 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Progress Section */}
-          <View style={[styles.progressSection, styles.tempOutline]}>
-            <Text style={styles.tempLabel}>PROGRESS SECTION (progressSection)</Text>
+          <View style={styles.progressSection}>
             {renderProgressDetails()}
 
             {project.practices.type === 'count' && (
@@ -549,8 +545,7 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Project Details */}
-          <View style={[styles.projectDetails, styles.tempOutline]}>
-            <Text style={styles.tempLabel}>PROJECT DETAILS (projectDetails)</Text>
+          <View style={styles.projectDetails}>
             <Text style={styles.projectDetailsTitle}>项目详情</Text>
             
             <View style={styles.detailsGrid}>
@@ -579,8 +574,7 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Action Buttons */}
-          <View style={[styles.actionButtons, styles.tempOutline]}>
-            <Text style={styles.tempLabel}>ACTION BUTTONS (actionButtons)</Text>
+          <View style={styles.actionButtons}>
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleEditPractice}
@@ -602,10 +596,8 @@ export default function PracticeDetailScreen() {
         </View>
 
         {/* Recent Records Card */}
-        <View style={[styles.recordsCard, styles.tempOutline]}>
-          <Text style={styles.tempLabel}>RECORDS CARD (recordsCard)</Text>
-          <View style={[styles.recordsHeader, styles.tempOutline]}>
-            <Text style={styles.tempLabel}>RECORDS HEADER (recordsHeader)</Text>
+        <View style={styles.recordsCard}>
+          <View style={styles.recordsHeader}>
             <Text style={styles.recordsTitle}>最近记录</Text>
             <TouchableOpacity
               style={styles.viewAllButton}
@@ -616,8 +608,7 @@ export default function PracticeDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={[styles.recordsList, styles.tempOutline]}>
-            <Text style={styles.tempLabel}>RECORDS LIST (recordsList)</Text>
+          <View style={styles.recordsList}>
             {renderRecentRecords()}
           </View>
         </View>
@@ -657,9 +648,6 @@ const styles = StyleSheet.create({
     ...ComponentTokens.card.practice,
     margin: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.md,
-    // TEMPORARY: Learning outline
-    borderWidth: 2,
-    borderColor: '#FF0000',
   },
   practiceHeader: {
     paddingHorizontal: DesignSystem.spacing.xl,
@@ -886,23 +874,5 @@ const styles = StyleSheet.create({
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
-  },
-  // TEMPORARY: Learning styles - remove these later
-  tempOutline: {
-    borderWidth: 1,
-    borderColor: '#0066FF',
-    borderStyle: 'dashed',
-  },
-  tempLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#0066FF',
-    backgroundColor: '#E6F3FF',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 1000,
   },
 });
