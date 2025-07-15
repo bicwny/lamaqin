@@ -17,8 +17,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textTertiary,
+        tabBarActiveTintColor: DesignSystem.colors.primary,
+        tabBarInactiveTintColor: DesignSystem.colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -26,7 +26,7 @@ export default function TabLayout() {
           ios: {
             backgroundColor: "rgba(255, 255, 255, 0.95)",
             borderTopWidth: 0.5,
-            borderTopColor: Colors.border,
+            borderTopColor: DesignSystem.colors.border,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
             shadowOpacity: 0.1,
@@ -38,7 +38,7 @@ export default function TabLayout() {
           default: {
             backgroundColor: "#fff",
             borderTopWidth: 0.5,
-            borderTopColor: Colors.border,
+            borderTopColor: DesignSystem.colors.border,
             elevation: 8,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
