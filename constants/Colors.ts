@@ -127,7 +127,6 @@ const SEMANTIC_COLORS = {
   statusInactive: BRAND_COLORS.textTertiary,
 
   // Buddhist practice specific
-  dharmaRed: BRAND_COLORS.primary,      // Main practice color
   wisdomGold: '#D4AF37',                // Optional accent for special elements
   compassionOrange: BRAND_COLORS.accent, // Secondary accent
 };
