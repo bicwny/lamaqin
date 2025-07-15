@@ -1,0 +1,332 @@
+
+# 1.5 Component Pattern Documentation Report
+## Generated: 2025-01-15
+## Status: Complete
+
+### Button Pattern Analysis
+
+**1. Primary Button Pattern:**
+```typescript
+// Current inconsistent implementations:
+// practice-detail: backgroundColor: Colors.primary, paddingVertical: 16, paddingHorizontal: 20
+// study.tsx: backgroundColor: Colors.primary, paddingVertical: 12, paddingHorizontal: 16
+// modals: backgroundColor: Colors.primary, paddingVertical: 16, paddingHorizontal: 16
+```
+
+**Standardized Pattern (DesignSystem):**
+```typescript
+// DesignSystem.components.button.primary - EXISTING ✅
+backgroundColor: '#da4347',
+paddingVertical: 16,
+paddingHorizontal: 20,
+borderRadius: 12,
+minHeight: 48,
+```
+
+**2. Secondary Button Pattern:**
+```typescript
+// Current inconsistent implementations:
+// practice-detail: backgroundColor: 'white', borderWidth: 1.5, borderColor: Colors.primary
+// study.tsx: backgroundColor: '#F2F2F7', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)'
+// modals: backgroundColor: '#f2f2f7', borderWidth: 1, borderColor: '#e9ecef'
+```
+
+**Standardized Pattern (DesignSystem):**
+```typescript
+// DesignSystem.components.button.secondary - EXISTING ✅
+backgroundColor: '#f2f2f7',
+paddingVertical: 16,
+paddingHorizontal: 20,
+borderRadius: 12,
+minHeight: 48,
+borderWidth: 1,
+borderColor: '#e9ecef',
+```
+
+### Card Pattern Analysis
+
+**1. Main Card Pattern:**
+```typescript
+// Current implementations:
+// practice-detail: backgroundColor: 'white', borderRadius: 12, padding: 20
+// study.tsx: backgroundColor: 'white', borderRadius: 12, padding: 20
+// CardContainer: backgroundColor: 'white', borderRadius: 12, padding: 20 (configurable)
+```
+
+**Standardized Pattern (DesignSystem):**
+```typescript
+// DesignSystem.components.card - EXISTING ✅
+backgroundColor: '#ffffff',
+borderRadius: 12,
+padding: 16, // NOTE: Most files use 20px - needs update
+shadowColor: '#000',
+shadowOffset: { width: 0, height: 2 },
+shadowOpacity: 0.1,
+shadowRadius: 4,
+```
+
+**2. Card Shadow Pattern:**
+```typescript
+// Current inconsistent implementations:
+// practice-detail: shadowOpacity: 0.08, shadowRadius: 12, elevation: 4
+// study.tsx: shadowOpacity: 0.08, shadowRadius: 12, elevation: 4
+// index.tsx: shadowOpacity: 0.08, shadowRadius: 12, elevation: 4
+```
+
+**Needs DesignSystem Update:**
+```typescript
+// ADD TO DesignSystem.shadow:
+card: {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 4,
+  borderWidth: 0.5,
+  borderColor: 'rgba(0,0,0,0.04)',
+}
+```
+
+### Input Pattern Analysis
+
+**1. Text Input Pattern:**
+```typescript
+// Current implementations across modals:
+// meditation-record: borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12
+// custom-record: borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, padding: 12
+```
+
+**Missing from DesignSystem - NEEDS ADDITION:**
+```typescript
+// ADD TO DesignSystem.components:
+input: {
+  backgroundColor: '#ffffff',
+  borderWidth: 1,
+  borderColor: '#e9ecef',
+  borderRadius: 8,
+  padding: 12,
+  fontSize: 16,
+  color: '#1a1a1a',
+  placeholderTextColor: '#999999',
+}
+```
+
+### Modal Pattern Analysis
+
+**1. Modal Header Pattern:**
+```typescript
+// ModalTemplate.tsx - GOOD EXAMPLE ✅
+// Uses DesignSystem.spacing.lg, DesignSystem.spacing.md
+// Consistent header layout with left/center/right sections
+```
+
+**2. Modal Content Pattern:**
+```typescript
+// Current pattern in ModalTemplate:
+// padding: DesignSystem.spacing.lg (16px)
+// backgroundColor: DesignSystem.colors.background
+```
+
+### Progress Bar Pattern Analysis
+
+**1. Progress Bar Pattern:**
+```typescript
+// Current implementations:
+// practice-detail: height: 8, backgroundColor: '#e9ecef', borderRadius: 4
+// study.tsx: height: 6, backgroundColor: '#f0f0f0', borderRadius: 3
+// index.tsx: Various custom implementations
+```
+
+**Missing from DesignSystem - NEEDS ADDITION:**
+```typescript
+// ADD TO DesignSystem.components:
+progressBar: {
+  height: 8,
+  backgroundColor: '#e9ecef',
+  borderRadius: 4,
+  fill: {
+    backgroundColor: '#da4347',
+    borderRadius: 4,
+  }
+}
+```
+
+### Action Button Row Pattern Analysis
+
+**1. Quick Action Buttons:**
+```typescript
+// Current implementations:
+// study.tsx: flexDirection: 'row', gap: 12, paddingVertical: 12
+// index.tsx: flexDirection: 'row', gap: 12, flex: 1
+```
+
+**Standardized Pattern:**
+```typescript
+// ActionButtonRow component exists but needs DesignSystem integration
+// Pattern: flexDirection: 'row', gap: 12, equal flex distribution
+```
+
+### List Item Pattern Analysis
+
+**1. Record Item Pattern:**
+```typescript
+// Current implementations:
+// practice-detail: marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1
+// meditation-history: Similar but inconsistent spacing
+```
+
+**Missing from DesignSystem - NEEDS ADDITION:**
+```typescript
+// ADD TO DesignSystem.components:
+listItem: {
+  marginBottom: 16,
+  paddingBottom: 16,
+  borderBottomWidth: 1,
+  borderBottomColor: '#f0f0f0',
+}
+```
+
+### Badge/Status Pattern Analysis
+
+**1. Status Badge Pattern:**
+```typescript
+// Current implementations:
+// practice-detail: backgroundColor: '#e8f5e8', paddingHorizontal: 12, paddingVertical: 4
+// study.tsx: Various color-coded status indicators
+```
+
+**Missing from DesignSystem - NEEDS ADDITION:**
+```typescript
+// ADD TO DesignSystem.components:
+badge: {
+  success: {
+    backgroundColor: '#e8f5e8',
+    color: '#2e7d32',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  warning: {
+    backgroundColor: '#fff3cd',
+    color: '#856404',
+    // ... similar pattern
+  }
+}
+```
+
+### Typography Pattern Analysis
+
+**1. Heading Patterns:**
+```typescript
+// Current inconsistent implementations:
+// practice-detail: fontSize: 24, fontWeight: '700', letterSpacing: -0.3
+// study.tsx: fontSize: 18, fontWeight: '700', letterSpacing: -0.3
+// index.tsx: fontSize: 18, fontWeight: '700', letterSpacing: -0.3
+```
+
+**DesignSystem Usage:**
+```typescript
+// createStyles.heading() exists but not consistently used
+// Most files use hardcoded values instead of DesignSystem tokens
+```
+
+### Component Integration with DesignSystem
+
+**Components Already Using DesignSystem ✅:**
+1. **ModalTemplate.tsx** - Uses spacing, colors, typography tokens
+2. **PageTemplate.tsx** - Uses some DesignSystem tokens
+3. **CardContainer.tsx** - Partially uses design tokens
+
+**Components NOT Using DesignSystem ❌:**
+1. **practice-detail/[practiceId].tsx** - All hardcoded values
+2. **study.tsx** - All hardcoded values
+3. **index.tsx** - All hardcoded values
+4. **meditation-record.tsx** - All hardcoded values
+5. **custom-record.tsx** - All hardcoded values
+
+### Pattern Consistency Analysis
+
+**Consistent Patterns (Good):**
+- Card shadows: Most files use same shadow configuration
+- Border radius: 12px consistently used for cards
+- Primary color: Colors.primary used consistently
+- Card margins: `marginHorizontal: 16, marginVertical: 8` pattern
+
+**Inconsistent Patterns (Needs Fix):**
+- Button padding: 12px vs 16px vertical padding
+- Progress bar height: 6px vs 8px
+- Input border color: '#ddd' vs '#e9ecef'
+- Text input padding: 12px vs 16px
+- Section spacing: 16px vs 20px
+
+### Missing DesignSystem Components
+
+**High Priority Additions Needed:**
+1. **Input Components** - Text input, textarea, number input patterns
+2. **Progress Components** - Progress bars, loading states
+3. **List Components** - List items, dividers, record items
+4. **Badge Components** - Status indicators, completion badges
+5. **Card Shadow** - Standardized shadow configuration
+6. **Action Button Groups** - Button row layouts
+
+### File-by-File Pattern Usage
+
+**High Pattern Consistency:**
+- ✅ **ModalTemplate.tsx** - Uses DesignSystem extensively
+- ✅ **CardContainer.tsx** - Good component abstraction
+
+**Medium Pattern Consistency:**
+- ⚠️ **PageTemplate.tsx** - Some DesignSystem usage
+- ⚠️ **ActionButtonRow.tsx** - Exists but needs DesignSystem integration
+
+**Low Pattern Consistency:**
+- ❌ **practice-detail/[practiceId].tsx** - 200+ hardcoded style values
+- ❌ **study.tsx** - 150+ hardcoded style values
+- ❌ **index.tsx** - 100+ hardcoded style values
+- ❌ **meditation-record.tsx** - 80+ hardcoded style values
+
+### Recommended Pattern Migration Order
+
+**Phase 1 - Extend DesignSystem (Week 1):**
+1. Add missing component patterns to DesignSystem.ts
+2. Update existing component patterns for consistency
+3. Add missing spacing/typography tokens
+
+**Phase 2 - Template Components (Week 2):**
+1. Update all template components to use DesignSystem
+2. Fix inconsistent patterns in existing components
+3. Create missing component abstractions
+
+**Phase 3 - Screen Components (Week 3-4):**
+1. Migrate high-priority screens (practice-detail, study, index)
+2. Update modal components
+3. Fix remaining inconsistencies
+
+**Phase 4 - Validation (Week 5):**
+1. Remove hardcoded values
+2. Test pattern consistency
+3. Performance optimization
+
+### Pattern Migration Utilities Needed
+
+**Create Helper Functions:**
+```typescript
+// Utilities for common patterns
+export const createButtonStyle = (variant: 'primary' | 'secondary') => ({
+  ...DesignSystem.components.button[variant],
+  ...DesignSystem.shadow.md,
+});
+
+export const createCardStyle = (padding?: keyof typeof DesignSystem.spacing) => ({
+  ...DesignSystem.components.card,
+  ...DesignSystem.shadow.card,
+  padding: padding ? DesignSystem.spacing[padding] : DesignSystem.spacing.lg,
+});
+```
+
+---
+**Phase 1.5 Status: ✅ COMPLETE**
+**Phase 1 Status: ✅ COMPLETE (100%)**
+**Next: Phase 2 - DesignSystem Expansion & Template Migration**
