@@ -1,0 +1,153 @@
+
+# 1.4 Spacing Pattern Analysis Report
+## Generated: 2025-01-15
+## Status: Complete
+
+### Spacing Values Inventory
+
+| Value (px) | Usage Count | Usage Type | Files Found | DesignSystem Target |
+|------------|-------------|------------|-------------|-------------------|
+| 4          | 15+         | Small gaps, padding | Multiple | spacing.xs |
+| 6          | 5           | Small borders, gaps | practice-detail, study | ❌ Missing |
+| 8          | 20+         | Margins, gaps | Multiple | spacing.sm |
+| 10         | 8           | Padding, margins | study.tsx, profile | ❌ Missing |
+| 12         | 25+         | Common padding | Multiple | spacing.md |
+| 16         | 40+         | Standard padding | Multiple | spacing.lg |
+| 20         | 30+         | Large padding | Multiple | spacing.xl |
+| 24         | 15          | Extra padding | practice-detail | spacing.2xl |
+| 32         | 8           | Section spacing | Multiple | spacing.3xl |
+| 40         | 5           | Large spacing | Multiple | spacing.4xl |
+| 48         | 3           | Very large | Multiple | spacing.5xl |
+
+### Critical Spacing Issues Found
+
+**1. Missing DesignSystem Tokens:**
+- `6px` spacing used in 5+ locations (borders, small gaps)
+- `10px` spacing used in 8+ locations (button padding, margins)
+
+**2. File-Specific Analysis:**
+
+**practice-detail/[practiceId].tsx** (HIGH PRIORITY):
+- Padding: 20px (container), 16px (progress), 12px (gaps)
+- Margins: 8px, 12px, 16px, 20px (inconsistent)
+- Card margins: marginHorizontal: 16, marginVertical: 8
+- Button gaps: 12px, 8px (mixed patterns)
+
+**app/(tabs)/study.tsx** (HIGH PRIORITY):
+- Padding: 20px (cards), 16px (headers), 12px (content)
+- Margins: 16px (horizontal), 12px (vertical)
+- Section spacing: 16px standard
+- Button padding: 12px vertical, 16px horizontal
+
+**components/ModalTemplate.tsx**:
+- Header padding: 16px horizontal, 12px vertical  
+- Content padding: 16px default, 20px scroll
+- Uses DesignSystem.spacing.lg (16px) ✅ GOOD
+
+**components/CardContainer.tsx**:
+- Default padding: 20px
+- Default margins: horizontal 16px, vertical 8px
+- Consistent pattern ✅ GOOD
+
+### Spacing Pattern Categories
+
+**1. Container Spacing:**
+- Page padding: 16px-20px (inconsistent)
+- Card padding: 16px-20px (inconsistent)  
+- Modal padding: 16px-20px (inconsistent)
+
+**2. Component Spacing:**
+- Button padding: 12px-16px vertical, 16px-20px horizontal
+- Input padding: 12px standard
+- Icon gaps: 6px-8px (inconsistent)
+
+**3. Layout Spacing:**
+- Section margins: 16px-20px (inconsistent)
+- Item gaps: 8px-12px (inconsistent)
+- Card margins: 8px vertical, 16px horizontal (consistent)
+
+### Hardcoded Spacing Violations
+
+**High Priority Files:**
+1. `app/practice-detail/[practiceId].tsx` - 25+ hardcoded spacing values
+2. `app/(tabs)/study.tsx` - 20+ hardcoded spacing values  
+3. `app/edit-profile.tsx` - 15+ hardcoded spacing values
+4. `app/practice-config.tsx` - 18+ hardcoded spacing values
+5. `app/add-practice.tsx` - 12+ hardcoded spacing values
+
+**Medium Priority Files:**
+1. `app/profile.tsx` - 10+ hardcoded spacing values
+2. `app/meditation-detail/[recordId].tsx` - 8+ hardcoded spacing values
+3. `components/SectionTitle.tsx` - Custom spacing props
+
+### Inconsistent Patterns
+
+**1. Card Margin Patterns:**
+- `marginHorizontal: 16, marginVertical: 8` (most common)
+- `margin: 16` (some files)
+- `marginBottom: 12` vs `marginBottom: 16` (mixed)
+
+**2. Button Padding Patterns:**
+- `paddingVertical: 12, paddingHorizontal: 16` (common)
+- `paddingVertical: 14, paddingHorizontal: 16` (study.tsx)
+- `paddingVertical: 16, paddingHorizontal: 20` (practice-detail)
+
+**3. Section Spacing:**
+- `marginBottom: 16` (most common)
+- `marginBottom: 20` (some files)
+- `marginBottom: 12` (inconsistent)
+
+### Migration Priority
+
+**Phase 1 - Missing Tokens (ADD TO DESIGNSYSTEM):**
+```typescript
+spacing: {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 32,
+  '4xl': 40,
+  '5xl': 48,
+  // ADD THESE:
+  xxs: 6,    // For small borders, icon gaps
+  base: 10,  // For button padding, small margins
+}
+```
+
+**Phase 2 - High Priority Files:**
+1. practice-detail/[practiceId].tsx
+2. app/(tabs)/study.tsx  
+3. components/ModalTemplate.tsx (partially done)
+4. components/CardContainer.tsx
+
+**Phase 3 - Standardize Patterns:**
+- Card margin pattern: `DesignSystem.spacing.lg` horizontal, `DesignSystem.spacing.sm` vertical
+- Button padding pattern: `DesignSystem.spacing.md` vertical, `DesignSystem.spacing.lg` horizontal
+- Section spacing: `DesignSystem.spacing.lg` standard
+
+### Files Using DesignSystem Spacing (GOOD EXAMPLES)
+
+✅ `components/ModalTemplate.tsx` - Uses DesignSystem.spacing tokens
+✅ `app/edit-profile.tsx` - Uses DesignSystem.spacing.xl
+⚠️ Most other files use hardcoded values
+
+### Next Steps for Phase 1 Completion
+
+1. **Add missing spacing tokens** to DesignSystem.ts
+2. **Document component spacing patterns** in Phase 1.5
+3. **Create spacing migration utility functions**
+4. **Begin file-by-file migration** in Phase 2
+
+### Estimated Migration Impact
+
+- **25+ files** need spacing token updates
+- **200+ spacing declarations** need migration
+- **High impact**: practice-detail, study, modal components
+- **Medium impact**: profile, meditation, configuration screens
+
+---
+**Phase 1.4 Status: ✅ COMPLETE**
+**Next: Phase 1.5 - Component Pattern Documentation**
