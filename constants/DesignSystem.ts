@@ -29,6 +29,38 @@ export const DesignSystem = {
     error: '#dc3545',
     info: '#3b82f6',
     
+    // Buddhist semantic colors
+    dharmaRed: '#da4347',           // Primary practice energy
+    compassionOrange: '#FF6B35',    // Mindfulness and compassion
+    wisdomGold: '#D4AF37',          // Study achievements and wisdom
+    meditationBlue: '#4A90E2',      // Deep contemplation
+    enlightenmentWhite: '#ffffff',  // Purity and clarity
+    
+    // Practice status colors with Buddhist meaning
+    practiceComplete: '#2e7d32',    // Completed practice (wisdom green)
+    practiceActive: '#da4347',      // Active practice (dharma red)
+    practiceInactive: '#999999',    // Inactive practice
+    studyProgress: '#4A90E2',       // Learning progress (meditation blue)
+    mindfulnessAlert: '#f59e0b',    // Mindful attention needed
+    
+    // Success state variations
+    successBackground: '#e8f5e8',   // Light success background
+    successBorder: '#2e7d32',       // Success border
+    
+    // Warning state variations  
+    warningBackground: '#fff3cd',   // Light warning background
+    warningBorder: '#f59e0b',       // Warning border
+    
+    // Error state variations
+    errorBackground: '#f8d7da',     // Light error background
+    errorBorder: '#dc3545',         // Error border
+    
+    // Utility colors found in code
+    cardShadow: '#000000',          // Shadow color for cards
+    overlayDark: 'rgba(0, 0, 0, 0.5)', // Modal overlay
+    textOnDark: '#ffffff',          // Text on dark backgrounds
+    textOnLight: '#1a1a1a',         // Text on light backgrounds
+    
     // Semantic colors
     cardBackground: '#ffffff',
     modalBackground: '#ffffff',
