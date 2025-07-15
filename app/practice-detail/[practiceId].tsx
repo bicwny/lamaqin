@@ -142,7 +142,7 @@ export default function PracticeDetailScreen() {
       // Get today's records
       const { data: todayData, error: todayError } = await supabase
         .from('meditation_records')
-        .select('id, user_id, practice_id, record_date, duration_minutes, session_number, notes, created_at')
+        .select('id, user_id, practice_id, record_date, duration_minutes, session_number, created_at')
         .eq('user_id', user.id)
         .eq('practice_id', projectData.practice_id)
         .eq('record_date', today)
@@ -159,7 +159,7 @@ export default function PracticeDetailScreen() {
 
         const { data: weeklyData, error: weeklyError } = await supabase
           .from('meditation_records')
-          .select('id, user_id, practice_id, record_date, duration_minutes, session_number, notes, created_at')
+          .select('id, user_id, practice_id, record_date, duration_minutes, session_number, created_at')
           .eq('user_id', user.id)
           .eq('practice_id', projectData.practice_id)
           .gte('record_date', startOfWeek.toISOString().split('T')[0])
@@ -340,14 +340,6 @@ export default function PracticeDetailScreen() {
           <Text style={styles.recordCount}>
             第{record.session_number || 1}座 · {record.duration_minutes}分钟
           </Text>
-          {record.notes && (
-            <View style={styles.recordNotes}>
-              <Text style={styles.notesLabel}>备注:</Text>
-              <Text style={styles.notesText} numberOfLines={2}>
-                {record.notes}
-              </Text>
-            </View>
-          )}
         </TouchableOpacity>
       ));
     } else {
