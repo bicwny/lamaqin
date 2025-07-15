@@ -1050,7 +1050,7 @@ export default function PracticeConfigScreen() {
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.saveButtonText}>
-              {isEditMode ? "更新项目" : "确认添加项目"}
+              {isEditMode ? "编辑" : "确认添加项目"}
             </Text>
           )}
         </TouchableOpacity>
