@@ -251,7 +251,9 @@ export default function MeditationDetailScreen() {
 
   return (
     <PageTemplate
-      title={project.practices.name} // Dynamic title here
+      title={project.practices.name}
+      subtitle={project.project_name || project.preset_project_id ? 
+        `项目：${project.project_name || '默认项目'}` : undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
       backgroundColor={Colors.background}
