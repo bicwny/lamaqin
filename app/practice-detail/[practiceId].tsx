@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -496,11 +497,9 @@ export default function PracticeDetailScreen() {
         }
       >
         {/* Main Practice Info Card */}
-        <View style={[styles.mainCard, { borderWidth: 2, borderColor: 'red', position: 'relative' }]}>
-          <Text style={styles.debugLabel}>mainCard</Text>
+        <View style={styles.mainCard}>
           {/* Practice Type and Status Header */}
-          <View style={[styles.practiceHeader, { borderWidth: 2, borderColor: 'green', position: 'relative' }]}>
-            <Text style={styles.debugLabel}>practiceHeader</Text></View>
+          <View style={styles.practiceHeader}>
             <View style={styles.practiceTypeRow}>
               <Text style={styles.practiceType}>
                 {project.practices.type === 'count' ? '计数类' : '计时类'}
@@ -525,8 +524,7 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Progress Section */}
-          <View style={[styles.progressSection, { borderWidth: 2, borderColor: 'blue', position: 'relative' }]}>
-            <Text style={styles.debugLabel}>progressSection</Text></View>
+          <View style={styles.progressSection}>
             {renderProgressDetails()}
 
             {project.practices.type === 'count' && (
@@ -547,10 +545,9 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Project Details */}
-          <View style={[styles.projectDetails, { borderWidth: 2, borderColor: 'orange', position: 'relative' }]}>
-            <Text style={styles.debugLabel}>projectDetails</Text></View>
+          <View style={styles.projectDetails}>
             <Text style={styles.projectDetailsTitle}>项目详情</Text>
-
+            
             <View style={styles.detailsGrid}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>开始日期</Text>
@@ -577,8 +574,7 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Action Buttons */}
-          <View style={[styles.actionButtons, { borderWidth: 2, borderColor: 'magenta', position: 'relative' }]}>
-            <Text style={styles.debugLabel}>actionButtons</Text></View>
+          <View style={styles.actionButtons}>
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleEditPractice}
@@ -600,10 +596,8 @@ export default function PracticeDetailScreen() {
         </View>
 
         {/* Recent Records Card */}
-        <View style={[styles.recordsCard, { borderWidth: 2, borderColor: 'purple', position: 'relative' }]}>
-          <Text style={styles.debugLabel}>recordsCard</Text></view>
-          <View style={[styles.recordsHeader, { borderWidth: 2, borderColor: 'cyan', position: 'relative' }]}>
-            <Text style={styles.debugLabel}>recordsHeader</Text></view>
+        <View style={styles.recordsCard}>
+          <View style={styles.recordsHeader}>
             <Text style={styles.recordsTitle}>最近记录</Text>
             <TouchableOpacity
               style={styles.viewAllButton}
@@ -614,8 +608,7 @@ export default function PracticeDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={[styles.recordsList, { borderWidth: 2, borderColor: 'yellow', position: 'relative' }]}>
-            <Text style={styles.debugLabel}>recordsList</Text></view>
+          <View style={styles.recordsList}>
             {renderRecentRecords()}
           </View>
         </View>
@@ -649,7 +642,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   mainCard: {
     ...ComponentTokens.card.practice,
@@ -657,8 +650,8 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   practiceHeader: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   practiceTypeRow: {
@@ -691,10 +684,10 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
   },
   progressSection: {
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.background,
-    marginHorizontal: DesignSystem.spacing.lg,
+    marginHorizontal: DesignSystem.spacing.xl,
     borderRadius: DesignSystem.borderRadius.lg,
     marginBottom: DesignSystem.spacing.lg,
   },
@@ -738,7 +731,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   projectDetails: {
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   projectDetailsTitle: {
@@ -773,8 +766,8 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     gap: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   primaryButton: {
     ...ComponentTokens.button.primary,
@@ -807,8 +800,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
   recordsTitle: {
@@ -825,8 +818,8 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   recordsList: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   noRecordsText: {
     ...Typography.styles.body('base'),
@@ -881,19 +874,5 @@ const styles = StyleSheet.create({
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
-  },
-  // TEMP DEBUG STYLES - REMOVE LATER
-  debugLabel: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    color: 'white',
-    fontSize: 10,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 4,
-    zIndex: 1000,
-    fontWeight: 'bold',
   },
 });
