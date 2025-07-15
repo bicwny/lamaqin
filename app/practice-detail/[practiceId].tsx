@@ -649,23 +649,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: DesignSystem.spacing.lg,
+    flexWrap: 'wrap',
+    gap: DesignSystem.spacing.sm,
   },
   typeStatusContainer: {
     flex: 1,
     marginRight: DesignSystem.spacing.md,
+    minWidth: 0, // Allows text to wrap properly
   },
   practiceType: {
     ...Typography.styles.label('sm'),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.primary,
     marginBottom: DesignSystem.spacing.xs,
+    flexWrap: 'wrap',
   },
   practiceDisplayType: {
     ...Typography.styles.label('xs'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.textSecondary,
+    flexWrap: 'wrap',
   },
-  completedBadge: ComponentTokens.buddhist.completionBadge,
+  completedBadge: {
+    ...ComponentTokens.buddhist.completionBadge,
+    flexShrink: 0, // Prevent badge from shrinking
+    alignSelf: 'flex-start',
+  },
   completedText: {
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.practiceComplete,
