@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -52,7 +51,7 @@ interface MeditationRecord {
 export default function MeditationDetailScreen() {
   const { user } = useAuth();
   const { practiceId } = useLocalSearchParams<{ practiceId: string }>();
-  
+
   const [project, setProject] = useState<PracticeProject | null>(null);
   const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
@@ -178,7 +177,7 @@ export default function MeditationDetailScreen() {
 
   const handleViewHistory = () => {
     if (!project) return;
-    
+
     router.push({
       pathname: '/meditation-history',
       params: {
@@ -190,7 +189,7 @@ export default function MeditationDetailScreen() {
 
   const handleRecordMeditation = () => {
     if (!project) return;
-    
+
     router.push({
       pathname: '/modals/meditation-record',
       params: {
@@ -252,7 +251,7 @@ export default function MeditationDetailScreen() {
 
   return (
     <PageTemplate
-      title="观修详情"
+      title={project.practices.name} // Dynamic title here
       showBackButton={true}
       onBackPress={() => router.back()}
       backgroundColor={Colors.background}
@@ -268,7 +267,7 @@ export default function MeditationDetailScreen() {
         <View style={styles.infoCard}>
           <Text style={styles.practiceTitle}>{project.practices.name}</Text>
           <Text style={styles.practiceType}>观修项目 · 计时类</Text>
-          
+
           <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
               总进度：{progress.current}/{progress.target}天
@@ -291,7 +290,7 @@ export default function MeditationDetailScreen() {
               <Text style={styles.statValue}>{totalSessions}</Text>
               <Text style={styles.statLabel}>总观修次数</Text>
             </View>
-            
+
             <View style={styles.statItem}>
               <Text style={styles.statValue}>
                 {isWeekly ? `${weeklyCount}/${target}` : `${todayCount}/${target}`}
@@ -314,7 +313,7 @@ export default function MeditationDetailScreen() {
               {((isWeekly && weeklyCount >= target) || (!isWeekly && todayCount >= target)) && ' ✅'}
             </Text>
           </View>
-          
+
           {todayRecords.length > 0 && (
             <View style={styles.todaySessionsContainer}>
               <Text style={styles.todaySessionsTitle}>今日观修记录：</Text>
@@ -465,7 +464,7 @@ function MeditationHistorySection({
         {sortedDates.map((date) => {
           const dayRecords = groupedRecords[date];
           const totalDuration = dayRecords.reduce((sum, record) => sum + record.duration_minutes, 0);
-          
+
           return (
             <View key={date} style={styles.dateGroup}>
               <View style={styles.dateHeader}>
@@ -481,7 +480,7 @@ function MeditationHistorySection({
                   {dayRecords.length}座 · {totalDuration}分钟
                 </Text>
               </View>
-              
+
               {dayRecords
                 .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
                 .map((record, index) => (
@@ -502,7 +501,7 @@ function MeditationHistorySection({
                           {record.duration_minutes}分钟
                         </Text>
                       </View>
-                      
+
                       <Text style={styles.recordTime}>
                         {new Date(record.created_at).toLocaleTimeString('zh-CN', {
                           hour: '2-digit',
@@ -510,13 +509,13 @@ function MeditationHistorySection({
                         })}
                       </Text>
                     </View>
-                    
+
                     {record.reflection && (
                       <Text style={styles.recordReflection} numberOfLines={2}>
                         {record.reflection}
                       </Text>
                     )}
-                    
+
                     <Ionicons name="chevron-forward" size={16} color="#ccc" style={styles.recordChevron} />
                   </TouchableOpacity>
                 ))}
