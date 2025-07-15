@@ -114,8 +114,10 @@ export const DesignSystem = {
   
   // Spacing
   spacing: {
+    xxs: 6,    // For small borders, icon gaps, tight spacing
     xs: 4,
     sm: 8,
+    base: 10,  // For button padding, small margins, form elements
     md: 12,
     lg: 16,
     xl: 20,
