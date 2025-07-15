@@ -1,0 +1,196 @@
+
+# Design System Migration - Style Inventory Spreadsheet
+
+## TYPOGRAPHY AUDIT
+
+### Font Sizes Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| 12px  | practice-detail/[practiceId].tsx (loadingText) | 1 | DesignSystem.typography.fontSize.xs |
+| 14px  | practice-detail/[practiceId].tsx (practiceType, dailyTargetText, etc.) | 8 | DesignSystem.typography.fontSize.sm |
+| 16px  | practice-detail/[practiceId].tsx (practiceDescription, etc.) | 12 | DesignSystem.typography.fontSize.base |
+| 18px  | practice-detail/[practiceId].tsx (progressText, etc.) | 4 | DesignSystem.typography.fontSize.lg |
+| 20px  | [TO BE AUDITED] | ? | DesignSystem.typography.fontSize.xl |
+| 24px  | practice-detail/[practiceId].tsx (practiceTitle) | 1 | DesignSystem.typography.fontSize.2xl |
+| 32px  | [TO BE AUDITED] | ? | DesignSystem.typography.fontSize.4xl |
+
+### Font Weights Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| '400' | [TO BE AUDITED] | ? | DesignSystem.typography.fontWeight.normal |
+| '500' | practice-detail/[practiceId].tsx (loadingText, etc.) | 6 | DesignSystem.typography.fontWeight.medium |
+| '600' | practice-detail/[practiceId].tsx (completedText, etc.) | 8 | DesignSystem.typography.fontWeight.semibold |
+| '700' | practice-detail/[practiceId].tsx (practiceTitle, etc.) | 6 | DesignSystem.typography.fontWeight.bold |
+
+### Letter Spacing Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| -0.1  | practice-detail/[practiceId].tsx (secondaryButtonText) | 1 | DesignSystem.typography.letterSpacing.tight |
+| -0.2  | practice-detail/[practiceId].tsx (buttonText) | 1 | DesignSystem.typography.letterSpacing.tighter |
+| -0.3  | practice-detail/[practiceId].tsx (practiceTitle, etc.) | 4 | DesignSystem.typography.letterSpacing.tightest |
+
+### Line Heights Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| 20    | practice-detail/[practiceId].tsx (notesText) | 1 | DesignSystem.typography.lineHeight.tight |
+| 24    | practice-detail/[practiceId].tsx (practiceDescription) | 1 | DesignSystem.typography.lineHeight.normal |
+
+## COLOR AUDIT
+
+### Colors.ts vs DesignSystem.colors Usage:
+| File | Colors.ts Imports | DesignSystem.colors Imports | Hardcoded Colors |
+|------|-------------------|----------------------------|------------------|
+| practice-detail/[practiceId].tsx | Colors.background, Colors.primary, Colors.textSecondary | None | '#1a1a1a', '#FFFFFF', '#e9ecef', '#f0f0f0', '#e8f5e8', '#2e7d32', '#f8f9fa' |
+| [TO BE AUDITED] | ? | ? | ? |
+
+### Hardcoded Color Values Found:
+| Color | Files Using It | Usage Context | Proposed Token |
+|-------|----------------|---------------|----------------|
+| '#1a1a1a' | practice-detail/[practiceId].tsx | Text primary | DesignSystem.colors.textPrimary |
+| '#FFFFFF' | practice-detail/[practiceId].tsx | Background white | DesignSystem.colors.white |
+| '#e9ecef' | practice-detail/[practiceId].tsx | Progress bar background | DesignSystem.colors.gray.100 |
+| '#f0f0f0' | practice-detail/[practiceId].tsx | Border separator | DesignSystem.colors.gray.200 |
+| '#e8f5e8' | practice-detail/[practiceId].tsx | Success background | DesignSystem.colors.success.light |
+| '#2e7d32' | practice-detail/[practiceId].tsx | Success text | DesignSystem.colors.success.main |
+| '#f8f9fa' | practice-detail/[practiceId].tsx | Notes background | DesignSystem.colors.gray.50 |
+| 'rgba(0,0,0,0.04)' | practice-detail/[practiceId].tsx | Border subtle | DesignSystem.colors.border.subtle |
+| 'rgba(0,0,0,0.08)' | practice-detail/[practiceId].tsx | Shadow opacity | DesignSystem.shadows.card.shadowOpacity |
+| 'rgba(0,0,0,0.1)' | practice-detail/[practiceId].tsx | Button shadow | DesignSystem.shadows.button.shadowOpacity |
+
+### Buddhist Semantic Colors Needed:
+| Semantic Name | Current Usage | Proposed Token |
+|---------------|---------------|----------------|
+| meditation | Colors.primary (#da4347) | DesignSystem.colors.meditation |
+| compassion | Derived from primary | DesignSystem.colors.compassion |
+| wisdom | Darker primary | DesignSystem.colors.wisdom |
+| progress | Success states | DesignSystem.colors.progress |
+| reflection | Secondary text | DesignSystem.colors.reflection |
+
+## SPACING AUDIT
+
+### Padding Values Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| 4px   | practice-detail/[practiceId].tsx (completedBadge) | 1 | DesignSystem.spacing.xs |
+| 8px   | practice-detail/[practiceId].tsx (progressBar height, gaps) | 3 | DesignSystem.spacing.sm |
+| 12px  | practice-detail/[practiceId].tsx (loadingText, gaps, etc.) | 6 | DesignSystem.spacing.base |
+| 16px  | practice-detail/[practiceId].tsx (buttons, margins, etc.) | 8 | DesignSystem.spacing.lg |
+| 20px  | practice-detail/[practiceId].tsx (cards, sections, etc.) | 5 | DesignSystem.spacing.xl |
+| 40px  | practice-detail/[practiceId].tsx (emptyContainer) | 1 | DesignSystem.spacing.4xl |
+
+### Margin Values Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| 8px   | practice-detail/[practiceId].tsx (various margins) | 8 | DesignSystem.spacing.sm |
+| 12px  | practice-detail/[practiceId].tsx (completedBadge, etc.) | 4 | DesignSystem.spacing.base |
+| 16px  | practice-detail/[practiceId].tsx (sections, etc.) | 6 | DesignSystem.spacing.lg |
+| 20px  | practice-detail/[practiceId].tsx (actionButtons) | 1 | DesignSystem.spacing.xl |
+
+### Gap Values Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| 4px   | practice-detail/[practiceId].tsx (viewAllButton) | 1 | DesignSystem.spacing.xs |
+| 6px   | practice-detail/[practiceId].tsx (secondaryButton) | 1 | DesignSystem.spacing.sm |
+| 8px   | practice-detail/[practiceId].tsx (primaryButton) | 1 | DesignSystem.spacing.sm |
+| 12px  | practice-detail/[practiceId].tsx (progressBar, buttons) | 2 | DesignSystem.spacing.base |
+
+## SHADOWS & ELEVATION AUDIT
+
+### Shadow Patterns Found:
+| Pattern | Files Using It | Usage | Proposed Token |
+|---------|----------------|-------|----------------|
+| shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 | practice-detail/[practiceId].tsx | Card shadow | DesignSystem.shadows.card |
+| shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 | practice-detail/[practiceId].tsx | Button shadow | DesignSystem.shadows.button |
+| shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 | practice-detail/[practiceId].tsx | Secondary button | DesignSystem.shadows.subtle |
+
+## BORDER RADIUS AUDIT
+
+### Border Radius Values Found:
+| Value | Files Using It | Count | Proposed Token |
+|-------|----------------|-------|----------------|
+| 4px   | practice-detail/[practiceId].tsx (progressBar, progressFill) | 2 | DesignSystem.borderRadius.sm |
+| 8px   | practice-detail/[practiceId].tsx (recordNotes) | 1 | DesignSystem.borderRadius.base |
+| 12px  | practice-detail/[practiceId].tsx (cards, buttons, etc.) | 6 | DesignSystem.borderRadius.lg |
+
+## COMPONENT PATTERNS AUDIT
+
+### Button Patterns Found:
+| Pattern Name | Files Using It | Style Characteristics | Proposed Component |
+|--------------|----------------|----------------------|-------------------|
+| Primary Button | practice-detail/[practiceId].tsx | Red background, white text, shadow, flex: 2 | createStyles.button('primary', 'lg') |
+| Secondary Button | practice-detail/[practiceId].tsx | White background, red border, red text, flex: 1 | createStyles.button('secondary', 'lg') |
+| View All Button | practice-detail/[practiceId].tsx | Text button with icon, no background | createStyles.button('text', 'sm') |
+
+### Card Patterns Found:
+| Pattern Name | Files Using It | Style Characteristics | Proposed Component |
+|--------------|----------------|----------------------|-------------------|
+| Info Card | practice-detail/[practiceId].tsx | White background, padding: 20, shadow, border radius: 12 | createStyles.card('default') |
+| History Card | practice-detail/[practiceId].tsx | Same as info card | createStyles.card('default') |
+| Record Item | practice-detail/[practiceId].tsx | No background, bottom border, padding bottom | createStyles.listItem('default') |
+
+### Progress Bar Patterns Found:
+| Pattern Name | Files Using It | Style Characteristics | Proposed Component |
+|--------------|----------------|----------------------|-------------------|
+| Linear Progress | practice-detail/[practiceId].tsx | Gray background, red fill, height: 8, rounded | createStyles.progressBar('linear') |
+
+## FILES TO AUDIT NEXT (Priority Order):
+
+### Phase 1 - High Priority (Shared Components):
+1. components/ThemedText.tsx - Core typography component
+2. components/ThemedView.tsx - Core view component
+3. components/PageTemplate.tsx - Page structure
+4. components/ModalTemplate.tsx - Modal structure
+5. app/_layout.tsx - App-wide theme
+6. app/(tabs)/_layout.tsx - Tab navigation
+
+### Phase 2 - Medium Priority (Main Features):
+1. app/(tabs)/index.tsx - Daily dashboard
+2. app/(tabs)/practice.tsx - Practice overview
+3. app/(tabs)/study.tsx - Study interface
+4. app/(tabs)/stats.tsx - Statistics display
+5. app/(tabs)/mindfulness.tsx - Mindfulness features
+
+### Phase 3 - Lower Priority (Detail Screens):
+1. app/course-detail/[courseId].tsx
+2. app/modals/meditation-record.tsx
+3. app/modals/custom-record.tsx
+4. app/practice-config.tsx
+5. app/lesson-viewer.tsx
+
+## MIGRATION RISK ASSESSMENT:
+
+### Low Risk (Isolated Components):
+- practice-detail/[practiceId].tsx ✓ (Already audited)
+- meditation-detail/[recordId].tsx
+- Individual modal components
+
+### Medium Risk (Shared but Contained):
+- PageTemplate.tsx (affects all screens but contained)
+- ModalTemplate.tsx (affects all modals but contained)
+- Card components (reusable but predictable)
+
+### High Risk (Core Infrastructure):
+- ThemedText.tsx (affects entire app typography)
+- ThemedView.tsx (affects entire app colors)
+- _layout.tsx files (affects navigation and theme)
+
+### Critical Risk (Breaking Changes):
+- Colors.ts removal (affects every file that imports it)
+- DesignSystem.ts major changes (affects all migrated files)
+
+## NEXT STEPS:
+
+1. Complete audit of components/ThemedText.tsx and ThemedView.tsx
+2. Audit all _layout.tsx files for navigation styling
+3. Audit main tab screens for repeated patterns
+4. Document createStyles usage opportunities
+5. Plan Buddhist semantic color mapping
+6. Create component migration templates
+
+## NOTES:
+- practice-detail/[practiceId].tsx shows heavy use of hardcoded values
+- Pattern: Cards consistently use 20px padding, 12px border radius
+- Pattern: Buttons use consistent shadow patterns
+- Pattern: Typography uses -0.3 letterSpacing for headings
+- Buddhist colors need semantic mapping (meditation, compassion, wisdom, etc.)
+- Many files likely import Colors.ts instead of using DesignSystem.colors
