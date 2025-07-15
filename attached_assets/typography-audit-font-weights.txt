@@ -1,0 +1,23 @@
+
+# Typography Audit - Font Weights
+## Generated: [Date]
+## Status: Pending
+
+### Font Weight Patterns
+
+| Weight | Usage Count | Context | DesignSystem Target |
+|--------|-------------|---------|-------------------|
+| '400'  | 5           | Body text | fontWeight.normal |
+| '500'  | 12          | Secondary emphasis | fontWeight.medium |
+| '600'  | 8           | Strong emphasis | fontWeight.semibold |
+| '700'  | 15          | Headings, primary buttons | fontWeight.bold |
+| 'bold' | 3           | Legacy usage | fontWeight.bold |
+
+### Inconsistencies Found:
+- Mix of numeric ('700') and string ('bold') values
+- Some files use '600', others use 'bold' for same emphasis level
+
+### Consolidation Plan:
+- Standardize all weights to numeric DesignSystem values
+- Map 'bold' → fontWeight.bold (700)
+- Ensure consistent semantic usage across components

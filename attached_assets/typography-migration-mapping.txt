@@ -1,0 +1,55 @@
+
+# Typography Migration Mapping
+## Generated: [Date]
+## Purpose: Master reference for typography consolidation
+
+### Current State → Target State Mapping
+
+#### Font Sizes
+```
+Current: fontSize: 24, fontWeight: '700'
+Target:  createStyles.heading('2xl')
+Risk:    Low - Clear semantic mapping
+
+Current: fontSize: 16, fontWeight: '500'  
+Target:  createStyles.body('base', 'medium')
+Risk:    Medium - Multiple contexts
+
+Current: fontSize: 14, color: Colors.textSecondary
+Target:  createStyles.caption('sm')
+Risk:    Low - Clear secondary text pattern
+```
+
+#### Complete Pattern Replacements
+```
+// practice-detail/[practiceId].tsx Line 543
+OLD: {
+  fontSize: 24,
+  fontWeight: '700',
+  color: '#1a1a1a',
+  marginBottom: 8,
+  letterSpacing: -0.3,
+}
+NEW: createStyles.heading('2xl')
+
+// practice-detail/[practiceId].tsx Line 567
+OLD: {
+  fontSize: 16,
+  color: Colors.textSecondary,
+  lineHeight: 24,
+  marginBottom: 16,
+}
+NEW: createStyles.body('base', 'medium', 'secondary')
+```
+
+### High-Risk Combinations
+1. **Custom letterSpacing values** - Need careful token mapping
+2. **Mixed color + typography** - Require semantic color tokens
+3. **Context-specific spacing** - May need component-specific tokens
+
+### Migration Order
+1. Simple font size replacements (lowest risk)
+2. Font weight standardization  
+3. Letter spacing consolidation
+4. Line height optimization
+5. Complex typography + color combinations

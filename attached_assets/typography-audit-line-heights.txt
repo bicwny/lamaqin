@@ -1,0 +1,23 @@
+
+# Typography Audit - Line Heights
+## Generated: [Date]
+## Status: Pending
+
+### Line Height Patterns
+
+| Value | Usage Count | Font Size Context | DesignSystem Target |
+|-------|-------------|------------------|-------------------|
+| 20    | 8           | 14px text | lineHeight.sm |
+| 24    | 12          | 16px text | lineHeight.base |
+| 28    | 5           | 18px text | lineHeight.lg |
+| 32    | 3           | 24px text | lineHeight.xl |
+
+### Ratio Analysis:
+- Most common ratio: 1.5 (24px line height for 16px font)
+- Tight ratio: 1.33 (20px line height for 15px font)
+- Comfortable ratio: 1.6 (32px line height for 20px font)
+
+### Standardization Needs:
+- Establish consistent line height scale
+- Ensure proper text readability ratios
+- Map to semantic typography combinations
