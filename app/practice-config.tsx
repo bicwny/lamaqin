@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Colors } from "@/constants/Colors";
+import { DesignSystem } from "@/constants/DesignSystem";
 import PageTemplate from "@/components/PageTemplate";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getCurrentWeekStart } from "@/lib/topic-progress";

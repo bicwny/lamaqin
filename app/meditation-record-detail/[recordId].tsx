@@ -17,7 +17,7 @@ import { router, useLocalSearchParams, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { meditationService } from '@/lib/database';
 import PageHeader from '@/components/PageHeader';
 import { toastService } from '@/lib/toast';

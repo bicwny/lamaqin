@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { testConnection } from '@/lib/database';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 export default function DatabaseStatus() {
   const [connected, setConnected] = useState(false);

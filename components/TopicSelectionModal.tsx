@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 interface MeditationTopic {
   topic_number: number;
