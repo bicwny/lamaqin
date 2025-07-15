@@ -3,7 +3,6 @@ import { View, StyleSheet, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { DesignSystem } from '@/constants/DesignSystem';
 
 interface LessonTemplateProps {
   title?: string;
@@ -19,7 +18,7 @@ export default function LessonTemplate({
   headerLeft,
   headerRight,
   children,
-  backgroundColor = Colors.background,
+  backgroundColor = DesignSystem.colors.background,
   contentContainerStyle,
 }: LessonTemplateProps) {
   return (
@@ -36,7 +35,7 @@ export default function LessonTemplate({
           headerTitleStyle: {
             fontSize: 16,
             fontWeight: '600',
-            color: Colors.text,
+            color: DesignSystem.colors.textPrimary,
           },
         }} 
       />
