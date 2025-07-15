@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
+import { DesignSystem } from "@/constants/DesignSystem";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
