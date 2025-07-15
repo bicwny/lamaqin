@@ -1,14 +1,14 @@
+
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Typography } from '@/utils/typography';
-import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 
 export function DesignTokenPreview() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Design System Tokens Preview</Text>
-
+      
       {/* Color Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Color Tokens</Text>
@@ -26,7 +26,7 @@ export function DesignTokenPreview() {
       {/* Typography Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Typography Tokens</Text>
-
+        
         {/* Font Sizes */}
         <Text style={styles.subSectionTitle}>Font Sizes</Text>
         {Object.entries(DesignSystem.typography.fontSize).map(([size, value]) => (
@@ -46,268 +46,39 @@ export function DesignTokenPreview() {
             </Text>
           </View>
         ))}
-
-        {/* Typography Styles */}
-        <Text style={styles.subSectionTitle}>Typography Styles</Text>
-        <View style={styles.typographyStylesGrid}>
-          <View style={styles.typographyStyleItem}>
-            <Text style={styles.componentLabel}>Heading XL</Text>
-            <Text style={Typography.styles.heading('xl')}>Heading XL Sample</Text>
-          </View>
-          <View style={styles.typographyStyleItem}>
-            <Text style={styles.componentLabel}>Heading 2XL</Text>
-            <Text style={Typography.styles.heading('2xl')}>Heading 2XL Sample</Text>
-          </View>
-          <View style={styles.typographyStyleItem}>
-            <Text style={styles.componentLabel}>Subheading LG</Text>
-            <Text style={Typography.styles.subheading('lg')}>Subheading LG Sample</Text>
-          </View>
-          <View style={styles.typographyStyleItem}>
-            <Text style={styles.componentLabel}>Body Base</Text>
-            <Text style={Typography.styles.body('base')}>Body Base Sample</Text>
-          </View>
-          <View style={styles.typographyStyleItem}>
-            <Text style={styles.componentLabel}>Label SM</Text>
-            <Text style={Typography.styles.label('sm')}>Label SM Sample</Text>
-          </View>
-        </View>
       </View>
 
       {/* Spacing Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Spacing Tokens</Text>
-        <View style={styles.spacingGrid}>
-          {Object.entries(DesignSystem.spacing).map(([size, value]) => (
-            <View key={size} style={styles.spacingItem}>
-              <View style={[styles.spacingBox, { width: value, height: value }]} />
-              <Text style={styles.spacingLabel}>{size}: {value}px</Text>
-            </View>
-          ))}
-        </View>
+        {Object.entries(DesignSystem.spacing).map(([size, value]) => (
+          <View key={size} style={styles.spacingItem}>
+            <Text style={styles.spacingLabel}>{size}: {value}px</Text>
+            <View style={[styles.spacingBox, { width: value, height: 20 }]} />
+          </View>
+        ))}
       </View>
 
       {/* Border Radius Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Border Radius Tokens</Text>
-        <View style={styles.borderRadiusGrid}>
-          {Object.entries(DesignSystem.borderRadius).map(([size, value]) => (
-            <View key={size} style={styles.borderRadiusItem}>
-              <View style={[styles.borderRadiusBox, { borderRadius: value }]} />
-              <Text style={styles.borderRadiusLabel}>{size}: {value}px</Text>
-            </View>
-          ))}
-        </View>
+        {Object.entries(DesignSystem.borderRadius).map(([size, value]) => (
+          <View key={size} style={styles.radiusItem}>
+            <Text style={styles.radiusLabel}>{size}: {value}px</Text>
+            <View style={[styles.radiusBox, { borderRadius: value }]} />
+          </View>
+        ))}
       </View>
 
       {/* Shadow Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Shadow Tokens</Text>
-        <View style={styles.shadowGrid}>
-          {Object.entries(DesignSystem.shadow).map(([size, shadowStyle]) => (
-            <View key={size} style={styles.shadowItem}>
-              <View style={[styles.shadowBox, shadowStyle]} />
-              <Text style={styles.shadowLabel}>{size} shadow</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {/* Component Tokens Previews */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Component Tokens</Text>
-
-        {/* Button Components */}
-        <Text style={styles.subSectionTitle}>Buttons</Text>
-        <View style={styles.componentGrid}>
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Primary Button</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('primary')}>
-              <Text style={componentHelpers.getButtonTextStyle('primary')}>Primary Button</Text>
-            </TouchableOpacity>
+        {Object.entries(DesignSystem.shadow).map(([size, shadowProps]) => (
+          <View key={size} style={styles.shadowItem}>
+            <Text style={styles.shadowLabel}>{size}</Text>
+            <View style={[styles.shadowBox, shadowProps]} />
           </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Secondary Button</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('secondary')}>
-              <Text style={componentHelpers.getButtonTextStyle('secondary')}>Secondary Button</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Small Button</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('small')}>
-              <Text style={ComponentTextStyles.button.small}>Small Button</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Text Button</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('text')}>
-              <Text style={componentHelpers.getButtonTextStyle('text')}>Text Button</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Dharma Button</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('dharma')}>
-              <Text style={ComponentTextStyles.button.dharma}>Dharma Button</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Card Components */}
-        <Text style={styles.subSectionTitle}>Cards</Text>
-        <View style={styles.componentGrid}>
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Standard Card</Text>
-            <View style={[componentHelpers.getCardStyle('standard'), styles.cardPreview]}>
-              <Text style={componentHelpers.getCardTextStyle('title')}>Card Title</Text>
-              <Text style={componentHelpers.getCardTextStyle('body')}>This is a standard card with sample content to show the styling.</Text>
-              <Text style={componentHelpers.getCardTextStyle('metadata')}>Metadata • Info</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Practice Card</Text>
-            <View style={[componentHelpers.getCardStyle('practice'), styles.cardPreview]}>
-              <Text style={componentHelpers.getCardTextStyle('subtitle')}>Practice Card</Text>
-              <Text style={componentHelpers.getCardTextStyle('body')}>Practice session content and details.</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Course Card</Text>
-            <View style={[componentHelpers.getCardStyle('course'), styles.cardPreview]}>
-              <Text style={componentHelpers.getCardTextStyle('title')}>Course Title</Text>
-              <Text style={componentHelpers.getCardTextStyle('body')}>Course description and learning materials.</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Status Card</Text>
-            <View style={[componentHelpers.getCardStyle('status'), styles.cardPreview]}>
-              <Text style={ComponentTextStyles.buddhist.completionText}>✅ Completed</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Input Components */}
-        <Text style={styles.subSectionTitle}>Inputs</Text>
-        <View style={styles.componentGrid}>
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Standard Input</Text>
-            <TextInput 
-              style={ComponentTokens.input.standard}
-              placeholder="Standard input field"
-              placeholderTextColor={DesignSystem.colors.textSecondary}
-            />
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Search Input</Text>
-            <TextInput 
-              style={ComponentTokens.input.search}
-              placeholder="Search..."
-              placeholderTextColor={DesignSystem.colors.textSecondary}
-            />
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Textarea Input</Text>
-            <TextInput 
-              style={ComponentTokens.input.textarea}
-              placeholder="Enter multiple lines of text..."
-              placeholderTextColor={DesignSystem.colors.textSecondary}
-              multiline
-            />
-          </View>
-        </View>
-
-        {/* Progress Components */}
-        <Text style={styles.subSectionTitle}>Progress Bars</Text>
-        <View style={styles.componentGrid}>
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Standard Progress (60%)</Text>
-            <View style={ComponentTokens.progress.bar.container}>
-              <View style={[ComponentTokens.progress.bar.fill, { width: '60%' }]} />
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Course Progress (75%)</Text>
-            <View style={ComponentTokens.progress.course.container}>
-              <View style={[ComponentTokens.progress.course.fill, { width: '75%' }]} />
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Practice Progress (45%)</Text>
-            <View style={ComponentTokens.progress.practice.container}>
-              <View style={[ComponentTokens.progress.practice.fill, { width: '45%' }]} />
-            </View>
-          </View>
-        </View>
-
-        {/* Modal Components */}
-        <Text style={styles.subSectionTitle}>Modal Styles</Text>
-        <View style={styles.componentGrid}>
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Standard Modal</Text>
-            <View style={[componentHelpers.getModalStyle('standard'), styles.modalPreview]}>
-              <Text style={ComponentTextStyles.header.section}>Modal Title</Text>
-              <Text style={ComponentTextStyles.card.body}>Modal content goes here...</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Alert Modal</Text>
-            <View style={[componentHelpers.getModalStyle('alert'), styles.modalPreview]}>
-              <Text style={ComponentTextStyles.header.section}>Alert!</Text>
-              <Text style={ComponentTextStyles.card.body}>Important message</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Modal Overlay</Text>
-            <View style={[componentHelpers.getModalStyle('overlay'), styles.overlayPreview]}>
-              <Text style={[ComponentTextStyles.card.body, { color: DesignSystem.colors.textInverse }]}>Overlay Background</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Buddhist Components */}
-        <Text style={styles.subSectionTitle}>Buddhist Components</Text>
-        <View style={styles.componentGrid}>
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Dharma Card</Text>
-            <View style={[componentHelpers.getBuddhistStyle('dharmaCard'), styles.cardPreview]}>
-              <Text style={componentHelpers.getBuddhistTextStyle('dharmaTitle')}>Dharma Practice</Text>
-              <Text style={componentHelpers.getBuddhistTextStyle('practiceText')}>Buddhist practice content with special styling.</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Meditation Card</Text>
-            <View style={[componentHelpers.getBuddhistStyle('meditationCard'), styles.cardPreview]}>
-              <Text style={ComponentTextStyles.card.subtitle}>Meditation Session</Text>
-              <Text style={componentHelpers.getBuddhistTextStyle('practiceText')}>Deep contemplation practice.</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Wisdom Badge</Text>
-            <View style={componentHelpers.getBuddhistStyle('wisdomBadge')}>
-              <Text style={componentHelpers.getBuddhistTextStyle('wisdomText')}>Wisdom</Text>
-            </View>
-          </View>
-          
-          <View style={styles.componentItem}>
-            <Text style={styles.componentLabel}>Completion Badge</Text>
-            <View style={componentHelpers.getBuddhistStyle('completionBadge')}>
-              <Text style={componentHelpers.getBuddhistTextStyle('completionText')}>Completed</Text>
-            </View>
-          </View>
-        </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -316,83 +87,27 @@ export function DesignTokenPreview() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.background,
+    padding: DesignSystem.spacing.lg,
   },
   title: {
     ...Typography.styles.heading('2xl'),
-    textAlign: 'center',
     marginBottom: DesignSystem.spacing.xl,
-    color: DesignSystem.colors.textPrimary,
+    textAlign: 'center',
   },
   section: {
-    marginBottom: DesignSystem.spacing['2xl'],
+    marginBottom: DesignSystem.spacing['3xl'],
   },
   sectionTitle: {
-    ...Typography.styles.heading('xl'),
+    ...Typography.styles.subheading('xl'),
     marginBottom: DesignSystem.spacing.lg,
-    color: DesignSystem.colors.textPrimary,
+    color: DesignSystem.colors.primary,
   },
   subSectionTitle: {
     ...Typography.styles.subheading('lg'),
     marginTop: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.md,
-    color: DesignSystem.colors.textSecondary,
   },
-
-  // Component Grids
-  componentGrid: {
-    gap: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  componentItem: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  componentLabel: {
-    ...Typography.styles.label('sm'),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    marginBottom: DesignSystem.spacing.sm,
-    color: DesignSystem.colors.textSecondary,
-    textTransform: 'capitalize' as const,
-  },
-  buttonText: {
-    color: DesignSystem.colors.textInverse,
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
-  inputPlaceholder: {
-    color: DesignSystem.colors.textSecondary,
-  },
-  cardPreview: {
-    marginHorizontal: 0,
-    marginVertical: 0,
-    maxWidth: '100%',
-  },
-  modalPreview: {
-    minHeight: 80,
-    maxWidth: '90%',
-    margin: 0,
-  },
-  overlayPreview: {
-    minHeight: 60,
-    maxWidth: '90%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: DesignSystem.borderRadius.md,
-  },
-
-  // Typography Styles Grid
-  typographyStylesGrid: {
-    gap: DesignSystem.spacing.md,
-  },
-  typographyStyleItem: {
-    marginBottom: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
-  },
-
-  // Color Grid
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -400,8 +115,8 @@ const styles = StyleSheet.create({
   },
   colorItem: {
     alignItems: 'center',
+    width: 100,
     marginBottom: DesignSystem.spacing.md,
-    minWidth: 100,
   },
   colorSwatch: {
     width: 60,
@@ -412,94 +127,59 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.border,
   },
   colorName: {
-    ...Typography.styles.label('sm'),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    ...Typography.styles.label('xs'),
     textAlign: 'center',
   },
   colorValue: {
-    ...Typography.styles.label('xs'),
-    color: DesignSystem.colors.textSecondary,
+    ...Typography.styles.caption(),
     textAlign: 'center',
   },
-
-  // Typography Grid
   typographyItem: {
-    marginBottom: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.borderLight,
   },
   sampleText: {
     color: DesignSystem.colors.textPrimary,
   },
-
-  // Spacing Grid
-  spacingGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.md,
-  },
   spacingItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
-    minWidth: 120,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  spacingLabel: {
+    ...Typography.styles.label('sm'),
+    width: 100,
   },
   spacingBox: {
     backgroundColor: DesignSystem.colors.primary,
-    marginBottom: DesignSystem.spacing.xs,
-    minWidth: 20,
-    minHeight: 20,
+    marginLeft: DesignSystem.spacing.md,
   },
-  spacingLabel: {
-    ...Typography.styles.label('xs'),
-    color: DesignSystem.colors.textPrimary,
-    textAlign: 'center',
-  },
-
-  // Border Radius Grid
-  borderRadiusGrid: {
+  radiusItem: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.md,
-  },
-  borderRadiusItem: {
     alignItems: 'center',
     marginBottom: DesignSystem.spacing.md,
-    minWidth: 100,
   },
-  borderRadiusBox: {
+  radiusLabel: {
+    ...Typography.styles.label('sm'),
+    width: 100,
+  },
+  radiusBox: {
     width: 60,
-    height: 60,
-    backgroundColor: DesignSystem.colors.primary,
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  borderRadiusLabel: {
-    ...Typography.styles.label('xs'),
-    color: DesignSystem.colors.textPrimary,
-    textAlign: 'center',
-  },
-
-  // Shadow Grid
-  shadowGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.lg,
+    height: 40,
+    backgroundColor: DesignSystem.colors.primaryLight,
+    marginLeft: DesignSystem.spacing.md,
   },
   shadowItem: {
-    alignItems: 'center',
     marginBottom: DesignSystem.spacing.lg,
-    minWidth: 100,
-  },
-  shadowBox: {
-    width: 60,
-    height: 60,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    marginBottom: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.md,
   },
   shadowLabel: {
-    ...Typography.styles.label('xs'),
-    color: DesignSystem.colors.textPrimary,
-    textAlign: 'center',
+    ...Typography.styles.label('sm'),
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  shadowBox: {
+    width: 100,
+    height: 60,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
   },
 });
