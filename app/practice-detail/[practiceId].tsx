@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -547,7 +546,7 @@ export default function PracticeDetailScreen() {
           {/* Project Details */}
           <View style={styles.projectDetails}>
             <Text style={styles.projectDetailsTitle}>项目详情</Text>
-            
+
             <View style={styles.detailsGrid}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>开始日期</Text>
@@ -642,12 +641,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: DesignSystem.spacing.xl,
+    paddingBottom: 0,
   },
   mainCard: {
     ...ComponentTokens.card.practice,
-    margin: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.md,
+    margin: 0,
+    marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   practiceHeader: {
     paddingHorizontal: DesignSystem.spacing.xl,
@@ -687,9 +691,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.background,
-    marginHorizontal: DesignSystem.spacing.xl,
+    marginHorizontal: 0,
+    marginVertical: 0,
     borderRadius: DesignSystem.borderRadius.lg,
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: 0,
+    marginTop: 0,
   },
   progressDetails: {
     marginBottom: DesignSystem.spacing.md,
@@ -793,8 +799,13 @@ const styles = StyleSheet.create({
   },
   recordsCard: {
     ...ComponentTokens.card.practice,
-    margin: DesignSystem.spacing.lg,
+    margin: 0,
     marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   recordsHeader: {
     flexDirection: 'row',
