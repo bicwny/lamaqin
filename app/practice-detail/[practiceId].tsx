@@ -494,13 +494,20 @@ export default function PracticeDetailScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Combined Practice Info and Details Card */}
+        {/* Unified Practice Header Card */}
         <View style={styles.infoCard}>
-          <View style={styles.practiceTypeContainer}>
-            <Text style={styles.practiceType}>
-              {project.practices.type === 'count' ? '计数类' : '计时类'}
-              {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
-            </Text>
+          {/* Combined Type and Status Header */}
+          <View style={styles.headerRow}>
+            <View style={styles.typeStatusContainer}>
+              <Text style={styles.practiceType}>
+                {project.practices.type === 'count' ? '计数类' : '计时类'}
+                {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
+              </Text>
+              <Text style={styles.practiceDisplayType}>
+                {practiceDisplayType}
+                {project.practices.type === 'time' && totalWeeks && ` · ${totalWeeks}周`}
+              </Text>
+            </View>
             {progress.isCompleted && (
               <View style={styles.completedBadge}>
                 <Text style={styles.completedText}>✅ 已完成</Text>
@@ -508,10 +515,9 @@ export default function PracticeDetailScreen() {
             )}
           </View>
 
+          {/* Practice Title and Description */}
           <Text style={styles.practiceTitle}>
             {project.practices.name}
-            {project.practices.type === 'time' && ` (${practiceDisplayType})`}
-            {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
           </Text>
 
           {project.practices.description && (
@@ -520,30 +526,36 @@ export default function PracticeDetailScreen() {
             </Text>
           )}
 
-          {/* Project Details Section */}
-          <View style={styles.detailsSection}>
-            <Text style={styles.detailsSectionTitle}>项目详情</Text>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>开始日期：</Text>
-              <Text style={styles.detailValue}>{project.start_date}</Text>
-            </View>
-
-            {project.target_end_date && (
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>目标结束日期：</Text>
-                <Text style={styles.detailValue}>{project.target_end_date}</Text>
+          {/* Integrated Project Details */}
+          <View style={styles.projectInfoGrid}>
+            <View style={styles.infoGridRow}>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>开始日期</Text>
+                <Text style={styles.infoValue}>{project.start_date}</Text>
               </View>
-            )}
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>项目状态：</Text>
-              <Text style={[
-                styles.detailValue,
-                progress.isCompleted ? styles.statusCompleted : styles.statusActive
-              ]}>
-                {progress.isCompleted ? '已完成' : '进行中'}
-              </Text>
+              {project.target_end_date && (
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>目标结束</Text>
+                  <Text style={styles.infoValue}>{project.target_end_date}</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.infoGridRow}>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>项目状态</Text>
+                <Text style={[
+                  styles.infoValue,
+                  progress.isCompleted ? styles.statusCompleted : styles.statusActive
+                ]}>
+                  {progress.isCompleted ? '已完成' : '进行中'}
+                </Text>
+              </View>
+              {!project.target_end_date && (
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>类型</Text>
+                  <Text style={styles.infoValue}>持续进行</Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -632,15 +644,26 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
   },
   infoCard: ComponentTokens.card.practice,
-  practiceTypeContainer: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
+    alignItems: 'flex-start',
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  typeStatusContainer: {
+    flex: 1,
+    marginRight: DesignSystem.spacing.md,
   },
   practiceType: {
     ...Typography.styles.label('sm'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  practiceDisplayType: {
+    ...Typography.styles.label('xs'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textSecondary,
   },
   completedBadge: ComponentTokens.buddhist.completionBadge,
   completedText: {
@@ -735,36 +758,36 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.button.primary,
     letterSpacing: DesignSystem.typography.letterSpacing.tighter,
   },
-  detailsSection: {
-    marginTop: DesignSystem.spacing['3xl'],
-    paddingTop: DesignSystem.spacing['3xl'],
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.borderLight,
+  projectInfoGrid: {
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.lg,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.borderLight,
   },
-  detailsSectionTitle: {
-    ...Typography.styles.subheading('lg'),
-    marginBottom: DesignSystem.spacing['2xl'],
-  },
-  detailRow: {
+  infoGridRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: DesignSystem.spacing.lg,
-    minHeight: 24,
+    marginBottom: DesignSystem.spacing.md,
   },
-  detailLabel: {
-    ...Typography.styles.body('base'),
+  infoItem: {
+    flex: 1,
+    marginHorizontal: DesignSystem.spacing.xs,
+  },
+  infoLabel: {
+    ...Typography.styles.label('xs'),
     color: DesignSystem.colors.textSecondary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-    flex: 1,
-    marginRight: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: DesignSystem.typography.letterSpacing.wider,
   },
-  detailValue: {
-    ...Typography.styles.body('base'),
+  infoValue: {
+    ...Typography.styles.body('sm'),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.textPrimary,
-    flex: 1,
-    textAlign: 'right',
+    lineHeight: DesignSystem.typography.lineHeight.normal,
   },
   statusCompleted: {
     color: DesignSystem.colors.practiceComplete,
