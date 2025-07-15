@@ -496,9 +496,11 @@ export default function PracticeDetailScreen() {
         }
       >
         {/* Main Practice Info Card */}
-        <View style={styles.mainCard}>
+        <View style={[styles.mainCard, { borderWidth: 2, borderColor: 'red', position: 'relative' }]}>
+          <Text style={styles.debugLabel}>mainCard</Text>
           {/* Practice Type and Status Header */}
-          <View style={styles.practiceHeader}>
+          <View style={[styles.practiceHeader, { borderWidth: 2, borderColor: 'green', position: 'relative' }]}>
+            <Text style={styles.debugLabel}>practiceHeader</Text></View>
             <View style={styles.practiceTypeRow}>
               <Text style={styles.practiceType}>
                 {project.practices.type === 'count' ? '计数类' : '计时类'}
@@ -523,7 +525,8 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Progress Section */}
-          <View style={styles.progressSection}>
+          <View style={[styles.progressSection, { borderWidth: 2, borderColor: 'blue', position: 'relative' }]}>
+            <Text style={styles.debugLabel}>progressSection</Text></View>
             {renderProgressDetails()}
 
             {project.practices.type === 'count' && (
@@ -544,7 +547,8 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Project Details */}
-          <View style={styles.projectDetails}>
+          <View style={[styles.projectDetails, { borderWidth: 2, borderColor: 'orange', position: 'relative' }]}>
+            <Text style={styles.debugLabel}>projectDetails</Text></View>
             <Text style={styles.projectDetailsTitle}>项目详情</Text>
 
             <View style={styles.detailsGrid}>
@@ -573,7 +577,8 @@ export default function PracticeDetailScreen() {
           </View>
 
           {/* Action Buttons */}
-          <View style={styles.actionButtons}>
+          <View style={[styles.actionButtons, { borderWidth: 2, borderColor: 'magenta', position: 'relative' }]}>
+            <Text style={styles.debugLabel}>actionButtons</Text></View>
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleEditPractice}
@@ -595,8 +600,10 @@ export default function PracticeDetailScreen() {
         </View>
 
         {/* Recent Records Card */}
-        <View style={styles.recordsCard}>
-          <View style={styles.recordsHeader}>
+        <View style={[styles.recordsCard, { borderWidth: 2, borderColor: 'purple', position: 'relative' }]}>
+          <Text style={styles.debugLabel}>recordsCard</Text></view>
+          <View style={[styles.recordsHeader, { borderWidth: 2, borderColor: 'cyan', position: 'relative' }]}>
+            <Text style={styles.debugLabel}>recordsHeader</Text></view>
             <Text style={styles.recordsTitle}>最近记录</Text>
             <TouchableOpacity
               style={styles.viewAllButton}
@@ -607,7 +614,8 @@ export default function PracticeDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.recordsList}>
+          <View style={[styles.recordsList, { borderWidth: 2, borderColor: 'yellow', position: 'relative' }]}>
+            <Text style={styles.debugLabel}>recordsList</Text></view>
             {renderRecentRecords()}
           </View>
         </View>
