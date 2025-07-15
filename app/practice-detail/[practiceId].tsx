@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   mainCard: {
     ...ComponentTokens.card.practice,
@@ -650,8 +650,8 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   practiceHeader: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
     paddingBottom: DesignSystem.spacing.lg,
   },
   practiceTypeRow: {
@@ -684,10 +684,10 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
   },
   progressSection: {
-    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.background,
-    marginHorizontal: DesignSystem.spacing.xl,
+    marginHorizontal: DesignSystem.spacing.lg,
     borderRadius: DesignSystem.borderRadius.lg,
     marginBottom: DesignSystem.spacing.lg,
   },
@@ -731,7 +731,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   projectDetails: {
-    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingBottom: DesignSystem.spacing.lg,
   },
   projectDetailsTitle: {
@@ -766,8 +766,8 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     gap: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   primaryButton: {
     ...ComponentTokens.button.primary,
@@ -800,8 +800,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
     paddingBottom: DesignSystem.spacing.lg,
   },
   recordsTitle: {
@@ -818,8 +818,8 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   recordsList: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   noRecordsText: {
     ...Typography.styles.body('base'),
