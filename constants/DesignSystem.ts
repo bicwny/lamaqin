@@ -45,29 +45,38 @@ export const DesignSystem = {
       lg: 18,
       xl: 20,
       '2xl': 24,
-      '3xl': 32,
+      '3xl': 30,
+      '4xl': 32,
+      '5xl': 36,
     },
     
     // Font weights
     fontWeight: {
+      light: '300',
       normal: '400',
       medium: '500',
       semibold: '600',
       bold: '700',
+      extrabold: '800',
     },
     
     // Line heights
     lineHeight: {
-      tight: 1.2,
+      none: 1,
+      tight: 1.25,
+      snug: 1.375,
       normal: 1.5,
-      relaxed: 1.6,
+      relaxed: 1.625,
+      loose: 2,
     },
     
     // Letter spacing
     letterSpacing: {
+      tighter: -0.2,
       tight: -0.3,
       normal: 0,
       wide: 0.1,
+      wider: 0.15,
     },
   },
   
@@ -207,6 +216,15 @@ export const createStyles = {
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
     letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.lineHeight.tight,
+  }),
+  
+  subheading: (size: keyof typeof DesignSystem.typography.fontSize = 'lg') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.lineHeight.snug,
   }),
   
   body: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
@@ -214,6 +232,51 @@ export const createStyles = {
     fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textSecondary,
     lineHeight: DesignSystem.typography.lineHeight.normal,
+  }),
+  
+  label: (size: keyof typeof DesignSystem.typography.fontSize = 'sm') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.lineHeight.snug,
+  }),
+  
+  caption: () => ({
+    fontSize: DesignSystem.typography.fontSize.xs,
+    fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textTertiary,
+    lineHeight: DesignSystem.typography.lineHeight.tight,
+  }),
+  
+  // Buddhist semantic text styles
+  dharmaTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.lineHeight.tight,
+  }),
+  
+  practiceText: () => ({
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textPrimary,
+    lineHeight: DesignSystem.typography.lineHeight.relaxed,
+  }),
+  
+  // Interactive text styles
+  buttonText: (variant: 'primary' | 'secondary' = 'primary') => ({
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+    color: variant === 'primary' ? DesignSystem.colors.textInverse : DesignSystem.colors.primary,
+  }),
+  
+  linkText: () => ({
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
+    letterSpacing: DesignSystem.typography.letterSpacing.normal,
   }),
   
   // Layout styles
