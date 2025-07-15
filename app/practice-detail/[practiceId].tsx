@@ -490,65 +490,41 @@ export default function PracticeDetailScreen() {
       padding={0}
     >
       <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Combined Practice Info and Details Card */}
-        <View style={styles.infoCard}>
-          <View style={styles.practiceTypeContainer}>
-            <Text style={styles.practiceType}>
-              {project.practices.type === 'count' ? '计数类' : '计时类'}
-              {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
-            </Text>
-            {progress.isCompleted && (
-              <View style={styles.completedBadge}>
-                <Text style={styles.completedText}>✅ 已完成</Text>
-              </View>
-            )}
-          </View>
-
-          <Text style={styles.practiceTitle}>
-            {project.practices.name}
-            {project.practices.type === 'time' && ` (${practiceDisplayType})`}
-            {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
-          </Text>
-
-          {project.practices.description && (
-            <Text style={styles.practiceDescription}>
-              {project.practices.description}
-            </Text>
-          )}
-
-          {/* Project Details Section */}
-          <View style={styles.detailsSection}>
-            <Text style={styles.detailsSectionTitle}>项目详情</Text>
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>开始日期：</Text>
-              <Text style={styles.detailValue}>{project.start_date}</Text>
-            </View>
-
-            {project.target_end_date && (
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>目标结束日期：</Text>
-                <Text style={styles.detailValue}>{project.target_end_date}</Text>
-              </View>
-            )}
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>项目状态：</Text>
-              <Text style={[
-                styles.detailValue,
-                progress.isCompleted ? styles.statusCompleted : styles.statusActive
-              ]}>
-                {progress.isCompleted ? '已完成' : '进行中'}
+        {/* Main Practice Info Card */}
+        <View style={styles.mainCard}>
+          {/* Practice Type and Status Header */}
+          <View style={styles.practiceHeader}>
+            <View style={styles.practiceTypeRow}>
+              <Text style={styles.practiceType}>
+                {project.practices.type === 'count' ? '计数类' : '计时类'}
+                {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
               </Text>
+              {progress.isCompleted && (
+                <View style={styles.completedBadge}>
+                  <Text style={styles.completedText}>✅ 已完成</Text>
+                </View>
+              )}
             </View>
+
+            <Text style={styles.practiceTitle}>
+              {project.practices.name}
+            </Text>
+
+            {project.practices.description && (
+              <Text style={styles.practiceDescription}>
+                {project.practices.description}
+              </Text>
+            )}
           </View>
 
           {/* Progress Section */}
-          <View style={styles.progressContainer}>
+          <View style={styles.progressSection}>
             {renderProgressDetails()}
 
             {project.practices.type === 'count' && (
@@ -568,8 +544,37 @@ export default function PracticeDetailScreen() {
             )}
           </View>
 
+          {/* Project Details */}
+          <View style={styles.projectDetails}>
+            <Text style={styles.projectDetailsTitle}>项目详情</Text>
+            
+            <View style={styles.detailsGrid}>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>开始日期</Text>
+                <Text style={styles.detailValue}>{project.start_date}</Text>
+              </View>
+
+              {project.target_end_date && (
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailLabel}>目标结束日期</Text>
+                  <Text style={styles.detailValue}>{project.target_end_date}</Text>
+                </View>
+              )}
+
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>项目状态</Text>
+                <Text style={[
+                  styles.detailValue,
+                  progress.isCompleted ? styles.statusCompleted : styles.statusActive
+                ]}>
+                  {progress.isCompleted ? '已完成' : '进行中'}
+                </Text>
+              </View>
+            </View>
+          </View>
+
           {/* Action Buttons */}
-          <View style={styles.actionButtonsContainer}>
+          <View style={styles.actionButtons}>
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={handleEditPractice}
@@ -590,10 +595,10 @@ export default function PracticeDetailScreen() {
           </View>
         </View>
 
-        {/* Recent Records Section */}
-        <View style={styles.historyCard}>
-          <View style={styles.historyHeader}>
-            <Text style={styles.historyTitle}>最近记录</Text>
+        {/* Recent Records Card */}
+        <View style={styles.recordsCard}>
+          <View style={styles.recordsHeader}>
+            <Text style={styles.recordsTitle}>最近记录</Text>
             <TouchableOpacity
               style={styles.viewAllButton}
               onPress={handleViewHistory}
@@ -603,7 +608,9 @@ export default function PracticeDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          {renderRecentRecords()}
+          <View style={styles.recordsList}>
+            {renderRecentRecords()}
+          </View>
         </View>
       </ScrollView>
     </PageTemplate>
@@ -631,22 +638,34 @@ const styles = StyleSheet.create({
     ...Typography.styles.subheading('lg'),
     color: DesignSystem.colors.textSecondary,
   },
-  infoCard: {
-    ...ComponentTokens.card.practice,
-    padding: DesignSystem.spacing.xl,
-    marginHorizontal: DesignSystem.spacing.lg,
-    marginVertical: DesignSystem.spacing.sm,
+  scrollContainer: {
+    flex: 1,
   },
-  practiceTypeContainer: {
+  scrollContent: {
+    paddingBottom: DesignSystem.spacing.xl,
+  },
+  mainCard: {
+    ...ComponentTokens.card.practice,
+    margin: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.md,
+  },
+  practiceHeader: {
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.lg,
+  },
+  practiceTypeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.lg,
   },
   practiceType: {
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textSecondary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   completedBadge: {
     ...ComponentTokens.buddhist.completionBadge,
@@ -656,36 +675,46 @@ const styles = StyleSheet.create({
   },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.md,
+    lineHeight: DesignSystem.typography.lineHeight.tight * DesignSystem.typography.fontSize['2xl'],
   },
   practiceDescription: {
     ...Typography.styles.body('base'),
     lineHeight: DesignSystem.typography.lineHeight.relaxed * DesignSystem.typography.fontSize.base,
-    marginBottom: DesignSystem.spacing.lg,
+    color: DesignSystem.colors.textSecondary,
   },
-  progressContainer: {
+  progressSection: {
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.background,
+    marginHorizontal: DesignSystem.spacing.xl,
+    borderRadius: DesignSystem.borderRadius.lg,
     marginBottom: DesignSystem.spacing.lg,
   },
   progressDetails: {
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.md,
   },
   progressText: {
     ...Typography.styles.subheading('lg'),
-    marginBottom: DesignSystem.spacing.xxs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   dailyTargetText: {
     ...Typography.styles.label('sm'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textSecondary,
   },
   sessionDetails: {
     ...Typography.styles.label('sm'),
     fontStyle: 'italic',
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textSecondary,
+    marginTop: DesignSystem.spacing.xs,
   },
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.sm,
   },
   progressBar: {
     ...ComponentTokens.progress.practice.container,
@@ -701,48 +730,22 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: 'right',
   },
-  actionButtonsContainer: {
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.xl,
+  projectDetails: {
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.lg,
   },
-  primaryButton: {
-    ...ComponentTokens.button.primary,
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: DesignSystem.spacing.sm,
-  },
-  secondaryButton: {
-    ...ComponentTokens.button.secondary,
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: DesignSystem.spacing.xxs,
-  },
-  secondaryButtonText: {
-    ...ComponentTextStyles.button.secondary,
-  },
-  buttonText: {
-    ...ComponentTextStyles.button.primary,
-  },
-  detailsSection: {
-    marginTop: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.borderLight,
-  },
-  detailsSectionTitle: {
+  projectDetailsTitle: {
     ...Typography.styles.subheading('lg'),
     marginBottom: DesignSystem.spacing.lg,
   },
-  detailRow: {
+  detailsGrid: {
+    gap: DesignSystem.spacing.md,
+  },
+  detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   detailLabel: {
     ...Typography.styles.body('base'),
@@ -760,37 +763,70 @@ const styles = StyleSheet.create({
   statusActive: {
     color: DesignSystem.colors.primary,
   },
-  noRecordsText: {
-    ...Typography.styles.body('base'),
-    color: DesignSystem.colors.textSecondary,
-    textAlign: 'center',
-    paddingVertical: DesignSystem.spacing.xl,
-    fontStyle: 'italic',
+  actionButtons: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
-  historyCard: {
+  primaryButton: {
+    ...ComponentTokens.button.primary,
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.sm,
+  },
+  secondaryButton: {
+    ...ComponentTokens.button.secondary,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.xs,
+  },
+  secondaryButtonText: {
+    ...ComponentTextStyles.button.secondary,
+  },
+  buttonText: {
+    ...ComponentTextStyles.button.primary,
+  },
+  recordsCard: {
     ...ComponentTokens.card.practice,
-    padding: DesignSystem.spacing.xl,
-    marginHorizontal: DesignSystem.spacing.lg,
-    marginVertical: DesignSystem.spacing.sm,
+    margin: DesignSystem.spacing.lg,
+    marginTop: 0,
   },
-  historyHeader: {
+  recordsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.lg,
   },
-  historyTitle: {
+  recordsTitle: {
     ...Typography.styles.subheading('lg'),
   },
   viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.xxs,
+    gap: DesignSystem.spacing.xs,
   },
   viewAllText: {
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.primary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
+  },
+  recordsList: {
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
+  },
+  noRecordsText: {
+    ...Typography.styles.body('base'),
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: DesignSystem.spacing['2xl'],
+    fontStyle: 'italic',
   },
   recordItem: {
     marginBottom: DesignSystem.spacing.lg,
@@ -818,7 +854,7 @@ const styles = StyleSheet.create({
     ...Typography.styles.body('base'),
     color: DesignSystem.colors.textPrimary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-    marginBottom: DesignSystem.spacing.xxs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   recordNotes: {
     backgroundColor: DesignSystem.colors.background,
@@ -832,7 +868,7 @@ const styles = StyleSheet.create({
     ...Typography.styles.label('sm'),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.xxs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   notesText: {
     ...Typography.styles.label('sm'),
