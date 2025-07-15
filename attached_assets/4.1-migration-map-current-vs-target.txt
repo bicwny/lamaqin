@@ -1,0 +1,385 @@
+
+# Phase 4.1: Migration Map - Current vs Target State
+
+## Overview
+This document provides a comprehensive mapping of the current styling implementation vs the target DesignSystem.ts implementation, serving as a roadmap for systematic migration.
+
+## Migration Status Summary
+
+### Phase Completion Status
+- ✅ **Phase 1: Audit & Documentation** (100% Complete)
+- ✅ **Phase 2: DesignSystem.ts Expansion** (100% Complete)  
+- ✅ **Phase 3: Migration Utilities** (100% Complete)
+- 🔄 **Phase 4: File Migration** (Starting Now)
+
+## Current State Analysis
+
+### 1. Import Dependencies
+**Current State:**
+```typescript
+// Multiple files still using old Colors.ts
+import { Colors } from '@/constants/Colors';
+import Colors from '@/constants/Colors';
+```
+
+**Target State:**
+```typescript
+// All files should use new DesignSystem.ts
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
+import { Typography } from '@/utils/typography';
+```
+
+### 2. Color Implementation
+
+#### 2.1 Hardcoded Color Values
+**Current State (25+ instances found):**
+```typescript
+// Text colors
+color: '#1a1a1a'        → DesignSystem.colors.textPrimary
+color: '#666666'        → DesignSystem.colors.textSecondary
+color: '#ffffff'        → DesignSystem.colors.textInverse
+
+// Background colors
+backgroundColor: '#f8f9fa'   → DesignSystem.colors.background
+backgroundColor: '#ffffff'  → DesignSystem.colors.backgroundSecondary
+
+// Primary colors
+backgroundColor: '#da4347'  → DesignSystem.colors.primary
+borderColor: '#da4347'     → DesignSystem.colors.primary
+
+// Border colors
+borderColor: '#e9ecef'     → DesignSystem.colors.border
+borderColor: '#f0f0f0'     → DesignSystem.colors.borderLight
+
+// Status colors
+backgroundColor: '#2e7d32' → DesignSystem.colors.practiceComplete
+backgroundColor: '#e8f5e8' → DesignSystem.colors.successBackground
+```
+
+#### 2.2 Colors.ts References
+**Current State:**
+```typescript
+// Found in practice-detail and other files
+Colors.light.text         → DesignSystem.colors.textPrimary
+Colors.light.background   → DesignSystem.colors.background
+Colors.primary           → DesignSystem.colors.primary
+```
+
+**Target State:**
+All Colors.* references eliminated, using semantic DesignSystem.colors tokens.
+
+### 3. Typography Implementation
+
+#### 3.1 Hardcoded Font Values
+**Current State (50+ instances found):**
+```typescript
+// Font sizes
+fontSize: 12    → DesignSystem.typography.fontSize.xs
+fontSize: 14    → DesignSystem.typography.fontSize.sm
+fontSize: 16    → DesignSystem.typography.fontSize.base
+fontSize: 18    → DesignSystem.typography.fontSize.lg
+fontSize: 20    → DesignSystem.typography.fontSize.xl
+fontSize: 24    → DesignSystem.typography.fontSize['2xl']
+
+// Font weights
+fontWeight: '400'  → DesignSystem.typography.fontWeight.normal
+fontWeight: '500'  → DesignSystem.typography.fontWeight.medium
+fontWeight: '600'  → DesignSystem.typography.fontWeight.semibold
+fontWeight: '700'  → DesignSystem.typography.fontWeight.bold
+
+// Letter spacing
+letterSpacing: -0.2  → DesignSystem.typography.letterSpacing.tighter
+letterSpacing: -0.1  → DesignSystem.typography.letterSpacing.normal
+```
+
+**Target State:**
+```typescript
+// Using Typography utility functions
+...Typography.styles.heading('2xl')
+...Typography.styles.body('base')
+...Typography.styles.label('sm')
+
+// Or direct DesignSystem references
+fontSize: DesignSystem.typography.fontSize.base
+fontWeight: DesignSystem.typography.fontWeight.semibold
+```
+
+### 4. Spacing Implementation
+
+#### 4.1 Hardcoded Spacing Values
+**Current State (60+ instances found):**
+```typescript
+// Padding values
+padding: 20              → DesignSystem.spacing.xl
+paddingVertical: 16      → DesignSystem.spacing.lg
+paddingHorizontal: 20    → DesignSystem.spacing.xl
+paddingVertical: 12      → DesignSystem.spacing.md
+
+// Margin values
+marginBottom: 16         → DesignSystem.spacing.lg
+marginBottom: 12         → DesignSystem.spacing.md
+marginBottom: 8          → DesignSystem.spacing.sm
+marginHorizontal: 16     → DesignSystem.spacing.lg
+
+// Border radius
+borderRadius: 12         → DesignSystem.borderRadius.lg
+borderRadius: 8          → DesignSystem.borderRadius.md
+borderRadius: 16         → DesignSystem.borderRadius.xl
+```
+
+**Target State:**
+All hardcoded spacing values replaced with DesignSystem.spacing tokens.
+
+### 5. Component Pattern Implementation
+
+#### 5.1 Button Patterns
+**Current State:**
+```typescript
+// Inconsistent button styling across files
+primaryButton: {
+  backgroundColor: '#da4347',
+  paddingVertical: 16,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#ffffff',
+}
+```
+
+**Target State:**
+```typescript
+// Consistent component tokens
+primaryButton: ComponentTokens.button.primary,
+// Or helper function
+primaryButton: componentHelpers.getButtonStyle('primary'),
+```
+
+#### 5.2 Card Patterns
+**Current State:**
+```typescript
+// Inconsistent card styling
+practiceCard: {
+  backgroundColor: '#ffffff',
+  borderRadius: 12,
+  padding: 16,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 4,
+}
+```
+
+**Target State:**
+```typescript
+// Consistent component tokens
+practiceCard: ComponentTokens.card.practice,
+```
+
+## File-by-File Migration Map
+
+### Priority 1: High-Impact Files (Start Here)
+
+#### 1. app/practice-detail/[practiceId].tsx
+**Current Issues:**
+- ❌ Using `Colors` import (causing console error)
+- ❌ 50+ hardcoded style declarations
+- ❌ Inconsistent button patterns
+- ❌ Hardcoded colors: 8+ instances
+- ❌ Hardcoded spacing: 15+ instances
+
+**Migration Plan:**
+1. Fix Colors import → DesignSystem imports
+2. Apply button migration templates
+3. Apply card migration templates
+4. Migrate all hardcoded colors and spacing
+5. Use Typography utility functions
+
+**Estimated Impact:** 🔴 Critical (blocks app functionality)
+
+#### 2. app/(tabs)/study.tsx
+**Current Issues:**
+- ❌ 30+ style declarations
+- ❌ Course card patterns
+- ❌ Progress bar styling
+- ❌ Hardcoded colors: 6+ instances
+
+**Migration Plan:**
+1. Apply course card templates
+2. Apply progress bar templates
+3. Migrate hardcoded values
+
+**Estimated Impact:** 🟡 High (major user screen)
+
+#### 3. components/ModalTemplate.tsx
+**Current Issues:**
+- ❌ Template affects entire app
+- ❌ Modal styling patterns
+- ❌ Overlay background
+
+**Migration Plan:**
+1. Apply modal templates
+2. Update overlay styling
+3. Use component tokens
+
+**Estimated Impact:** 🟡 High (affects all modals)
+
+### Priority 2: Medium-Impact Files
+
+#### 4. app/(tabs)/practice.tsx
+**Current Issues:**
+- ❌ 25+ style declarations
+- ❌ Practice card patterns
+- ❌ Button inconsistencies
+
+#### 5. app/course-detail/[courseId].tsx
+**Current Issues:**
+- ❌ 20+ style declarations
+- ❌ Course-specific styling
+- ❌ Progress indicators
+
+#### 6. app/(tabs)/index.tsx
+**Current Issues:**
+- ❌ 15+ style declarations
+- ❌ Home screen layout
+- ❌ Card patterns
+
+### Priority 3: Lower-Impact Files
+
+#### 7. components/PageHeader.tsx
+#### 8. components/ActionButtonRow.tsx
+#### 9. app/profile.tsx
+#### 10. app/meditation-history.tsx
+
+## Migration Templates Ready for Use
+
+### 1. Button Templates
+- ✅ Primary button pattern
+- ✅ Secondary button pattern  
+- ✅ Small button pattern
+- ✅ Text button pattern
+- ✅ Dharma button pattern
+
+### 2. Card Templates
+- ✅ Standard card pattern
+- ✅ Practice card pattern
+- ✅ Course card pattern
+- ✅ Status card pattern
+
+### 3. Input Templates
+- ✅ Standard input pattern
+- ✅ Search input pattern
+- ✅ Textarea pattern
+
+### 4. Text Templates
+- ✅ Page title pattern
+- ✅ Section title pattern
+- ✅ Body text pattern
+- ✅ Label pattern
+
+### 5. Layout Templates
+- ✅ Page container pattern
+- ✅ Section container pattern
+
+## Automated Migration Tools Ready
+
+### 1. MigrationUtils
+- ✅ Pattern matching and replacement
+- ✅ Color migration mapping
+- ✅ Spacing migration mapping
+- ✅ Full style transformation
+
+### 2. FileTransformer
+- ✅ Complete file transformation
+- ✅ Import replacement
+- ✅ Style pattern replacement
+- ✅ Migration reporting
+
+### 3. Validation Tools
+- ✅ Hardcoded value detection
+- ✅ Design token validation
+- ✅ Migration success verification
+
+## Expected Outcomes After Migration
+
+### 1. Code Quality Improvements
+- **Consistency**: All components use same design tokens
+- **Maintainability**: Single source of truth for styling
+- **Type Safety**: Full TypeScript support
+- **Performance**: Reduced bundle size
+
+### 2. Design System Benefits
+- **Scalability**: Easy to add new components
+- **Theme Support**: Foundation for dark/light themes
+- **Accessibility**: Consistent sizing and contrast
+- **Buddhist Semantics**: Meaningful color naming
+
+### 3. Developer Experience
+- **IntelliSense**: Better autocomplete support
+- **Error Prevention**: TypeScript catches style mismatches
+- **Documentation**: Self-documenting design tokens
+- **Rapid Development**: Pre-built component patterns
+
+## Next Steps
+
+### Immediate Actions (Day 4)
+1. **Start with practice-detail file** (fixes critical console error)
+2. **Apply migration templates systematically**
+3. **Generate migration reports for each file**
+4. **Validate each migration thoroughly**
+
+### Week 1 Goals
+- ✅ Complete Priority 1 files (practice-detail, study, ModalTemplate)
+- ✅ Eliminate all Colors.ts imports
+- ✅ Resolve console errors
+- ✅ Validate design consistency
+
+### Week 2 Goals
+- ✅ Complete Priority 2 files (practice, course-detail, index)
+- ✅ Migrate all hardcoded colors and spacing
+- ✅ Implement component token usage
+
+### Success Metrics
+- **0 console errors** related to Colors.ts
+- **0 hardcoded hex values** in codebase
+- **0 hardcoded spacing values** in codebase
+- **100% DesignSystem.ts adoption** across all files
+- **Consistent visual appearance** maintained
+
+## Tools and Resources Available
+
+### Migration Commands
+```bash
+# Apply migration to specific file
+FileTransformer.transformFile(content, 'practice-detail.tsx')
+
+# Generate migration report
+FileTransformer.generateMigrationReport(before, after, filename)
+
+# Validate migration success
+MigrationUtils.fullMigration(styleObject)
+```
+
+### Template Application
+```typescript
+// Apply button template
+const buttonStyle = MigrationTemplates.button.primary.apply();
+
+// Apply card template
+const cardStyle = MigrationTemplates.card.practice.apply();
+
+// Apply full migration
+const migratedStyles = MigrationUtils.fullMigration(originalStyles);
+```
+
+---
+
+## Status: Ready for Implementation
+✅ All migration tools and templates are implemented and ready
+✅ File priority order established
+✅ Migration patterns documented
+✅ Success metrics defined
+
+**Next Action**: Begin with practice-detail file migration to resolve critical console error and establish migration workflow.
