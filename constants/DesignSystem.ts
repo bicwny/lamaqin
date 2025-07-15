@@ -1,6 +1,6 @@
 
 export const DesignSystem = {
-  // Colors
+  // Colors - Complete color system
   colors: {
     // Primary colors
     primary: '#da4347',
@@ -33,6 +33,17 @@ export const DesignSystem = {
     cardBackground: '#ffffff',
     modalBackground: '#ffffff',
     overlayBackground: 'rgba(0, 0, 0, 0.5)',
+    
+    // Tab colors
+    tabIconDefault: '#999999',
+    tabIconSelected: '#da4347',
+    
+    // Icon colors
+    icon: '#666666',
+    
+    // Theme-aware colors
+    tint: '#da4347',
+    surface: '#ffffff',
   },
   
   // Typography
@@ -130,13 +141,13 @@ export const DesignSystem = {
         minHeight: 48,
       },
       secondary: {
-        backgroundColor: '#f2f2f7',
+        backgroundColor: '#ffffff',
         paddingVertical: 16,
         paddingHorizontal: 20,
         borderRadius: 12,
         minHeight: 48,
         borderWidth: 1,
-        borderColor: '#e9ecef',
+        borderColor: '#da4347',
       },
       text: {
         primary: {
