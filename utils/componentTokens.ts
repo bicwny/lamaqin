@@ -160,51 +160,12 @@ export const ComponentTokens = {
     },
   },
 
-  // Progress tokens with DesignSystem references
+  // Progress tokens - consolidated into single component with size variants
   progress: {
-    bar: {
-      container: {
-        height: DesignSystem.spacing.sm,
-        backgroundColor: DesignSystem.colors.border,
-        borderRadius: DesignSystem.borderRadius.sm,
-        overflow: 'hidden' as const,
-      },
-      fill: {
-        height: '100%' as const,
-        backgroundColor: DesignSystem.colors.primary,
-        borderRadius: DesignSystem.borderRadius.sm,
-      },
-    },
-    
-    course: {
-      container: {
-        height: DesignSystem.spacing.md,
-        backgroundColor: DesignSystem.colors.borderLight,
-        borderRadius: DesignSystem.spacing.xxs,
-        overflow: 'hidden' as const,
-      },
-      fill: {
-        height: '100%' as const,
-        backgroundColor: DesignSystem.colors.studyProgress,
-        borderRadius: DesignSystem.spacing.xxs,
-      },
-    },
-    
-    practice: {
-      container: {
-        height: DesignSystem.spacing.base,
-        backgroundColor: DesignSystem.colors.background,
-        borderRadius: 5,
-        overflow: 'hidden' as const,
-        borderWidth: 1,
-        borderColor: DesignSystem.colors.border,
-      },
-      fill: {
-        height: '100%' as const,
-        backgroundColor: DesignSystem.colors.dharmaRed,
-        borderRadius: DesignSystem.borderRadius.sm,
-      },
-    },
+    // Legacy support - maps to new ProgressBar component sizes
+    thin: 'thin' as const,     // Replaces: progress.bar (height: 8px)
+    medium: 'medium' as const, // Replaces: progress.course (height: 12px)
+    thick: 'thick' as const,   // Replaces: progress.practice (height: 10px)
   },
 
   // Modal tokens with DesignSystem references
@@ -449,8 +410,8 @@ export const componentHelpers = {
   getCardTextStyle: (variant: keyof typeof ComponentTextStyles.card) => 
     ComponentTextStyles.card[variant],
   
-  // Get progress bar styles
-  getProgressStyle: (variant: keyof typeof ComponentTokens.progress) => 
+  // Get progress bar size (for new ProgressBar component)
+  getProgressSize: (variant: keyof typeof ComponentTokens.progress) => 
     ComponentTokens.progress[variant],
   
   // Get modal style

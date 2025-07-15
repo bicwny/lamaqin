@@ -19,6 +19,7 @@ import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
+import ProgressBar from '@/components/ProgressBar';
 
 interface PracticeProject {
   id: string;
@@ -529,14 +530,11 @@ export default function PracticeDetailScreen() {
 
             {project.practices.type === 'count' && (
               <View style={styles.progressBarContainer}>
-                <View style={styles.progressBar}>
-                  <View 
-                    style={[
-                      styles.progressFill, 
-                      { width: `${Math.min(progress.percentage, 100)}%` }
-                    ]} 
-                  />
-                </View>
+                <ProgressBar 
+                  progress={progress.percentage} 
+                  size="thick" 
+                  containerStyle={{ flex: 1 }}
+                />
                 <Text style={styles.progressPercentage}>
                   {Math.round(progress.percentage)}%
                 </Text>
@@ -716,13 +714,7 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
     marginTop: DesignSystem.spacing.sm,
   },
-  progressBar: {
-    ...ComponentTokens.progress.practice.container,
-    flex: 1,
-  },
-  progressFill: {
-    ...ComponentTokens.progress.practice.fill,
-  },
+  
   progressPercentage: {
     fontSize: DesignSystem.typography.fontSize.base,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
