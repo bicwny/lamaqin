@@ -28,8 +28,8 @@ const SIZE_CONFIG = {
     borderRadius: DesignSystem.spacing.xxs,
   },
   thick: {
-    height: 10,
-    borderRadius: 5,
+    height: 16,
+    borderRadius: 8,
   },
 } as const;
 
