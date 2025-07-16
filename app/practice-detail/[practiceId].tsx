@@ -654,10 +654,6 @@ const styles = StyleSheet.create({
   mainCard: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
-    borderColor: DesignSystem.colors.borderLight,
-    borderWidth: 1,
-    // margin: DesignSystem.spacing.lg,
-    // marginBottom: DesignSystem.spacing.md,
   },
   practiceHeader: {
     paddingHorizontal: DesignSystem.spacing.xl,
