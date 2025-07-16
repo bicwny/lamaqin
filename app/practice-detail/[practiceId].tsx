@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
   
   // Section 1: Practice & Timeline
   section1: {
-    //paddingBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   completedBadge: {
     paddingVertical: DesignSystem.spacing.xs,
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   // Divider
   divider: {
     ...ComponentTokens.divider.horizontal,
-    // marginVertical: DesignSystem.spacing.lg,
+    marginVertical: DesignSystem.spacing.lg,
   },
 
   // Section 2: Progress Info
