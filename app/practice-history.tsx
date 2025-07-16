@@ -355,8 +355,6 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
-    margin: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.sm,
     padding: ComponentTokens.card.padding.spacious,
   },
   summaryTitle: {
@@ -388,8 +386,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recordsSection: {
-    margin: DesignSystem.spacing.lg,
-    marginTop: DesignSystem.spacing.sm,
+    // margin: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.xl,
   },
   sectionTitle: {
     ...ComponentTextStyles.subheading,

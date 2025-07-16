@@ -68,8 +68,7 @@ export default function PracticeRecordCard({
     } else {
       return (
         <Text style={styles.recordCount}>
-          {showActions ? "数量: " : "+"}
-          {record.count?.toLocaleString()} {practiceUnit}
+          +{record.count?.toLocaleString()} {practiceUnit}
         </Text>
       );
     }
@@ -104,7 +103,7 @@ export default function PracticeRecordCard({
 
         {record.notes && (
           <View style={styles.notesContainer}>
-            {showActions && <Text style={styles.notesLabel}>备注:</Text>}
+
             <Text style={styles.notesText} numberOfLines={showActions ? 3 : 2}>
               {record.notes}
             </Text>
@@ -129,13 +128,13 @@ export default function PracticeRecordCard({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.deleteButton, isDeleting && styles.disabledButton]}
+            style={[styles.editButton, isDeleting && styles.disabledButton]}
             onPress={onDelete}
             disabled={isDeleting}
           >
             <Text
               style={[
-                styles.deleteButtonText,
+                styles.editButtonText,
                 isDeleting && styles.disabledButtonText,
               ]}
             >
