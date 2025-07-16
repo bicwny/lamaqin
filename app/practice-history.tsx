@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -14,9 +15,12 @@ import {
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
+import ProgressBar from '@/components/ProgressBar';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
+import { Typography } from '@/utils/typography';
 
 interface DailyRecord {
   id: string;
@@ -248,10 +252,10 @@ export default function PracticeHistoryScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>正在加载...</Text>
         </View>
       </PageTemplate>
@@ -268,7 +272,7 @@ export default function PracticeHistoryScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
       contentContainerStyle={{
         refreshControl: (
@@ -289,12 +293,11 @@ export default function PracticeHistoryScreen() {
             </Text>
           </View>
 
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { width: `${Math.min(progress.percentage, 100)}%` }
-              ]} 
+          <View style={styles.progressBarContainer}>
+            <ProgressBar 
+              progress={progress.percentage} 
+              size="thick" 
+              containerStyle={{ flex: 1 }}
             />
           </View>
 
@@ -328,7 +331,7 @@ export default function PracticeHistoryScreen() {
                   >
                     {isDeleting && (
                       <View style={styles.deletingOverlay}>
-                        <ActivityIndicator color="#dc3545" size="small" />
+                        <ActivityIndicator color={DesignSystem.colors.destructive} size="small" />
                         <Text style={styles.deletingText}>删除中...</Text>
                       </View>
                     )}
@@ -394,177 +397,141 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#666',
+    ...ComponentTextStyles.body,
+    marginTop: DesignSystem.spacing.md,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   summaryCard: {
-    backgroundColor: 'white',
-    margin: 16,
-    marginBottom: 8,
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...ComponentTokens.card.variants.outlined,
+    margin: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.sm,
+    padding: ComponentTokens.card.padding.spacious,
   },
   summaryTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
+    ...ComponentTextStyles.subheading,
     textAlign: 'center',
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.md,
   },
   progressText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   progressPercentage: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.primary,
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
   },
-  progressBar: {
-    height: 8,
-    backgroundColor: '#e9ecef',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.primary,
-    borderRadius: 4,
+  progressBarContainer: {
+    marginBottom: DesignSystem.spacing.md,
   },
   dailyTarget: {
-    fontSize: 14,
-    color: '#666',
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
   },
   recordsSection: {
-    margin: 16,
-    marginTop: 8,
+    margin: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.sm,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.md,
   },
   emptyContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 40,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   emptyText: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 8,
+    ...ComponentTextStyles.subheading,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#999',
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
   },
   recordsList: {
-    gap: 12,
+    gap: DesignSystem.spacing.md,
   },
   recordCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...ComponentTokens.card.variants.outlined,
+    padding: DesignSystem.spacing.lg,
   },
   recordHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    paddingBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.md,
+    borderBottomWidth: ComponentTokens.divider.thickness.thin,
+    borderBottomColor: ComponentTokens.divider.colors.light,
   },
   recordDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   recordTime: {
-    fontSize: 14,
-    color: '#666',
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
   },
   recordContent: {
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.md,
   },
   recordCount: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    marginBottom: DesignSystem.spacing.sm,
   },
   notesContainer: {
-    marginTop: 8,
-    padding: 12,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
+    marginTop: DesignSystem.spacing.sm,
+    padding: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.surface,
+    borderRadius: DesignSystem.borderRadius.md,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: DesignSystem.colors.primary,
   },
   notesLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    ...ComponentTextStyles.label,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.xs,
   },
   notesText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+    ...ComponentTextStyles.body,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.relaxed,
   },
   recordActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 12,
+    gap: DesignSystem.spacing.md,
   },
   editButton: {
-    backgroundColor: '#007bff',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    ...ComponentTokens.button.variants.secondary,
+    ...ComponentTokens.button.sizes.small,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   editButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
+    ...ComponentTextStyles.button.secondary,
   },
   deleteButton: {
-    backgroundColor: '#dc3545',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    ...ComponentTokens.button.variants.destructive,
+    ...ComponentTokens.button.sizes.small,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   deleteButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
+    ...ComponentTextStyles.button.primary,
   },
   recordCardDeleting: {
     opacity: 0.6,
@@ -580,14 +547,14 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
+    borderRadius: DesignSystem.borderRadius.lg,
     flexDirection: 'row',
-    gap: 8,
+    gap: DesignSystem.spacing.sm,
   },
   deletingText: {
-    color: '#dc3545',
-    fontSize: 14,
-    fontWeight: '500',
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.destructive,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   disabledContent: {
     opacity: 0.5,
