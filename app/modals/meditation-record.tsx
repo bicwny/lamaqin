@@ -213,7 +213,19 @@ export default function MeditationRecordScreen() {
             </Text>
           </View>
 
-          <View style={styles.headerRight} />
+          <View style={styles.headerRight}>
+            <TouchableOpacity 
+              style={[styles.saveHeaderButton, loading && styles.saveHeaderButtonDisabled]}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
+              ) : (
+                <Text style={styles.saveHeaderButtonText}>保存</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Content */}
@@ -279,18 +291,7 @@ export default function MeditationRecordScreen() {
               </Text>
             </View>
 
-            {/* Save Button */}
-            <TouchableOpacity 
-              style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-              onPress={handleSave}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color={DesignSystem.colors.textInverse} />
-              ) : (
-                <Text style={styles.saveButtonText}>💾 保存记录</Text>
-              )}
-            </TouchableOpacity>
+            
           </View>
         </ScrollView>
         
@@ -405,19 +406,22 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     padding: DesignSystem.spacing.xl,
   },
-  saveButton: {
-    backgroundColor: DesignSystem.colors.warning,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingVertical: DesignSystem.spacing.lg,
+  saveHeaderButton: {
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.primary,
+    borderRadius: DesignSystem.borderRadius.sm,
+    minWidth: 60,
     alignItems: 'center',
-    marginTop: DesignSystem.spacing.lg,
+    justifyContent: 'center',
   },
-  saveButtonDisabled: {
+  saveHeaderButtonDisabled: {
     opacity: 0.6,
   },
-  saveButtonText: {
+  saveHeaderButtonText: {
     ...createStyles.buttonText('primary'),
-    color: DesignSystem.colors.textPrimary,
-    fontSize: DesignSystem.typography.fontSize.lg,
+    color: DesignSystem.colors.textInverse,
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
 });
