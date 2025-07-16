@@ -3,9 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
@@ -13,9 +12,11 @@ import { router, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
-import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
+import ProgressBar from '@/components/ProgressBar';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
+import { presetProjectNameService } from '@/lib/database';
 import { toastService } from '@/lib/toast';
 
 interface PracticeProject {
@@ -204,7 +205,7 @@ export default function PracticeScreen() {
           onPress: handleAddPractice
         }}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
@@ -222,7 +223,7 @@ export default function PracticeScreen() {
           onPress: handleAddPractice
         }}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
         padding={0}
       >
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -259,7 +260,7 @@ export default function PracticeScreen() {
           onPress: handleAddPractice
         }}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
         padding={0}
       >
         <ScrollView 
@@ -497,213 +498,152 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-
   loadingText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-    marginTop: 16,
+    marginTop: DesignSystem.spacing.lg,
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
-  manageButton: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  practiceCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-  },
-  practiceHeader: {
-    marginBottom: 8,
-  },
-  practiceType: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  totalSessions: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-    marginBottom: 12,
-  },
-  practiceNameRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    gap: 12,
-  },
-  practiceName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    flex: 1,
-    flexShrink: 1,
-  },
-  projectNamePill: {
-    backgroundColor: '#E5E7EB',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-    flexShrink: 0,
-  },
-  projectNameText: {
-    fontSize: 12,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-    letterSpacing: -0.1,
-  },
-  practiceInfo: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  practiceDetails: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  progressContainer: {
-    marginBottom: 16,
-  },
-  weeklyProgress: {
-    marginTop: 8,
-  },
-  weeklyProgressText: {
-    fontSize: 14,
-    color: '#1a1a1a',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  weeklyProgressSubtext: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  primaryButton: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  secondaryButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  emptyState: {
+  emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    minHeight: 500,
-  },
-  iconContainer: {
-    marginBottom: 24,
+    padding: DesignSystem.spacing['4xl'],
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginBottom: 12,
+    ...ComponentTextStyles.heading,
+    marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...ComponentTextStyles.body,
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-    maxWidth: 280,
+    marginBottom: DesignSystem.spacing['4xl'],
   },
-  browseButton: {
+  addButton: {
+    ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.medium,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    ...ComponentTextStyles.button.primary,
+  },
+  projectCard: {
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginVertical: ComponentTokens.card.margin.compact,
+  },
+  activeProjectCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: DesignSystem.colors.primary,
+  },
+  inactiveProjectCard: {
+    opacity: 0.7,
+  },
+  projectHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  projectInfo: {
+    flex: 1,
+    marginRight: DesignSystem.spacing.md,
+  },
+  practiceName: {
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  projectName: {
+    ...ComponentTextStyles.label,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  statusBadge: {
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.borderRadius.md,
+    alignSelf: 'flex-start',
+  },
+  activeBadge: {
+    backgroundColor: DesignSystem.colors.successBackground,
+  },
+  inactiveBadge: {
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+  },
+  statusText: {
+    ...ComponentTextStyles.caption,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+  },
+  activeStatusText: {
+    color: DesignSystem.colors.practiceComplete,
+  },
+  inactiveStatusText: {
+    color: DesignSystem.colors.textSecondary,
+  },
+  progressSection: {
+    marginBottom: DesignSystem.spacing.md,
+  },
+  progressText: {
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  progressSubtext: {
+    ...ComponentTextStyles.label,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
+    gap: DesignSystem.spacing.md,
   },
-  browseButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-    marginLeft: 8,
+  progressPercentage: {
+    ...ComponentTextStyles.label,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
+    minWidth: 40,
+    textAlign: 'right',
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+  },
+  actionButton: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  primaryAction: {
+    ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.small,
+  },
+  secondaryAction: {
+    ...ComponentTokens.button.variants.secondary,
+    ...ComponentTokens.button.sizes.small,
+  },
+  primaryActionText: {
+    ...ComponentTextStyles.button.primary,
+    fontSize: DesignSystem.typography.fontSize.sm,
+  },
+  secondaryActionText: {
+    ...ComponentTextStyles.button.secondary,
+    fontSize: DesignSystem.typography.fontSize.sm,
+  },
+  fab: {
+    position: 'absolute',
+    right: DesignSystem.spacing.lg,
+    bottom: DesignSystem.spacing.lg,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: DesignSystem.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...DesignSystem.shadow.lg,
   },
 });
