@@ -106,6 +106,20 @@ export const spacingHelpers = {
     marginHorizontal: DesignSystem.spacing[horizontal],
   }),
   
+  // Get single margin value by variant name
+  getMargin: (variant: 'none' | 'tight' | 'compact' | 'comfortable' | 'spacious' | 'loose' | 'extraLoose') => {
+    const marginMap = {
+      none: 0,
+      tight: DesignSystem.spacing.xs,
+      compact: DesignSystem.spacing.sm,
+      comfortable: DesignSystem.spacing.md,
+      spacious: DesignSystem.spacing.lg,
+      loose: DesignSystem.spacing.xl,
+      extraLoose: DesignSystem.spacing['2xl'],
+    };
+    return marginMap[variant];
+  },
+  
   // Get consistent gap for flex layouts
   gap: (size: keyof typeof DesignSystem.spacing) => ({
     gap: DesignSystem.spacing[size],

@@ -107,6 +107,17 @@ export const ComponentTokens = {
       spacious: DesignSystem.spacing.xl,     // 20px (was standard/course)
     },
     
+    // Margin variations
+    margin: {
+      none: 0,                               // No margin
+      tight: DesignSystem.spacing.xs,        // 4px - minimal spacing
+      compact: DesignSystem.spacing.sm,      // 8px - close proximity
+      comfortable: DesignSystem.spacing.md,  // 12px - balanced spacing
+      spacious: DesignSystem.spacing.lg,     // 16px - generous spacing
+      loose: DesignSystem.spacing.xl,        // 20px - wide spacing
+      extraLoose: DesignSystem.spacing['2xl'], // 24px - maximum spacing
+    },
+    
     // Legacy support - maps old variants to new system
     legacy: {
       standard: { variant: 'outlined' as const, padding: 'spacious' as const },
@@ -461,6 +472,17 @@ export const componentHelpers = {
   ) => ({
     ...ComponentTokens.card.variants[variant],
     padding: ComponentTokens.card.padding[padding],
+  }),
+  
+  // Get card style with custom margin
+  getCardWithMargin: (
+    variant: 'outlined' | 'elevated',
+    padding: 'compact' | 'comfortable' | 'spacious' = 'comfortable',
+    margin: keyof typeof ComponentTokens.card.margin = 'comfortable'
+  ) => ({
+    ...ComponentTokens.card.variants[variant],
+    padding: ComponentTokens.card.padding[padding],
+    margin: ComponentTokens.card.margin[margin],
   }),
   
   // Legacy card style support
