@@ -319,10 +319,10 @@ export default function PracticeDetailScreen() {
         );
       }
 
-      return recentRecords.map((record, index) => (
+      return recentRecords.map((record) => (
         <TouchableOpacity
           key={record.id}
-          style={index < recentRecords.length - 1 ? styles.recordItemWithDivider : styles.recordItem}
+          style={styles.recordItem}
           onPress={() => router.push({
             pathname: '/meditation-detail/[recordId]',
             params: { recordId: record.id }
@@ -352,8 +352,8 @@ export default function PracticeDetailScreen() {
         );
       }
 
-      return practiceRecords.slice(0, 5).map((record, index) => (
-        <View key={record.id} style={index < practiceRecords.length - 1 ? styles.recordItemWithDivider : styles.recordItem}>
+      return practiceRecords.slice(0, 5).map((record) => (
+        <View key={record.id} style={styles.recordItem}>
           <View style={styles.recordHeader}>
             <Text style={styles.recordDate}>
               {new Date(record.record_date).toLocaleDateString('zh-CN')}
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     padding: ComponentTokens.card.padding.comfortable,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-
+  
   // Section 1: Practice & Timeline
   section1: {
     // paddingBottom: DesignSystem.spacing.lg,
@@ -761,15 +761,16 @@ const styles = StyleSheet.create({
   recordsCard: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.spacious,
+    margin: DesignSystem.spacing.lg,
+    marginTop: 0,
   },
   recordsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // paddingHorizontal: DesignSystem.spacing.xl,
-    // paddingTop: DesignSystem.spacing.xl,
-    // paddingBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   recordsTitle: {
     ...Typography.styles.subheading('lg'),
@@ -785,8 +786,8 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   recordsList: {
-    // paddingHorizontal: DesignSystem.spacing.xl,
-    // paddingBottom: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   noRecordsText: {
     ...Typography.styles.body('base'),
@@ -796,35 +797,32 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   recordItem: {
-    paddingVertical: DesignSystem.spacing.md,
-  },
-  recordItemWithDivider: {
-    paddingVertical: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.borderLight,
-    marginBottom: DesignSystem.spacing.sm,
   },
   recordHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // marginBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   recordDate: {
-    ...Typography.styles.body('sm'),
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    ...Typography.styles.body('base'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.textPrimary,
   },
   recordTime: {
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textSecondary,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   recordCount: {
     ...Typography.styles.body('base'),
     color: DesignSystem.colors.textPrimary,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
-    // marginBottom: DesignSystem.spacing.xs,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.xs,
   },
   recordNotes: {
     backgroundColor: DesignSystem.colors.background,
