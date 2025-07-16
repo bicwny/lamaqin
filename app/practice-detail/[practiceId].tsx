@@ -16,7 +16,7 @@ import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
+import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import ProgressBar from '@/components/ProgressBar';
 import PracticeRecordCard from '@/components/PracticeRecordCard';
@@ -597,9 +597,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: DesignSystem.spacing.md,
     ...ComponentTextStyles.body,
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    marginTop: DesignSystem.spacing.md,
   },
   emptyContainer: {
     flex: 1,
@@ -617,15 +617,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: DesignSystem.spacing.xl,
   },
-  mainCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.spacious,
-  },
+  mainCard: componentHelpers.getCardWithMargin('outlined', 'comfortable', 'spacious'),
 
   // Section 1: Practice & Timeline
   section1: {
-    // paddingBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   practiceHeaderRow: {
     flexDirection: 'row',
@@ -650,11 +646,11 @@ const styles = StyleSheet.create({
   },
 
   // Divider
-  divider: ComponentTokens.divider.horizontal,
+  divider: componentHelpers.getDividerStyle('horizontal', 'thin', 'default', 'normal'),
 
   // Section 2: Progress Info
   section2: {
-    // paddingBottom: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   countRow: {
     flexDirection: 'row',
@@ -663,8 +659,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.sm,
   },
   currentCount: {
-    ...ComponentTextStyles.subheading,
-    fontSize: DesignSystem.typography.fontSize.xl,
+    ...Typography.styles.heading('xl'),
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
   },
@@ -683,7 +678,7 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
   },
   progressPercentage: {
-    fontSize: DesignSystem.typography.fontSize.base,
+    ...Typography.styles.body('base'),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.primary,
     minWidth: 50,
@@ -709,37 +704,29 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
   },
   secondaryButtonNew: {
-    ...ComponentTokens.button.variants.secondary,
-    ...ComponentTokens.button.sizes.medium,
+    ...componentHelpers.getButtonStyle('secondary', 'medium'),
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonNew: {
-    ...ComponentTokens.button.variants.primary,
-    ...ComponentTokens.button.sizes.medium,
+    ...componentHelpers.getButtonStyle('primary', 'medium'),
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryButtonTextNew: {
-    ...ComponentTextStyles.button.secondary,
+    ...componentHelpers.getButtonTextStyle('secondary', 'medium'),
   },
   primaryButtonTextNew: {
-    ...ComponentTextStyles.button.primary,
+    ...componentHelpers.getButtonTextStyle('primary', 'medium'),
   },
-  recordsCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.spacious,
-  },
+  recordsCard: componentHelpers.getCardWithMargin('outlined', 'comfortable', 'spacious'),
   recordsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    //paddingHorizontal: DesignSystem.spacing.xl,
-    //paddingTop: DesignSystem.spacing.xl,
-    //paddingBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.md,
   },
   recordsTitle: {
     ...ComponentTextStyles.subheading,
@@ -754,14 +741,14 @@ const styles = StyleSheet.create({
     fontSize: DesignSystem.typography.fontSize.sm,
   },
   recordsList: {
-    //paddingHorizontal: DesignSystem.spacing.xl,
-    //paddingBottom: DesignSystem.spacing.xl,
+    gap: DesignSystem.spacing.sm,
   },
   noRecordsText: {
     ...ComponentTextStyles.body,
     textAlign: 'center',
     paddingVertical: DesignSystem.spacing['2xl'],
     fontStyle: 'italic',
+    color: DesignSystem.colors.textSecondary,
   },
   programRow: {
     flexDirection: 'row',
