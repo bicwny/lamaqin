@@ -268,7 +268,7 @@ export default function PracticeScreen() {
             style={[styles.actionButton, styles.viewDetailsButton]}
             onPress={() => handleViewDetails(item.id, item.practices.name)}
           >
-            <Text style={styles.actionButtonText}>详情</Text>
+            <Text style={styles.primaryButtonText}>详情</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -459,5 +459,8 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     ...ComponentTextStyles.button.secondary,
+  },
+  primaryButtonText: {
+    ...ComponentTextStyles.button.primary,
   },
 });
