@@ -193,7 +193,7 @@ export default function MeditationRecordScreen() {
       keyboardAvoidingView={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
         <View style={styles.formContainer}>
-          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+          <Text style={styles.practiceTitle}>{practiceName}</Text>
 
           {/* Duration Input */}
           <View style={styles.inputSection}>
@@ -282,9 +282,9 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xl,
   },
   practiceTitle: {
-    ...createStyles.dharmaTitle('2xl'),
+    ...createStyles.dharmaTitle('xl'),
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing['2xl'],
+    marginBottom: DesignSystem.spacing['lg'],
     paddingBottom: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   topicSelector: {
     ...ComponentTokens.input.standard,
-    paddingVertical: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -339,9 +339,9 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.borderRadius.md,
     paddingVertical: DesignSystem.spacing.lg,
     alignItems: 'center',
-    marginTop: DesignSystem.spacing['2xl'],
-    marginBottom: DesignSystem.spacing['3xl'],
-    ...DesignSystem.shadow.md,
+    // marginTop: DesignSystem.spacing['2xl'],
+    // marginBottom: DesignSystem.spacing['3xl'],
+    // ...DesignSystem.shadow.md,
   },
   saveButtonDisabled: {
     opacity: 0.6,
