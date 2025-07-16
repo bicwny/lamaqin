@@ -697,12 +697,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: DesignSystem.spacing.sm,
     marginBottom: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.background,
-    borderRadius: DesignSystem.borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.primary,
   },
   programNameLabel: {
     ...Typography.styles.label('sm'),
@@ -711,10 +705,10 @@ const styles = StyleSheet.create({
     marginRight: DesignSystem.spacing.xs,
   },
   programNameText: {
-    ...Typography.styles.body('base'),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
-    flex: 1,
+    ...ComponentTokens.badge.pill.small,
+    backgroundColor: DesignSystem.colors.primary,
+    color: DesignSystem.colors.textInverse,
+    alignSelf: 'flex-start',
   },
   progressSection: {
     paddingHorizontal: DesignSystem.spacing.xl,
