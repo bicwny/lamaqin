@@ -254,11 +254,6 @@ export default function PracticeScreen() {
               {Math.round(progress.percentage)}%
             </Text>
           </View>
-          <ProgressBar 
-            progress={progress.percentage} 
-            size="thick"
-            containerStyle={styles.progressBar}
-          />
         </View>
 
         <View style={styles.actionsContainer}>
@@ -447,10 +442,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.primary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
-  progressBar: {
-    flex: 1,
-    marginRight: 12,
-  },
+  
   actionsContainer: {
     flexDirection: "row",
     gap: DesignSystem.spacing.md,
