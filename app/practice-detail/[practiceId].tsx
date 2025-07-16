@@ -471,7 +471,7 @@ export default function PracticeDetailScreen() {
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
             {progress.isCompleted && (
-              <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.practiceComplete} style={{ marginBottom: DesignSystem.spacing.sm }} />
+              <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.practiceComplete} style={{ marginBottom: DesignSystem.spacing.sm }} />
             )}
 
             <Text style={styles.practiceTitle}>
