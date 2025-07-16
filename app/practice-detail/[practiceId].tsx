@@ -482,8 +482,6 @@ export default function PracticeDetailScreen() {
   return (
     <PageTemplate
       title={project.practices.name}
-      subtitle={project.project_name || project.preset_project_id ? 
-        `项目：${getDisplayProjectName()}` : undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
       backgroundColor={DesignSystem.colors.background}
