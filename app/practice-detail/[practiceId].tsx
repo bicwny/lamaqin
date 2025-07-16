@@ -546,33 +546,15 @@ export default function PracticeDetailScreen() {
             )}
           </View>
 
-          {/* Project Details */}
-          <View style={styles.projectDetails}>
-            <Text style={styles.projectDetailsTitle}>项目详情</Text>
-
-            <View style={styles.detailsGrid}>
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>开始日期</Text>
-                <Text style={styles.detailValue}>{project.start_date}</Text>
-              </View>
-
-              {project.target_end_date && (
-                <View style={styles.detailItem}>
-                  <Text style={styles.detailLabel}>目标结束日期</Text>
-                  <Text style={styles.detailValue}>{project.target_end_date}</Text>
-                </View>
-              )}
-
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>项目状态</Text>
-                <Text style={[
-                  styles.detailValue,
-                  progress.isCompleted ? styles.statusCompleted : styles.statusActive
-                ]}>
-                  {progress.isCompleted ? '已完成' : '进行中'}
-                </Text>
-              </View>
-            </View>
+          {/* Project Timeline */}
+          <View style={styles.projectTimeline}>
+            <Text style={styles.timelineText}>
+              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'} • 天数：{
+                project.target_end_date 
+                  ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))
+                  : '∞'
+              }天
+            </Text>
           </View>
 
           {/* Action Buttons */}
@@ -751,38 +733,16 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: 'right',
   },
-  projectDetails: {
+  projectTimeline: {
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
-  },
-  projectDetailsTitle: {
-    ...Typography.styles.subheading('lg'),
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  detailsGrid: {
-    gap: DesignSystem.spacing.md,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.sm,
   },
-  detailLabel: {
+  timelineText: {
     ...Typography.styles.body('base'),
     color: DesignSystem.colors.textSecondary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  detailValue: {
-    ...Typography.styles.body('base'),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.textPrimary,
-  },
-  statusCompleted: {
-    color: DesignSystem.colors.practiceComplete,
-  },
-  statusActive: {
-    color: DesignSystem.colors.primary,
+    textAlign: 'center',
   },
   actionButtons: {
     flexDirection: 'row',
