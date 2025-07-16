@@ -471,7 +471,9 @@ export default function PracticeDetailScreen() {
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
             {progress.isCompleted && (
-              <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.practiceComplete} style={{ marginBottom: DesignSystem.spacing.sm }} />
+              <View style={styles.completedBadge}>
+                <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.practiceComplete} />
+              </View>
             )}
 
             <Text style={styles.practiceTitle}>
@@ -613,19 +615,7 @@ const styles = StyleSheet.create({
     // paddingBottom: DesignSystem.spacing.lg,
   },
   completedBadge: {
-    paddingVertical: DesignSystem.spacing.xs,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.successBackground,
-    borderRadius: DesignSystem.borderRadius.sm,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.practiceComplete,
-    alignSelf: 'flex-start',
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  completedBadgeText: {
-    ...Typography.styles.label('sm'),
-    color: DesignSystem.colors.practiceComplete,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    ...ComponentTokens.completedBadge.container,
   },
   practiceTitle: {
     ...ComponentTextStyles.dharma,

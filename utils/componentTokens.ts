@@ -340,11 +340,20 @@ export const ComponentTokens = {
       borderColor: DesignSystem.colors.practiceComplete,
       alignSelf: 'flex-start',
       marginBottom: DesignSystem.spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 24,
+    },
+    icon: {
+      size: 16,
+      color: DesignSystem.colors.practiceComplete,
     },
     text: {
       fontSize: DesignSystem.typography.fontSize.sm,
       fontWeight: DesignSystem.typography.fontWeight.semibold,
       color: DesignSystem.colors.practiceComplete,
+      marginLeft: DesignSystem.spacing.xs,
     },
   },
 
@@ -896,6 +905,14 @@ export const componentHelpers = {
       ...colorStyle,
     };
   },
+
+  // Get completed badge style (standardized success indicator)
+  getCompletedBadgeStyle: () => ComponentTokens.completedBadge.container,
+  getCompletedBadgeIconProps: () => ({
+    name: 'checkmark-circle' as const,
+    size: ComponentTokens.completedBadge.icon.size,
+    color: ComponentTokens.completedBadge.icon.color,
+  }),
 
   // Legacy badge support
   getLegacyBadgeStyle: (legacyVariant: 'small' | 'wisdomBadge' | 'completionBadge') => {
