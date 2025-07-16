@@ -508,6 +508,17 @@ export const DesignSystem = {
         borderWidth: 1,
         borderColor: '#2e7d32',      // Will reference colors.practiceComplete
       },
+
+      // Completed practice badge (top-right indicator)
+      completedBadge: {
+        backgroundColor: '#e8f5e8',  // Will reference colors.successBackground
+        borderRadius: 8,             // Will reference borderRadius.md
+        paddingHorizontal: 8,        // Will reference spacing.sm
+        paddingVertical: 4,          // Will reference spacing.xs
+        borderWidth: 1,
+        borderColor: '#2e7d32',      // Will reference colors.practiceComplete
+        alignSelf: 'flex-start',
+      },
     },
   },
 };

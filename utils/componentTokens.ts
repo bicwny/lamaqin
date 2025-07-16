@@ -329,6 +329,25 @@ export const ComponentTokens = {
     success: DesignSystem.colors.practiceComplete, // For completion/success elements
   },
 
+  // Completed badge tokens (for practice completion indicators)
+  completedBadge: {
+    container: {
+      backgroundColor: DesignSystem.colors.successBackground,
+      borderRadius: DesignSystem.borderRadius.md,
+      paddingHorizontal: DesignSystem.spacing.sm,
+      paddingVertical: DesignSystem.spacing.xs,
+      borderWidth: 1,
+      borderColor: DesignSystem.colors.practiceComplete,
+      alignSelf: 'flex-start',
+      marginBottom: DesignSystem.spacing.sm,
+    },
+    text: {
+      fontSize: DesignSystem.typography.fontSize.sm,
+      fontWeight: DesignSystem.typography.fontWeight.semibold,
+      color: DesignSystem.colors.practiceComplete,
+    },
+  },
+
   // Badge component tokens - comprehensive system
   badge: {
     // Size variations
