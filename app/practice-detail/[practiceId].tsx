@@ -734,15 +734,15 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   projectTimeline: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.lg,
-    alignItems: 'center',
+    // paddingHorizontal: DesignSystem.spacing.xl,
+    // paddingBottom: DesignSystem.spacing.lg,
+    // alignItems: 'left',
   },
   timelineText: {
     ...Typography.styles.body('base'),
     color: DesignSystem.colors.textSecondary,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-    textAlign: 'center',
+    fontWeight: DesignSystem.typography.fontWeight.normal,
+    textAlign: 'left',
   },
   actionButtons: {
     flexDirection: 'row',
