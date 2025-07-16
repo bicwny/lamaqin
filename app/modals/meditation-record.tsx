@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -13,7 +14,9 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
-import { ComponentTokens } from '@/utils/componentTokens';
+import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
+import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
 import TopicSelectionModal from '@/components/TopicSelectionModal';
 import ModalTemplate from '@/components/ModalTemplate';
@@ -252,7 +255,7 @@ export default function MeditationRecordScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={DesignSystem.colors.textInverse} />
             ) : (
               <Text style={styles.saveButtonText}>💾 保存记录</Text>
             )}
@@ -274,40 +277,29 @@ export default function MeditationRecordScreen() {
 
 const styles = StyleSheet.create({
   formContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginBottom: DesignSystem.spacing.xl,
   },
   practiceTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
+    ...createStyles.dharmaTitle('2xl'),
     textAlign: 'center',
-    marginBottom: 24,
-    paddingBottom: 16,
+    marginBottom: DesignSystem.spacing['2xl'],
+    paddingBottom: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef'
+    borderBottomColor: DesignSystem.colors.border,
   },
   inputSection: {
-    marginBottom: 24
+    marginBottom: DesignSystem.spacing['2xl'],
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6
+    ...createStyles.subheading('base'),
+    marginBottom: DesignSystem.spacing.xs,
   },
   inputHint: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 8,
-    lineHeight: 20
+    ...createStyles.body('sm'),
+    color: DesignSystem.colors.textTertiary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   textInput: {
     ...ComponentTokens.input.standard,
@@ -315,54 +307,48 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 120,
     textAlignVertical: 'top',
-    paddingTop: 12,
-    paddingBottom: 12,
+    paddingTop: DesignSystem.spacing.md,
+    paddingBottom: DesignSystem.spacing.md,
   },
   topicSelector: {
     ...ComponentTokens.input.standard,
-    paddingVertical: 16,
+    paddingVertical: DesignSystem.spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   topicSelectorText: {
-    fontSize: 16,
-    color: '#333',
+    ...createStyles.body('base'),
     flex: 1,
   },
   topicSelectorArrow: {
-    fontSize: 18,
-    color: '#999',
-    marginLeft: 8,
+    ...createStyles.body('lg'),
+    color: DesignSystem.colors.textSecondary,
+    marginLeft: DesignSystem.spacing.sm,
   },
   characterCount: {
-    fontSize: 12,
-    color: '#6c757d',
+    ...createStyles.caption(),
     textAlign: 'right',
-    marginTop: 4
+    marginTop: DesignSystem.spacing.xs,
   },
   loadingIndicator: {
-    padding: 20
+    padding: DesignSystem.spacing.xl,
   },
   saveButton: {
-    backgroundColor: '#ffc107',
-    borderRadius: 8,
-    paddingVertical: 16,
+    backgroundColor: DesignSystem.colors.warning,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingVertical: DesignSystem.spacing.lg,
     alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3
+    marginTop: DesignSystem.spacing['2xl'],
+    marginBottom: DesignSystem.spacing['3xl'],
+    ...DesignSystem.shadow.md,
   },
   saveButtonDisabled: {
-    opacity: 0.6
+    opacity: 0.6,
   },
   saveButtonText: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: '600'
-  }
+    ...createStyles.buttonText('primary'),
+    color: DesignSystem.colors.textPrimary,
+    fontSize: DesignSystem.typography.fontSize.lg,
+  },
 });
