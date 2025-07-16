@@ -286,4 +286,4 @@ export default function PracticeScreen() {
       backgroundColor={DesignSystem.colors.background}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }The code has been modified to use card margin tokens for consistent spacing.
+      }
