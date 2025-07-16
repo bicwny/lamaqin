@@ -5,7 +5,7 @@ import { componentHelpers } from '@/utils/componentTokens';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'outlined' | 'elevated';
+  variant?: 'outlined' | 'elevated' | 'section';
   padding?: 'compact' | 'comfortable' | 'spacious';
   style?: ViewStyle;
 }
@@ -14,7 +14,7 @@ interface CardProps {
  * Consolidated Card component
  * Replaces: standard, practice, course card variants
  * 
- * @param variant - 'outlined' (low shadow) or 'elevated' (high shadow)
+ * @param variant - 'outlined' (low shadow), 'elevated' (high shadow), or 'section' (minimal shadow)
  * @param padding - 'compact' (12px), 'comfortable' (16px), 'spacious' (20px)
  */
 export default function Card({ 

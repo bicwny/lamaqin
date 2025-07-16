@@ -6,7 +6,7 @@ import { componentHelpers } from '@/utils/componentTokens';
 interface CardContainerProps {
   children: React.ReactNode;
   style?: ViewStyle;
-  variant?: 'outlined' | 'elevated';
+  variant?: 'outlined' | 'elevated' | 'section';
   padding?: 'compact' | 'comfortable' | 'spacious' | number;
   margin?: number;
   marginHorizontal?: number;

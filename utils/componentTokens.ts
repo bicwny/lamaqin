@@ -1,4 +1,3 @@
-
 /**
  * Component Token Utilities
  * Provides easy access to component-specific design tokens
@@ -18,21 +17,21 @@ export const ComponentTokens = {
         borderColor: 'transparent',
         ...DesignSystem.shadow.md,
       },
-      
+
       secondary: {
         backgroundColor: DesignSystem.colors.backgroundSecondary,
         borderWidth: 1.5,
         borderColor: DesignSystem.colors.primary,
         ...DesignSystem.shadow.sm,
       },
-      
+
       ghost: {
         backgroundColor: 'transparent',
         borderWidth: 0,
         borderColor: 'transparent',
       },
     },
-    
+
     // Size variations
     sizes: {
       small: {
@@ -41,14 +40,14 @@ export const ComponentTokens = {
         borderRadius: DesignSystem.borderRadius.md,
         minHeight: 36,
       },
-      
+
       medium: {
         paddingVertical: DesignSystem.spacing.lg,
         paddingHorizontal: DesignSystem.spacing.xl,
         borderRadius: DesignSystem.borderRadius.lg,
         minHeight: 48,
       },
-      
+
       large: {
         paddingVertical: DesignSystem.spacing.xl,
         paddingHorizontal: DesignSystem.spacing['2xl'],
@@ -56,7 +55,7 @@ export const ComponentTokens = {
         minHeight: 56,
       },
     },
-    
+
     // Legacy support - maps old variants to new system
     legacy: {
       primary: { variant: 'primary' as const, size: 'medium' as const },
@@ -82,7 +81,7 @@ export const ComponentTokens = {
         borderWidth: 1,
         borderColor: DesignSystem.colors.borderDark,
       },
-      
+
       elevated: {
         backgroundColor: DesignSystem.colors.backgroundSecondary,
         borderRadius: DesignSystem.borderRadius.xl,
@@ -95,14 +94,14 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.background,
       },
     },
-    
+
     // Padding variations
     padding: {
       compact: DesignSystem.spacing.md,      // 12px (was status)
       comfortable: DesignSystem.spacing.lg,  // 16px (was practice)
       spacious: DesignSystem.spacing.xl,     // 20px (was standard/course)
     },
-    
+
     // Margin variations
     margin: {
       none: 0,                               // No margin
@@ -113,7 +112,7 @@ export const ComponentTokens = {
       loose: DesignSystem.spacing.xl,        // 20px - wide spacing
       extraLoose: DesignSystem.spacing['2xl'], // 24px - maximum spacing
     },
-    
+
     // Legacy support - maps old variants to new system
     legacy: {
       standard: { variant: 'outlined' as const, padding: 'spacious' as const },
@@ -137,7 +136,7 @@ export const ComponentTokens = {
         borderLeftWidth: 4,
         borderLeftColor: DesignSystem.colors.practiceComplete,
       },
-      
+
       warning: {
         backgroundColor: DesignSystem.colors.warningBackground,
         borderRadius: DesignSystem.borderRadius.lg,
@@ -149,7 +148,7 @@ export const ComponentTokens = {
         borderLeftWidth: 4,
         borderLeftColor: DesignSystem.colors.warningBorder,
       },
-      
+
       error: {
         backgroundColor: DesignSystem.colors.errorBackground,
         borderRadius: DesignSystem.borderRadius.lg,
@@ -161,7 +160,7 @@ export const ComponentTokens = {
         borderLeftWidth: 4,
         borderLeftColor: DesignSystem.colors.errorBorder,
       },
-      
+
       info: {
         backgroundColor: DesignSystem.colors.background,
         borderRadius: DesignSystem.borderRadius.lg,
@@ -191,7 +190,7 @@ export const ComponentTokens = {
       minHeight: 48,
       lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
     },
-    
+
     search: {
       borderWidth: 1,
       borderColor: DesignSystem.colors.borderLight,
@@ -204,7 +203,7 @@ export const ComponentTokens = {
       backgroundColor: DesignSystem.colors.background,
       minHeight: 44,
     },
-    
+
     textarea: {
       borderWidth: 1,
       borderColor: DesignSystem.colors.border,
@@ -242,13 +241,13 @@ export const ComponentTokens = {
       shadowRadius: 8,
       elevation: 8,
     },
-    
+
     fullscreen: {
       backgroundColor: DesignSystem.colors.background,
       borderRadius: 0,
       padding: 0,
     },
-    
+
     alert: {
       backgroundColor: DesignSystem.colors.backgroundSecondary,
       borderRadius: DesignSystem.borderRadius.xl,
@@ -260,7 +259,7 @@ export const ComponentTokens = {
       shadowRadius: 16,
       elevation: 12,
     },
-    
+
     overlay: {
       backgroundColor: DesignSystem.colors.overlayDark,
     },
@@ -282,21 +281,21 @@ export const ComponentTokens = {
       backgroundColor: DesignSystem.colors.border,
       marginVertical: DesignSystem.spacing.md,
     },
-    
+
     // Vertical dividers
     vertical: {
       width: 1,
       backgroundColor: DesignSystem.colors.border,
       marginHorizontal: DesignSystem.spacing.md,
     },
-    
+
     // Thickness variations
     thickness: {
       thin: 1,
       medium: 2,
       thick: 3,
     },
-    
+
     // Color variants
     colors: {
       light: DesignSystem.colors.borderLight,
@@ -304,7 +303,7 @@ export const ComponentTokens = {
       dark: DesignSystem.colors.borderDark,
       primary: DesignSystem.colors.primary,
     },
-    
+
     // Spacing variations
     spacing: {
       none: 0,
@@ -335,7 +334,7 @@ export const ComponentTokens = {
         fontSize: DesignSystem.typography.fontSize.xs,  // 12px
         fontWeight: DesignSystem.typography.fontWeight.semibold,
       },
-      
+
       medium: {
         paddingHorizontal: DesignSystem.spacing.md,     // 12px
         paddingVertical: DesignSystem.spacing.sm,       // 8px
@@ -344,7 +343,7 @@ export const ComponentTokens = {
         fontSize: DesignSystem.typography.fontSize.sm,  // 14px
         fontWeight: DesignSystem.typography.fontWeight.semibold,
       },
-      
+
       large: {
         paddingHorizontal: DesignSystem.spacing.lg,     // 16px
         paddingVertical: DesignSystem.spacing.base,     // 10px
@@ -354,7 +353,7 @@ export const ComponentTokens = {
         fontWeight: DesignSystem.typography.fontWeight.semibold,
       },
     },
-    
+
     // Variant styles
     variants: {
       // Standard badge with background
@@ -365,7 +364,7 @@ export const ComponentTokens = {
         elevation: 2,
         borderWidth: 0,
       },
-      
+
       // Outlined badge
       outlined: {
         backgroundColor: 'transparent',
@@ -375,7 +374,7 @@ export const ComponentTokens = {
         shadowRadius: 0,
         elevation: 0,
       },
-      
+
       // Soft/ghost badge
       soft: {
         shadowOffset: { width: 0, height: 0 },
@@ -385,7 +384,7 @@ export const ComponentTokens = {
         borderWidth: 0,
       },
     },
-    
+
     // Pill variations (fully rounded)
     pill: {
       small: {
@@ -396,7 +395,7 @@ export const ComponentTokens = {
         fontSize: DesignSystem.typography.fontSize.xs,  // 12px
         fontWeight: DesignSystem.typography.fontWeight.semibold,
       },
-      
+
       medium: {
         paddingHorizontal: DesignSystem.spacing.lg,     // 16px
         paddingVertical: DesignSystem.spacing.sm,       // 8px
@@ -405,7 +404,7 @@ export const ComponentTokens = {
         fontSize: DesignSystem.typography.fontSize.sm,  // 14px
         fontWeight: DesignSystem.typography.fontWeight.semibold,
       },
-      
+
       large: {
         paddingHorizontal: DesignSystem.spacing.xl,     // 20px
         paddingVertical: DesignSystem.spacing.base,     // 10px
@@ -415,7 +414,7 @@ export const ComponentTokens = {
         fontWeight: DesignSystem.typography.fontWeight.semibold,
       },
     },
-    
+
     // Semantic color variants
     colors: {
       // Primary theme
@@ -425,7 +424,7 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.primary,
         shadowColor: DesignSystem.colors.primary,
       },
-      
+
       // Success states
       success: {
         backgroundColor: DesignSystem.colors.practiceComplete,
@@ -433,7 +432,7 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.practiceComplete,
         shadowColor: DesignSystem.colors.practiceComplete,
       },
-      
+
       // Warning states
       warning: {
         backgroundColor: DesignSystem.colors.warning,
@@ -441,7 +440,7 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.warning,
         shadowColor: DesignSystem.colors.warning,
       },
-      
+
       // Error states
       error: {
         backgroundColor: DesignSystem.colors.error,
@@ -449,7 +448,7 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.error,
         shadowColor: DesignSystem.colors.error,
       },
-      
+
       // Info states
       info: {
         backgroundColor: DesignSystem.colors.info,
@@ -457,7 +456,7 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.info,
         shadowColor: DesignSystem.colors.info,
       },
-      
+
       // Neutral/default
       neutral: {
         backgroundColor: DesignSystem.colors.backgroundSecondary,
@@ -465,7 +464,7 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.border,
         shadowColor: DesignSystem.colors.cardShadow,
       },
-      
+
       // Buddhist semantic colors
       dharma: {
         backgroundColor: DesignSystem.colors.dharmaRed,
@@ -473,14 +472,14 @@ export const ComponentTokens = {
         borderColor: DesignSystem.colors.dharmaRed,
         shadowColor: DesignSystem.colors.dharmaRed,
       },
-      
+
       meditation: {
         backgroundColor: DesignSystem.colors.meditationBlue,
         color: DesignSystem.colors.textInverse,
         borderColor: DesignSystem.colors.meditationBlue,
         shadowColor: DesignSystem.colors.meditationBlue,
       },
-      
+
       wisdom: {
         backgroundColor: DesignSystem.colors.wisdomGold,
         color: DesignSystem.colors.textPrimary,
@@ -488,7 +487,7 @@ export const ComponentTokens = {
         shadowColor: DesignSystem.colors.wisdomGold,
       },
     },
-    
+
     // Soft/ghost color variants (light backgrounds)
     softColors: {
       primary: {
@@ -496,56 +495,56 @@ export const ComponentTokens = {
         color: DesignSystem.colors.primary,
         borderColor: `${DesignSystem.colors.primary}30`,
       },
-      
+
       success: {
         backgroundColor: DesignSystem.colors.successBackground,
         color: DesignSystem.colors.practiceComplete,
         borderColor: DesignSystem.colors.practiceComplete,
       },
-      
+
       warning: {
         backgroundColor: DesignSystem.colors.warningBackground,
         color: DesignSystem.colors.warning,
         borderColor: DesignSystem.colors.warningBorder,
       },
-      
+
       error: {
         backgroundColor: DesignSystem.colors.errorBackground,
         color: DesignSystem.colors.error,
         borderColor: DesignSystem.colors.errorBorder,
       },
-      
+
       info: {
         backgroundColor: `${DesignSystem.colors.info}15`,
         color: DesignSystem.colors.info,
         borderColor: `${DesignSystem.colors.info}30`,
       },
-      
+
       neutral: {
         backgroundColor: DesignSystem.colors.background,
         color: DesignSystem.colors.textSecondary,
         borderColor: DesignSystem.colors.borderLight,
       },
-      
+
       dharma: {
         backgroundColor: `${DesignSystem.colors.dharmaRed}15`,
         color: DesignSystem.colors.dharmaRed,
         borderColor: `${DesignSystem.colors.dharmaRed}30`,
       },
-      
+
       meditation: {
         backgroundColor: `${DesignSystem.colors.meditationBlue}15`,
         color: DesignSystem.colors.meditationBlue,
         borderColor: `${DesignSystem.colors.meditationBlue}30`,
       },
-      
+
       wisdom: {
         backgroundColor: `${DesignSystem.colors.wisdomGold}20`,
         color: DesignSystem.colors.wisdomGold,
         borderColor: `${DesignSystem.colors.wisdomGold}40`,
       },
     },
-    
+
     // Legacy support
     legacy: {
       small: { size: 'small' as const, variant: 'filled' as const, color: 'primary' as const },
@@ -576,7 +575,7 @@ export const ComponentTextStyles = {
         letterSpacing: DesignSystem.typography.letterSpacing.normal,
       },
     },
-    
+
     // Text styles by size
     sizes: {
       small: {
@@ -589,7 +588,7 @@ export const ComponentTextStyles = {
         fontSize: DesignSystem.typography.fontSize.lg,
       },
     },
-    
+
     // Legacy text style mappings (resolved after export)
     legacy: {
       primary: {
@@ -624,7 +623,7 @@ export const ComponentTextStyles = {
       },
     },
   },
-  
+
   card: {
     title: {
       fontSize: DesignSystem.typography.fontSize['2xl'],
@@ -651,7 +650,7 @@ export const ComponentTextStyles = {
       color: DesignSystem.colors.textSecondary,
     },
   },
-  
+
   // Notification text styles (for new Notification component)
   notification: {
     title: {
@@ -666,14 +665,14 @@ export const ComponentTextStyles = {
       lineHeight: DesignSystem.typography.lineHeight.relaxed,
     },
   },
-  
+
   header: {
     // Legacy support - text styles are now handled by Header component internally
     page: 'page' as const,
     modal: 'modal' as const,
     section: 'section' as const,
   },
-  
+
   // Semantic text styles (consolidated from Buddhist-specific)
   semantic: {
     dharmaTitle: {
@@ -712,22 +711,22 @@ export const componentHelpers = {
     ...ComponentTokens.button.variants[variant],
     ...ComponentTokens.button.sizes[size],
   }),
-  
+
   // Legacy button style support
   getLegacyButtonStyle: (legacyVariant: 'primary' | 'secondary' | 'small' | 'text' | 'dharma') => {
     const mapping = ComponentTokens.button.legacy[legacyVariant];
     return componentHelpers.getButtonStyle(mapping.variant, mapping.size);
   },
-  
+
   // Get complete card style with new consolidated system
   getCardStyle: (
-    variant: 'outlined' | 'elevated', 
+    variant: 'outlined' | 'elevated' | 'section', 
     padding: 'compact' | 'comfortable' | 'spacious' = 'comfortable'
   ) => ({
     ...ComponentTokens.card.variants[variant],
     padding: ComponentTokens.card.padding[padding],
   }),
-  
+
   // Get card style with custom margin
   getCardWithMargin: (
     variant: 'outlined' | 'elevated',
@@ -738,7 +737,7 @@ export const componentHelpers = {
     padding: ComponentTokens.card.padding[padding],
     margin: ComponentTokens.card.margin[margin],
   }),
-  
+
   // Legacy card style support
   getLegacyCardStyle: (legacyVariant: 'standard' | 'practice' | 'course') => {
     const mapping = ComponentTokens.card.legacy[legacyVariant];
@@ -747,11 +746,11 @@ export const componentHelpers = {
     }
     return componentHelpers.getCardStyle(mapping.variant, mapping.padding);
   },
-  
+
   // Get notification style (replaces status cards)
   getNotificationStyle: (variant: keyof typeof ComponentTokens.notification.variants) => 
     ComponentTokens.notification.variants[variant],
-  
+
   // Get button text style with new consolidated system
   getButtonTextStyle: (
     variant: 'primary' | 'secondary' | 'ghost', 
@@ -760,36 +759,36 @@ export const componentHelpers = {
     ...ComponentTextStyles.button.variants[variant],
     ...ComponentTextStyles.button.sizes[size],
   }),
-  
+
   // Legacy button text style support
   getLegacyButtonTextStyle: (legacyVariant: 'primary' | 'secondary' | 'small' | 'text' | 'dharma') => {
     return ComponentTextStyles.button.legacy[legacyVariant];
   },
-  
+
   // Get card text style
   getCardTextStyle: (variant: keyof typeof ComponentTextStyles.card) => 
     ComponentTextStyles.card[variant],
-  
+
   // Get notification text style
   getNotificationTextStyle: (variant: keyof typeof ComponentTextStyles.notification) => 
     ComponentTextStyles.notification[variant],
-  
+
   // Get progress bar size (for new ProgressBar component)
   getProgressSize: (variant: keyof typeof ComponentTokens.progress) => 
     ComponentTokens.progress[variant],
-  
+
   // Get modal style
   getModalStyle: (variant: keyof typeof ComponentTokens.modal) => 
     ComponentTokens.modal[variant],
-  
+
   // Get header context (for new Header component)
   getHeaderContext: (variant: keyof typeof ComponentTokens.header) => 
     ComponentTokens.header[variant],
-  
+
   // Get semantic color (replaces Buddhist-specific styles)
   getSemanticColor: (variant: keyof typeof ComponentTokens.semantic) => 
     ComponentTokens.semantic[variant],
-  
+
   // Get complete badge style with new consolidated system
   getBadgeStyle: (
     size: 'small' | 'medium' | 'large',
@@ -801,14 +800,14 @@ export const componentHelpers = {
     const colorStyle = variant === 'soft' 
       ? ComponentTokens.badge.softColors[color] 
       : ComponentTokens.badge.colors[color];
-    
+
     return {
       ...sizeStyle,
       ...variantStyle,
       ...colorStyle,
     };
   },
-  
+
   // Get pill style (fully rounded badge)
   getPillStyle: (
     size: 'small' | 'medium' | 'large',
@@ -820,20 +819,20 @@ export const componentHelpers = {
     const colorStyle = variant === 'soft' 
       ? ComponentTokens.badge.softColors[color] 
       : ComponentTokens.badge.colors[color];
-    
+
     return {
       ...sizeStyle,
       ...variantStyle,
       ...colorStyle,
     };
   },
-  
+
   // Legacy badge support
   getLegacyBadgeStyle: (legacyVariant: 'small' | 'wisdomBadge' | 'completionBadge') => {
     const mapping = ComponentTokens.badge.legacy[legacyVariant];
     return componentHelpers.getBadgeStyle(mapping.size, mapping.variant, mapping.color);
   },
-  
+
   // Get card style with semantic accent color
   getCardWithAccent: (variant: keyof typeof ComponentTokens.card, accentColor?: keyof typeof ComponentTokens.semantic) => {
     const baseCard = ComponentTokens.card[variant];
@@ -846,11 +845,11 @@ export const componentHelpers = {
     }
     return baseCard;
   },
-  
+
   // Get semantic text styles
   getSemanticTextStyle: (variant: keyof typeof ComponentTextStyles.semantic) => 
     ComponentTextStyles.semantic[variant],
-  
+
   // Get divider style
   getDividerStyle: (
     orientation: 'horizontal' | 'vertical' = 'horizontal',
@@ -862,7 +861,7 @@ export const componentHelpers = {
     const thicknessValue = ComponentTokens.divider.thickness[thickness];
     const colorValue = ComponentTokens.divider.colors[color];
     const spacingValue = ComponentTokens.divider.spacing[spacing];
-    
+
     return {
       ...baseStyle,
       backgroundColor: colorValue,
