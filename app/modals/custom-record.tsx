@@ -210,6 +210,8 @@ export default function CustomRecordScreen() {
       }}
       scrollable={true}
       showCloseButton={true}
+      variant="dialog"
+      size="default"
     >
         {loadingRecord ? (
           <View style={styles.loadingContainer}>

@@ -392,19 +392,18 @@ export const DesignSystem = {
       },
     },
 
-    // Modal component tokens
+    // Modal component tokens - Consolidated
     modal: {
-      // Standard modals
-      standard: {
+      // Dialog modals (replaces standard + alert)
+      dialog: {
         backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
         borderRadius: 12,            // Will reference borderRadius.lg
-        padding: 20,                 // Will reference spacing.xl
-        margin: 20,                  // Will reference spacing.xl
         shadowColor: '#000',         // Will reference colors.cardShadow
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.25,
         shadowRadius: 8,
         elevation: 8,
+        // Size-based spacing handled by component
       },
       
       // Full-screen modals
@@ -413,24 +412,11 @@ export const DesignSystem = {
         borderRadius: 0,
         padding: 0,
       },
-      
-      // Alert/confirmation modals
-      alert: {
-        backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
-        borderRadius: 16,            // Will reference borderRadius.xl
-        padding: 24,                 // Will reference spacing.2xl
-        margin: 24,                  // Will reference spacing.2xl
-        shadowColor: '#000',         // Will reference colors.cardShadow
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-        elevation: 12,
-      },
-      
-      // Modal overlay
-      overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Will reference colors.overlayDark
-      },
+    },
+
+    // Modal overlay utility (separated from modal variants)
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Will reference colors.overlayDark
     },
 
     // Header component tokens

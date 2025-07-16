@@ -185,6 +185,8 @@ export default function MeditationRecordScreen() {
       }}
       scrollable={true}
       showCloseButton={true}
+      variant="dialog"
+      size="default"
       keyboardAvoidingView={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
         <View style={styles.formContainer}>

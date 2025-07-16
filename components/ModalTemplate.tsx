@@ -17,10 +17,12 @@ interface ModalTemplateProps {
   };
   children: React.ReactNode;
   scrollable?: boolean;
-  padding?: number;
+  size?: 'compact' | 'default' | 'large';
+  variant?: 'dialog' | 'fullscreen';
   backgroundColor?: string;
   contentContainerStyle?: any;
   headerStyle?: any;
+  keyboardAvoidingView?: 'padding' | 'height' | 'position';
 }
 
 export default function ModalTemplate({
@@ -30,23 +32,36 @@ export default function ModalTemplate({
   rightAction,
   children,
   scrollable = true,
-  padding = 16,
-  backgroundColor = '#f8f9fa',
+  size = 'default',
+  variant = 'dialog',
+  backgroundColor,
   contentContainerStyle,
   headerStyle,
+  keyboardAvoidingView,
 }: ModalTemplateProps) {
+  // Get modal styles using consolidated system
+  const modalStyles = variant === 'fullscreen' 
+    ? ComponentTokens.modal.fullscreen
+    : ComponentTokens.modal.sizes[size];
+  
+  const defaultBackgroundColor = variant === 'fullscreen' 
+    ? DesignSystem.colors.background 
+    : DesignSystem.colors.backgroundSecondary;
+
   const content = (
-    <View style={[styles.content, { padding }, contentContainerStyle]}>
+    <View style={[styles.content, modalStyles, contentContainerStyle]}>
       {children}
     </View>
   );
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['left', 'right', 'top', 'bottom']}>
+  const containerBackground = backgroundColor || defaultBackgroundColor;
+  
+  const modalContainer = (
+    <SafeAreaView style={[styles.container, { backgroundColor: containerBackground }]} edges={['left', 'right', 'top', 'bottom']}>
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar 
         barStyle="dark-content" 
-        backgroundColor={backgroundColor}
+        backgroundColor={containerBackground}
         translucent={false}
       />
 
@@ -98,6 +113,22 @@ export default function ModalTemplate({
       )}
     </SafeAreaView>
   );
+
+  // Wrap with KeyboardAvoidingView if specified
+  if (keyboardAvoidingView) {
+    const KeyboardAvoidingView = require('react-native').KeyboardAvoidingView;
+    return (
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={keyboardAvoidingView}
+        keyboardVerticalOffset={0}
+      >
+        {modalContainer}
+      </KeyboardAvoidingView>
+    );
+  }
+
+  return modalContainer;
 }
 
 const styles = StyleSheet.create({
@@ -151,6 +182,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: DesignSystem.spacing.lg,
+    // Padding now handled by modal size tokens
   },
 });
