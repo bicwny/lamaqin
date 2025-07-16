@@ -18,6 +18,7 @@ import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
+import { ComponentTextStyles } from '@/utils/componentTokens';
 import ProgressBar from '@/components/ProgressBar';
 
 interface PracticeProject {
@@ -612,7 +613,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: DesignSystem.spacing.md,
-    ...Typography.styles.body('base'),
+    ...ComponentTextStyles.body,
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   emptyContainer: {
@@ -622,7 +623,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing['4xl'],
   },
   emptyText: {
-    ...Typography.styles.subheading('lg'),
+    ...ComponentTextStyles.subheading,
     color: DesignSystem.colors.textSecondary,
   },
   scrollContainer: {
@@ -657,8 +658,7 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   practiceTitle: {
-    ...Typography.styles.dharmaTitle('2xl'),
-    lineHeight: DesignSystem.typography.lineHeight.tight * DesignSystem.typography.fontSize['2xl'],
+    ...ComponentTextStyles.dharma,
     marginBottom: DesignSystem.spacing.sm,
   },
   programPillContainer: {
@@ -670,9 +670,8 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   timelineText: {
-    ...Typography.styles.body('base'),
+    ...ComponentTextStyles.body,
     color: DesignSystem.colors.textSecondary,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
   },
 
   // Divider
@@ -689,18 +688,17 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.sm,
   },
   currentCount: {
-    ...Typography.styles.subheading('xl'),
+    ...ComponentTextStyles.subheading,
+    fontSize: DesignSystem.typography.fontSize.xl,
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
   },
   totalCountAndDays: {
-    ...Typography.styles.body('base'),
+    ...ComponentTextStyles.body,
     color: DesignSystem.colors.textSecondary,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
   },
   dailyTargetText: {
-    ...Typography.styles.label('sm'),
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
     marginBottom: DesignSystem.spacing.md,
   },
@@ -720,13 +718,12 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   progressText: {
-    ...Typography.styles.subheading('lg'),
+    ...ComponentTextStyles.subheading,
     marginBottom: DesignSystem.spacing.xs,
   },
   sessionDetails: {
-    ...Typography.styles.label('sm'),
+    ...ComponentTextStyles.label,
     fontStyle: 'italic',
-    fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.textSecondary,
     marginTop: DesignSystem.spacing.xs,
   },
@@ -768,7 +765,7 @@ const styles = StyleSheet.create({
     //paddingBottom: DesignSystem.spacing.lg,
   },
   recordsTitle: {
-    ...Typography.styles.subheading('lg'),
+    ...ComponentTextStyles.subheading,
   },
   viewAllButton: {
     flexDirection: 'row',
@@ -776,17 +773,15 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xs,
   },
   viewAllText: {
-    ...Typography.styles.label('sm'),
-    color: DesignSystem.colors.primary,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    ...ComponentTextStyles.link,
+    fontSize: DesignSystem.typography.fontSize.sm,
   },
   recordsList: {
     //paddingHorizontal: DesignSystem.spacing.xl,
     //paddingBottom: DesignSystem.spacing.xl,
   },
   noRecordsText: {
-    ...Typography.styles.body('base'),
-    color: DesignSystem.colors.textSecondary,
+    ...ComponentTextStyles.body,
     textAlign: 'center',
     paddingVertical: DesignSystem.spacing['2xl'],
     fontStyle: 'italic',
@@ -807,20 +802,17 @@ const styles = StyleSheet.create({
     //marginBottom: DesignSystem.spacing.sm,
   },
   recordDate: {
-    ...Typography.styles.label('sm'),
-    color: DesignSystem.colors.textSecondary,
+    ...ComponentTextStyles.label,
     fontWeight: DesignSystem.typography.fontWeight.normal,
   },
   recordTime: {
-    ...Typography.styles.label('sm'),
-    color: DesignSystem.colors.textSecondary,
+    ...ComponentTextStyles.label,
     fontWeight: DesignSystem.typography.fontWeight.normal,
   },
   recordCount: {
-    ...Typography.styles.body('base'),
+    ...ComponentTextStyles.body,
     color: DesignSystem.colors.textPrimary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-    // marginBottom: DesignSystem.spacing.xs,
   },
   recordNotes: {
     backgroundColor: DesignSystem.colors.background,
@@ -832,8 +824,8 @@ const styles = StyleSheet.create({
   },
 
   notesText: {
-    ...Typography.styles.body('sm'),
+    ...ComponentTextStyles.body,
+    fontSize: DesignSystem.typography.fontSize.sm,
     color: DesignSystem.colors.textPrimary,
-    lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
 });

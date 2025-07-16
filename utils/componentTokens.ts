@@ -1,3 +1,4 @@
+
 /**
  * Component Token Utilities
  * Provides easy access to component-specific design tokens
@@ -560,150 +561,164 @@ export const ComponentTokens = {
   },
 };
 
-// Text styles that use component tokens
+// CONSOLIDATED Text styles - reduced from 24 to 12 semantic styles
 export const ComponentTextStyles = {
+  // 1. PRIMARY TEXT STYLES (4 core styles)
+  heading: {
+    // Main headings - consolidates pageTitle, sectionTitle, dharmaTitle
+    fontSize: DesignSystem.typography.fontSize['2xl'],      // 24px
+    fontWeight: DesignSystem.typography.fontWeight.bold,    // 700
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize['2xl'] * DesignSystem.typography.lineHeight.tight,
+  },
+
+  subheading: {
+    // Secondary headings - consolidates subtitle, card.title
+    fontSize: DesignSystem.typography.fontSize.lg,          // 18px
+    fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize.lg * DesignSystem.typography.lineHeight.snug,
+  },
+
+  body: {
+    // Regular content text - consolidates bodyText, content, description
+    fontSize: DesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: DesignSystem.typography.fontWeight.normal,  // 400
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+  },
+
+  label: {
+    // Small labels and metadata - consolidates label, metadata, helper
+    fontSize: DesignSystem.typography.fontSize.sm,          // 14px
+    fontWeight: DesignSystem.typography.fontWeight.medium,  // 500
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
+  },
+
+  // 2. INTERACTIVE TEXT STYLES (3 styles)
   button: {
-    // Text styles by variant
-    variants: {
-      primary: {
-        color: DesignSystem.colors.textInverse,
-        fontWeight: DesignSystem.typography.fontWeight.bold,
-        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
-      },
-      secondary: {
-        color: DesignSystem.colors.primary,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        letterSpacing: DesignSystem.typography.letterSpacing.normal,
-      },
-      ghost: {
-        color: DesignSystem.colors.primary,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        letterSpacing: DesignSystem.typography.letterSpacing.normal,
-      },
-    },
-
-    // Text styles by size
-    sizes: {
-      small: {
-        fontSize: DesignSystem.typography.fontSize.sm,
-      },
-      medium: {
-        fontSize: DesignSystem.typography.fontSize.base,
-      },
-      large: {
-        fontSize: DesignSystem.typography.fontSize.lg,
-      },
-    },
-
-    // Legacy text style mappings (resolved after export)
-    legacy: {
-      primary: {
-        color: DesignSystem.colors.textInverse,
-        fontWeight: DesignSystem.typography.fontWeight.bold,
-        fontSize: DesignSystem.typography.fontSize.base,
-        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
-      },
-      secondary: {
-        color: DesignSystem.colors.primary,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        fontSize: DesignSystem.typography.fontSize.base,
-        letterSpacing: DesignSystem.typography.letterSpacing.normal,
-      },
-      small: {
-        color: DesignSystem.colors.primary,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        fontSize: DesignSystem.typography.fontSize.sm,
-        letterSpacing: DesignSystem.typography.letterSpacing.normal,
-      },
-      text: {
-        color: DesignSystem.colors.primary,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        fontSize: DesignSystem.typography.fontSize.sm,
-        letterSpacing: DesignSystem.typography.letterSpacing.normal,
-      },
-      dharma: {
-        color: DesignSystem.colors.textInverse,
-        fontWeight: DesignSystem.typography.fontWeight.bold,
-        fontSize: DesignSystem.typography.fontSize.lg,
-        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
-      },
-    },
-  },
-
-  card: {
-    title: {
-      fontSize: DesignSystem.typography.fontSize['2xl'],
-      fontWeight: DesignSystem.typography.fontWeight.bold,
-      color: DesignSystem.colors.textPrimary,
-      letterSpacing: DesignSystem.typography.letterSpacing.tight,
-      lineHeight: DesignSystem.typography.lineHeight.tight,
-    },
-    subtitle: {
-      fontSize: DesignSystem.typography.fontSize.lg,
-      fontWeight: DesignSystem.typography.fontWeight.semibold,
-      color: DesignSystem.colors.textPrimary,
-      letterSpacing: DesignSystem.typography.letterSpacing.tight,
-    },
-    body: {
-      fontSize: DesignSystem.typography.fontSize.base,
-      fontWeight: DesignSystem.typography.fontWeight.normal,
-      color: DesignSystem.colors.textSecondary,
-      lineHeight: DesignSystem.typography.lineHeight.relaxed,
-    },
-    metadata: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.medium,
-      color: DesignSystem.colors.textSecondary,
-    },
-  },
-
-  // Notification text styles (for new Notification component)
-  notification: {
-    title: {
-      fontSize: DesignSystem.typography.fontSize.base,
-      fontWeight: DesignSystem.typography.fontWeight.semibold,
-      color: DesignSystem.colors.textPrimary,
-    },
-    message: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.normal,
-      color: DesignSystem.colors.textSecondary,
-      lineHeight: DesignSystem.typography.lineHeight.relaxed,
-    },
-  },
-
-  header: {
-    // Legacy support - text styles are now handled by Header component internally
-    page: 'page' as const,
-    modal: 'modal' as const,
-    section: 'section' as const,
-  },
-
-  // Semantic text styles (consolidated from Buddhist-specific)
-  semantic: {
-    dharmaTitle: {
-      fontSize: DesignSystem.typography.fontSize['2xl'],
-      fontWeight: DesignSystem.typography.fontWeight.bold,
-      color: DesignSystem.colors.textPrimary,
-      letterSpacing: DesignSystem.typography.letterSpacing.tight,
-      lineHeight: DesignSystem.typography.lineHeight.tight,
-    },
-    practiceText: {
-      fontSize: DesignSystem.typography.fontSize.base,
-      fontWeight: DesignSystem.typography.fontWeight.medium,
-      color: DesignSystem.colors.textPrimary,
-      lineHeight: DesignSystem.typography.lineHeight.relaxed,
-    },
-    successText: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.semibold,
-      color: DesignSystem.colors.practiceComplete,
-    },
-    accentText: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.semibold,
+    primary: {
+      fontSize: DesignSystem.typography.fontSize.base,      // 16px
+      fontWeight: DesignSystem.typography.fontWeight.bold, // 700
       color: DesignSystem.colors.textInverse,
+      letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+      lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
     },
+
+    secondary: {
+      fontSize: DesignSystem.typography.fontSize.base,      // 16px
+      fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+      color: DesignSystem.colors.primary,
+      letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+    },
+  },
+
+  link: {
+    // Interactive links - consolidates linkText
+    fontSize: DesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+    color: DesignSystem.colors.primary,
+    letterSpacing: DesignSystem.typography.letterSpacing.normal,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+  },
+
+  // 3. SEMANTIC TEXT STYLES (3 Buddhist-specific styles)
+  dharma: {
+    // Buddhist practice text - consolidates dharmaTitle, practiceText
+    fontSize: DesignSystem.typography.fontSize['2xl'],      // 24px
+    fontWeight: DesignSystem.typography.fontWeight.bold,    // 700
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize['2xl'] * DesignSystem.typography.lineHeight.tight,
+  },
+
+  practice: {
+    // Practice content text - optimized for reading Buddhist content
+    fontSize: DesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: DesignSystem.typography.fontWeight.medium,  // 500
+    color: DesignSystem.colors.textPrimary,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
+  },
+
+  success: {
+    // Completion and success states
+    fontSize: DesignSystem.typography.fontSize.sm,          // 14px
+    fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+    color: DesignSystem.colors.practiceComplete,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
+  },
+
+  // 4. UTILITY TEXT STYLES (2 styles)
+  caption: {
+    // Smallest text for fine print - consolidates caption, error
+    fontSize: DesignSystem.typography.fontSize.xs,          // 12px
+    fontWeight: DesignSystem.typography.fontWeight.normal,  // 400
+    color: DesignSystem.colors.textTertiary,
+    lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
+  },
+
+  input: {
+    // Form input text
+    fontSize: DesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: DesignSystem.typography.fontWeight.normal,  // 400
+    color: DesignSystem.colors.textPrimary,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
+  },
+
+  // LEGACY SUPPORT - maps old styles to new consolidated ones
+  legacy: {
+    // Button text styles
+    buttonPrimary: 'button.primary' as const,
+    buttonSecondary: 'button.secondary' as const,
+    buttonSmall: 'button.secondary' as const,
+    buttonText: 'button.secondary' as const,
+    buttonDharma: 'button.primary' as const,
+
+    // Card text styles
+    cardTitle: 'subheading' as const,
+    cardSubtitle: 'label' as const,
+    cardBody: 'body' as const,
+    cardMetadata: 'caption' as const,
+
+    // Header text styles
+    pageHeader: 'heading' as const,
+    modalHeader: 'subheading' as const,
+    sectionHeader: 'subheading' as const,
+
+    // Notification text styles
+    notificationTitle: 'subheading' as const,
+    notificationMessage: 'body' as const,
+
+    // Semantic text styles
+    dharmaTitle: 'dharma' as const,
+    practiceText: 'practice' as const,
+    successText: 'success' as const,
+    accentText: 'button.primary' as const,
+
+    // Form text styles
+    formLabel: 'label' as const,
+    formInput: 'input' as const,
+    formHelper: 'caption' as const,
+    formError: 'caption' as const,
+
+    // Component-specific legacy mappings
+    practiceDetailTitle: 'heading' as const,
+    practiceDetailSubtitle: 'subheading' as const,
+    practiceDetailDescription: 'body' as const,
+    practiceDetailLabel: 'label' as const,
+    practiceDetailValue: 'body' as const,
+    practiceDetailMetadata: 'caption' as const,
+    practiceDetailButton: 'button.primary' as const,
+    practiceDetailSecondaryButton: 'button.secondary' as const,
+
+    modalTitle: 'subheading' as const,
+    modalSubtitle: 'body' as const,
+    modalContent: 'body' as const,
+    modalButton: 'button.primary' as const,
   },
 };
 
@@ -785,9 +800,24 @@ export const componentHelpers = {
     ...ComponentTextStyles.button.sizes[size],
   }),
 
-  // Legacy button text style support
-  getLegacyButtonTextStyle: (legacyVariant: 'primary' | 'secondary' | 'small' | 'text' | 'dharma') => {
-    return ComponentTextStyles.button.legacy[legacyVariant];
+  // NEW: Get consolidated text style
+  getTextStyle: (style: keyof typeof ComponentTextStyles) => {
+    const textStyle = ComponentTextStyles[style];
+    // Handle nested styles like button.primary
+    if (typeof textStyle === 'object' && textStyle !== null && !('fontSize' in textStyle)) {
+      return textStyle;
+    }
+    return textStyle;
+  },
+
+  // NEW: Get legacy text style (maps to consolidated styles)
+  getLegacyTextStyle: (legacyStyle: keyof typeof ComponentTextStyles.legacy) => {
+    const mapping = ComponentTextStyles.legacy[legacyStyle];
+    if (mapping.includes('.')) {
+      const [parent, child] = mapping.split('.');
+      return ComponentTextStyles[parent as keyof typeof ComponentTextStyles][child];
+    }
+    return ComponentTextStyles[mapping as keyof typeof ComponentTextStyles];
   },
 
   // Get card text style
