@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: DesignSystem.spacing.xl,
   },
-  mainCard: componentHelpers.getCardWithMargin("outlined", "comfortable", "0"),
+  mainCard: componentHelpers.getCardWithBottomMargin("outlined", "comfortable", "comfortable"),
 
   // Section 1: Practice & Timeline
   section1: {

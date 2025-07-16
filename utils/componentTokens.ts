@@ -835,6 +835,17 @@ export const componentHelpers = {
     margin: ComponentTokens.card.margin[margin],
   }),
 
+  // Get card with bottom margin only
+  getCardWithBottomMargin: (
+    variant: 'outlined' | 'elevated',
+    padding: 'compact' | 'comfortable' | 'spacious' = 'comfortable',
+    marginBottom: keyof typeof ComponentTokens.card.margin = 'comfortable'
+  ) => ({
+    ...ComponentTokens.card.variants[variant],
+    padding: ComponentTokens.card.padding[padding],
+    marginBottom: ComponentTokens.card.margin[marginBottom],
+  }),
+
   // Legacy card style support
   getLegacyCardStyle: (legacyVariant: 'standard' | 'practice' | 'course') => {
     const mapping = ComponentTokens.card.legacy[legacyVariant];
