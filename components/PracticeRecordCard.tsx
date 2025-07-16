@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     ...ComponentTokens.button.sizes.small,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   editButtonText: {
     ...ComponentTextStyles.button.secondary,
