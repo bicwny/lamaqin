@@ -13,6 +13,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { ComponentTokens } from '@/utils/componentTokens';
 import { toastService } from '@/lib/toast';
 import ModalTemplate from '@/components/ModalTemplate';
 
@@ -309,17 +310,11 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
   textInput: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-    color: '#333'
+    ...ComponentTokens.input.standard,
   },
   multilineInput: {
+    ...ComponentTokens.input.textarea,
     height: 100,
-    textAlignVertical: 'top'
   },
   characterCount: {
     fontSize: 12,

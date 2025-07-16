@@ -5,6 +5,7 @@ import ModalTemplate from '@/components/ModalTemplate';
 import LessonTemplate from '@/components/LessonTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
+import { ComponentTokens } from '@/utils/componentTokens';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
@@ -30,13 +31,7 @@ export function ExampleModal() {
             修行时长（分钟）
           </Text>
           <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: '#ddd',
-              borderRadius: 8,
-              padding: 12,
-              fontSize: 16,
-            }}
+            style={ComponentTokens.input.standard}
             placeholder="30"
             keyboardType="numeric"
           />
