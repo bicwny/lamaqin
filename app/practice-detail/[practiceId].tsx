@@ -668,9 +668,6 @@ const styles = StyleSheet.create({
     ...ComponentTokens.badge.small,
     backgroundColor: ComponentTokens.semantic.success,
   },
-  completedText: {
-    ...ComponentTextStyles.badge.text,
-  },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
     marginBottom: DesignSystem.spacing.md,
@@ -867,23 +864,4 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
-  progressBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.sm,
-  },
-  progressBar: {
-    height: 10,
-    backgroundColor: DesignSystem.colors.background,
-    borderRadius: 5,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: DesignSystem.colors.dharmaRed,
-    borderRadius: 4,
-  },
-});
+  });
