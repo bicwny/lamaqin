@@ -652,7 +652,10 @@ const styles = StyleSheet.create({
     paddingBottom: DesignSystem.spacing.xl,
   },
   mainCard: {
-    ...ComponentTokens.card.practice,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    borderColor: DesignSystem.colors.borderLight,
+    borderWidth: 1,
     // margin: DesignSystem.spacing.lg,
     // marginBottom: DesignSystem.spacing.md,
   },
@@ -824,7 +827,8 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.button.primary,
   },
   recordsCard: {
-    ...ComponentTokens.card.practice,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
     margin: DesignSystem.spacing.lg,
     marginTop: 0,
   },
@@ -908,3 +912,6 @@ const styles = StyleSheet.create({
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
   });
+```
+
+**Analysis:** The code was updated to replace the `practice` card variant with the `outlined` variant from the `ComponentTokens` for both `mainCard` and `recordsCard` styles, and also apply `comfortable` padding to them.
