@@ -1,4 +1,3 @@
-
 /**
  * Component Token Utilities
  * Provides easy access to component-specific design tokens
@@ -628,20 +627,50 @@ export const ComponentTextStyles = {
 
   // 2. INTERACTIVE TEXT STYLES (3 styles)
   button: {
-    primary: {
-      fontSize: DesignSystem.typography.fontSize.base,      // 16px
-      fontWeight: DesignSystem.typography.fontWeight.bold, // 700
-      color: DesignSystem.colors.textInverse,
-      letterSpacing: DesignSystem.typography.letterSpacing.tighter,
-      lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+    variants: {
+      primary: {
+        fontSize: DesignSystem.typography.fontSize.base,      // 16px
+        fontWeight: DesignSystem.typography.fontWeight.bold, // 700
+        color: DesignSystem.colors.textInverse,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
+
+      secondary: {
+        fontSize: DesignSystem.typography.fontSize.base,      // 16px
+        fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+        color: DesignSystem.colors.primary,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
+
+      ghost: {
+        fontSize: DesignSystem.typography.fontSize.base,      // 16px
+        fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+        color: DesignSystem.colors.primary,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
     },
 
-    secondary: {
-      fontSize: DesignSystem.typography.fontSize.base,      // 16px
-      fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
-      color: DesignSystem.colors.primary,
-      letterSpacing: DesignSystem.typography.letterSpacing.normal,
-      lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+    sizes: {
+      small: {
+        fontSize: DesignSystem.typography.fontSize.sm,       // 14px
+        fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
+        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.tight,
+      },
+
+      medium: {
+        fontSize: DesignSystem.typography.fontSize.base,     // 16px
+        fontWeight: DesignSystem.typography.fontWeight.bold, // 700
+        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
+      },
+
+      large: {
+        fontSize: DesignSystem.typography.fontSize.lg,       // 18px
+        fontWeight: DesignSystem.typography.fontWeight.bold, // 700
+        lineHeight: DesignSystem.typography.fontSize.lg * DesignSystem.typography.lineHeight.tight,
+      },
     },
   },
 
@@ -931,7 +960,7 @@ export const componentHelpers = {
       neutral: DesignSystem.colors.textSecondary,
       inverse: DesignSystem.colors.textInverse,
     };
-    
+
     return {
       name,
       size: sizeMap[size],
