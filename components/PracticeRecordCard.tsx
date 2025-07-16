@@ -1,14 +1,13 @@
-
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-} from 'react-native';
-import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
+} from "react-native";
+import { DesignSystem } from "@/constants/DesignSystem";
+import { ComponentTokens, ComponentTextStyles } from "@/utils/componentTokens";
 
 interface PracticeRecordCardProps {
   record: {
@@ -21,7 +20,7 @@ interface PracticeRecordCardProps {
     notes?: string;
   };
   practiceUnit?: string;
-  practiceType?: 'time' | 'count';
+  practiceType?: "time" | "count";
   isLast?: boolean;
   isDeleting?: boolean;
   onPress?: () => void;
@@ -32,8 +31,8 @@ interface PracticeRecordCardProps {
 
 export default function PracticeRecordCard({
   record,
-  practiceUnit = '次',
-  practiceType = 'count',
+  practiceUnit = "次",
+  practiceType = "count",
   isLast = false,
   isDeleting = false,
   onPress,
@@ -43,24 +42,24 @@ export default function PracticeRecordCard({
 }: PracticeRecordCardProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      weekday: 'short'
+    return date.toLocaleDateString("zh-CN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      weekday: "short",
     });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('zh-CN', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleTimeString("zh-CN", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const renderRecordContent = () => {
-    if (practiceType === 'time') {
+    if (practiceType === "time") {
       return (
         <Text style={styles.recordCount}>
           第{record.session_number || 1}座 · {record.duration_minutes}分钟
@@ -69,7 +68,8 @@ export default function PracticeRecordCard({
     } else {
       return (
         <Text style={styles.recordCount}>
-          {showActions ? '数量: ' : '+'}{record.count?.toLocaleString()} {practiceUnit}
+          {showActions ? "数量: " : "+"}
+          {record.count?.toLocaleString()} {practiceUnit}
         </Text>
       );
     }
@@ -86,18 +86,17 @@ export default function PracticeRecordCard({
     <>
       {isDeleting && (
         <View style={styles.deletingOverlay}>
-          <ActivityIndicator color={DesignSystem.colors.destructive} size="small" />
+          <ActivityIndicator
+            color={DesignSystem.colors.destructive}
+            size="small"
+          />
           <Text style={styles.deletingText}>删除中...</Text>
         </View>
       )}
 
       <View style={[styles.header, isDeleting && styles.disabledContent]}>
-        <Text style={styles.recordDate}>
-          {formatDate(record.record_date)}
-        </Text>
-        <Text style={styles.recordTime}>
-          {formatTime(record.created_at)}
-        </Text>
+        <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
+        <Text style={styles.recordTime}>{formatTime(record.created_at)}</Text>
       </View>
 
       <View style={[styles.content, isDeleting && styles.disabledContent]}>
@@ -120,7 +119,12 @@ export default function PracticeRecordCard({
             onPress={onEdit}
             disabled={isDeleting}
           >
-            <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
+            <Text
+              style={[
+                styles.editButtonText,
+                isDeleting && styles.disabledButtonText,
+              ]}
+            >
               编辑
             </Text>
           </TouchableOpacity>
@@ -129,7 +133,12 @@ export default function PracticeRecordCard({
             onPress={onDelete}
             disabled={isDeleting}
           >
-            <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
+            <Text
+              style={[
+                styles.deleteButtonText,
+                isDeleting && styles.disabledButtonText,
+              ]}
+            >
               删除
             </Text>
           </TouchableOpacity>
@@ -164,20 +173,20 @@ const styles = StyleSheet.create({
   },
   containerDeleting: {
     opacity: 0.6,
-    position: 'relative',
+    position: "relative",
   },
   deletingOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     zIndex: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: DesignSystem.borderRadius.lg,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: DesignSystem.spacing.sm,
   },
   deletingText: {
@@ -186,9 +195,9 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: DesignSystem.spacing.sm,
   },
   recordDate: {
@@ -200,7 +209,7 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.fontWeight.normal,
   },
   content: {
-    marginBottom: DesignSystem.spacing.md,
+    // marginBottom: DesignSystem.spacing.md,
   },
   recordCount: {
     ...ComponentTextStyles.body,
@@ -210,9 +219,9 @@ const styles = StyleSheet.create({
   notesContainer: {
     marginTop: DesignSystem.spacing.sm,
     padding: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.surface,
-    borderRadius: DesignSystem.borderRadius.md,
-    borderLeftWidth: 3,
+    backgroundColor: DesignSystem.colors.background,
+    // borderRadius: DesignSystem.borderRadius.md,
+    borderLeftWidth: 2,
     borderLeftColor: DesignSystem.colors.primary,
   },
   notesLabel: {
@@ -224,19 +233,21 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     fontSize: DesignSystem.typography.fontSize.sm,
     color: DesignSystem.colors.textSecondary,
-    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.relaxed,
+    lineHeight:
+      DesignSystem.typography.fontSize.sm *
+      DesignSystem.typography.lineHeight.relaxed,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     gap: DesignSystem.spacing.md,
     marginTop: DesignSystem.spacing.sm,
   },
   editButton: {
     ...ComponentTokens.button.variants.secondary,
     ...ComponentTokens.button.sizes.small,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: DesignSystem.spacing.lg,
   },
   editButtonText: {
@@ -245,8 +256,8 @@ const styles = StyleSheet.create({
   deleteButton: {
     ...ComponentTokens.button.variants.destructive,
     ...ComponentTokens.button.sizes.small,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: DesignSystem.spacing.lg,
   },
   deleteButtonText: {
