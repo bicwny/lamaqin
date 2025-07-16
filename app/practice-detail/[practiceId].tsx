@@ -16,9 +16,10 @@ import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
+import { ComponentTokens } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import ProgressBar from '@/components/ProgressBar';
+import { ComponentTextStyles } from '@/utils/componentTextStyles'; // Import ComponentTextStyles
 
 interface PracticeProject {
   id: string;
@@ -507,7 +508,7 @@ export default function PracticeDetailScreen() {
               </Text>
               {progress.isCompleted && (
                 <View style={styles.completedBadge}>
-                  <Text style={styles.completedText}>✅ 已完成</Text>
+                  <Text style={ComponentTextStyles.badge.text}>✅ 已完成</Text>
                 </View>
               )}
             </View>
