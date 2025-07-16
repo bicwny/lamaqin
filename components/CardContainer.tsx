@@ -1,34 +1,47 @@
 
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
+import { componentHelpers } from '@/utils/componentTokens';
 
 interface CardContainerProps {
   children: React.ReactNode;
   style?: ViewStyle;
-  padding?: number;
+  variant?: 'outlined' | 'elevated';
+  padding?: 'compact' | 'comfortable' | 'spacious' | number;
   margin?: number;
   marginHorizontal?: number;
   marginVertical?: number;
 }
 
+/**
+ * CardContainer - Updated to use new consolidated card system
+ * @deprecated Consider using the new Card component directly
+ */
 export default function CardContainer({
   children,
   style,
-  padding = 20,
+  variant = 'outlined',
+  padding = 'comfortable',
   margin,
-  marginHorizontal = 16,
-  marginVertical = 8,
+  marginHorizontal,
+  marginVertical,
 }: CardContainerProps) {
+  // Get base card style from new system
+  const baseCardStyle = componentHelpers.getCardStyle(variant, typeof padding === 'string' ? padding : 'comfortable');
+  
+  // Override with custom spacing if provided
+  const customSpacing = {
+    ...(typeof padding === 'number' && { padding }),
+    ...(margin !== undefined && { margin }),
+    ...(marginHorizontal !== undefined && { marginHorizontal }),
+    ...(marginVertical !== undefined && { marginVertical }),
+  };
+
   return (
     <View 
       style={[
-        styles.card,
-        {
-          padding,
-          margin,
-          marginHorizontal,
-          marginVertical,
-        },
+        baseCardStyle,
+        customSpacing,
         style
       ]}
     >
@@ -36,17 +49,3 @@ export default function CardContainer({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
-  },
-});

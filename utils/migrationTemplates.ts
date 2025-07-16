@@ -159,9 +159,9 @@ export const MigrationTemplates = {
     },
   },
 
-  // Card migration templates
+  // Card migration templates - Updated for consolidated system
   card: {
-    // Standard card template
+    // Standard card template → outlined + spacious
     standard: {
       oldPattern: {
         backgroundColor: '#ffffff',
@@ -175,11 +175,12 @@ export const MigrationTemplates = {
         shadowRadius: 12,
         elevation: 4,
       },
-      newPattern: ComponentTokens.card.standard,
-      apply: () => componentHelpers.getCardStyle('standard'),
+      newPattern: componentHelpers.getCardStyle('outlined', 'spacious'),
+      apply: () => componentHelpers.getCardStyle('outlined', 'spacious'),
+      component: '<Card variant="outlined" padding="spacious">',
     },
     
-    // Practice card template
+    // Practice card template → outlined + comfortable
     practice: {
       oldPattern: {
         backgroundColor: '#ffffff',
@@ -193,8 +194,76 @@ export const MigrationTemplates = {
         shadowRadius: 8,
         elevation: 2,
       },
-      newPattern: ComponentTokens.card.practice,
-      apply: () => componentHelpers.getCardStyle('practice'),
+      newPattern: componentHelpers.getCardStyle('outlined', 'comfortable'),
+      apply: () => componentHelpers.getCardStyle('outlined', 'comfortable'),
+      component: '<Card variant="outlined" padding="comfortable">',
+    },
+    
+    // Course card template → elevated + spacious
+    course: {
+      oldPattern: {
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
+        padding: 20,
+        marginHorizontal: 16,
+        marginVertical: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 6,
+      },
+      newPattern: componentHelpers.getCardStyle('elevated', 'spacious'),
+      apply: () => componentHelpers.getCardStyle('elevated', 'spacious'),
+      component: '<Card variant="elevated" padding="spacious">',
+    },
+    
+    // Status card template → Notification component
+    status: {
+      oldPattern: {
+        backgroundColor: '#e8f5e8',
+        borderRadius: 12,
+        padding: 12,
+        marginHorizontal: 16,
+        marginVertical: 4,
+        borderWidth: 1,
+        borderColor: '#2e7d32',
+      },
+      newPattern: componentHelpers.getNotificationStyle('success'),
+      apply: () => componentHelpers.getNotificationStyle('success'),
+      component: '<Notification variant="success" message="..." />',
+      requiresComponentChange: true,
+    },
+  },
+  
+  // Notification templates (new)
+  notification: {
+    success: {
+      oldPattern: 'status card patterns',
+      newPattern: componentHelpers.getNotificationStyle('success'),
+      apply: () => componentHelpers.getNotificationStyle('success'),
+      component: '<Notification variant="success" title="..." message="..." />',
+    },
+    
+    warning: {
+      oldPattern: 'warning card patterns',
+      newPattern: componentHelpers.getNotificationStyle('warning'),
+      apply: () => componentHelpers.getNotificationStyle('warning'),
+      component: '<Notification variant="warning" title="..." message="..." />',
+    },
+    
+    error: {
+      oldPattern: 'error card patterns',
+      newPattern: componentHelpers.getNotificationStyle('error'),
+      apply: () => componentHelpers.getNotificationStyle('error'),
+      component: '<Notification variant="error" title="..." message="..." />',
+    },
+    
+    info: {
+      oldPattern: 'info card patterns',
+      newPattern: componentHelpers.getNotificationStyle('info'),
+      apply: () => componentHelpers.getNotificationStyle('info'),
+      component: '<Notification variant="info" title="..." message="..." />',
     },
   },
 

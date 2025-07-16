@@ -67,61 +67,105 @@ export const ComponentTokens = {
     },
   },
 
-  // Card tokens with DesignSystem references
+  // Card tokens with DesignSystem references - Consolidated system
   card: {
-    standard: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      borderRadius: DesignSystem.borderRadius.lg,
-      padding: DesignSystem.spacing.xl,
-      marginHorizontal: DesignSystem.spacing.lg,
-      marginVertical: DesignSystem.spacing.sm,
-      shadowColor: DesignSystem.colors.cardShadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 12,
-      elevation: 4,
-      borderWidth: 0.5,
-      borderColor: 'rgba(0,0,0,0.04)',
+    // Base card styles by variant
+    variants: {
+      outlined: {
+        backgroundColor: DesignSystem.colors.backgroundSecondary,
+        borderRadius: DesignSystem.borderRadius.lg,
+        marginHorizontal: DesignSystem.spacing.lg,
+        marginVertical: DesignSystem.spacing.sm,
+        shadowColor: DesignSystem.colors.cardShadow,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: DesignSystem.colors.borderLight,
+      },
+      
+      elevated: {
+        backgroundColor: DesignSystem.colors.backgroundSecondary,
+        borderRadius: DesignSystem.borderRadius.xl,
+        marginHorizontal: DesignSystem.spacing.lg,
+        marginVertical: DesignSystem.spacing.sm,
+        shadowColor: DesignSystem.colors.cardShadow,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
+        elevation: 6,
+        borderWidth: 1,
+        borderColor: DesignSystem.colors.background,
+      },
     },
     
-    practice: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      borderRadius: DesignSystem.borderRadius.lg,
-      padding: DesignSystem.spacing.lg,
-      marginHorizontal: DesignSystem.spacing.lg,
-      marginVertical: DesignSystem.spacing.xxs,
-      shadowColor: DesignSystem.colors.cardShadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.borderLight,
+    // Padding variations
+    padding: {
+      compact: DesignSystem.spacing.md,      // 12px (was status)
+      comfortable: DesignSystem.spacing.lg,  // 16px (was practice)
+      spacious: DesignSystem.spacing.xl,     // 20px (was standard/course)
     },
     
-    course: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      borderRadius: DesignSystem.borderRadius.xl,
-      padding: DesignSystem.spacing.xl,
-      marginHorizontal: DesignSystem.spacing.lg,
-      marginVertical: DesignSystem.spacing.sm,
-      shadowColor: DesignSystem.colors.cardShadow,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 16,
-      elevation: 6,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.background,
+    // Legacy support - maps old variants to new system
+    legacy: {
+      standard: { variant: 'outlined' as const, padding: 'spacious' as const },
+      practice: { variant: 'outlined' as const, padding: 'comfortable' as const },
+      course: { variant: 'elevated' as const, padding: 'spacious' as const },
+      status: 'notification' as const, // Maps to new Notification component
     },
-    
-    status: {
-      backgroundColor: DesignSystem.colors.successBackground,
-      borderRadius: DesignSystem.borderRadius.lg,
-      padding: DesignSystem.spacing.md,
-      marginHorizontal: DesignSystem.spacing.lg,
-      marginVertical: DesignSystem.spacing.xs,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.practiceComplete,
+  },
+
+  // Notification component tokens (replaces status cards)
+  notification: {
+    variants: {
+      success: {
+        backgroundColor: DesignSystem.colors.successBackground,
+        borderRadius: DesignSystem.borderRadius.lg,
+        padding: DesignSystem.spacing.md,
+        marginHorizontal: DesignSystem.spacing.lg,
+        marginVertical: DesignSystem.spacing.xs,
+        borderWidth: 1,
+        borderColor: DesignSystem.colors.practiceComplete,
+        borderLeftWidth: 4,
+        borderLeftColor: DesignSystem.colors.practiceComplete,
+      },
+      
+      warning: {
+        backgroundColor: DesignSystem.colors.warningBackground,
+        borderRadius: DesignSystem.borderRadius.lg,
+        padding: DesignSystem.spacing.md,
+        marginHorizontal: DesignSystem.spacing.lg,
+        marginVertical: DesignSystem.spacing.xs,
+        borderWidth: 1,
+        borderColor: DesignSystem.colors.warningBorder,
+        borderLeftWidth: 4,
+        borderLeftColor: DesignSystem.colors.warningBorder,
+      },
+      
+      error: {
+        backgroundColor: DesignSystem.colors.errorBackground,
+        borderRadius: DesignSystem.borderRadius.lg,
+        padding: DesignSystem.spacing.md,
+        marginHorizontal: DesignSystem.spacing.lg,
+        marginVertical: DesignSystem.spacing.xs,
+        borderWidth: 1,
+        borderColor: DesignSystem.colors.errorBorder,
+        borderLeftWidth: 4,
+        borderLeftColor: DesignSystem.colors.errorBorder,
+      },
+      
+      info: {
+        backgroundColor: DesignSystem.colors.background,
+        borderRadius: DesignSystem.borderRadius.lg,
+        padding: DesignSystem.spacing.md,
+        marginHorizontal: DesignSystem.spacing.lg,
+        marginVertical: DesignSystem.spacing.xs,
+        borderWidth: 1,
+        borderColor: DesignSystem.colors.info,
+        borderLeftWidth: 4,
+        borderLeftColor: DesignSystem.colors.info,
+      },
     },
   },
 
@@ -343,6 +387,21 @@ export const ComponentTextStyles = {
     },
   },
   
+  // Notification text styles (for new Notification component)
+  notification: {
+    title: {
+      fontSize: DesignSystem.typography.fontSize.base,
+      fontWeight: DesignSystem.typography.fontWeight.semibold,
+      color: DesignSystem.colors.textPrimary,
+    },
+    message: {
+      fontSize: DesignSystem.typography.fontSize.sm,
+      fontWeight: DesignSystem.typography.fontWeight.normal,
+      color: DesignSystem.colors.textSecondary,
+      lineHeight: DesignSystem.typography.lineHeight.relaxed,
+    },
+  },
+  
   header: {
     // Legacy support - text styles are now handled by Header component internally
     page: 'page' as const,
@@ -395,9 +454,27 @@ export const componentHelpers = {
     return componentHelpers.getButtonStyle(mapping.variant, mapping.size);
   },
   
-  // Get complete card style
-  getCardStyle: (variant: keyof typeof ComponentTokens.card) => 
-    ComponentTokens.card[variant],
+  // Get complete card style with new consolidated system
+  getCardStyle: (
+    variant: 'outlined' | 'elevated', 
+    padding: 'compact' | 'comfortable' | 'spacious' = 'comfortable'
+  ) => ({
+    ...ComponentTokens.card.variants[variant],
+    padding: ComponentTokens.card.padding[padding],
+  }),
+  
+  // Legacy card style support
+  getLegacyCardStyle: (legacyVariant: 'standard' | 'practice' | 'course') => {
+    const mapping = ComponentTokens.card.legacy[legacyVariant];
+    if (typeof mapping === 'string') {
+      throw new Error(`Legacy variant '${legacyVariant}' should use Notification component instead`);
+    }
+    return componentHelpers.getCardStyle(mapping.variant, mapping.padding);
+  },
+  
+  // Get notification style (replaces status cards)
+  getNotificationStyle: (variant: keyof typeof ComponentTokens.notification.variants) => 
+    ComponentTokens.notification.variants[variant],
   
   // Get button text style with new consolidated system
   getButtonTextStyle: (
@@ -416,6 +493,10 @@ export const componentHelpers = {
   // Get card text style
   getCardTextStyle: (variant: keyof typeof ComponentTextStyles.card) => 
     ComponentTextStyles.card[variant],
+  
+  // Get notification text style
+  getNotificationTextStyle: (variant: keyof typeof ComponentTextStyles.notification) => 
+    ComponentTextStyles.notification[variant],
   
   // Get progress bar size (for new ProgressBar component)
   getProgressSize: (variant: keyof typeof ComponentTokens.progress) => 
