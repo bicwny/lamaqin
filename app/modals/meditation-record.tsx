@@ -192,7 +192,6 @@ export default function MeditationRecordScreen() {
       size="default"
       keyboardAvoidingView={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-        <View style={styles.formContainer}>
           <Text style={styles.practiceTitle}>{practiceName}</Text>
 
           {/* Duration Input */}
@@ -260,7 +259,6 @@ export default function MeditationRecordScreen() {
               <Text style={styles.saveButtonText}>💾 保存记录</Text>
             )}
           </TouchableOpacity>
-        </View>
         
         {/* Topic Selection Modal */}
         <TopicSelectionModal
@@ -276,15 +274,10 @@ export default function MeditationRecordScreen() {
 }
 
 const styles = StyleSheet.create({
-  formContainer: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
-    marginBottom: DesignSystem.spacing.xl,
-  },
   practiceTitle: {
     ...createStyles.dharmaTitle('xl'),
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing['lg'],
+    marginBottom: DesignSystem.spacing['2xl'],
     paddingBottom: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border,
