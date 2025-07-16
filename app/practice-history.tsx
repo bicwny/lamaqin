@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -247,9 +246,8 @@ export default function PracticeHistoryScreen() {
   if (loading) {
     return (
       <PageTemplate
-        title={`📿 ${practiceName} - 详情`}
-        subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
-          `项目：${getDisplayProjectName(projectInfo)}` : undefined}
+        title={`${practiceName} - 详情`}
+        subtitle={undefined}
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
@@ -267,9 +265,8 @@ export default function PracticeHistoryScreen() {
 
   return (
     <PageTemplate
-      title={`📿 ${practiceName} - 详情`}
-      subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
-        `项目：${getDisplayProjectName(projectInfo)}` : undefined}
+      title={`${practiceName} - 详情`}
+      subtitle={undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
@@ -410,5 +407,5 @@ const styles = StyleSheet.create({
   recordsList: {
     gap: DesignSystem.spacing.md,
   },
-  
+
 });
