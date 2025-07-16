@@ -914,6 +914,31 @@ export const componentHelpers = {
     color: ComponentTokens.completedBadge.icon.color,
   }),
 
+  // Icon helper functions
+  getIconProps: (
+    name: string,
+    size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' = 'md',
+    color: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'inverse' = 'neutral'
+  ) => {
+    const sizeMap = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32, '2xl': 40 };
+    const colorMap = {
+      primary: DesignSystem.colors.primary,
+      secondary: DesignSystem.colors.textSecondary,
+      success: DesignSystem.colors.practiceComplete,
+      warning: DesignSystem.colors.warning,
+      error: DesignSystem.colors.error,
+      info: DesignSystem.colors.info,
+      neutral: DesignSystem.colors.textSecondary,
+      inverse: DesignSystem.colors.textInverse,
+    };
+    
+    return {
+      name,
+      size: sizeMap[size],
+      color: colorMap[color],
+    };
+  },
+
   // Legacy badge support
   getLegacyBadgeStyle: (legacyVariant: 'small' | 'wisdomBadge' | 'completionBadge') => {
     const mapping = ComponentTokens.badge.legacy[legacyVariant];

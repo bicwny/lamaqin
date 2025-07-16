@@ -54,6 +54,19 @@ interface MeditationRecord {
   created_at: string;
 }
 
+// Define IconProps interface
+interface IconProps {
+  semantic: 'completion';
+}
+
+// Icon Component (replace with your actual Icon component implementation)
+const Icon: React.FC<IconProps> = ({ semantic }) => {
+  // Replace this with your actual icon implementation
+  // This is a placeholder, so it just returns a simple Text component
+  const color = DesignSystem.colors.practiceComplete;
+  return <Ionicons name="checkmark-circle" size={16} color={color} />;
+};
+
 export default function PracticeDetailScreen() {
   const { user } = useAuth();
   const { practiceId } = useLocalSearchParams<{ practiceId: string }>();
@@ -471,8 +484,8 @@ export default function PracticeDetailScreen() {
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
             {progress.isCompleted && (
-              <View>
-                <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.practiceComplete} />
+              <View style={styles.completedBadge}>
+                <Icon semantic="completion" />
               </View>
             )}
 
