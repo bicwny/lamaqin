@@ -508,54 +508,33 @@ export default function PracticeConfigScreen() {
 
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>项目时长</Text>
-          <View style={styles.segmentedControl}>
+          
+          <View style={styles.smartDurationContainer}>
+            <View style={styles.daysInputContainer}>
+              <TextInput
+                style={styles.daysInput}
+                value={customDays}
+                onChangeText={handleDaysInputChange}
+                keyboardType="numeric"
+                placeholder="60"
+              />
+              <Text style={styles.daysInputLabel}>天</Text>
+            </View>
+            <Text style={styles.durationSeparator}>至</Text>
             <TouchableOpacity
-              style={[
-                styles.segmentButton,
-                durationMode === "固定时长" && styles.segmentButtonActive,
-              ]}
-              onPress={() => setDurationMode("固定时长")}
+              style={styles.endDatePickerButton}
+              onPress={() => setCustomDatePickerVisibility(true)}
             >
-              <Text style={[
-                styles.segmentButtonText,
-                durationMode === "固定时长" && styles.segmentButtonTextActive,
-              ]}>
-                固定时长
+              <Text style={styles.endDatePickerButtonText}>
+                {customEndDate.toLocaleDateString('zh-CN')}
               </Text>
+              <Text style={styles.dateButtonIcon}>📅</Text>
             </TouchableOpacity>
           </View>
 
-          {durationMode === "固定时长" && (
-            <View style={styles.smartDurationContainer}>
-              <View style={styles.daysInputContainer}>
-                <TextInput
-                  style={styles.daysInput}
-                  value={customDays}
-                  onChangeText={handleDaysInputChange}
-                  keyboardType="numeric"
-                  placeholder="60"
-                />
-                <Text style={styles.daysInputLabel}>天</Text>
-              </View>
-              <Text style={styles.durationSeparator}>至</Text>
-              <TouchableOpacity
-                style={styles.endDatePickerButton}
-                onPress={() => setCustomDatePickerVisibility(true)}
-              >
-                <Text style={styles.endDatePickerButtonText}>
-                  {customEndDate.toLocaleDateString('zh-CN')}
-                </Text>
-                <Text style={styles.dateButtonIcon}>📅</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
           <View style={styles.durationDisplay}>
             <Text style={styles.durationDisplayText}>
-              {durationMode === "固定时长" 
-                ? `项目时长：${calculatedDays} 天`
-                : ``
-              }
+              项目时长：{calculatedDays} 天
             </Text>
           </View>
         </View>
