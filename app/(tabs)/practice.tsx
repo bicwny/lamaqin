@@ -435,24 +435,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: DesignSystem.spacing.md,
+    // marginBottom: DesignSystem.spacing.md,
   },
   practiceInfo: {
     flex: 1,
   },
   practiceName: {
     ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.xs,
+    // marginBottom: DesignSystem.spacing.sm,
   },
   programName: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   completedBadge: {
     fontSize: DesignSystem.typography.fontSize.lg,
   },
   progressContainer: {
-    marginBottom: DesignSystem.spacing.lg,
+    // marginBottom: DesignSystem.spacing.lg,
   },
   progressInfo: {
     flexDirection: "row",
@@ -493,7 +494,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: DesignSystem.colors.divider,
-    marginVertical: DesignSystem.spacing.md,
+    marginVertical: DesignSystem.spacing.sm,
   },
   progressBarContainer: {
     marginTop: DesignSystem.spacing.sm,
