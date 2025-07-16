@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -17,7 +16,7 @@ import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
+import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import ProgressBar from '@/components/ProgressBar';
 
@@ -545,7 +544,7 @@ export default function PracticeDetailScreen() {
           {/* Project Details */}
           <View style={styles.projectDetails}>
             <Text style={styles.projectDetailsTitle}>项目详情</Text>
-            
+
             <View style={styles.detailsGrid}>
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>开始日期</Text>
@@ -666,10 +665,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   completedBadge: {
-    ...ComponentTokens.buddhist.completionBadge,
+    ...ComponentTokens.card.badge,
   },
   completedText: {
-    ...ComponentTextStyles.buddhist.completionText,
+    ...ComponentTextStyles.badge.text,
   },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
@@ -714,7 +713,7 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
     marginTop: DesignSystem.spacing.sm,
   },
-  
+
   progressPercentage: {
     fontSize: DesignSystem.typography.fontSize.base,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
@@ -866,5 +865,24 @@ const styles = StyleSheet.create({
     ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
+  },
+  progressBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.sm,
+  },
+  progressBar: {
+    height: 10,
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: 5,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: DesignSystem.colors.dharmaRed,
+    borderRadius: 4,
   },
 });
