@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -224,6 +225,62 @@ export default function PracticeScreen() {
     });
   };
 
+  const renderPracticeItem = ({ item }: { item: PracticeProject }) => {
+    const progress = calculateProgress(item);
+    const presetName = item.preset_project_id
+      ? presetProjectNames[item.preset_project_id]
+      : null;
+    const displayName = item.project_name || presetName || "预设项目";
+
+    return (
+      <View style={styles.practiceItem}>
+        <View style={styles.practiceHeader}>
+          <View style={styles.practiceInfo}>
+            <Text style={styles.practiceName}>{item.practices.name}</Text>
+            {(item.project_name || item.preset_project_id) && (
+              <Text style={styles.programName}>{displayName}</Text>
+            )}
+          </View>
+          {progress.isCompleted && (
+            <Text style={styles.completedBadge}>✅</Text>
+          )}
+        </View>
+
+        <View style={styles.progressContainer}>
+          <View style={styles.progressInfo}>
+            <Text style={styles.progressText}>
+              {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {item.practices.unit}
+            </Text>
+            <Text style={styles.progressPercentage}>
+              {Math.round(progress.percentage)}%
+            </Text>
+          </View>
+          <ProgressBar 
+            progress={progress.percentage} 
+            size="standard" 
+            containerStyle={styles.progressBar}
+          />
+        </View>
+
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => handleCustomRecord(item.id, item.practices.name)}
+          >
+            <Text style={styles.actionButtonText}>记录</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.viewDetailsButton]}
+            onPress={() => handleViewDetails(item.id, item.practices.name)}
+          >
+            <Text style={styles.actionButtonText}>详情</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   if (loading) {
     return (
       <PageTemplate
@@ -236,6 +293,7 @@ export default function PracticeScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -282,19 +340,25 @@ export default function PracticeScreen() {
         text: "添加",
         onPress: handleAddPractice,
       }}
-      scrollable={true}
+      scrollable={false}
       backgroundColor={DesignSystem.colors.background}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    );
-  }
+      padding={0}
+    >
+      <FlatList
+        data={projects}
+        renderItem={renderPracticeItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+    </PageTemplate>
+  );
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -302,111 +366,106 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.background,
   },
   loadingText: {
-    fontSize: 16,
+    ...ComponentTextStyles.body,
     color: DesignSystem.colors.textSecondary,
+    marginTop: DesignSystem.spacing.md,
   },
   emptyState: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: DesignSystem.spacing.xl,
     backgroundColor: DesignSystem.colors.background,
   },
   iconContainer: {
-    marginBottom: 20,
+    marginBottom: DesignSystem.spacing.xl,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: 10,
+    ...ComponentTextStyles.heading,
     textAlign: "center",
+    marginBottom: DesignSystem.spacing.md,
   },
   emptyDescription: {
-    fontSize: 16,
+    ...ComponentTextStyles.body,
     color: DesignSystem.colors.textSecondary,
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: DesignSystem.spacing["2xl"],
   },
   browseButton: {
+    ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.large,
     flexDirection: "row",
-    backgroundColor: DesignSystem.colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 24,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    gap: DesignSystem.spacing.sm,
   },
   browseButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 10,
+    ...ComponentTextStyles.button.primary,
+    fontSize: DesignSystem.typography.fontSize.base,
+  },
+  listContainer: {
+    padding: DesignSystem.spacing.lg,
   },
   practiceItem: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginBottom: ComponentTokens.card.margin.standard,
+  },
+  practiceHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: DesignSystem.spacing.md,
+  },
+  practiceInfo: {
+    flex: 1,
   },
   practiceName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: 8,
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.xs,
   },
-  practiceDescription: {
-    fontSize: 14,
+  programName: {
+    ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
-    marginBottom: 12,
+  },
+  completedBadge: {
+    fontSize: DesignSystem.typography.fontSize.lg,
   },
   progressContainer: {
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.lg,
   },
-  progressLabel: {
-    fontSize: 12,
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: 4,
-  },
-  actionsContainer: {
+  progressInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  progressText: {
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textPrimary,
+  },
+  progressPercentage: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+  },
+  progressBar: {
+    flex: 1,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    gap: DesignSystem.spacing.md,
   },
   actionButton: {
-    backgroundColor: DesignSystem.colors.secondary,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    ...ComponentTokens.button.variants.secondary,
+    ...ComponentTokens.button.sizes.medium,
+    flex: 1,
     alignItems: "center",
-  },
-  actionButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "bold",
+    justifyContent: "center",
   },
   viewDetailsButton: {
-    backgroundColor: DesignSystem.colors.primary,
+    ...ComponentTokens.button.variants.primary,
   },
-  completedText: {
-    color: DesignSystem.colors.success,
-    fontWeight: "bold",
+  actionButtonText: {
+    ...ComponentTextStyles.button.secondary,
   },
 });
