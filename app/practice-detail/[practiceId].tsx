@@ -471,10 +471,13 @@ export default function PracticeDetailScreen() {
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
             {progress.isCompleted && (
-              <View style={styles.completedBadge}>
-                <Text style={styles.completedBadgeText}>✅ 已完成</Text>
+            <View style={styles.completedBadge}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: DesignSystem.spacing.xs }}>
+                <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.practiceComplete} />
+                <Text style={styles.completedBadgeText}>已完成</Text>
               </View>
-            )}
+            </View>
+          )}
 
             <Text style={styles.practiceTitle}>
               {project.practices.name}
@@ -760,5 +763,5 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing['2xl'],
     fontStyle: 'italic',
   },
-  
+
 });
