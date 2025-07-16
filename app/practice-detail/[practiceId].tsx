@@ -319,10 +319,10 @@ export default function PracticeDetailScreen() {
         );
       }
 
-      return recentRecords.map((record) => (
+      return recentRecords.map((record, index) => (
         <TouchableOpacity
           key={record.id}
-          style={styles.recordItem}
+          style={index < recentRecords.length - 1 ? styles.recordItemWithDivider : styles.recordItem}
           onPress={() => router.push({
             pathname: '/meditation-detail/[recordId]',
             params: { recordId: record.id }
@@ -352,8 +352,8 @@ export default function PracticeDetailScreen() {
         );
       }
 
-      return practiceRecords.slice(0, 5).map((record) => (
-        <View key={record.id} style={styles.recordItem}>
+      return practiceRecords.slice(0, 5).map((record, index) => (
+        <View key={record.id} style={index < practiceRecords.length - 1 ? styles.recordItemWithDivider : styles.recordItem}>
           <View style={styles.recordHeader}>
             <Text style={styles.recordDate}>
               {new Date(record.record_date).toLocaleDateString('zh-CN')}
