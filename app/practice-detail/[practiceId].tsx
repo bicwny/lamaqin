@@ -496,13 +496,9 @@ export default function PracticeDetailScreen() {
       >
         {/* Main Practice Info Card */}
         <View style={styles.mainCard}>
-          {/* Practice Type and Status Header */}
+          {/* Practice Status Header */}
           <View style={styles.practiceHeader}>
             <View style={styles.practiceTypeRow}>
-              <Text style={styles.practiceType}>
-                {project.practices.type === 'count' ? '计数类' : '计时类'}
-                {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
-              </Text>
               {progress.isCompleted && (
                 <View style={styles.completedBadge}>
                   <Text style={styles.completedBadgeText}>✅ 已完成</Text>
