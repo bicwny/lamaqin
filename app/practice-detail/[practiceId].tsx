@@ -516,6 +516,16 @@ export default function PracticeDetailScreen() {
               {project.practices.name}
             </Text>
 
+            {/* Program Name Display */}
+            {(project.project_name || project.preset_project_id) && (
+              <View style={styles.programNameContainer}>
+                <Text style={styles.programNameLabel}>项目：</Text>
+                <Text style={styles.programNameText}>
+                  {getDisplayProjectName()}
+                </Text>
+              </View>
+            )}
+
             {project.practices.description && (
               <Text style={styles.practiceDescription}>
                 {project.practices.description}
@@ -677,6 +687,30 @@ const styles = StyleSheet.create({
     ...Typography.styles.body('base'),
     lineHeight: DesignSystem.typography.lineHeight.relaxed * DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textSecondary,
+  },
+  programNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderLeftWidth: 3,
+    borderLeftColor: DesignSystem.colors.primary,
+  },
+  programNameLabel: {
+    ...Typography.styles.label('sm'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textSecondary,
+    marginRight: DesignSystem.spacing.xs,
+  },
+  programNameText: {
+    ...Typography.styles.body('base'),
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
+    flex: 1,
   },
   progressSection: {
     paddingHorizontal: DesignSystem.spacing.xl,
