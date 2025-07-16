@@ -379,6 +379,307 @@ export default function PracticeConfigScreen() {
     }
   };
 
+  const handleConfirm = () => {
+    handleSave();
+  };
+
+  const renderCountBasedConfig = () => {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>目标设置</Text>
+        
+        <View style={styles.goalTypeContainer}>
+          <View style={styles.segmentedControl}>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                configMode === "total" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setConfigMode("total")}
+            >
+              <Text style={[
+                styles.segmentButtonText,
+                configMode === "total" && styles.segmentButtonTextActive,
+              ]}>
+                总目标
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                configMode === "daily" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setConfigMode("daily")}
+            >
+              <Text style={[
+                styles.segmentButtonText,
+                configMode === "daily" && styles.segmentButtonTextActive,
+              ]}>
+                每日目标
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {configMode === "total" ? (
+            <View style={styles.goalInputContainer}>
+              <Text style={styles.goalInputLabel}>
+                整个项目的总目标数量
+              </Text>
+              <View style={styles.goalInputRow}>
+                <TextInput
+                  style={styles.goalTextInput}
+                  value={totalTarget}
+                  onChangeText={setTotalTarget}
+                  placeholder="输入总目标数量"
+                  keyboardType="numeric"
+                />
+                <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+              </View>
+              {suggestedDaily > 0 && (
+                <Text style={styles.helpText}>
+                  建议每日：{suggestedDaily} {practiceUnit}
+                </Text>
+              )}
+            </View>
+          ) : (
+            <View style={styles.goalInputContainer}>
+              <Text style={styles.goalInputLabel}>
+                每日目标数量
+              </Text>
+              <View style={styles.goalInputRow}>
+                <TextInput
+                  style={styles.goalTextInput}
+                  value={dailyTarget}
+                  onChangeText={setDailyTarget}
+                  placeholder="输入每日目标"
+                  keyboardType="numeric"
+                />
+                <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+              </View>
+              {projectedTotal > 0 && (
+                <Text style={styles.helpText}>
+                  预计总量：{projectedTotal.toLocaleString()} {practiceUnit}
+                </Text>
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const renderTimeBasedConfig = () => {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>目标设置</Text>
+        
+        <View style={styles.timeInputContainer}>
+          <Text style={styles.timeInputLabel}>每周目标座数</Text>
+          <View style={styles.inputRow}>
+            <Text style={styles.inputPrefix}>每周</Text>
+            <TextInput
+              style={styles.textInput}
+              value={sessionsTarget}
+              onChangeText={setSessionsTarget}
+              placeholder="1"
+              keyboardType="numeric"
+            />
+            <Text style={styles.inputUnit}>座</Text>
+          </View>
+          <Text style={styles.helpText}>
+            设置您希望每周完成的修行座数
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderTimePlanning = () => {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>时间规划</Text>
+        
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>开始日期</Text>
+          <TouchableOpacity
+            style={styles.simpleDateButton}
+            onPress={() => setStartDatePickerVisibility(true)}
+          >
+            <Text style={styles.simpleDateButtonText}>
+              {startDate.toLocaleDateString('zh-CN')}
+            </Text>
+            <Text style={styles.dateButtonIcon}>📅</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>项目时长</Text>
+          <View style={styles.segmentedControl}>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                durationMode === "持续进行" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setDurationMode("持续进行")}
+            >
+              <Text style={[
+                styles.segmentButtonText,
+                durationMode === "持续进行" && styles.segmentButtonTextActive,
+              ]}>
+                持续进行
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                durationMode === "固定时长" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setDurationMode("固定时长")}
+            >
+              <Text style={[
+                styles.segmentButtonText,
+                durationMode === "固定时长" && styles.segmentButtonTextActive,
+              ]}>
+                固定时长
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {durationMode === "固定时长" && (
+            <View style={styles.smartDurationContainer}>
+              <View style={styles.daysInputContainer}>
+                <TextInput
+                  style={styles.daysInput}
+                  value={customDays}
+                  onChangeText={handleDaysInputChange}
+                  keyboardType="numeric"
+                  placeholder="60"
+                />
+                <Text style={styles.daysInputLabel}>天</Text>
+              </View>
+              <Text style={styles.durationSeparator}>至</Text>
+              <TouchableOpacity
+                style={styles.endDatePickerButton}
+                onPress={() => setCustomDatePickerVisibility(true)}
+              >
+                <Text style={styles.endDatePickerButtonText}>
+                  {customEndDate.toLocaleDateString('zh-CN')}
+                </Text>
+                <Text style={styles.dateButtonIcon}>📅</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View style={styles.durationDisplay}>
+            <Text style={styles.durationDisplayText}>
+              {durationMode === "持续进行" 
+                ? "项目将持续进行，直到您手动结束" 
+                : `项目时长：${calculatedDays} 天`
+              }
+            </Text>
+          </View>
+        </View>
+
+        {/* Date Pickers */}
+        <ModalDatetimePicker
+          isVisible={isStartDatePickerVisible}
+          mode="date"
+          onConfirm={(date) => {
+            setStartDate(date);
+            setStartDatePickerVisibility(false);
+          }}
+          onCancel={() => setStartDatePickerVisibility(false)}
+          date={startDate}
+        />
+
+        <ModalDatetimePicker
+          isVisible={isCustomDatePickerVisible}
+          mode="date"
+          onConfirm={(date) => {
+            handleEndDateChange(date);
+            setCustomDatePickerVisibility(false);
+          }}
+          onCancel={() => setCustomDatePickerVisibility(false)}
+          date={customEndDate}
+          minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
+        />
+      </View>
+    );
+  };
+
+  const renderSmartSummary = () => {
+    const days = getDurationInDays();
+    const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+    
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>项目预览</Text>
+        
+        <View style={styles.previewCard}>
+          <View style={styles.previewHeader}>
+            <Text style={styles.previewPracticeName}>{practiceName}</Text>
+            {projectName && (
+              <View style={styles.previewProjectPill}>
+                <Text style={styles.previewProjectPillText}>{projectName}</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.previewDetails}>
+            <Text style={styles.previewDetailItem}>
+              📅 开始日期：{startDate.toLocaleDateString('zh-CN')}
+            </Text>
+            
+            {durationMode === "持续进行" ? (
+              <Text style={styles.previewDetailItem}>
+                ⏳ 项目时长：持续进行
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.previewDetailItem}>
+                  ⏳ 项目时长：{days} 天
+                </Text>
+                <Text style={styles.previewDetailItem}>
+                  🏁 结束日期：{endDate.toLocaleDateString('zh-CN')}
+                </Text>
+              </>
+            )}
+
+            {practiceType === "count" ? (
+              <>
+                {configMode === "total" && totalTarget && (
+                  <Text style={styles.previewDetailItem}>
+                    🎯 总目标：{parseInt(totalTarget).toLocaleString()} {practiceUnit}
+                  </Text>
+                )}
+                {(configMode === "daily" || suggestedDaily > 0) && (
+                  <Text style={styles.previewDetailItem}>
+                    📊 每日目标：{configMode === "daily" ? dailyTarget : suggestedDaily} {practiceUnit}
+                  </Text>
+                )}
+                {projectedTotal > 0 && configMode === "daily" && (
+                  <Text style={styles.previewDetailItem}>
+                    📈 预计总量：{projectedTotal.toLocaleString()} {practiceUnit}
+                  </Text>
+                )}
+              </>
+            ) : (
+              <Text style={styles.previewDetailItem}>
+                🧘 每周目标：{sessionsTarget} 座
+              </Text>
+            )}
+          </View>
+
+          {(!totalTarget && !dailyTarget && !sessionsTarget) && (
+            <Text style={styles.previewPlaceholder}>
+              请设置目标后查看项目预览
+            </Text>
+          )}
+        </View>
+      </View>
+    );
+  };
+
   return (
     <PageTemplate
       title={isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
