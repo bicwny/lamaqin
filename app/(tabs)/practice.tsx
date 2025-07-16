@@ -254,7 +254,9 @@ export default function PracticeScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.emptyState}>
+          <Text style={{position: 'absolute', top: 5, left: 5, fontSize: 12, fontWeight: 'bold', color: 'red', backgroundColor: 'white'}}>EMPTY_STATE</Text>
           <View style={styles.iconContainer}>
+            <Text style={{position: 'absolute', top: -15, left: 5, fontSize: 10, fontWeight: 'bold', color: 'blue', backgroundColor: 'white'}}>ICON_CONTAINER</Text>
             <Ionicons name="flower-outline" size={80} color="#9CA3AF" />
           </View>
 
@@ -288,7 +290,10 @@ export default function PracticeScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Text style={styles.sectionTitle}>我的修行项目：</Text>
+      <Text style={styles.sectionTitle}>
+        <Text style={{position: 'absolute', top: -15, left: 5, fontSize: 10, fontWeight: 'bold', color: 'green', backgroundColor: 'white'}}>SECTION_TITLE</Text>
+        我的修行项目：
+      </Text>
 
       {projects.map((project) => {
         const progress = calculateProgress(project);
@@ -310,6 +315,7 @@ export default function PracticeScreen() {
 
         return (
           <View key={project.id} style={styles.practiceCard}>
+            <Text style={{position: 'absolute', top: 5, left: 5, fontSize: 10, fontWeight: 'bold', color: 'purple', backgroundColor: 'white', zIndex: 100}}>PRACTICE_CARD</Text>
             {/* Practice Name and Project Name Row */}
             <View style={styles.practiceNameRow}>
               <Text style={styles.practiceName}>
@@ -547,9 +553,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: DesignSystem.spacing["2xl"],
     paddingTop: DesignSystem.spacing["3xl"],
+    // DEBUG: Temporary outline
+    borderWidth: 2,
+    borderColor: 'red',
+    backgroundColor: 'rgba(255,0,0,0.1)',
   },
   iconContainer: {
     marginBottom: DesignSystem.spacing["2xl"],
+    // DEBUG: Temporary outline
+    borderWidth: 2,
+    borderColor: 'blue',
+    backgroundColor: 'rgba(0,0,255,0.1)',
   },
   emptyTitle: {
     ...ComponentTextStyles.heading,
@@ -576,18 +590,30 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.subheading,
     marginBottom: DesignSystem.spacing.lg,
     paddingHorizontal: DesignSystem.spacing.lg,
+    // DEBUG: Temporary outline
+    borderWidth: 2,
+    borderColor: 'green',
+    backgroundColor: 'rgba(0,255,0,0.1)',
   },
   practiceCard: {
     ...ComponentTokens.card.variants.outlined,
     // marginHorizontal: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.lg,
     padding: ComponentTokens.card.padding.comfortable,
+    // DEBUG: Temporary outline
+    borderWidth: 3,
+    borderColor: 'purple',
+    backgroundColor: 'rgba(128,0,128,0.1)',
   },
   practiceNameRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: DesignSystem.spacing.sm,
+    // DEBUG: Temporary outline
+    borderWidth: 1,
+    borderColor: 'cyan',
+    backgroundColor: 'rgba(0,255,255,0.1)',
   },
   practiceName: {
     ...ComponentTextStyles.subheading,
@@ -604,6 +630,10 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     marginBottom: DesignSystem.spacing.lg,
+    // DEBUG: Temporary outline
+    borderWidth: 1,
+    borderColor: 'yellow',
+    backgroundColor: 'rgba(255,255,0,0.1)',
   },
   practiceInfo: {
     ...ComponentTextStyles.body,
@@ -628,6 +658,10 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     gap: DesignSystem.spacing.md,
+    // DEBUG: Temporary outline
+    borderWidth: 1,
+    borderColor: 'pink',
+    backgroundColor: 'rgba(255,192,203,0.1)',
   },
   primaryButton: {
     ...ComponentTokens.button.variants.primary,
@@ -652,6 +686,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: DesignSystem.spacing.xl,
+    // DEBUG: Temporary outline
+    borderWidth: 2,
+    borderColor: 'orange',
+    backgroundColor: 'rgba(255,165,0,0.1)',
   },
   loadingText: {
     marginTop: DesignSystem.spacing.lg,
