@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -257,7 +256,7 @@ export default function PracticeScreen() {
           </View>
           <ProgressBar 
             progress={progress.percentage} 
-            size="standard" 
+            size="thick"
             containerStyle={styles.progressBar}
           />
         </View>
@@ -450,6 +449,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
+    marginRight: 12,
   },
   actionsContainer: {
     flexDirection: "row",
