@@ -74,15 +74,15 @@ export const ComponentTokens = {
       outlined: {
         backgroundColor: DesignSystem.colors.backgroundSecondary,
         borderRadius: DesignSystem.borderRadius.lg,
-        marginHorizontal: DesignSystem.spacing.lg,
-        marginVertical: DesignSystem.spacing.sm,
+        // marginHorizontal: DesignSystem.spacing.lg,
+        // marginVertical: DesignSystem.spacing.sm,
         shadowColor: DesignSystem.colors.cardShadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
         borderWidth: 1,
-        borderColor: DesignSystem.colors.borderLight,
+        borderColor: DesignSystem.colors.borderDark,
       },
       
       elevated: {

@@ -653,8 +653,8 @@ const styles = StyleSheet.create({
   },
   mainCard: {
     ...ComponentTokens.card.practice,
-    margin: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.md,
+    // margin: DesignSystem.spacing.lg,
+    // marginBottom: DesignSystem.spacing.md,
   },
   practiceHeader: {
     paddingHorizontal: DesignSystem.spacing.xl,
