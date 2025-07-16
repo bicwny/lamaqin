@@ -513,7 +513,8 @@ export default function PracticeDetailScreen() {
             {/* Program Name Display */}
             {(project.project_name || project.preset_project_id) && (
               <View style={styles.programNameContainer}>
-                <Text style={styles.programNameLabel}>项目：</Text>
+                {/* Remove text "项目：" */}
+                {/* Apply small pill style  */}
                 <Text style={styles.programNameText}>
                   {getDisplayProjectName()}
                 </Text>
