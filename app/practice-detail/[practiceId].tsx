@@ -471,8 +471,8 @@ export default function PracticeDetailScreen() {
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
             {progress.isCompleted && (
-              <View style={styles.completedBadge}>
-                <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.practiceComplete} />
+              <View>
+                <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.practiceComplete} />
               </View>
             )}
 
