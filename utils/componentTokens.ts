@@ -631,7 +631,7 @@ export const ComponentTextStyles = {
       primary: {
         fontSize: DesignSystem.typography.fontSize.base,      // 16px
         fontWeight: DesignSystem.typography.fontWeight.bold, // 700
-        color: DesignSystem.colors.textInverse,
+        color: '#ffffff',  // White text for primary buttons
         letterSpacing: DesignSystem.typography.letterSpacing.tighter,
         lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
       },
@@ -639,7 +639,7 @@ export const ComponentTextStyles = {
       secondary: {
         fontSize: DesignSystem.typography.fontSize.base,      // 16px
         fontWeight: DesignSystem.typography.fontWeight.semibold, // 600
-        color: DesignSystem.colors.primary,
+        color: DesignSystem.colors.primary,  // Red text for secondary buttons
         letterSpacing: DesignSystem.typography.letterSpacing.normal,
         lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
       },
