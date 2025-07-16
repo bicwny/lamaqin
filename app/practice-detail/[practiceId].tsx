@@ -16,10 +16,9 @@ import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens } from '@/utils/componentTokens';
+import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import ProgressBar from '@/components/ProgressBar';
-import { ComponentTextStyles } from '@/utils/componentTextStyles'; // Import ComponentTextStyles
 
 interface PracticeProject {
   id: string;
@@ -508,7 +507,7 @@ export default function PracticeDetailScreen() {
               </Text>
               {progress.isCompleted && (
                 <View style={styles.completedBadge}>
-                  <Text style={ComponentTextStyles.badge.text}>✅ 已完成</Text>
+                  <Text style={ComponentTextStyles.semantic.successText}>✅ 已完成</Text>
                 </View>
               )}
             </View>
@@ -666,7 +665,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   completedBadge: {
-    ...ComponentTokens.card.badge,
+    ...ComponentTokens.badge.small,
+    backgroundColor: ComponentTokens.semantic.success,
   },
   completedText: {
     ...ComponentTextStyles.badge.text,
