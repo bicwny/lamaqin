@@ -507,7 +507,7 @@ export default function PracticeDetailScreen() {
               </Text>
               {progress.isCompleted && (
                 <View style={styles.completedBadge}>
-                  <Text style={ComponentTextStyles.semantic.successText}>✅ 已完成</Text>
+                  <Text style={styles.completedBadgeText}>✅ 已完成</Text>
                 </View>
               )}
             </View>
@@ -675,8 +675,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   completedBadge: {
-    ...ComponentTokens.badge.small,
-    backgroundColor: ComponentTokens.semantic.success,
+    paddingVertical: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    backgroundColor: DesignSystem.colors.successBackground,
+    borderRadius: DesignSystem.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.practiceComplete,
+  },
+  completedBadgeText: {
+    ...Typography.styles.label('sm'),
+    color: DesignSystem.colors.practiceComplete,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
