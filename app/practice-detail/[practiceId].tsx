@@ -654,11 +654,12 @@ const styles = StyleSheet.create({
   mainCard: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   practiceHeader: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.lg,
+    // paddingHorizontal: DesignSystem.spacing.xl,
+    // paddingTop: DesignSystem.spacing.xl,
+    // paddingBottom: DesignSystem.spacing.lg,
   },
   practiceTypeRow: {
     flexDirection: 'row',

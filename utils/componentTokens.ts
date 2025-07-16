@@ -74,8 +74,6 @@ export const ComponentTokens = {
       outlined: {
         backgroundColor: DesignSystem.colors.backgroundSecondary,
         borderRadius: DesignSystem.borderRadius.lg,
-        // marginHorizontal: DesignSystem.spacing.lg,
-        // marginVertical: DesignSystem.spacing.sm,
         shadowColor: DesignSystem.colors.cardShadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -88,8 +86,6 @@ export const ComponentTokens = {
       elevated: {
         backgroundColor: DesignSystem.colors.backgroundSecondary,
         borderRadius: DesignSystem.borderRadius.xl,
-        marginHorizontal: DesignSystem.spacing.lg,
-        marginVertical: DesignSystem.spacing.sm,
         shadowColor: DesignSystem.colors.cardShadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.12,
