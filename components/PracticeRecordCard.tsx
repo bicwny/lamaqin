@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   notesContainer: {
     marginTop: DesignSystem.spacing.sm,
     padding: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     // borderRadius: DesignSystem.borderRadius.md,
     borderLeftWidth: 2,
     borderLeftColor: DesignSystem.colors.primary,
