@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
   
   // Section 1: Practice & Timeline
   section1: {
-    paddingBottom: DesignSystem.spacing.lg,
+    // paddingBottom: DesignSystem.spacing.lg,
   },
   completedBadge: {
     paddingVertical: DesignSystem.spacing.xs,
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
 
   // Section 2: Progress Info
   section2: {
-    paddingBottom: DesignSystem.spacing.lg,
+    // paddingBottom: DesignSystem.spacing.lg,
   },
   countRow: {
     flexDirection: 'row',
