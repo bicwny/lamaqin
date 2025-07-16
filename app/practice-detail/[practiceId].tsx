@@ -733,13 +733,15 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
   },
   secondaryButtonNew: {
-    ...ComponentTokens.button.secondary,
+    ...ComponentTokens.button.variants.secondary,
+    ...ComponentTokens.button.sizes.medium,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonNew: {
-    ...ComponentTokens.button.primary,
+    ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.medium,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
