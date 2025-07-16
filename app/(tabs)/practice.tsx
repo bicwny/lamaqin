@@ -268,9 +268,6 @@ export default function PracticeScreen() {
               {progress.current.toLocaleString()}/
               {progress.target.toLocaleString()} {item.practices.unit}
             </Text>
-            <Text style={styles.progressPercentage}>
-              {Math.round(progress.percentage)}%
-            </Text>
           </View>
           <View style={styles.progressBarContainer}>
             <ProgressBar
@@ -278,6 +275,9 @@ export default function PracticeScreen() {
               size="thick"
               containerStyle={{ flex: 1 }}
             />
+            <Text style={styles.progressPercentage}>
+              {Math.round(progress.percentage)}%
+            </Text>
           </View>
         </View>
 
@@ -454,22 +454,25 @@ const styles = StyleSheet.create({
     fontSize: DesignSystem.typography.fontSize.lg,
   },
   progressContainer: {
-    // marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // marginBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   progressText: {
     ...ComponentTextStyles.body,
     color: DesignSystem.colors.textPrimary,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   progressPercentage: {
-    ...ComponentTextStyles.label,
+    ...ComponentTextStyles.body,
     color: DesignSystem.colors.primary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
+    minWidth: 50,
+    textAlign: "right",
   },
 
   actionsContainer: {
@@ -502,7 +505,8 @@ const styles = StyleSheet.create({
     marginVertical: DesignSystem.spacing.sm,
   },
   progressBarContainer: {
-    marginTop: DesignSystem.spacing.sm,
-    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: DesignSystem.spacing.md,
   },
 });
