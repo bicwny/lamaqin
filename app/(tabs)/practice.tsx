@@ -481,14 +481,14 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     ...ComponentTokens.button.variants.secondary,
-    ...ComponentTokens.button.sizes.medium,
+    ...ComponentTokens.button.sizes.small,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   primaryButton: {
     ...ComponentTokens.button.variants.primary,
-    ...ComponentTokens.button.sizes.medium,
+    ...ComponentTokens.button.sizes.small,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
