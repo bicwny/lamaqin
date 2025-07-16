@@ -94,8 +94,8 @@ export default function PracticeConfigScreen() {
   const [projectName, setProjectName] = useState(
     isEditMode && currentProjectName ? currentProjectName : ""
   );
-  const [durationMode, setDurationMode] = useState<"持续进行" | "固定时长">(
-    isEditMode && !currentEndDate ? "持续进行" : "固定时长"
+  const [durationMode, setDurationMode] = useState<"固定时长">(
+    isEditMode && !currentEndDate ? "固定时长" : "固定时长"
   );
   const [configMode, setConfigMode] = useState<"total" | "daily">(
     isEditMode && currentGoalType ? currentGoalType as "total" | "daily" : "total"
@@ -319,16 +319,10 @@ export default function PracticeConfigScreen() {
         finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
         targetPeriod = "weekly";
 
-        if (durationMode === "持续进行") {
-          // Ongoing practice - no end date
-          endDate = null;
-          finalTotalTarget = 0; // 0 indicates ongoing
-        } else {
-          // Fixed duration practice
-          const days = getDurationInDays();
-          endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-          finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
-        }
+        // Fixed duration practice
+        const days = getDurationInDays();
+        endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+        finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
       }
 
       const projectData = {
@@ -387,7 +381,7 @@ export default function PracticeConfigScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>目标设置</Text>
-        
+
         <View style={styles.goalTypeContainer}>
           <View style={styles.segmentedControl}>
             <TouchableOpacity
@@ -472,7 +466,7 @@ export default function PracticeConfigScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>目标设置</Text>
-        
+
         <View style={styles.timeInputContainer}>
           <Text style={styles.timeInputLabel}>每周目标座数</Text>
           <View style={styles.inputRow}>
@@ -498,7 +492,7 @@ export default function PracticeConfigScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>时间规划</Text>
-        
+
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>开始日期</Text>
           <TouchableOpacity
@@ -515,20 +509,6 @@ export default function PracticeConfigScreen() {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>项目时长</Text>
           <View style={styles.segmentedControl}>
-            <TouchableOpacity
-              style={[
-                styles.segmentButton,
-                durationMode === "持续进行" && styles.segmentButtonActive,
-              ]}
-              onPress={() => setDurationMode("持续进行")}
-            >
-              <Text style={[
-                styles.segmentButtonText,
-                durationMode === "持续进行" && styles.segmentButtonTextActive,
-              ]}>
-                持续进行
-              </Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={[
                 styles.segmentButton,
@@ -572,9 +552,9 @@ export default function PracticeConfigScreen() {
 
           <View style={styles.durationDisplay}>
             <Text style={styles.durationDisplayText}>
-              {durationMode === "持续进行" 
-                ? "项目将持续进行，直到您手动结束" 
-                : `项目时长：${calculatedDays} 天`
+              {durationMode === "固定时长" 
+                ? `项目时长：${calculatedDays} 天`
+                : ``
               }
             </Text>
           </View>
@@ -610,11 +590,11 @@ export default function PracticeConfigScreen() {
   const renderSmartSummary = () => {
     const days = getDurationInDays();
     const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-    
+
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>项目预览</Text>
-        
+
         <View style={styles.previewCard}>
           <View style={styles.previewHeader}>
             <Text style={styles.previewPracticeName}>{practiceName}</Text>
@@ -629,12 +609,8 @@ export default function PracticeConfigScreen() {
             <Text style={styles.previewDetailItem}>
               📅 开始日期：{startDate.toLocaleDateString('zh-CN')}
             </Text>
-            
-            {durationMode === "持续进行" ? (
-              <Text style={styles.previewDetailItem}>
-                ⏳ 项目时长：持续进行
-              </Text>
-            ) : (
+
+            {durationMode === "固定时长" ? (
               <>
                 <Text style={styles.previewDetailItem}>
                   ⏳ 项目时长：{days} 天
@@ -643,6 +619,10 @@ export default function PracticeConfigScreen() {
                   🏁 结束日期：{endDate.toLocaleDateString('zh-CN')}
                 </Text>
               </>
+            ) : (
+              <Text style={styles.previewDetailItem}>
+                ⏳ 项目时长：持续进行
+              </Text>
             )}
 
             {practiceType === "count" ? (
@@ -944,10 +924,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
   },
   smartDurationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: DesignSystem.spacing.md,
-    marginBottom: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.sm,
   },
   daysInputContainer: {
     ...ComponentTokens.input.standard,
@@ -1018,7 +995,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary,
     borderRadius: DesignSystem.borderRadius.lg,
     paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.xs,```python
   },
   previewProjectPillText: {
     ...ComponentTextStyles.caption,
