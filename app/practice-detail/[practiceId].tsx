@@ -659,11 +659,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: DesignSystem.spacing.xl,
   },
-  mainCard: componentHelpers.getCardWithBottomMargin("outlined", "comfortable", "comfortable"),
+  mainCard: componentHelpers.getCardWithBottomMargin(
+    "outlined",
+    "comfortable",
+    "comfortable",
+  ),
 
   // Section 1: Practice & Timeline
   section1: {
-    paddingBottom: DesignSystem.spacing.lg,
+    // paddingBottom: DesignSystem.spacing.lg,
   },
   practiceHeaderRow: {
     flexDirection: "row",
@@ -696,9 +700,7 @@ const styles = StyleSheet.create({
   ),
 
   // Section 2: Progress Info
-  section2: {
-    paddingBottom: DesignSystem.spacing.lg,
-  },
+  section2: {},
   countRow: {
     flexDirection: "row",
     alignItems: "baseline",
