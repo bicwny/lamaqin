@@ -688,8 +688,7 @@ const styles = StyleSheet.create({
   },
   programNameText: {
     ...ComponentTokens.badge.pill.small,
-    backgroundColor: DesignSystem.colors.primary,
-    color: DesignSystem.colors.textInverse,
+    ...ComponentTokens.badge.softColors.neutral,
     alignSelf: 'flex-start',
   },
   progressSection: {
