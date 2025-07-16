@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,19 +7,23 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-} from 'react-native';
-import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { Ionicons } from '@expo/vector-icons';
-import { presetProjectNameService } from '@/lib/database';
-import PageTemplate from '@/components/PageTemplate';
-import { toastService } from '@/lib/toast';
-import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
-import { Typography } from '@/utils/typography';
-import ProgressBar from '@/components/ProgressBar';
-import PracticeRecordCard from '@/components/PracticeRecordCard';
+} from "react-native";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { Ionicons } from "@expo/vector-icons";
+import { presetProjectNameService } from "@/lib/database";
+import PageTemplate from "@/components/PageTemplate";
+import { toastService } from "@/lib/toast";
+import { DesignSystem } from "@/constants/DesignSystem";
+import {
+  ComponentTokens,
+  ComponentTextStyles,
+  componentHelpers,
+} from "@/utils/componentTokens";
+import { Typography } from "@/utils/typography";
+import ProgressBar from "@/components/ProgressBar";
+import PracticeRecordCard from "@/components/PracticeRecordCard";
 
 interface PracticeProject {
   id: string;
@@ -56,7 +60,7 @@ interface MeditationRecord {
 
 // Define IconProps interface
 interface IconProps {
-  semantic: 'completion';
+  semantic: "completion";
 }
 
 // Icon Component (replace with your actual Icon component implementation)
@@ -72,7 +76,7 @@ export default function PracticeDetailScreen() {
   const { practiceId } = useLocalSearchParams<{ practiceId: string }>();
 
   const [project, setProject] = useState<PracticeProject | null>(null);
-  const [presetProjectName, setPresetProjectName] = useState<string>('');
+  const [presetProjectName, setPresetProjectName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
@@ -90,7 +94,7 @@ export default function PracticeDetailScreen() {
       if (user && practiceId) {
         loadPracticeData();
       }
-    }, [user, practiceId])
+    }, [user, practiceId]),
   );
 
   const loadPracticeData = async () => {
@@ -101,8 +105,9 @@ export default function PracticeDetailScreen() {
 
       // Load practice project
       const { data: practiceData, error } = await supabase
-        .from('user_practice_projects')
-        .select(`
+        .from("user_practice_projects")
+        .select(
+          `
           *,
           practices (
             id,
@@ -111,9 +116,10 @@ export default function PracticeDetailScreen() {
             unit,
             description
           )
-        `)
-        .eq('id', practiceId)
-        .eq('user_id', user.id)
+        `,
+        )
+        .eq("id", practiceId)
+        .eq("user_id", user.id)
         .single();
 
       if (error) throw error;
@@ -123,26 +129,31 @@ export default function PracticeDetailScreen() {
       // Load preset project name if needed
       if (practiceData.preset_project_id) {
         try {
-          const presets = await presetProjectNameService.getPresetProjectNames();
-          const preset = presets.find(p => p.id === practiceData.preset_project_id);
+          const presets =
+            await presetProjectNameService.getPresetProjectNames();
+          const preset = presets.find(
+            (p) => p.id === practiceData.preset_project_id,
+          );
           if (preset) {
             setPresetProjectName(preset.name);
           }
         } catch (presetError) {
-          console.error('Error loading preset project name:', presetError);
+          console.error("Error loading preset project name:", presetError);
         }
       }
 
       // Load meditation records if it's a time-based practice
-      if (practiceData.practices.type === 'time') {
+      if (practiceData.practices.type === "time") {
         await loadMeditationRecords(practiceData);
-      } else if (practiceData.practices.type === 'count') {
+      } else if (practiceData.practices.type === "count") {
         await loadPracticeRecords(practiceData.id);
       }
-
     } catch (error) {
-      console.error('Error loading practice data:', error);
-      toastService.error({ title: '❌ 加载失败', message: '修行数据加载失败，请重试' });
+      console.error("Error loading practice data:", error);
+      toastService.error({
+        title: "❌ 加载失败",
+        message: "修行数据加载失败，请重试",
+      });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -153,34 +164,38 @@ export default function PracticeDetailScreen() {
     if (!user?.id) return;
 
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
 
       // Get today's records
       const { data: todayData, error: todayError } = await supabase
-        .from('meditation_records')
-        .select('id, user_id, practice_id, record_date, duration_minutes, session_number, created_at')
-        .eq('user_id', user.id)
-        .eq('practice_id', projectData.practice_id)
-        .eq('record_date', today)
-        .order('created_at', { ascending: true });
+        .from("meditation_records")
+        .select(
+          "id, user_id, practice_id, record_date, duration_minutes, session_number, created_at",
+        )
+        .eq("user_id", user.id)
+        .eq("practice_id", projectData.practice_id)
+        .eq("record_date", today)
+        .order("created_at", { ascending: true });
 
       if (todayError) throw todayError;
 
       // Get this week's records for weekly projects
-      if (projectData.target_period === 'weekly') {
+      if (projectData.target_period === "weekly") {
         const startOfWeek = new Date();
         startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
 
         const { data: weeklyData, error: weeklyError } = await supabase
-          .from('meditation_records')
-          .select('id, user_id, practice_id, record_date, duration_minutes, session_number, created_at')
-          .eq('user_id', user.id)
-          .eq('practice_id', projectData.practice_id)
-          .gte('record_date', startOfWeek.toISOString().split('T')[0])
-          .lte('record_date', endOfWeek.toISOString().split('T')[0])
-          .order('created_at', { ascending: true });
+          .from("meditation_records")
+          .select(
+            "id, user_id, practice_id, record_date, duration_minutes, session_number, created_at",
+          )
+          .eq("user_id", user.id)
+          .eq("practice_id", projectData.practice_id)
+          .gte("record_date", startOfWeek.toISOString().split("T")[0])
+          .lte("record_date", endOfWeek.toISOString().split("T")[0])
+          .order("created_at", { ascending: true });
 
         if (weeklyError) throw weeklyError;
         setWeeklyRecords(weeklyData || []);
@@ -188,7 +203,7 @@ export default function PracticeDetailScreen() {
 
       setTodayRecords(todayData || []);
     } catch (error) {
-      console.error('Error loading meditation records:', error);
+      console.error("Error loading meditation records:", error);
     }
   };
 
@@ -197,17 +212,17 @@ export default function PracticeDetailScreen() {
 
     try {
       const { data, error } = await supabase
-        .from('daily_records')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('practice_project_id', projectId)
-        .order('record_date', { ascending: false })
+        .from("daily_records")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("practice_project_id", projectId)
+        .order("record_date", { ascending: false })
         .limit(10); // Show last 10 records
 
       if (error) throw error;
       setPracticeRecords(data || []);
     } catch (error) {
-      console.error('Error loading practice records:', error);
+      console.error("Error loading practice records:", error);
     }
   };
 
@@ -217,10 +232,14 @@ export default function PracticeDetailScreen() {
   };
 
   const calculateProgress = () => {
-    if (!project) return { percentage: 0, current: 0, target: 0, isCompleted: false };
+    if (!project)
+      return { percentage: 0, current: 0, target: 0, isCompleted: false };
 
-    if (project.practices.type === 'count') {
-      const percentage = Math.min((project.current_count / project.target_count) * 100, 100);
+    if (project.practices.type === "count") {
+      const percentage = Math.min(
+        (project.current_count / project.target_count) * 100,
+        100,
+      );
       return {
         current: project.current_count,
         target: project.target_count,
@@ -232,7 +251,10 @@ export default function PracticeDetailScreen() {
       return {
         current: project.current_count,
         target: project.target_count,
-        percentage: Math.min((project.current_count / project.target_count) * 100, 100),
+        percentage: Math.min(
+          (project.current_count / project.target_count) * 100,
+          100,
+        ),
         isCompleted: project.current_count >= project.target_count,
       };
     }
@@ -241,10 +263,10 @@ export default function PracticeDetailScreen() {
   const handleRecord = () => {
     if (!project) return;
 
-    if (project.practices.type === 'time') {
+    if (project.practices.type === "time") {
       // For meditation practices, navigate to the meditation record modal
       router.push({
-        pathname: '/modals/meditation-record',
+        pathname: "/modals/meditation-record",
         params: {
           projectId: project.id,
           practiceId: project.practice_id,
@@ -254,7 +276,7 @@ export default function PracticeDetailScreen() {
     } else {
       // For count-based practices, show simple input
       router.push({
-        pathname: '/modals/custom-record',
+        pathname: "/modals/custom-record",
         params: {
           projectId: project.id,
           practiceName: project.practices.name,
@@ -267,10 +289,10 @@ export default function PracticeDetailScreen() {
   const handleViewHistory = () => {
     if (!project) return;
 
-    if (project.practices.type === 'time') {
+    if (project.practices.type === "time") {
       // For meditation practices, show meditation history
       router.push({
-        pathname: '/meditation-history',
+        pathname: "/meditation-history",
         params: {
           practiceId: project.practice_id,
           practiceName: project.practices.name,
@@ -279,7 +301,7 @@ export default function PracticeDetailScreen() {
     } else {
       // For count-based practices, show regular history
       router.push({
-        pathname: '/practice-history',
+        pathname: "/practice-history",
         params: {
           projectId: project.id,
           practiceName: project.practices.name,
@@ -292,45 +314,46 @@ export default function PracticeDetailScreen() {
     if (!project) return;
 
     router.push({
-      pathname: '/practice-config',
+      pathname: "/practice-config",
       params: {
         practiceId: project.practice_id,
         practiceName: project.practices.name,
         practiceType: project.practices.type,
         practiceUnit: project.practices.unit,
-        practiceDescription: project.practices.description || '',
-        editMode: 'true',
+        practiceDescription: project.practices.description || "",
+        editMode: "true",
         projectId: project.id,
         currentTargetCount: project.target_count.toString(),
         currentDailyTarget: project.daily_target.toString(),
         currentStartDate: project.start_date,
-        currentEndDate: project.target_end_date || '',
+        currentEndDate: project.target_end_date || "",
         currentTargetPeriod: project.target_period,
-        currentGoalType: project.goal_type || 'total',
-        currentProjectName: project.project_name || '',
-        currentPresetId: project.preset_project_id || '',
+        currentGoalType: project.goal_type || "total",
+        currentProjectName: project.project_name || "",
+        currentPresetId: project.preset_project_id || "",
       },
     });
   };
 
   const getDisplayProjectName = () => {
-    if (!project) return '';
-    return project.project_name || presetProjectName || '预设项目';
+    if (!project) return "";
+    return project.project_name || presetProjectName || "预设项目";
   };
 
   const renderRecentRecords = () => {
     if (!project) return null;
 
-    if (project.practices.type === 'time') {
+    if (project.practices.type === "time") {
       // Show recent meditation records
       const recentRecords = [...todayRecords, ...weeklyRecords]
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )
         .slice(0, 5);
 
       if (recentRecords.length === 0) {
-        return (
-          <Text style={styles.noRecordsText}>暂无观修记录</Text>
-        );
+        return <Text style={styles.noRecordsText}>暂无观修记录</Text>;
       }
 
       return recentRecords.map((record, index) => (
@@ -340,29 +363,31 @@ export default function PracticeDetailScreen() {
           practiceType="time"
           practiceUnit={project.practices.unit}
           isLast={index === recentRecords.length - 1}
-          onPress={() => router.push({
-            pathname: '/meditation-detail/[recordId]',
-            params: { recordId: record.id }
-          })}
+          onPress={() =>
+            router.push({
+              pathname: "/meditation-detail/[recordId]",
+              params: { recordId: record.id },
+            })
+          }
         />
       ));
     } else {
       // Show recent count-based records
       if (practiceRecords.length === 0) {
-        return (
-          <Text style={styles.noRecordsText}>暂无修行记录</Text>
-        );
+        return <Text style={styles.noRecordsText}>暂无修行记录</Text>;
       }
 
-      return practiceRecords.slice(0, 5).map((record, index) => (
-        <PracticeRecordCard
-          key={record.id}
-          record={record}
-          practiceType="count"
-          practiceUnit={project.practices.unit}
-          isLast={index === practiceRecords.length - 1}
-        />
-      ));
+      return practiceRecords
+        .slice(0, 5)
+        .map((record, index) => (
+          <PracticeRecordCard
+            key={record.id}
+            record={record}
+            practiceType="count"
+            practiceUnit={project.practices.unit}
+            isLast={index === practiceRecords.length - 1}
+          />
+        ));
     }
   };
 
@@ -370,16 +395,19 @@ export default function PracticeDetailScreen() {
     if (!project) return null;
 
     const progress = calculateProgress();
-    const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
+    const isTimeBasedWeekly =
+      project.practices.type === "time" && project.target_period === "weekly";
 
-    if (project.practices.type === 'count') {
+    if (project.practices.type === "count") {
       return (
         <View style={styles.progressDetails}>
           <Text style={styles.progressText}>
-            {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
+            {progress.current.toLocaleString()}/
+            {progress.target.toLocaleString()} {project.practices.unit}
           </Text>
           <Text style={styles.dailyTargetText}>
-            每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
+            每日目标：{project.daily_target.toLocaleString()}{" "}
+            {project.practices.unit}
           </Text>
         </View>
       );
@@ -388,9 +416,11 @@ export default function PracticeDetailScreen() {
       const target = project.daily_target;
 
       // Format session details for today
-      const todayDetails = todayRecords.map((record, index) =>
-        `第${index + 1}座${record.duration_minutes}分钟`
-      ).join('；');
+      const todayDetails = todayRecords
+        .map(
+          (record, index) => `第${index + 1}座${record.duration_minutes}分钟`,
+        )
+        .join("；");
 
       if (isTimeBasedWeekly) {
         const weeklyCount = weeklyRecords.length;
@@ -399,12 +429,11 @@ export default function PracticeDetailScreen() {
         return (
           <View style={styles.progressDetails}>
             <Text style={styles.progressText}>
-              本周进度：{weeklyCount}/{weeklyTarget}座{weeklyCount >= weeklyTarget ? ' ✅' : ''}
+              本周进度：{weeklyCount}/{weeklyTarget}座
+              {weeklyCount >= weeklyTarget ? " ✅" : ""}
             </Text>
             {todayCount > 0 && todayDetails && (
-              <Text style={styles.sessionDetails}>
-                今日：{todayDetails}
-              </Text>
+              <Text style={styles.sessionDetails}>今日：{todayDetails}</Text>
             )}
           </View>
         );
@@ -412,12 +441,11 @@ export default function PracticeDetailScreen() {
         return (
           <View style={styles.progressDetails}>
             <Text style={styles.progressText}>
-              今日进度：{todayCount}/{target}座{todayCount >= target ? ' ✅' : ''}
+              今日进度：{todayCount}/{target}座
+              {todayCount >= target ? " ✅" : ""}
             </Text>
             {todayCount > 0 && todayDetails && (
-              <Text style={styles.sessionDetails}>
-                {todayDetails}
-              </Text>
+              <Text style={styles.sessionDetails}>{todayDetails}</Text>
             )}
           </View>
         );
@@ -459,9 +487,13 @@ export default function PracticeDetailScreen() {
   }
 
   const progress = calculateProgress();
-  const practiceDisplayType = project.target_end_date ? '固定时长' : '持续进行';
-  const totalWeeks = project.target_end_date 
-    ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
+  const practiceDisplayType = project.target_end_date ? "固定时长" : "持续进行";
+  const totalWeeks = project.target_end_date
+    ? Math.ceil(
+        (new Date(project.target_end_date).getTime() -
+          new Date(project.start_date).getTime()) /
+          (7 * 24 * 60 * 60 * 1000),
+      )
     : null;
 
   return (
@@ -494,17 +526,20 @@ export default function PracticeDetailScreen() {
 
               {/* Completion badge on the right (24px) */}
               {progress.isCompleted && (
-                <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.practiceComplete} />
+                <Ionicons
+                  name="checkmark-circle"
+                  size={24}
+                  color={DesignSystem.colors.practiceComplete}
+                />
               )}
             </View>
 
             {/* Practice name */}
-            <Text style={styles.practiceTitle}>
-              {project.practices.name}
-            </Text>
+            <Text style={styles.practiceTitle}>{project.practices.name}</Text>
             {/* Timeline */}
             <Text style={styles.timelineText}>
-              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'}
+              发愿：{project.start_date} • 圆满：
+              {project.target_end_date || "持续进行"}
             </Text>
           </View>
 
@@ -513,7 +548,7 @@ export default function PracticeDetailScreen() {
 
           {/* Section 2: Progress Info */}
           <View style={styles.section2}>
-            {project.practices.type === 'count' ? (
+            {project.practices.type === "count" ? (
               <>
                 {/* Current vs Total Count */}
                 <View style={styles.countRow}>
@@ -521,20 +556,25 @@ export default function PracticeDetailScreen() {
                     {progress.current.toLocaleString()}
                   </Text>
                   <Text style={styles.totalCountAndDays}>
-                    {progress.target.toLocaleString()} {project.practices.unit} • {totalWeeks ? `${Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天` : '持续进行'}
+                    {progress.target.toLocaleString()} {project.practices.unit}{" "}
+                    •{" "}
+                    {totalWeeks
+                      ? `${Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天`
+                      : "持续进行"}
                   </Text>
                 </View>
 
                 {/* Daily Target */}
                 <Text style={styles.dailyTargetText}>
-                  每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
+                  每日目标：{project.daily_target.toLocaleString()}{" "}
+                  {project.practices.unit}
                 </Text>
 
                 {/* Progress Bar */}
                 <View style={styles.progressBarContainer}>
-                  <ProgressBar 
-                    progress={progress.percentage} 
-                    size="thick" 
+                  <ProgressBar
+                    progress={progress.percentage}
+                    size="thick"
                     containerStyle={{ flex: 1 }}
                   />
                   <Text style={styles.progressPercentage}>
@@ -577,13 +617,15 @@ export default function PracticeDetailScreen() {
               onPress={handleViewHistory}
             >
               <Text style={styles.viewAllText}>查看全部</Text>
-              <Ionicons name="chevron-forward" size={16} color={DesignSystem.colors.primary} />
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={DesignSystem.colors.primary}
+              />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.recordsList}>
-            {renderRecentRecords()}
-          </View>
+          <View style={styles.recordsList}>{renderRecentRecords()}</View>
         </View>
       </ScrollView>
     </PageTemplate>
@@ -593,8 +635,8 @@ export default function PracticeDetailScreen() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     ...ComponentTextStyles.body,
@@ -603,9 +645,9 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: DesignSystem.spacing['4xl'],
+    justifyContent: "center",
+    alignItems: "center",
+    padding: DesignSystem.spacing["4xl"],
   },
   emptyText: {
     ...ComponentTextStyles.subheading,
@@ -617,16 +659,16 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: DesignSystem.spacing.xl,
   },
-  mainCard: componentHelpers.getCardWithMargin('outlined', 'comfortable', 'spacious'),
+  mainCard: componentHelpers.getCardWithMargin("outlined", "comfortable", "0"),
 
   // Section 1: Practice & Timeline
   section1: {
     paddingBottom: DesignSystem.spacing.lg,
   },
   practiceHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: DesignSystem.spacing.sm,
   },
   practiceInfo: {
@@ -646,20 +688,25 @@ const styles = StyleSheet.create({
   },
 
   // Divider
-  divider: componentHelpers.getDividerStyle('horizontal', 'thin', 'default', 'normal'),
+  divider: componentHelpers.getDividerStyle(
+    "horizontal",
+    "thin",
+    "default",
+    "normal",
+  ),
 
   // Section 2: Progress Info
   section2: {
     paddingBottom: DesignSystem.spacing.lg,
   },
   countRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
+    flexDirection: "row",
+    alignItems: "baseline",
     gap: DesignSystem.spacing.sm,
     marginBottom: DesignSystem.spacing.sm,
   },
   currentCount: {
-    ...Typography.styles.heading('xl'),
+    ...Typography.styles.heading("xl"),
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
   },
@@ -673,16 +720,16 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   progressBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: DesignSystem.spacing.md,
   },
   progressPercentage: {
-    ...Typography.styles.body('base'),
+    ...Typography.styles.body("base"),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.primary,
     minWidth: 50,
-    textAlign: 'right',
+    textAlign: "right",
   },
   progressDetails: {
     marginBottom: DesignSystem.spacing.md,
@@ -693,47 +740,51 @@ const styles = StyleSheet.create({
   },
   sessionDetails: {
     ...ComponentTextStyles.label,
-    fontStyle: 'italic',
+    fontStyle: "italic",
     color: DesignSystem.colors.textSecondary,
     marginTop: DesignSystem.spacing.xs,
   },
 
   // Section 3: Action Buttons
   section3: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: DesignSystem.spacing.md,
   },
   secondaryButtonNew: {
-    ...componentHelpers.getButtonStyle('secondary', 'medium'),
+    ...componentHelpers.getButtonStyle("secondary", "medium"),
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   primaryButtonNew: {
-    ...componentHelpers.getButtonStyle('primary', 'medium'),
+    ...componentHelpers.getButtonStyle("primary", "medium"),
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   secondaryButtonTextNew: {
-    ...componentHelpers.getButtonTextStyle('secondary', 'medium'),
+    ...componentHelpers.getButtonTextStyle("secondary", "medium"),
   },
   primaryButtonTextNew: {
-    ...componentHelpers.getButtonTextStyle('primary', 'medium'),
+    ...componentHelpers.getButtonTextStyle("primary", "medium"),
   },
-  recordsCard: componentHelpers.getCardWithMargin('outlined', 'comfortable', 'spacious'),
+  recordsCard: componentHelpers.getCardWithMargin(
+    "outlined",
+    "comfortable",
+    "0",
+  ),
   recordsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: DesignSystem.spacing.md,
   },
   recordsTitle: {
     ...ComponentTextStyles.subheading,
   },
   viewAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: DesignSystem.spacing.xs,
   },
   viewAllText: {
@@ -745,16 +796,15 @@ const styles = StyleSheet.create({
   },
   noRecordsText: {
     ...ComponentTextStyles.body,
-    textAlign: 'center',
-    paddingVertical: DesignSystem.spacing['2xl'],
-    fontStyle: 'italic',
+    textAlign: "center",
+    paddingVertical: DesignSystem.spacing["2xl"],
+    fontStyle: "italic",
     color: DesignSystem.colors.textSecondary,
   },
   programRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: DesignSystem.spacing.sm,
   },
-
 });
