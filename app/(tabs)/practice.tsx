@@ -286,16 +286,16 @@ export default function PracticeScreen() {
             {/* Section 3: Action Buttons */}
             <View style={styles.actionsContainer}>
               <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() => handleCustomRecord(item.id, item.practices.name)}
-              >
-                <Text style={styles.actionButtonText}>记录</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, ComponentTokens.button.variants.primary]}
+                style={styles.secondaryButton}
                 onPress={() => handleViewDetails(item.id, item.practices.name)}
               >
-                <Text style={[styles.primaryButtonText]}>详情</Text>
+                <Text style={styles.secondaryButtonText}>详情</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={() => handleCustomRecord(item.id, item.practices.name)}
+              >
+                <Text style={styles.primaryButtonText}>记录</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -475,17 +475,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: DesignSystem.spacing.md,
   },
-  actionButton: {
+  secondaryButton: {
     ...ComponentTokens.button.variants.secondary,
     ...ComponentTokens.button.sizes.medium,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
-  viewDetailsButton: {
+  primaryButton: {
     ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.medium,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  actionButtonText: {
+  secondaryButtonText: {
     ...ComponentTextStyles.button.secondary,
   },
   primaryButtonText: {
