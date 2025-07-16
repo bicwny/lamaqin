@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import ProgressBar from '@/components/ProgressBar';
+import PracticeRecordCard from '@/components/PracticeRecordCard';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
@@ -322,65 +323,16 @@ export default function PracticeHistoryScreen() {
               {records.map((record) => {
                 const isDeleting = deletingRecords.has(record.id);
                 return (
-                  <View 
-                    key={record.id} 
-                    style={[
-                      styles.recordCard,
-                      isDeleting && styles.recordCardDeleting
-                    ]}
-                  >
-                    {isDeleting && (
-                      <View style={styles.deletingOverlay}>
-                        <ActivityIndicator color={DesignSystem.colors.destructive} size="small" />
-                        <Text style={styles.deletingText}>删除中...</Text>
-                      </View>
-                    )}
-
-                    <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
-                      <Text style={styles.recordDate}>
-                        {formatDate(record.record_date)}
-                      </Text>
-                      <Text style={styles.recordTime}>
-                        {formatTime(record.created_at)}
-                      </Text>
-                    </View>
-
-                    <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
-                      <Text style={styles.recordCount}>
-                        数量: {record.count.toLocaleString()} {projectInfo?.practices?.unit || '次'}
-                      </Text>
-
-                      {record.notes && (
-                        <View style={styles.notesContainer}>
-                          <Text style={styles.notesLabel}>备注:</Text>
-                          <Text style={styles.notesText} numberOfLines={3}>
-                            {record.notes}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-
-                    <View style={styles.recordActions}>
-                      <TouchableOpacity
-                        style={[styles.editButton, isDeleting && styles.disabledButton]}
-                        onPress={() => handleEdit(record)}
-                        disabled={isDeleting}
-                      >
-                        <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
-                          编辑
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.deleteButton, isDeleting && styles.disabledButton]}
-                        onPress={() => handleDelete(record)}
-                        disabled={isDeleting}
-                      >
-                        <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
-                          删除
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  <PracticeRecordCard
+                    key={record.id}
+                    record={record}
+                    practiceType="count"
+                    practiceUnit={projectInfo?.practices?.unit || '次'}
+                    isDeleting={isDeleting}
+                    showActions={true}
+                    onEdit={() => handleEdit(record)}
+                    onDelete={() => handleDelete(record)}
+                  />
                 );
               })}
             </View>
@@ -460,109 +412,5 @@ const styles = StyleSheet.create({
   recordsList: {
     gap: DesignSystem.spacing.md,
   },
-  recordCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: DesignSystem.spacing.lg,
-  },
-  recordHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingBottom: DesignSystem.spacing.sm,
-    marginBottom: DesignSystem.spacing.md,
-    borderBottomWidth: ComponentTokens.divider.thickness.thin,
-    borderBottomColor: ComponentTokens.divider.colors.light,
-  },
-  recordDate: {
-    ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
-  recordTime: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
-  },
-  recordContent: {
-    marginBottom: DesignSystem.spacing.md,
-  },
-  recordCount: {
-    ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  notesContainer: {
-    marginTop: DesignSystem.spacing.sm,
-    padding: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.surface,
-    borderRadius: DesignSystem.borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.primary,
-  },
-  notesLabel: {
-    ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  notesText: {
-    ...ComponentTextStyles.body,
-    fontSize: DesignSystem.typography.fontSize.sm,
-    color: DesignSystem.colors.textSecondary,
-    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.relaxed,
-  },
-  recordActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: DesignSystem.spacing.md,
-  },
-  editButton: {
-    ...ComponentTokens.button.variants.secondary,
-    ...ComponentTokens.button.sizes.small,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-  },
-  editButtonText: {
-    ...ComponentTextStyles.button.secondary,
-  },
-  deleteButton: {
-    ...ComponentTokens.button.variants.destructive,
-    ...ComponentTokens.button.sizes.small,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-  },
-  deleteButtonText: {
-    ...ComponentTextStyles.button.primary,
-  },
-  recordCardDeleting: {
-    opacity: 0.6,
-    position: 'relative',
-  },
-  deletingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    zIndex: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: DesignSystem.borderRadius.lg,
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.sm,
-  },
-  deletingText: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.destructive,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  disabledContent: {
-    opacity: 0.5,
-  },
-  disabledButton: {
-    opacity: 0.3,
-  },
-  disabledButtonText: {
-    opacity: 0.5,
-  },
+  
 });

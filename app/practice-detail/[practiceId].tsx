@@ -19,6 +19,7 @@ import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import ProgressBar from '@/components/ProgressBar';
+import PracticeRecordCard from '@/components/PracticeRecordCard';
 
 interface PracticeProject {
   id: string;
@@ -320,29 +321,17 @@ export default function PracticeDetailScreen() {
       }
 
       return recentRecords.map((record, index) => (
-        <TouchableOpacity
+        <PracticeRecordCard
           key={record.id}
-          style={index < recentRecords.length - 1 ? styles.recordItemWithDivider : styles.recordItem}
+          record={record}
+          practiceType="time"
+          practiceUnit={project.practices.unit}
+          isLast={index === recentRecords.length - 1}
           onPress={() => router.push({
             pathname: '/meditation-detail/[recordId]',
             params: { recordId: record.id }
           })}
-        >
-          <View style={styles.recordHeader}>
-            <Text style={styles.recordDate}>
-              {new Date(record.record_date).toLocaleDateString('zh-CN')}
-            </Text>
-            <Text style={styles.recordTime}>
-              {new Date(record.created_at).toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </Text>
-          </View>
-          <Text style={styles.recordCount}>
-            第{record.session_number || 1}座 · {record.duration_minutes}分钟
-          </Text>
-        </TouchableOpacity>
+        />
       ));
     } else {
       // Show recent count-based records
@@ -353,29 +342,13 @@ export default function PracticeDetailScreen() {
       }
 
       return practiceRecords.slice(0, 5).map((record, index) => (
-        <View key={record.id} style={index < practiceRecords.length - 1 ? styles.recordItemWithDivider : styles.recordItem}>
-          <View style={styles.recordHeader}>
-            <Text style={styles.recordDate}>
-              {new Date(record.record_date).toLocaleDateString('zh-CN')}
-            </Text>
-            <Text style={styles.recordTime}>
-              {new Date(record.created_at).toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </Text>
-          </View>
-          <Text style={styles.recordCount}>
-            +{record.count.toLocaleString()} {project.practices.unit}
-          </Text>
-          {record.notes && (
-            <View style={styles.recordNotes}>
-              <Text style={styles.notesText} numberOfLines={2}>
-                {record.notes}
-              </Text>
-            </View>
-          )}
-        </View>
+        <PracticeRecordCard
+          key={record.id}
+          record={record}
+          practiceType="count"
+          practiceUnit={project.practices.unit}
+          isLast={index === practiceRecords.length - 1}
+        />
       ));
     }
   };
@@ -787,46 +760,5 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing['2xl'],
     fontStyle: 'italic',
   },
-  recordItem: {
-    paddingVertical: DesignSystem.spacing.md,
-  },
-  recordItemWithDivider: {
-    paddingVertical: DesignSystem.spacing.md,
-    borderBottomWidth: ComponentTokens.divider.thickness.thin,
-    borderBottomColor: ComponentTokens.divider.colors.light,
-    marginBottom: ComponentTokens.divider.spacing.tight,
-  },
-  recordHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    //marginBottom: DesignSystem.spacing.sm,
-  },
-  recordDate: {
-    ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
-  },
-  recordTime: {
-    ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
-  },
-  recordCount: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textPrimary,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  recordNotes: {
-    backgroundColor: DesignSystem.colors.background,
-    padding: DesignSystem.spacing.sm,
-    // borderRadius: DesignSystem.borderRadius.md,
-    marginTop: DesignSystem.spacing.sm,
-    borderLeftWidth: 2,
-    borderLeftColor: DesignSystem.colors.primary,
-  },
-
-  notesText: {
-    ...ComponentTextStyles.body,
-    fontSize: DesignSystem.typography.fontSize.sm,
-    color: DesignSystem.colors.textPrimary,
-  },
+  
 });
