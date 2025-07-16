@@ -35,7 +35,7 @@ export const IconTokens = {
     
     completion: {
       name: 'checkmark-circle' as const,
-      size: 16,
+      size: 20,
       color: DesignSystem.colors.practiceComplete,
     },
     
