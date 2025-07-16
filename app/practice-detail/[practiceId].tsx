@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     padding: ComponentTokens.card.padding.comfortable,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-  
+
   // Section 1: Practice & Timeline
   section1: {
     // paddingBottom: DesignSystem.spacing.lg,
@@ -677,10 +677,7 @@ const styles = StyleSheet.create({
   },
 
   // Divider
-  divider: {
-    ...ComponentTokens.divider.horizontal,
-    marginVertical: DesignSystem.spacing.lg,
-  },
+  divider: ComponentTokens.divider.horizontal,
 
   // Section 2: Progress Info
   section2: {
@@ -796,10 +793,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   recordItem: {
-    //marginBottom: DesignSystem.spacing.lg,
-    //paddingBottom: DesignSystem.spacing.lg,
-    //borderBottomWidth: 1,
-    //borderBottomColor: DesignSystem.colors.borderLight,
+    paddingVertical: DesignSystem.spacing.md,
+  },
+  recordItemWithDivider: {
+    paddingVertical: DesignSystem.spacing.md,
+    borderBottomWidth: ComponentTokens.divider.thickness.thin,
+    borderBottomColor: ComponentTokens.divider.colors.light,
+    marginBottom: ComponentTokens.divider.spacing.tight,
   },
   recordHeader: {
     flexDirection: 'row',
