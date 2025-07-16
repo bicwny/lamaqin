@@ -688,12 +688,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   progressSection: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingVertical: DesignSystem.spacing.lg,
+    // paddingHorizontal: DesignSystem.spacing.xl,
+    // paddingVertical: DesignSystem.spacing.lg,
     backgroundColor: DesignSystem.colors.background,
-    marginHorizontal: DesignSystem.spacing.xl,
-    borderRadius: DesignSystem.borderRadius.lg,
-    marginBottom: DesignSystem.spacing.lg,
+    // marginHorizontal: DesignSystem.spacing.xl,
+    // borderRadius: DesignSystem.borderRadius.lg,
+    // marginBottom: DesignSystem.spacing.lg,
   },
   progressDetails: {
     marginBottom: DesignSystem.spacing.md,
