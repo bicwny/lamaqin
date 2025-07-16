@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
 
 interface ModalTemplateProps {
   title: string;
@@ -40,9 +41,7 @@ export default function ModalTemplate({
   keyboardAvoidingView,
 }: ModalTemplateProps) {
   // Get modal styles using consolidated system
-  const modalStyles = variant === 'fullscreen' 
-    ? ComponentTokens.modal.fullscreen
-    : ComponentTokens.modal.sizes[size];
+  const modalStyles = componentHelpers.getModalStyle(variant, size);
   
   const defaultBackgroundColor = variant === 'fullscreen' 
     ? DesignSystem.colors.background 
