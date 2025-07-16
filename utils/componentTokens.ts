@@ -283,16 +283,234 @@ export const ComponentTokens = {
     success: DesignSystem.colors.practiceComplete, // For completion/success elements
   },
 
-  // Badge component tokens
+  // Badge component tokens - comprehensive system
   badge: {
-    small: {
-      borderRadius: DesignSystem.borderRadius.lg,
-      paddingHorizontal: DesignSystem.spacing.md,
-      paddingVertical: DesignSystem.spacing.xs,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-      elevation: 3,
+    // Size variations
+    sizes: {
+      small: {
+        paddingHorizontal: DesignSystem.spacing.sm,     // 8px
+        paddingVertical: DesignSystem.spacing.xs,       // 4px
+        borderRadius: DesignSystem.borderRadius.md,     // 8px
+        minHeight: 20,
+        fontSize: DesignSystem.typography.fontSize.xs,  // 12px
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+      },
+      
+      medium: {
+        paddingHorizontal: DesignSystem.spacing.md,     // 12px
+        paddingVertical: DesignSystem.spacing.sm,       // 8px
+        borderRadius: DesignSystem.borderRadius.lg,     // 12px
+        minHeight: 28,
+        fontSize: DesignSystem.typography.fontSize.sm,  // 14px
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+      },
+      
+      large: {
+        paddingHorizontal: DesignSystem.spacing.lg,     // 16px
+        paddingVertical: DesignSystem.spacing.base,     // 10px
+        borderRadius: DesignSystem.borderRadius.lg,     // 12px
+        minHeight: 36,
+        fontSize: DesignSystem.typography.fontSize.base, // 16px
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+      },
+    },
+    
+    // Variant styles
+    variants: {
+      // Standard badge with background
+      filled: {
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+        borderWidth: 0,
+      },
+      
+      // Outlined badge
+      outlined: {
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+      },
+      
+      // Soft/ghost badge
+      soft: {
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+        elevation: 0,
+        borderWidth: 0,
+      },
+    },
+    
+    // Pill variations (fully rounded)
+    pill: {
+      small: {
+        paddingHorizontal: DesignSystem.spacing.md,     // 12px
+        paddingVertical: DesignSystem.spacing.xs,       // 4px
+        borderRadius: DesignSystem.borderRadius.full,   // 9999px
+        minHeight: 20,
+        fontSize: DesignSystem.typography.fontSize.xs,  // 12px
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+      },
+      
+      medium: {
+        paddingHorizontal: DesignSystem.spacing.lg,     // 16px
+        paddingVertical: DesignSystem.spacing.sm,       // 8px
+        borderRadius: DesignSystem.borderRadius.full,   // 9999px
+        minHeight: 28,
+        fontSize: DesignSystem.typography.fontSize.sm,  // 14px
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+      },
+      
+      large: {
+        paddingHorizontal: DesignSystem.spacing.xl,     // 20px
+        paddingVertical: DesignSystem.spacing.base,     // 10px
+        borderRadius: DesignSystem.borderRadius.full,   // 9999px
+        minHeight: 36,
+        fontSize: DesignSystem.typography.fontSize.base, // 16px
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+      },
+    },
+    
+    // Semantic color variants
+    colors: {
+      // Primary theme
+      primary: {
+        backgroundColor: DesignSystem.colors.primary,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.primary,
+        shadowColor: DesignSystem.colors.primary,
+      },
+      
+      // Success states
+      success: {
+        backgroundColor: DesignSystem.colors.practiceComplete,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.practiceComplete,
+        shadowColor: DesignSystem.colors.practiceComplete,
+      },
+      
+      // Warning states
+      warning: {
+        backgroundColor: DesignSystem.colors.warning,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.warning,
+        shadowColor: DesignSystem.colors.warning,
+      },
+      
+      // Error states
+      error: {
+        backgroundColor: DesignSystem.colors.error,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.error,
+        shadowColor: DesignSystem.colors.error,
+      },
+      
+      // Info states
+      info: {
+        backgroundColor: DesignSystem.colors.info,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.info,
+        shadowColor: DesignSystem.colors.info,
+      },
+      
+      // Neutral/default
+      neutral: {
+        backgroundColor: DesignSystem.colors.backgroundSecondary,
+        color: DesignSystem.colors.textSecondary,
+        borderColor: DesignSystem.colors.border,
+        shadowColor: DesignSystem.colors.cardShadow,
+      },
+      
+      // Buddhist semantic colors
+      dharma: {
+        backgroundColor: DesignSystem.colors.dharmaRed,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.dharmaRed,
+        shadowColor: DesignSystem.colors.dharmaRed,
+      },
+      
+      meditation: {
+        backgroundColor: DesignSystem.colors.meditationBlue,
+        color: DesignSystem.colors.textInverse,
+        borderColor: DesignSystem.colors.meditationBlue,
+        shadowColor: DesignSystem.colors.meditationBlue,
+      },
+      
+      wisdom: {
+        backgroundColor: DesignSystem.colors.wisdomGold,
+        color: DesignSystem.colors.textPrimary,
+        borderColor: DesignSystem.colors.wisdomGold,
+        shadowColor: DesignSystem.colors.wisdomGold,
+      },
+    },
+    
+    // Soft/ghost color variants (light backgrounds)
+    softColors: {
+      primary: {
+        backgroundColor: `${DesignSystem.colors.primary}15`, // 15% opacity
+        color: DesignSystem.colors.primary,
+        borderColor: `${DesignSystem.colors.primary}30`,
+      },
+      
+      success: {
+        backgroundColor: DesignSystem.colors.successBackground,
+        color: DesignSystem.colors.practiceComplete,
+        borderColor: DesignSystem.colors.practiceComplete,
+      },
+      
+      warning: {
+        backgroundColor: DesignSystem.colors.warningBackground,
+        color: DesignSystem.colors.warning,
+        borderColor: DesignSystem.colors.warningBorder,
+      },
+      
+      error: {
+        backgroundColor: DesignSystem.colors.errorBackground,
+        color: DesignSystem.colors.error,
+        borderColor: DesignSystem.colors.errorBorder,
+      },
+      
+      info: {
+        backgroundColor: `${DesignSystem.colors.info}15`,
+        color: DesignSystem.colors.info,
+        borderColor: `${DesignSystem.colors.info}30`,
+      },
+      
+      neutral: {
+        backgroundColor: DesignSystem.colors.background,
+        color: DesignSystem.colors.textSecondary,
+        borderColor: DesignSystem.colors.borderLight,
+      },
+      
+      dharma: {
+        backgroundColor: `${DesignSystem.colors.dharmaRed}15`,
+        color: DesignSystem.colors.dharmaRed,
+        borderColor: `${DesignSystem.colors.dharmaRed}30`,
+      },
+      
+      meditation: {
+        backgroundColor: `${DesignSystem.colors.meditationBlue}15`,
+        color: DesignSystem.colors.meditationBlue,
+        borderColor: `${DesignSystem.colors.meditationBlue}30`,
+      },
+      
+      wisdom: {
+        backgroundColor: `${DesignSystem.colors.wisdomGold}20`,
+        color: DesignSystem.colors.wisdomGold,
+        borderColor: `${DesignSystem.colors.wisdomGold}40`,
+      },
+    },
+    
+    // Legacy support
+    legacy: {
+      small: { size: 'small' as const, variant: 'filled' as const, color: 'primary' as const },
+      wisdomBadge: { size: 'medium' as const, variant: 'filled' as const, color: 'wisdom' as const },
+      completionBadge: { size: 'medium' as const, variant: 'soft' as const, color: 'success' as const },
     },
   },
 };
@@ -532,17 +750,48 @@ export const componentHelpers = {
   getSemanticColor: (variant: keyof typeof ComponentTokens.semantic) => 
     ComponentTokens.semantic[variant],
   
-  // Get badge style with semantic color
-  getBadgeStyle: (size: keyof typeof ComponentTokens.badge, semanticColor?: keyof typeof ComponentTokens.semantic) => {
-    const baseStyle = ComponentTokens.badge[size];
-    if (semanticColor) {
-      return {
-        ...baseStyle,
-        backgroundColor: ComponentTokens.semantic[semanticColor],
-        shadowColor: ComponentTokens.semantic[semanticColor],
-      };
-    }
-    return baseStyle;
+  // Get complete badge style with new consolidated system
+  getBadgeStyle: (
+    size: 'small' | 'medium' | 'large',
+    variant: 'filled' | 'outlined' | 'soft' = 'filled',
+    color: keyof typeof ComponentTokens.badge.colors = 'primary'
+  ) => {
+    const sizeStyle = ComponentTokens.badge.sizes[size];
+    const variantStyle = ComponentTokens.badge.variants[variant];
+    const colorStyle = variant === 'soft' 
+      ? ComponentTokens.badge.softColors[color] 
+      : ComponentTokens.badge.colors[color];
+    
+    return {
+      ...sizeStyle,
+      ...variantStyle,
+      ...colorStyle,
+    };
+  },
+  
+  // Get pill style (fully rounded badge)
+  getPillStyle: (
+    size: 'small' | 'medium' | 'large',
+    variant: 'filled' | 'outlined' | 'soft' = 'filled',
+    color: keyof typeof ComponentTokens.badge.colors = 'primary'
+  ) => {
+    const sizeStyle = ComponentTokens.badge.pill[size];
+    const variantStyle = ComponentTokens.badge.variants[variant];
+    const colorStyle = variant === 'soft' 
+      ? ComponentTokens.badge.softColors[color] 
+      : ComponentTokens.badge.colors[color];
+    
+    return {
+      ...sizeStyle,
+      ...variantStyle,
+      ...colorStyle,
+    };
+  },
+  
+  // Legacy badge support
+  getLegacyBadgeStyle: (legacyVariant: 'small' | 'wisdomBadge' | 'completionBadge') => {
+    const mapping = ComponentTokens.badge.legacy[legacyVariant];
+    return componentHelpers.getBadgeStyle(mapping.size, mapping.variant, mapping.color);
   },
   
   // Get card style with semantic accent color
