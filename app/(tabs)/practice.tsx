@@ -287,3 +287,126 @@ export default function PracticeScreen() {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
+    );
+  }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: DesignSystem.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: DesignSystem.colors.background,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: DesignSystem.colors.textSecondary,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    backgroundColor: DesignSystem.colors.background,
+  },
+  iconContainer: {
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: "center",
+    marginBottom: 30,
+  },
+  browseButton: {
+    flexDirection: "row",
+    backgroundColor: DesignSystem.colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  browseButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  practiceItem: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  practiceName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: 8,
+  },
+  practiceDescription: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: 12,
+  },
+  progressContainer: {
+    marginBottom: 16,
+  },
+  progressLabel: {
+    fontSize: 12,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: 4,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  actionButton: {
+    backgroundColor: DesignSystem.colors.secondary,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  actionButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  viewDetailsButton: {
+    backgroundColor: DesignSystem.colors.primary,
+  },
+  completedText: {
+    color: DesignSystem.colors.success,
+    fontWeight: "bold",
+  },
+});
