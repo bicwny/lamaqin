@@ -225,11 +225,7 @@ export default function PracticeScreen() {
         }}
         scrollable={false}
         backgroundColor={DesignSystem.colors.background}
-        padding={0}
       >
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-
-
           <View style={styles.emptyState}>
             <View style={styles.iconContainer}>
               <Ionicons name="flower-outline" size={80} color="#9CA3AF" />
@@ -248,7 +244,6 @@ export default function PracticeScreen() {
               <Text style={styles.browseButtonText}>添加修行项目</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
       </PageTemplate>
     );
   }
@@ -260,18 +255,12 @@ export default function PracticeScreen() {
           text: "添加",
           onPress: handleAddPractice
         }}
-        scrollable={false}
+        scrollable={true}
         backgroundColor={DesignSystem.colors.background}
-        padding={0}
-      >
-        <ScrollView 
-        style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-
-
         <Text style={styles.sectionTitle}>我的修行项目：</Text>
 
         {projects.map((project) => {
@@ -351,7 +340,6 @@ export default function PracticeScreen() {
             </View>
           );
         })}
-      </ScrollView>
     </PageTemplate>
   );
 }
@@ -499,18 +487,12 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: DesignSystem.spacing.lg,
-  },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: DesignSystem.spacing['2xl'],
-    paddingTop: DesignSystem.spacing['5xl'],
+    paddingTop: DesignSystem.spacing['3xl'],
   },
   iconContainer: {
     marginBottom: DesignSystem.spacing['2xl'],
@@ -615,17 +597,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: DesignSystem.spacing.xl,
   },
   loadingText: {
     marginTop: DesignSystem.spacing.lg,
     ...ComponentTextStyles.body,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: DesignSystem.spacing['4xl'],
   },
   addButton: {
     ...ComponentTokens.button.variants.primary,
