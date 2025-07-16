@@ -483,24 +483,26 @@ export default function PracticeDetailScreen() {
         <View style={styles.mainCard}>
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
-            {progress.isCompleted && (
-              <View style={styles.completedBadge}>
-                <Icon semantic="completion" />
-              </View>
-            )}
-
-            <Text style={styles.practiceTitle}>
-              {project.practices.name}
-            </Text>
-
-            {/* Program Name in pill style */}
-            {(project.project_name || project.preset_project_id) && (
-              <View style={styles.programPillContainer}>
-                <Text style={styles.programPill}>
-                  {getDisplayProjectName()}
+            {/* Practice name and completion badge row */}
+            <View style={styles.practiceHeaderRow}>
+              <View style={styles.practiceInfo}>
+                <Text style={styles.practiceTitle}>
+                  {project.practices.name}
                 </Text>
+                
+                {/* Program Name */}
+                {(project.project_name || project.preset_project_id) && (
+                  <Text style={styles.programName}>
+                    {getDisplayProjectName()}
+                  </Text>
+                )}
               </View>
-            )}
+              
+              {/* Completion badge on the right */}
+              {progress.isCompleted && (
+                <Icon semantic="completion" />
+              )}
+            </View>
 
             {/* Timeline */}
             <Text style={styles.timelineText}>
@@ -627,20 +629,22 @@ const styles = StyleSheet.create({
   section1: {
     // paddingBottom: DesignSystem.spacing.lg,
   },
-  completedBadge: {
-    // ...ComponentTokens.completedBadge.container,
+  practiceHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  practiceInfo: {
+    flex: 1,
   },
   practiceTitle: {
     ...ComponentTextStyles.dharma,
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.xs,
   },
-  programPillContainer: {
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  programPill: {
-    ...ComponentTokens.badge.pill.small,
-    ...ComponentTokens.badge.softColors.neutral,
-    alignSelf: 'flex-start',
+  programName: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
   },
   timelineText: {
     ...ComponentTextStyles.body,
