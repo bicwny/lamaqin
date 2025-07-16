@@ -911,7 +911,4 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
-  });
-```
-
-**Analysis:** The code was updated to replace the `practice` card variant with the `outlined` variant from the `ComponentTokens` for both `mainCard` and `recordsCard` styles, and also apply `comfortable` padding to them.
+});
