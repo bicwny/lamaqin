@@ -312,8 +312,7 @@ export default function PracticeHistoryScreen() {
 
           {records.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="checkmark-circle" size={48} color={DesignSystem.colors.success} />
-              <Text style={styles.emptyText}>暂无记录</Text>
+              <Text style={styles.emptyText}>📭 暂无记录</Text>
               <Text style={styles.emptySubtext}>开始您的第一次记录吧！</Text>
             </View>
           ) : (
