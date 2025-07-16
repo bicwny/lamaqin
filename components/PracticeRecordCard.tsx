@@ -68,7 +68,7 @@ export default function PracticeRecordCard({
     } else {
       return (
         <Text style={styles.recordCount}>
-          {showActions ? "数量: " : "+"}
+          +
           {record.count?.toLocaleString()} {practiceUnit}
         </Text>
       );
@@ -104,7 +104,7 @@ export default function PracticeRecordCard({
 
         {record.notes && (
           <View style={styles.notesContainer}>
-            {showActions && <Text style={styles.notesLabel}>备注:</Text>}
+          
             <Text style={styles.notesText} numberOfLines={showActions ? 3 : 2}>
               {record.notes}
             </Text>
