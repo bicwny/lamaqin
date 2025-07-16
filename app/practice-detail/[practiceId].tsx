@@ -549,7 +549,7 @@ export default function PracticeDetailScreen() {
           {/* Project Timeline */}
           <View style={styles.projectTimeline}>
             <Text style={styles.timelineText}>
-              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'} • 天数：{
+              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'} • {
                 project.target_end_date 
                   ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))
                   : '∞'
