@@ -18,7 +18,6 @@ import { toastService } from '@/lib/toast';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
-import { ComponentTextStyles } from '@/utils/componentTokens';
 import ProgressBar from '@/components/ProgressBar';
 
 interface PracticeProject {
