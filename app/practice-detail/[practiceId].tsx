@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+    // marginBottom: DesignSystem.spacing.lg,
   },
   practiceType: {
     ...Typography.styles.label('sm'),
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
   },
   practiceTitle: {
     ...Typography.styles.dharmaTitle('2xl'),
-    marginBottom: DesignSystem.spacing.md,
+    // marginBottom: DesignSystem.spacing.md,
     lineHeight: DesignSystem.typography.lineHeight.tight * DesignSystem.typography.fontSize['2xl'],
   },
   practiceDescription: {
