@@ -471,13 +471,8 @@ export default function PracticeDetailScreen() {
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
             {progress.isCompleted && (
-            <View style={styles.completedBadge}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: DesignSystem.spacing.xs }}>
-                <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.practiceComplete} />
-                <Text style={styles.completedBadgeText}>已完成</Text>
-              </View>
-            </View>
-          )}
+              <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.practiceComplete} style={{ marginBottom: DesignSystem.spacing.sm }} />
+            )}
 
             <Text style={styles.practiceTitle}>
               {project.practices.name}
