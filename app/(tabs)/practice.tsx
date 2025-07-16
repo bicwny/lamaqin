@@ -16,7 +16,11 @@ import { Ionicons } from "@expo/vector-icons";
 import PageTemplate from "@/components/PageTemplate";
 import ProgressBar from "@/components/ProgressBar";
 import { DesignSystem } from "@/constants/DesignSystem";
-import { ComponentTokens, ComponentTextStyles } from "@/utils/componentTokens";
+import {
+  ComponentTokens,
+  ComponentTextStyles,
+  componentHelpers,
+} from "@/utils/componentTokens";
 import { presetProjectNameService } from "@/lib/database";
 import { toastService } from "@/lib/toast";
 
@@ -232,46 +236,69 @@ export default function PracticeScreen() {
     const displayName = item.project_name || presetName || "预设项目";
 
     return (
-      <View style={styles.practiceItem}>
-        <View style={styles.practiceHeader}>
-          <View style={styles.practiceInfo}>
-            <Text style={styles.practiceName}>{item.practices.name}</Text>
-            {(item.project_name || item.preset_project_id) && (
-              <Text style={styles.programName}>{displayName}</Text>
-            )}
+      <View key={item.id} style={styles.practiceItem}>
+            {/* Section 1: Practice Header & Completion Badge */}
+            <View style={styles.practiceHeader}>
+              <View style={styles.practiceInfo}>
+                {/* Program name first, then practice name (matching practice-detail) */}
+                {(item.project_name || item.preset_project_id) && (
+                  <Text style={styles.programName}>
+                    {item.project_name || presetProjectNames[item.preset_project_id] || "预设项目"}
+                  </Text>
+                )}
+                <Text style={styles.practiceName}>{item.practices.name}</Text>
+              </View>
+              {/* Completion badge (24px icon matching practice-detail) */}
+              {progress.isCompleted && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={24}
+                  color={DesignSystem.colors.practiceComplete}
+                />
+              )}
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Section 2: Progress Info */}
+            <View style={styles.progressContainer}>
+              <View style={styles.progressInfo}>
+                <Text style={styles.progressText}>
+                  {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {item.practices.unit}
+                </Text>
+                <Text style={styles.progressPercentage}>
+                  {Math.round(progress.percentage)}%
+                </Text>
+              </View>
+              <View style={styles.progressBarContainer}>
+                <ProgressBar
+                  progress={progress.percentage}
+                  size="thick"
+                  containerStyle={{ flex: 1 }}
+                />
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Section 3: Action Buttons */}
+            <View style={styles.actionsContainer}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => handleCustomRecord(item.id, item.practices.name)}
+              >
+                <Text style={styles.actionButtonText}>记录</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, ComponentTokens.button.variants.primary]}
+                onPress={() => handleViewDetails(item.id, item.practices.name)}
+              >
+                <Text style={[styles.primaryButtonText]}>详情</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          {progress.isCompleted && (
-            <Text style={styles.completedBadge}>✅</Text>
-          )}
-        </View>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressInfo}>
-            <Text style={styles.progressText}>
-              {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {item.practices.unit}
-            </Text>
-            <Text style={styles.progressPercentage}>
-              {Math.round(progress.percentage)}%
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleCustomRecord(item.id, item.practices.name)}
-          >
-            <Text style={styles.actionButtonText}>记录</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.viewDetailsButton]}
-            onPress={() => handleViewDetails(item.id, item.practices.name)}
-          >
-            <Text style={styles.primaryButtonText}>详情</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
     );
   };
 
@@ -442,7 +469,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.primary,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
-  
+
   actionsContainer: {
     flexDirection: "row",
     gap: DesignSystem.spacing.md,
@@ -462,5 +489,14 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     ...ComponentTextStyles.button.primary,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: DesignSystem.colors.divider,
+    marginVertical: DesignSystem.spacing.md,
+  },
+  progressBarContainer: {
+    marginTop: DesignSystem.spacing.sm,
+    flex: 1,
   },
 });
