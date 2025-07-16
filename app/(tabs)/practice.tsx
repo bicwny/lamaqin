@@ -260,6 +260,7 @@ export default function PracticeScreen() {
           )}
         </View>
 
+
         {/* Section 2: Progress Info */}
         <View style={styles.progressContainer}>
           <View style={styles.progressInfo}>
@@ -279,6 +280,9 @@ export default function PracticeScreen() {
             />
           </View>
         </View>
+
+        {/* Divider */}
+        {/* <View style={styles.divider} />*/}
 
         {/* Section 3: Action Buttons */}
         <View style={styles.actionsContainer}>
@@ -475,7 +479,6 @@ const styles = StyleSheet.create({
   secondaryButton: {
     ...ComponentTokens.button.variants.secondary,
     ...ComponentTokens.button.sizes.medium,
-    color: DesignSystem.colors.primary,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -492,6 +495,11 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: DesignSystem.colors.textInverse,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: DesignSystem.colors.divider,
+    marginVertical: DesignSystem.spacing.sm,
   },
   progressBarContainer: {
     marginTop: DesignSystem.spacing.sm,
