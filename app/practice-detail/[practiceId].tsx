@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     padding: ComponentTokens.card.padding.comfortable,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-  
+
   // Section 1: Practice & Timeline
   section1: {
     // paddingBottom: DesignSystem.spacing.lg,
