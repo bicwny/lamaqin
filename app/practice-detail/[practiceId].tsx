@@ -483,32 +483,25 @@ export default function PracticeDetailScreen() {
         <View style={styles.mainCard}>
           {/* Section 1: Practice & Timeline */}
           <View style={styles.section1}>
-            {/* Practice name and completion badge row */}
-            <View style={styles.practiceHeaderRow}>
-              <View style={styles.practiceInfo}>
-                <Text style={styles.practiceTitle}>
-                  {project.practices.name}
+            {/* Program name and completion badge row */}
+            <View style={styles.programRow}>
+              {/* Program Name on the left */}
+              {(project.project_name || project.preset_project_id) && (
+                <Text style={styles.programName}>
+                  {getDisplayProjectName()}
                 </Text>
-                
-                {/* Program Name */}
-                {(project.project_name || project.preset_project_id) && (
-                  <Text style={styles.programName}>
-                    {getDisplayProjectName()}
-                  </Text>
-                )}
-              </View>
-              
-              {/* Completion badge on the right */}
+              )}
+
+              {/* Completion badge on the right (24px) */}
               {progress.isCompleted && (
-                <Icon semantic="completion" />
+                <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.practiceComplete} />
               )}
             </View>
 
-            {/* Timeline */}
-            <Text style={styles.timelineText}>
-              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'}
-            </Text>
-          </View>
+            {/* Practice name */}
+            <Text style={styles.practiceTitle}>
+              {project.practices.name}
+            </Text></View>
 
           {/* Divider */}
           <View style={styles.divider} />
@@ -764,6 +757,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: DesignSystem.spacing['2xl'],
     fontStyle: 'italic',
+  },
+  programRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: DesignSystem.spacing.sm,
   },
 
 });
