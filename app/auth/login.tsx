@@ -14,6 +14,7 @@ import {
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
+import { ComponentTokens } from '@/utils/componentTokens';
 
 // Error types for better categorization
 enum ErrorType {
@@ -223,7 +224,7 @@ export default function UnifiedAuthScreen() {
 
   const handleSendOTP = async () => {
     const trimmedEmail = email.trim();
-    
+
     // Check if email is empty or just whitespace
     if (!trimmedEmail) {
       showError(ErrorType.EMAIL_EMPTY);

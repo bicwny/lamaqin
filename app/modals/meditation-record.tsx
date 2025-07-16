@@ -13,6 +13,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
+import { ComponentTokens } from '@/utils/componentTokens';
 import { toastService } from '@/lib/toast';
 import TopicSelectionModal from '@/components/TopicSelectionModal';
 import ModalTemplate from '@/components/ModalTemplate';
@@ -307,13 +308,7 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
   textInput: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: 'white',
-    color: '#333'
+    ...ComponentTokens.input.standard,
   },
   multilineInput: {
     height: 120,
@@ -322,11 +317,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   topicSelector: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 8,
-    backgroundColor: 'white',
-    paddingHorizontal: 12,
+    ...ComponentTokens.input.standard,
     paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',

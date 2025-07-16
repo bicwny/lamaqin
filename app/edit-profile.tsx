@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { ComponentTokens } from '@/utils/componentTokens';
 import { useAuth } from '@/contexts/AuthContext';
 import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   input: {
-    ...DesignSystem.components.input,
+    ...ComponentTokens.input.standard,
     ...DesignSystem.shadow.sm,
   },
   saveButton: {

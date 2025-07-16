@@ -1208,8 +1208,8 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     paddingVertical: 12,
-    fontSize: 16,
-    color: "#333",
+    fontSize: ComponentTokens.input.standard.fontSize,
+    color: ComponentTokens.input.standard.color,
   },
   inputUnit: {
     fontSize: 16,
