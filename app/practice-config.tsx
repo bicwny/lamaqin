@@ -1207,7 +1207,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: ComponentTokens.input.standard.paddingVertical,
     fontSize: ComponentTokens.input.standard.fontSize,
     color: ComponentTokens.input.standard.color,
   },
@@ -1433,9 +1433,9 @@ const styles = StyleSheet.create({
   },
   goalTextInput: {
     flex: 1,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#333",
+    paddingVertical: ComponentTokens.input.standard.paddingVertical,
+    fontSize: ComponentTokens.input.standard.fontSize,
+    color: ComponentTokens.input.standard.color,
   },
   goalInputUnit: {
     fontSize: 16,
@@ -1531,9 +1531,9 @@ const styles = StyleSheet.create({
   },
   daysInput: {
     flex: 1,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#333",
+    paddingVertical: ComponentTokens.input.standard.paddingVertical,
+    fontSize: ComponentTokens.input.standard.fontSize,
+    color: ComponentTokens.input.standard.color,
     textAlign: "center",
   },
   daysInputLabel: {
@@ -1710,14 +1710,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e9ecef",
   },
   modalSearchInput: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#333",
-    borderWidth: 1,
-    borderColor: "#e9ecef",
+    ...ComponentTokens.input.search,
   },
   modalPresetList: {
     flex: 1,
@@ -1770,8 +1763,8 @@ const styles = StyleSheet.create({
     borderColor: "#e9ecef",
   },
   webDateInput: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: ComponentTokens.input.standard.fontSize,
+    color: ComponentTokens.input.standard.color,
     backgroundColor: "transparent",
     borderWidth: 0,
     outlineWidth: 0,
