@@ -12,9 +12,9 @@ import { spacingMigrationMap, spacingHelpers } from '@/utils/spacingMigration';
 
 // Migration templates for common component patterns
 export const MigrationTemplates = {
-  // Button migration templates
+  // Button migration templates - Updated for consolidated system
   button: {
-    // Primary button template
+    // Primary button template (medium size)
     primary: {
       // Old pattern (what to replace)
       oldPattern: {
@@ -28,14 +28,14 @@ export const MigrationTemplates = {
       },
       // New pattern (what to replace with)
       newPattern: {
-        ...ComponentTokens.button.primary,
-        ...ComponentTextStyles.button.primary,
+        ...componentHelpers.getButtonStyle('primary', 'medium'),
       },
       // Helper function
-      apply: () => componentHelpers.getButtonStyle('primary'),
+      apply: () => componentHelpers.getButtonStyle('primary', 'medium'),
+      textStyle: () => componentHelpers.getButtonTextStyle('primary', 'medium'),
     },
     
-    // Secondary button template
+    // Secondary button template (medium size)
     secondary: {
       oldPattern: {
         backgroundColor: '#ffffff',
@@ -44,18 +44,18 @@ export const MigrationTemplates = {
         borderRadius: 12,
         borderWidth: 1.5,
         borderColor: '#da4347',
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: '600',
         color: '#da4347',
       },
       newPattern: {
-        ...ComponentTokens.button.secondary,
-        ...ComponentTextStyles.button.secondary,
+        ...componentHelpers.getButtonStyle('secondary', 'medium'),
       },
-      apply: () => componentHelpers.getButtonStyle('secondary'),
+      apply: () => componentHelpers.getButtonStyle('secondary', 'medium'),
+      textStyle: () => componentHelpers.getButtonTextStyle('secondary', 'medium'),
     },
     
-    // Small button template
+    // Small button template (migrates to secondary + small size)
     small: {
       oldPattern: {
         backgroundColor: '#f8f9fa',
@@ -66,6 +66,89 @@ export const MigrationTemplates = {
         borderColor: '#e9ecef',
         fontSize: 14,
         fontWeight: '500',
+      },
+      newPattern: {
+        ...componentHelpers.getButtonStyle('secondary', 'small'),
+      },
+      apply: () => componentHelpers.getButtonStyle('secondary', 'small'),
+      textStyle: () => componentHelpers.getButtonTextStyle('secondary', 'small'),
+    },
+    
+    // Text button template (migrates to ghost + medium size)
+    text: {
+      oldPattern: {
+        backgroundColor: 'transparent',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#da4347',
+      },
+      newPattern: {
+        ...componentHelpers.getButtonStyle('ghost', 'medium'),
+      },
+      apply: () => componentHelpers.getButtonStyle('ghost', 'medium'),
+      textStyle: () => componentHelpers.getButtonTextStyle('ghost', 'medium'),
+    },
+    
+    // Dharma button template (migrates to primary + large size)
+    dharma: {
+      oldPattern: {
+        backgroundColor: '#da4347',
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        borderRadius: 12,
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#ffffff',
+      },
+      newPattern: {
+        ...componentHelpers.getButtonStyle('primary', 'large'),
+      },
+      apply: () => componentHelpers.getButtonStyle('primary', 'large'),
+      textStyle: () => componentHelpers.getButtonTextStyle('primary', 'large'),
+    },
+    
+    // New consolidated system templates
+    consolidated: {
+      primarySmall: {
+        apply: () => componentHelpers.getButtonStyle('primary', 'small'),
+        textStyle: () => componentHelpers.getButtonTextStyle('primary', 'small'),
+      },
+      primaryMedium: {
+        apply: () => componentHelpers.getButtonStyle('primary', 'medium'),
+        textStyle: () => componentHelpers.getButtonTextStyle('primary', 'medium'),
+      },
+      primaryLarge: {
+        apply: () => componentHelpers.getButtonStyle('primary', 'large'),
+        textStyle: () => componentHelpers.getButtonTextStyle('primary', 'large'),
+      },
+      secondarySmall: {
+        apply: () => componentHelpers.getButtonStyle('secondary', 'small'),
+        textStyle: () => componentHelpers.getButtonTextStyle('secondary', 'small'),
+      },
+      secondaryMedium: {
+        apply: () => componentHelpers.getButtonStyle('secondary', 'medium'),
+        textStyle: () => componentHelpers.getButtonTextStyle('secondary', 'medium'),
+      },
+      secondaryLarge: {
+        apply: () => componentHelpers.getButtonStyle('secondary', 'large'),
+        textStyle: () => componentHelpers.getButtonTextStyle('secondary', 'large'),
+      },
+      ghostSmall: {
+        apply: () => componentHelpers.getButtonStyle('ghost', 'small'),
+        textStyle: () => componentHelpers.getButtonTextStyle('ghost', 'small'),
+      },
+      ghostMedium: {
+        apply: () => componentHelpers.getButtonStyle('ghost', 'medium'),
+        textStyle: () => componentHelpers.getButtonTextStyle('ghost', 'medium'),
+      },
+      ghostLarge: {
+        apply: () => componentHelpers.getButtonStyle('ghost', 'large'),
+        textStyle: () => componentHelpers.getButtonTextStyle('ghost', 'large'),
+      },
+    },
         color: '#666666',
       },
       newPattern: {

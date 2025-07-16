@@ -8,52 +8,62 @@ import { DesignSystem } from '@/constants/DesignSystem';
 
 // Component token helpers that reference the main design system
 export const ComponentTokens = {
-  // Button tokens with DesignSystem references
+  // Button tokens with DesignSystem references - Consolidated system
   button: {
-    primary: {
-      backgroundColor: DesignSystem.colors.primary,
-      paddingVertical: DesignSystem.spacing.lg,
-      paddingHorizontal: DesignSystem.spacing.xl,
-      borderRadius: DesignSystem.borderRadius.lg,
-      minHeight: 48,
-      ...DesignSystem.shadow.md,
+    // Base button styles by variant
+    variants: {
+      primary: {
+        backgroundColor: DesignSystem.colors.primary,
+        borderWidth: 0,
+        borderColor: 'transparent',
+        ...DesignSystem.shadow.md,
+      },
+      
+      secondary: {
+        backgroundColor: DesignSystem.colors.backgroundSecondary,
+        borderWidth: 1.5,
+        borderColor: DesignSystem.colors.primary,
+        ...DesignSystem.shadow.sm,
+      },
+      
+      ghost: {
+        backgroundColor: 'transparent',
+        borderWidth: 0,
+        borderColor: 'transparent',
+      },
     },
     
-    secondary: {
-      backgroundColor: DesignSystem.colors.backgroundSecondary,
-      paddingVertical: DesignSystem.spacing.lg,
-      paddingHorizontal: DesignSystem.spacing.xl,
-      borderRadius: DesignSystem.borderRadius.lg,
-      borderWidth: 1.5,
-      borderColor: DesignSystem.colors.primary,
-      minHeight: 48,
-      ...DesignSystem.shadow.sm,
+    // Size variations
+    sizes: {
+      small: {
+        paddingVertical: DesignSystem.spacing.base,
+        paddingHorizontal: DesignSystem.spacing.md,
+        borderRadius: DesignSystem.borderRadius.md,
+        minHeight: 36,
+      },
+      
+      medium: {
+        paddingVertical: DesignSystem.spacing.lg,
+        paddingHorizontal: DesignSystem.spacing.xl,
+        borderRadius: DesignSystem.borderRadius.lg,
+        minHeight: 48,
+      },
+      
+      large: {
+        paddingVertical: DesignSystem.spacing.xl,
+        paddingHorizontal: DesignSystem.spacing['2xl'],
+        borderRadius: DesignSystem.borderRadius.lg,
+        minHeight: 56,
+      },
     },
     
-    small: {
-      backgroundColor: DesignSystem.colors.background,
-      paddingVertical: DesignSystem.spacing.base,
-      paddingHorizontal: DesignSystem.spacing.md,
-      borderRadius: DesignSystem.borderRadius.md,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.border,
-      minHeight: 36,
-    },
-    
-    text: {
-      backgroundColor: 'transparent',
-      paddingVertical: DesignSystem.spacing.sm,
-      paddingHorizontal: DesignSystem.spacing.md,
-      borderRadius: DesignSystem.spacing.xxs,
-    },
-    
-    dharma: {
-      backgroundColor: DesignSystem.colors.dharmaRed,
-      paddingVertical: DesignSystem.spacing.lg,
-      paddingHorizontal: DesignSystem.spacing['2xl'],
-      borderRadius: DesignSystem.borderRadius.lg,
-      minHeight: 48,
-      ...DesignSystem.shadow.md,
+    // Legacy support - maps old variants to new system
+    legacy: {
+      primary: { variant: 'primary' as const, size: 'medium' as const },
+      secondary: { variant: 'secondary' as const, size: 'medium' as const },
+      small: { variant: 'secondary' as const, size: 'small' as const },
+      text: { variant: 'ghost' as const, size: 'medium' as const },
+      dharma: { variant: 'primary' as const, size: 'large' as const }, // dharma → primary with large size
     },
   },
 
@@ -239,33 +249,70 @@ export const ComponentTokens = {
 // Text styles that use component tokens
 export const ComponentTextStyles = {
   button: {
-    primary: {
-      fontSize: DesignSystem.typography.fontSize.base,
-      fontWeight: DesignSystem.typography.fontWeight.bold,
-      color: DesignSystem.colors.textInverse,
-      letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+    // Text styles by variant
+    variants: {
+      primary: {
+        color: DesignSystem.colors.textInverse,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+      },
+      secondary: {
+        color: DesignSystem.colors.primary,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      },
+      ghost: {
+        color: DesignSystem.colors.primary,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      },
     },
-    secondary: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.semibold,
-      color: DesignSystem.colors.primary,
-      letterSpacing: DesignSystem.typography.letterSpacing.normal,
+    
+    // Text styles by size
+    sizes: {
+      small: {
+        fontSize: DesignSystem.typography.fontSize.sm,
+      },
+      medium: {
+        fontSize: DesignSystem.typography.fontSize.base,
+      },
+      large: {
+        fontSize: DesignSystem.typography.fontSize.lg,
+      },
     },
-    small: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.medium,
-      color: DesignSystem.colors.textSecondary,
-    },
-    text: {
-      fontSize: DesignSystem.typography.fontSize.sm,
-      fontWeight: DesignSystem.typography.fontWeight.semibold,
-      color: DesignSystem.colors.primary,
-    },
-    dharma: {
-      fontSize: DesignSystem.typography.fontSize.base,
-      fontWeight: DesignSystem.typography.fontWeight.bold,
-      color: DesignSystem.colors.textInverse,
-      letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+    
+    // Legacy text style mappings (resolved after export)
+    legacy: {
+      primary: {
+        color: DesignSystem.colors.textInverse,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        fontSize: DesignSystem.typography.fontSize.base,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+      },
+      secondary: {
+        color: DesignSystem.colors.primary,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        fontSize: DesignSystem.typography.fontSize.base,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      },
+      small: {
+        color: DesignSystem.colors.primary,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        fontSize: DesignSystem.typography.fontSize.sm,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      },
+      text: {
+        color: DesignSystem.colors.primary,
+        fontWeight: DesignSystem.typography.fontWeight.semibold,
+        fontSize: DesignSystem.typography.fontSize.sm,
+        letterSpacing: DesignSystem.typography.letterSpacing.normal,
+      },
+      dharma: {
+        color: DesignSystem.colors.textInverse,
+        fontWeight: DesignSystem.typography.fontWeight.bold,
+        fontSize: DesignSystem.typography.fontSize.lg,
+        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+      },
     },
   },
   
@@ -333,17 +380,38 @@ export const ComponentTextStyles = {
 
 // Helper functions for common patterns
 export const componentHelpers = {
-  // Get complete button style
-  getButtonStyle: (variant: keyof typeof ComponentTokens.button) => 
-    ComponentTokens.button[variant],
+  // Get complete button style with new consolidated system
+  getButtonStyle: (
+    variant: 'primary' | 'secondary' | 'ghost', 
+    size: 'small' | 'medium' | 'large' = 'medium'
+  ) => ({
+    ...ComponentTokens.button.variants[variant],
+    ...ComponentTokens.button.sizes[size],
+  }),
+  
+  // Legacy button style support
+  getLegacyButtonStyle: (legacyVariant: 'primary' | 'secondary' | 'small' | 'text' | 'dharma') => {
+    const mapping = ComponentTokens.button.legacy[legacyVariant];
+    return componentHelpers.getButtonStyle(mapping.variant, mapping.size);
+  },
   
   // Get complete card style
   getCardStyle: (variant: keyof typeof ComponentTokens.card) => 
     ComponentTokens.card[variant],
   
-  // Get button text style
-  getButtonTextStyle: (variant: keyof typeof ComponentTextStyles.button) => 
-    ComponentTextStyles.button[variant],
+  // Get button text style with new consolidated system
+  getButtonTextStyle: (
+    variant: 'primary' | 'secondary' | 'ghost', 
+    size: 'small' | 'medium' | 'large' = 'medium'
+  ) => ({
+    ...ComponentTextStyles.button.variants[variant],
+    ...ComponentTextStyles.button.sizes[size],
+  }),
+  
+  // Legacy button text style support
+  getLegacyButtonTextStyle: (legacyVariant: 'primary' | 'secondary' | 'small' | 'text' | 'dharma') => {
+    return ComponentTextStyles.button.legacy[legacyVariant];
+  },
   
   // Get card text style
   getCardTextStyle: (variant: keyof typeof ComponentTextStyles.card) => 
