@@ -274,6 +274,46 @@ export const ComponentTokens = {
     section: 'section' as const, // Maps to Header context="section"
   },
 
+  // Divider component tokens
+  divider: {
+    // Horizontal dividers (default)
+    horizontal: {
+      height: 1,
+      backgroundColor: DesignSystem.colors.border,
+      marginVertical: DesignSystem.spacing.md,
+    },
+    
+    // Vertical dividers
+    vertical: {
+      width: 1,
+      backgroundColor: DesignSystem.colors.border,
+      marginHorizontal: DesignSystem.spacing.md,
+    },
+    
+    // Thickness variations
+    thickness: {
+      thin: 1,
+      medium: 2,
+      thick: 3,
+    },
+    
+    // Color variants
+    colors: {
+      light: DesignSystem.colors.borderLight,
+      default: DesignSystem.colors.border,
+      dark: DesignSystem.colors.borderDark,
+      primary: DesignSystem.colors.primary,
+    },
+    
+    // Spacing variations
+    spacing: {
+      none: 0,
+      tight: DesignSystem.spacing.xs,
+      normal: DesignSystem.spacing.md,
+      loose: DesignSystem.spacing.lg,
+    },
+  },
+
   // Semantic color variants for Buddhist theming
   semantic: {
     // Semantic colors for Buddhist themes
@@ -810,6 +850,28 @@ export const componentHelpers = {
   // Get semantic text styles
   getSemanticTextStyle: (variant: keyof typeof ComponentTextStyles.semantic) => 
     ComponentTextStyles.semantic[variant],
+  
+  // Get divider style
+  getDividerStyle: (
+    orientation: 'horizontal' | 'vertical' = 'horizontal',
+    thickness: keyof typeof ComponentTokens.divider.thickness = 'thin',
+    color: keyof typeof ComponentTokens.divider.colors = 'default',
+    spacing: keyof typeof ComponentTokens.divider.spacing = 'normal'
+  ) => {
+    const baseStyle = ComponentTokens.divider[orientation];
+    const thicknessValue = ComponentTokens.divider.thickness[thickness];
+    const colorValue = ComponentTokens.divider.colors[color];
+    const spacingValue = ComponentTokens.divider.spacing[spacing];
+    
+    return {
+      ...baseStyle,
+      backgroundColor: colorValue,
+      ...(orientation === 'horizontal' 
+        ? { height: thicknessValue, marginVertical: spacingValue }
+        : { width: thicknessValue, marginHorizontal: spacingValue }
+      ),
+    };
+  },
 };
 
 export default ComponentTokens;
