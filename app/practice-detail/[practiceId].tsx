@@ -596,6 +596,9 @@ export default function PracticeDetailScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Divider */}
+          <View style={styles.divider} />
+
           <View style={styles.recordsList}>
             {renderRecentRecords()}
           </View>
