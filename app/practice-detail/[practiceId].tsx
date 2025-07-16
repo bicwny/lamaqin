@@ -501,7 +501,12 @@ export default function PracticeDetailScreen() {
             {/* Practice name */}
             <Text style={styles.practiceTitle}>
               {project.practices.name}
-            </Text></View>
+            </Text>
+            {/* Timeline */}
+            <Text style={styles.timelineText}>
+              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'}
+            </Text>
+          </View>
 
           {/* Divider */}
           <View style={styles.divider} />
