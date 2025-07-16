@@ -499,6 +499,118 @@ function TotalSessionsDisplay({ practiceId, userId }: { practiceId: string; user
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: DesignSystem.spacing.lg,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: DesignSystem.spacing['2xl'],
+    paddingTop: DesignSystem.spacing['5xl'],
+  },
+  iconContainer: {
+    marginBottom: DesignSystem.spacing['2xl'],
+  },
+  emptyTitle: {
+    ...ComponentTextStyles.heading,
+    marginBottom: DesignSystem.spacing.lg,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    ...ComponentTextStyles.body,
+    textAlign: 'center',
+    marginBottom: DesignSystem.spacing['2xl'],
+    lineHeight: DesignSystem.typography.lineHeight.relaxed,
+  },
+  browseButton: {
+    ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.medium,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: DesignSystem.spacing.sm,
+  },
+  browseButtonText: {
+    ...ComponentTextStyles.button.primary,
+  },
+  sectionTitle: {
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  practiceCard: {
+    ...ComponentTokens.card.variants.outlined,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
+    padding: ComponentTokens.card.padding.comfortable,
+  },
+  practiceNameRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  practiceName: {
+    ...ComponentTextStyles.subheading,
+    fontSize: DesignSystem.typography.fontSize.base,
+    flex: 1,
+  },
+  projectNamePill: {
+    ...ComponentTokens.badge.pill.small,
+    ...ComponentTokens.badge.softColors.neutral,
+    marginLeft: DesignSystem.spacing.sm,
+  },
+  projectNameText: {
+    ...ComponentTextStyles.caption,
+  },
+  progressContainer: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  practiceInfo: {
+    ...ComponentTextStyles.body,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  weeklyProgress: {
+    marginTop: DesignSystem.spacing.sm,
+  },
+  weeklyProgressText: {
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+  },
+  weeklyProgressSubtext: {
+    ...ComponentTextStyles.caption,
+    marginTop: DesignSystem.spacing.xs,
+    fontStyle: 'italic',
+  },
+  totalSessions: {
+    ...ComponentTextStyles.caption,
+    marginTop: DesignSystem.spacing.xs,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
+  },
+  primaryButton: {
+    ...ComponentTokens.button.variants.primary,
+    ...ComponentTokens.button.sizes.medium,
+    flex: 1,
+    alignItems: 'center',
+  },
+  secondaryButton: {
+    ...ComponentTokens.button.variants.secondary,
+    ...ComponentTokens.button.sizes.medium,
+    flex: 1,
+    alignItems: 'center',
+  },
+  buttonText: {
+    ...ComponentTextStyles.button.primary,
+  },
+  secondaryButtonText: {
+    ...ComponentTextStyles.button.secondary,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -514,16 +626,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: DesignSystem.spacing['4xl'],
-  },
-  emptyTitle: {
-    ...ComponentTextStyles.heading,
-    marginBottom: DesignSystem.spacing.lg,
-    textAlign: 'center',
-  },
-  emptyDescription: {
-    ...ComponentTextStyles.body,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing['4xl'],
   },
   addButton: {
     ...ComponentTokens.button.variants.primary,
@@ -555,10 +657,6 @@ const styles = StyleSheet.create({
   projectInfo: {
     flex: 1,
     marginRight: DesignSystem.spacing.md,
-  },
-  practiceName: {
-    ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.xs,
   },
   projectName: {
     ...ComponentTextStyles.label,
@@ -599,7 +697,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.label,
     marginBottom: DesignSystem.spacing.sm,
   },
-  progressContainer: {
+  progressContainer1: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: DesignSystem.spacing.md,
