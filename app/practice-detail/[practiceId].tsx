@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     // paddingBottom: DesignSystem.spacing.lg,
   },
   completedBadge: {
-    ...ComponentTokens.completedBadge.container,
+    // ...ComponentTokens.completedBadge.container,
   },
   practiceTitle: {
     ...ComponentTextStyles.dharma,
