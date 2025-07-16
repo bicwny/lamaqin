@@ -521,6 +521,13 @@ export default function PracticeDetailScreen() {
               </View>
             )}
 
+            {/* Project Timeline */}
+            <View style={styles.projectTimeline}>
+              <Text style={styles.timelineText}>
+                发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'}
+              </Text>
+            </View>
+
             {project.practices.description && (
               <Text style={styles.practiceDescription}>
                 {project.practices.description}
@@ -544,13 +551,6 @@ export default function PracticeDetailScreen() {
                 </Text>
               </View>
             )}
-          </View>
-
-          {/* Project Timeline */}
-          <View style={styles.projectTimeline}>
-            <Text style={styles.timelineText}>
-              发愿：{project.start_date} • 圆满：{project.target_end_date || '持续进行'}
-            </Text>
           </View>
 
           {/* Action Buttons */}
