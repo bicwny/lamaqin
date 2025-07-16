@@ -370,7 +370,6 @@ export default function PracticeDetailScreen() {
           </Text>
           {record.notes && (
             <View style={styles.recordNotes}>
-              <Text style={styles.notesLabel}>备注:</Text>
               <Text style={styles.notesText} numberOfLines={2}>
                 {record.notes}
               </Text>
@@ -820,25 +819,20 @@ const styles = StyleSheet.create({
   recordCount: {
     ...Typography.styles.body('base'),
     color: DesignSystem.colors.textPrimary,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
     // marginBottom: DesignSystem.spacing.xs,
   },
   recordNotes: {
     backgroundColor: DesignSystem.colors.background,
-    padding: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.sm,
+    // borderRadius: DesignSystem.borderRadius.md,
     marginTop: DesignSystem.spacing.sm,
-    borderLeftWidth: 3,
+    borderLeftWidth: 2,
     borderLeftColor: DesignSystem.colors.primary,
   },
-  notesLabel: {
-    ...Typography.styles.label('sm'),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.xs,
-  },
+
   notesText: {
-    ...Typography.styles.label('sm'),
+    ...Typography.styles.body('sm'),
     color: DesignSystem.colors.textPrimary,
     lineHeight: DesignSystem.typography.lineHeight.normal * DesignSystem.typography.fontSize.sm,
   },
