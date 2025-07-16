@@ -995,7 +995,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary,
     borderRadius: DesignSystem.borderRadius.lg,
     paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,```python
+    paddingVertical: DesignSystem.spacing.xs,
   },
   previewProjectPillText: {
     ...ComponentTextStyles.caption,
