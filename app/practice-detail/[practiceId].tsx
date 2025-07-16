@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     paddingBottom: DesignSystem.spacing.xl,
   },
   mainCard: {
-    ...ComponentTokens.card.variants.outlined,
+    ...ComponentTokens.card.variants.section,
     padding: ComponentTokens.card.padding.comfortable,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
@@ -759,7 +759,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.button.primary,
   },
   recordsCard: {
-    ...ComponentTokens.card.variants.outlined,
+    ...ComponentTokens.card.variants.section,
     padding: ComponentTokens.card.padding.comfortable,
     margin: DesignSystem.spacing.lg,
     marginTop: 0,
