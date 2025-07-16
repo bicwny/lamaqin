@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   practiceItem: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.standard,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   practiceHeader: {
     flexDirection: "row",
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.sm,
+    // marginBottom: DesignSystem.spacing.sm,
   },
   progressText: {
     ...ComponentTextStyles.body,
