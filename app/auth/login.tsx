@@ -15,9 +15,6 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { ComponentTokens } from '@/utils/componentTokens';
-import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTextStyles } from '@/utils/componentTokens';
-import { ComponentTextStyles } from '@/utils/typography';
 
 // Error types for better categorization
 enum ErrorType {
@@ -605,42 +602,44 @@ export default function UnifiedAuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: Colors.background,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: DesignSystem.spacing.xl,
+    padding: 20,
   },
   header: {
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing['4xl'],
+    marginBottom: 40,
   },
   logo: {
-    fontSize: DesignSystem.typography.fontSize['4xl'],
-    marginBottom: DesignSystem.spacing.base,
+    fontSize: 48,
+    marginBottom: 10,
   },
   title: {
-    ...ComponentTextStyles.heading,
-    color: DesignSystem.colors.primary,
-    marginBottom: DesignSystem.spacing.base,
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginBottom: 10,
   },
   subtitle: {
-    ...ComponentTextStyles.body.medium,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 16,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    lineHeight: DesignSystem.typography.lineHeight.relaxed * DesignSystem.typography.fontSize.base,
+    lineHeight: 22,
   },
   form: {
     width: '100%',
   },
   inputGroup: {
-    marginBottom: DesignSystem.spacing.xl,
+    marginBottom: 20,
   },
   inputLabel: {
-    ...ComponentTextStyles.label.medium,
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: DesignSystem.spacing.sm,
+    fontSize: 16,
+    color: Colors.text,
+    marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
     ...ComponentTokens.input.standard,
@@ -650,86 +649,100 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     ...ComponentTokens.input.standard,
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    backgroundColor: '#F5F5F5',
   },
   emailText: {
-    ...ComponentTextStyles.body.medium,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 16,
+    color: Colors.textSecondary,
     flex: 1,
   },
   changeEmailText: {
-    ...ComponentTextStyles.body.medium,
-    color: DesignSystem.colors.primary,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: '500',
   },
   primaryButton: {
-    ...ComponentTokens.button.variants.primary,
-    ...ComponentTokens.button.sizes.medium,
+    backgroundColor: Colors.primary,
+    paddingVertical: 15,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: DesignSystem.spacing.base,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   primaryButtonDisabled: {
     opacity: 0.6,
   },
   primaryButtonText: {
-    ...ComponentTextStyles.button.primary,
+    color: Colors.surface,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   resendButton: {
     alignItems: 'center',
-    marginTop: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.base,
+    marginTop: 15,
+    paddingVertical: 10,
   },
   resendButtonDisabled: {
     opacity: 0.6,
   },
   resendButtonText: {
-    ...ComponentTextStyles.button.secondary,
+    color: Colors.primary,
+    fontSize: 16,
     textDecorationLine: 'underline',
   },
   resendButtonTextDisabled: {
-    ...ComponentTextStyles.body.medium,
-    color: DesignSystem.colors.textSecondary,
+    color: Colors.textSecondary,
     textDecorationLine: 'none',
   },
   helpSection: {
-    marginTop: DesignSystem.spacing['3xl'],
-    padding: DesignSystem.spacing.xl,
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.lg,
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.borderLight,
+    borderColor: '#E9ECEF',
   },
   helpTitle: {
-    ...ComponentTextStyles.label.large,
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: DesignSystem.spacing.base,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 10,
   },
   helpText: {
-    ...ComponentTextStyles.body.small,
-    color: DesignSystem.colors.textSecondary,
-    lineHeight: DesignSystem.typography.lineHeight.relaxed * DesignSystem.typography.fontSize.sm,
+    fontSize: 14,
+    color: Colors.textSecondary,
+    lineHeight: 20,
   },
   errorStatus: {
-    ...ComponentTokens.notification.variants.error,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
   },
   errorStatusIcon: {
-    fontSize: DesignSystem.typography.fontSize.lg,
-    marginRight: DesignSystem.spacing.base,
+    fontSize: 18,
+    marginRight: 10,
   },
   errorStatusText: {
     flex: 1,
-    ...ComponentTextStyles.body.small,
-    color: DesignSystem.colors.errorText,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontSize: 14,
+    color: '#DC2626',
+    fontWeight: '500',
   },
   errorStatusClose: {
-    padding: DesignSystem.spacing.xs,
+    padding: 4,
   },
   errorStatusCloseText: {
-    fontSize: DesignSystem.typography.fontSize.base,
-    color: DesignSystem.colors.errorText,
-    fontWeight: DesignSystem.typography.fontWeight.bold,
+    fontSize: 16,
+    color: '#DC2626',
+    fontWeight: 'bold',
   },
 });
