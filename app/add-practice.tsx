@@ -101,13 +101,13 @@ export default function AddPracticeScreen() {
 
   if (loading) {
     return (
-      <PageTemplate
-        title="添加修法"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
-      >
+    <PageTemplate
+      title="添加修法"
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      scrollable={false}
+      backgroundVariant="dharma" // Red Tara background for practice energy & determination
+    >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
@@ -118,13 +118,13 @@ export default function AddPracticeScreen() {
 
   if (practices.length === 0) {
     return (
-      <PageTemplate
-        title="添加修法"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
-      >
+    <PageTemplate
+      title="添加修法"
+      showBackButton={true}
+      onBackPress={() => router.back()}
+      scrollable={false}
+      backgroundVariant="dharma" // Red Tara background for practice energy & determination
+    >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
           <Text style={styles.emptyDescription}>
@@ -146,7 +146,8 @@ export default function AddPracticeScreen() {
       title="添加修法"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={DesignSystem.colors.background}
+      scrollable={false}
+      backgroundVariant="dharma" // Red Tara background for practice energy & determination
       padding={0}
     >
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
