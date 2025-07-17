@@ -255,7 +255,7 @@ export default function PracticeScreen() {
             <Ionicons
               name="checkmark-circle"
               size={24}
-              color={DesignSystem.colors.practiceComplete}
+              color={DesignSystem.colors.greenTara}
             />
           )}
         </View>
@@ -274,6 +274,7 @@ export default function PracticeScreen() {
               progress={progress.percentage}
               size="thick"
               containerStyle={{ flex: 1 }}
+              fillColor={progress.isCompleted ? DesignSystem.colors.greenTara : DesignSystem.colors.redTara}
             />
             <Text style={styles.progressPercentage}>
               {Math.round(progress.percentage)}%
@@ -293,7 +294,7 @@ export default function PracticeScreen() {
             <Text style={styles.secondaryButtonText}>详情</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.primaryButton}
+            style={[styles.primaryButton, { backgroundColor: DesignSystem.colors.redTara }]}
             onPress={() => handleCustomRecord(item.id, item.practices.name)}
           >
             <Text style={styles.primaryButtonText}>记录</Text>
@@ -315,7 +316,7 @@ export default function PracticeScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.redTara} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -344,7 +345,7 @@ export default function PracticeScreen() {
           </Text>
 
           <TouchableOpacity
-            style={styles.browseButton}
+            style={[styles.browseButton, { backgroundColor: DesignSystem.colors.redTara }]}
             onPress={handleAddPractice}
           >
             <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
@@ -469,7 +470,7 @@ const styles = StyleSheet.create({
   },
   progressPercentage: {
     ...ComponentTextStyles.body,
-    color: DesignSystem.colors.primary,
+    color: DesignSystem.colors.redTara,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     minWidth: 50,
     textAlign: "right",
@@ -494,7 +495,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   secondaryButtonText: {
-    color: DesignSystem.colors.primary,
+    color: DesignSystem.colors.redTara,
   },
   primaryButtonText: {
     color: DesignSystem.colors.textInverse,
