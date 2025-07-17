@@ -134,10 +134,43 @@ export default function TabLayoutMigrationTest() {
         </View>
       </View>
 
-      {/* Color Hex Values for Reference */}
+      {/* Black and White Tara Examples */}
       <View style={styles.section}>
         <ThemedText variant="subheading" style={styles.sectionTitle}>
-          Five Taras Color Reference
+          Additional Tara Colors
+        </ThemedText>
+
+        <View style={styles.tabExample}>
+          <Ionicons
+            size={32}
+            name="shield"
+            color={DesignSystem.colors.blackTara}
+          />
+          <View style={styles.tabInfo}>
+            <ThemedText variant="label">Protection - The Black Tara</ThemedText>
+            <ThemedText variant="caption">Fierce compassion and protective energy</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.blackTara }]} />
+          </View>
+        </View>
+
+        <View style={styles.tabExample}>
+          <Ionicons
+            size={32}
+            name="medical"
+            color={DesignSystem.colors.blackTara}
+          />
+          <View style={styles.tabInfo}>
+            <ThemedText variant="label">Healing - The White Tara</ThemedText>
+            <ThemedText variant="caption">Purity, healing, and long life</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.whiteTara, borderWidth: 1, borderColor: DesignSystem.colors.border }]} />
+          </View>
+        </View>
+      </View>
+
+      {/* Seven Taras Color Reference */}
+      <View style={styles.section}>
+        <ThemedText variant="subheading" style={styles.sectionTitle}>
+          Seven Taras Color Reference
         </ThemedText>
 
         <View style={styles.colorReference}>
@@ -160,6 +193,14 @@ export default function TabLayoutMigrationTest() {
           <View style={styles.colorRefRow}>
             <ThemedText variant="label">Orange Tara:</ThemedText>
             <ThemedText variant="caption">{DesignSystem.colors.orangeTara}</ThemedText>
+          </View>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">Black Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.blackTara}</ThemedText>
+          </View>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">White Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.whiteTara}</ThemedText>
           </View>
         </View>
       </View>

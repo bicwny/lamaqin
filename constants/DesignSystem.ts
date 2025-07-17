@@ -44,7 +44,8 @@ export const DesignSystem = {
     orangeTara: '#FF6B35',          // The Orange Tara - Mindfulness and compassion
     yellowTara: '#D4AF37',          // The Yellow Tara - Study achievements and wisdom
     blueTara: '#4A90E2',            // The Blue Tara - Deep contemplation
-    enlightenmentWhite: '#ffffff',  // Purity and clarity
+    blackTara: '#2C2C2C',           // The Black Tara - Protection and fierce compassion
+    whiteTara: '#ffffff',           // The White Tara - Purity, healing, and long life
     
     // Practice status colors with Buddhist meaning
     greenTara: '#2e7d32',           // The Green Tara - Completed practice and growth
@@ -60,6 +61,8 @@ export const DesignSystem = {
     orangeTaraLight: '#FF8C5A',     // Light Orange Tara for gentle states
     yellowTaraLight: '#E6C757',     // Light Yellow Tara for progress indicators
     blueTaraLight: '#6BA3F0',       // Light Blue Tara for calm states
+    blackTaraLight: '#4A4A4A',      // Light Black Tara for protective states
+    whiteTaraLight: '#F8F8F8',      // Light White Tara for subtle backgrounds
     
     // Success state variations - Green Tara
     successBackground: '#e8f5e8',   // Light Green Tara background
@@ -591,6 +594,14 @@ export const colorWithOpacity = {
 
     greenTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
       return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.greenTara, opacity);
+    },
+
+    blackTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.blackTara, opacity);
+    },
+
+    whiteTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.whiteTara, opacity);
     },
 
     practiceActiveOverlay: (opacity: keyof typeof DesignSystem.opacity): string => {
