@@ -47,12 +47,12 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Card Tokens</Text>
         <View style={componentHelpers.getCardStyle('outlined', 'md')}>
-          <Text style={ComponentTextStyles.card.title}>Outlined Card</Text>
-          <Text style={ComponentTextStyles.card.body}>This is an outlined card with medium padding</Text>
+          <Text style={ComponentTextStyles.subheading}>Outlined Card</Text>
+          <Text style={ComponentTextStyles.body}>This is an outlined card with medium padding</Text>
         </View>
         <View style={componentHelpers.getCardStyle('elevated', 'lg')}>
-          <Text style={ComponentTextStyles.card.title}>Elevated Card</Text>
-          <Text style={ComponentTextStyles.card.body}>This is an elevated card with large padding</Text>
+          <Text style={ComponentTextStyles.subheading}>Elevated Card</Text>
+          <Text style={ComponentTextStyles.body}>This is an elevated card with large padding</Text>
         </View>
       </View>
 
@@ -79,12 +79,12 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Notification Tokens</Text>
         <View style={ComponentTokens.notification.variants.success}>
-          <Text style={ComponentTextStyles.notification.title}>Success Notification</Text>
-          <Text style={ComponentTextStyles.notification.message}>This is a success message example</Text>
+          <Text style={ComponentTextStyles.subheading}>Success Notification</Text>
+          <Text style={ComponentTextStyles.body}>This is a success message example</Text>
         </View>
         <View style={ComponentTokens.notification.variants.warning}>
-          <Text style={ComponentTextStyles.notification.title}>Warning Notification</Text>
-          <Text style={ComponentTextStyles.notification.message}>This is a warning message example</Text>
+          <Text style={ComponentTextStyles.subheading}>Warning Notification</Text>
+          <Text style={ComponentTextStyles.body}>This is a warning message example</Text>
         </View>
       </View>
     </ScrollView>
