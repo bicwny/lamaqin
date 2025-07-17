@@ -28,17 +28,17 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Button Tokens</Text>
         <View style={styles.buttonGrid}>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'small')}>
-            <Text style={componentHelpers.getButtonTextStyle('primary', 'small')}>Primary Small</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'sm')}>
+            <Text style={componentHelpers.getButtonTextStyle('primary', 'sm')}>Primary Small</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'medium')}>
-            <Text style={componentHelpers.getButtonTextStyle('primary', 'medium')}>Primary Medium</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'md')}>
+            <Text style={componentHelpers.getButtonTextStyle('primary', 'md')}>Primary Medium</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('secondary', 'medium')}>
-            <Text style={componentHelpers.getButtonTextStyle('secondary', 'medium')}>Secondary</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('secondary', 'md')}>
+            <Text style={componentHelpers.getButtonTextStyle('secondary', 'md')}>Secondary</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('ghost', 'medium')}>
-            <Text style={componentHelpers.getButtonTextStyle('ghost', 'medium')}>Ghost</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('ghost', 'md')}>
+            <Text style={componentHelpers.getButtonTextStyle('ghost', 'md')}>Ghost</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -46,13 +46,13 @@ export default function StyleTestingScreen() {
       {/* Card Tokens */}
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Card Tokens</Text>
-        <View style={componentHelpers.getCardStyle('outlined', 'comfortable')}>
+        <View style={componentHelpers.getCardStyle('outlined', 'md')}>
           <Text style={ComponentTextStyles.card.title}>Outlined Card</Text>
-          <Text style={ComponentTextStyles.card.body}>This is an outlined card with comfortable padding</Text>
+          <Text style={ComponentTextStyles.card.body}>This is an outlined card with medium padding</Text>
         </View>
-        <View style={componentHelpers.getCardStyle('elevated', 'spacious')}>
+        <View style={componentHelpers.getCardStyle('elevated', 'lg')}>
           <Text style={ComponentTextStyles.card.title}>Elevated Card</Text>
-          <Text style={ComponentTextStyles.card.body}>This is an elevated card with spacious padding</Text>
+          <Text style={ComponentTextStyles.card.body}>This is an elevated card with large padding</Text>
         </View>
       </View>
 
@@ -60,16 +60,16 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Badge & Pill Tokens</Text>
         <View style={styles.badgeGrid}>
-          <View style={componentHelpers.getBadgeStyle('small', 'filled', 'primary')}>
+          <View style={componentHelpers.getBadgeStyle('sm', 'filled', 'primary')}>
             <Text style={{ color: DesignSystem.colors.textInverse }}>Small Badge</Text>
           </View>
-          <View style={componentHelpers.getBadgeStyle('medium', 'outlined', 'success')}>
+          <View style={componentHelpers.getBadgeStyle('md', 'outlined', 'success')}>
             <Text style={{ color: DesignSystem.colors.practiceComplete }}>Outlined</Text>
           </View>
-          <View style={componentHelpers.getPillStyle('small', 'filled', 'dharma')}>
+          <View style={componentHelpers.getPillStyle('sm', 'filled', 'dharma')}>
             <Text style={{ color: DesignSystem.colors.textInverse }}>Dharma Pill</Text>
           </View>
-          <View style={componentHelpers.getBadgeStyle('medium', 'soft', 'warning')}>
+          <View style={componentHelpers.getBadgeStyle('md', 'soft', 'warning')}>
             <Text style={{ color: DesignSystem.colors.warning }}>Soft Warning</Text>
           </View>
         </View>
@@ -247,8 +247,8 @@ componentHelpers.getPillStyle('small', 'filled', 'dharma')`}
           
           <View style={styles.comparisonItem}>
             <Text style={styles.comparisonTitle}>✅ New Pattern</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'large')}>
-              <Text style={componentHelpers.getButtonTextStyle('primary', 'large')}>New Primary Large</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'lg')}>
+              <Text style={componentHelpers.getButtonTextStyle('primary', 'lg')}>New Primary Large</Text>
             </TouchableOpacity>
           </View>
         </View>
