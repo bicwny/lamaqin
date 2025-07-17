@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { Typography } from '@/utils/typography';
+import { ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type HeaderContext = 'page' | 'modal' | 'section';
@@ -68,7 +68,7 @@ export default function Header({
         {/* Left side */}
         {showBackButton ? (
           <TouchableOpacity onPress={onBackPress} style={styles.actionButton}>
-            <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.primary} />
+            <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.redTara} />
           </TouchableOpacity>
         ) : leftAction ? (
           <TouchableOpacity onPress={leftAction.onPress} style={styles.actionButton}>
@@ -108,9 +108,12 @@ export default function Header({
 }
 
 const styles = StyleSheet.create({
-  // Page header styles
+  // Page header styles - with subtle Tara color accents
   pageContainer: {
     backgroundColor: DesignSystem.colors.backgroundSecondary,
+    // Subtle Tara color accent for page headers
+    borderBottomWidth: 2,
+    borderBottomColor: DesignSystem.colors.whiteTara,
   },
   pageHeader: {
     flexDirection: 'row',
@@ -123,13 +126,16 @@ const styles = StyleSheet.create({
     borderBottomColor: DesignSystem.colors.borderLight,
   },
   pageTitle: {
-    ...Typography.styles.heading('xl'),
+    ...ComponentTextStyles.heading,
     textAlign: 'center',
   },
 
-  // Modal header styles
+  // Modal header styles - with Tara theming
   modalContainer: {
     backgroundColor: DesignSystem.colors.backgroundSecondary,
+    // Subtle accent for modal distinction
+    borderBottomWidth: 2,
+    borderBottomColor: DesignSystem.colors.blueTara,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -142,11 +148,11 @@ const styles = StyleSheet.create({
     borderBottomColor: DesignSystem.colors.border,
   },
   modalTitle: {
-    ...Typography.styles.heading('lg'),
+    ...ComponentTextStyles.subheading,
     textAlign: 'center',
   },
 
-  // Section header styles
+  // Section header styles - with Tara spiritual context
   sectionContainer: {
     backgroundColor: 'transparent',
   },
@@ -161,17 +167,17 @@ const styles = StyleSheet.create({
     borderBottomColor: DesignSystem.colors.borderLight,
   },
   sectionTitle: {
-    ...Typography.styles.subheading('lg'),
+    ...ComponentTextStyles.subheading,
     textAlign: 'center',
   },
 
-  // Common styles
+  // Common styles with Tara theming
   titleContainer: {
     flex: 1,
     alignItems: 'center',
   },
   subtitle: {
-    ...Typography.styles.label('sm'),
+    ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
     marginTop: DesignSystem.spacing.xs,
@@ -181,13 +187,33 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: DesignSystem.borderRadius.md,
+    // Subtle Tara color on press
+    backgroundColor: 'transparent',
   },
   actionText: {
-    ...Typography.styles.label('base'),
-    color: DesignSystem.colors.primary,
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.redTara, // Use Red Tara for action buttons
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   placeholder: {
     minWidth: 44,
+  },
+
+  // Tara-specific context styles
+  practiceContext: {
+    borderBottomColor: DesignSystem.colors.redTara,
+  },
+  mindfulnessContext: {
+    borderBottomColor: DesignSystem.colors.orangeTara,
+  },
+  studyContext: {
+    borderBottomColor: DesignSystem.colors.yellowTara,
+  },
+  meditationContext: {
+    borderBottomColor: DesignSystem.colors.blueTara,
+  },
+  successContext: {
+    borderBottomColor: DesignSystem.colors.greenTara,
   },
 });
