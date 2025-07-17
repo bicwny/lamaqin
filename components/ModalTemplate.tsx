@@ -3,9 +3,8 @@ import { View, ScrollView, StyleSheet, StatusBar, TouchableOpacity, Text } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
-import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens, componentHelpers, ComponentTextStyles } from '@/utils/componentTokens';
 
 interface ModalTemplateProps {
   title: string;
@@ -40,12 +39,13 @@ export default function ModalTemplate({
   headerStyle,
   keyboardAvoidingView,
 }: ModalTemplateProps) {
-  // Get modal styles using consolidated system
+  // Get modal styles using consolidated Tara system
   const modalStyles = componentHelpers.getModalStyle(variant, size);
   
+  // Use Tara colors for modal backgrounds with spiritual context
   const defaultBackgroundColor = variant === 'fullscreen' 
     ? DesignSystem.colors.background 
-    : DesignSystem.colors.backgroundSecondary;
+    : DesignSystem.colors.whiteTara; // Pure White Tara for modal clarity and healing
 
   const content = (
     <View style={[styles.content, modalStyles, contentContainerStyle]}>
@@ -72,7 +72,7 @@ export default function ModalTemplate({
               style={styles.closeButton}
               onPress={onClose}
             >
-              <Ionicons name="close" size={24} color={Colors.text} />
+              <Ionicons name="close" size={24} color={DesignSystem.colors.blackTara} />
             </TouchableOpacity>
           )}
         </View>
@@ -141,9 +141,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: DesignSystem.colors.whiteTara, // Pure White Tara for header clarity
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: DesignSystem.colors.borderLight,
+    // Subtle Blue Tara accent for contemplative modal distinction
+    borderTopWidth: 2,
+    borderTopColor: DesignSystem.colors.blueTara,
   },
   headerLeft: {
     flex: 1,
@@ -158,29 +161,36 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   headerTitle: {
-    ...createStyles.heading('lg'),
+    ...ComponentTextStyles.subheading, // Using consolidated Tara text styles
   },
   closeButton: {
     paddingVertical: DesignSystem.spacing.sm,
     paddingHorizontal: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.borderRadius.md,
+    // Subtle hover/press state with protective Black Tara energy
+    backgroundColor: 'transparent',
   },
   actionButton: {
     paddingVertical: DesignSystem.spacing.sm,
     paddingHorizontal: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    backgroundColor: 'transparent',
   },
   actionButtonText: {
-    ...createStyles.body(),
+    ...ComponentTextStyles.link, // Using consolidated Tara text styles
+    color: DesignSystem.colors.redTara, // Red Tara for action buttons with spiritual energy
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
   },
   content: {
     flex: 1,
+    backgroundColor: DesignSystem.colors.whiteTara, // Pure White Tara for content healing energy
   },
   scrollView: {
     flex: 1,
+    backgroundColor: DesignSystem.colors.whiteTara, // Consistent White Tara background
   },
   scrollContent: {
     flexGrow: 1,
-    // Padding now handled by modal size tokens
+    // Padding now handled by modal size tokens from Tara system
   },
 });
