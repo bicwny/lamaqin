@@ -359,13 +359,15 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     paddingHorizontal: DesignSystem.spacing.md,
+    flexGrow: 1,
   },
   tab: {
     alignItems: 'center',
     paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.md,
     marginRight: DesignSystem.spacing.sm,
     borderRadius: DesignSystem.borderRadius.md,
+    minWidth: 80,
   },
   activeTab: {
     backgroundColor: DesignSystem.colors.primary + '20',
@@ -377,8 +379,10 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xs,
   },
   tabLabel: {
-    ...Typography.styles.label('sm'),
+    ...Typography.styles.label('xs'),
     color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    numberOfLines: 1,
   },
   activeTabLabel: {
     color: DesignSystem.colors.primary,
