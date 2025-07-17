@@ -356,18 +356,20 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border,
+    maxHeight: 80,
   },
   tabContent: {
     paddingHorizontal: DesignSystem.spacing.md,
-    flexGrow: 1,
+    alignItems: 'center',
   },
   tab: {
     alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
     paddingHorizontal: DesignSystem.spacing.md,
     marginRight: DesignSystem.spacing.sm,
     borderRadius: DesignSystem.borderRadius.md,
     minWidth: 80,
+    height: 60,
   },
   activeTab: {
     backgroundColor: DesignSystem.colors.primary + '20',
