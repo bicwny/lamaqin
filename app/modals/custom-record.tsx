@@ -244,7 +244,7 @@ export default function CustomRecordScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color={ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={ConsolidatedDesignSystem.colors.primary} />
               ) : (
                 <Text style={styles.saveHeaderButtonText}>保存</Text>
               )}
@@ -261,7 +261,7 @@ export default function CustomRecordScreen() {
         >
           {loadingRecord ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary} />
+              <ActivityIndicator size="large" color={ConsolidatedDesignSystem.colors.primary} />
               <Text style={styles.loadingText}>正在加载记录...</Text>
             </View>
           ) : (
@@ -311,17 +311,17 @@ export default function CustomRecordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   headerLeft: {
     flex: 1,
@@ -339,8 +339,8 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
   },
   scrollView: {
     flex: 1,
@@ -350,27 +350,27 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    padding: ConsolidatedDesignSystem.spacing.lg,
   },
   practiceTitle: {
     ...createStyles.dharmaTitle('xl'),
     textAlign: 'center',
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
-    paddingBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
+    paddingBottom: ConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   inputSection: {
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
+    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
   },
   inputLabel: {
     ...createStyles.subheading('base'),
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+    marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   inputHint: {
     ...createStyles.body('sm'),
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   textInput: {
     ...ComponentTokens.input.standard,
@@ -378,31 +378,31 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 120,
     textAlignVertical: 'top',
-    paddingTop: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    paddingBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingTop: ConsolidatedDesignSystem.spacing.md,
+    paddingBottom: ConsolidatedDesignSystem.spacing.md,
   },
   characterCount: {
     ...createStyles.caption(),
     textAlign: 'right',
-    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+    marginTop: ConsolidatedDesignSystem.spacing.xs,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: ConsolidatedConsolidatedDesignSystem.spacing['4xl'],
+    padding: ConsolidatedDesignSystem.spacing['4xl'],
     minHeight: 200,
   },
   loadingText: {
-    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginTop: ConsolidatedDesignSystem.spacing.md,
     ...Typography.styles.body('base'),
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.medium,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   saveHeaderButton: {
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedDesignSystem.colors.primary,
+    borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
     minWidth: 60,
     alignItems: 'center',
     justifyContent: 'center',
@@ -412,8 +412,8 @@ const styles = StyleSheet.create({
   },
   saveHeaderButtonText: {
     ...createStyles.buttonText('primary'),
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedDesignSystem.colors["text-inverse"],
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
 });
