@@ -428,9 +428,7 @@ export default function PracticeDetailScreen() {
 
         return (
           <View style={styles.progressDetails}>
-            <Text style={styles.progressText}>
-              每周目标：{weeklyTarget}座
-            </Text>
+            <Text style={styles.progressText}>每周目标：{weeklyTarget}座</Text>
             {todayCount > 0 && todayDetails && (
               <Text style={styles.sessionDetails}>今日：{todayDetails}</Text>
             )}
@@ -660,7 +658,7 @@ const styles = StyleSheet.create({
   },
   mainCard: componentHelpers.getCardWithBottomMargin(
     "outlined",
-    "comfortable",
+    "md",
     "comfortable",
   ),
 
@@ -769,10 +767,10 @@ const styles = StyleSheet.create({
   primaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("primary", "medium"),
   },
-  recordsCard: componentHelpers.getCardWithMargin(
+  recordsCard: componentHelpers.getCardWithBottomMargin(
     "outlined",
+    "md",
     "comfortable",
-    "0",
   ),
   recordsHeader: {
     flexDirection: "row",
