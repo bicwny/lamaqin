@@ -19,11 +19,11 @@ export default function MigrationTestScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Migration Utility Test</Text>
+      <Text style={styles.title}>Pre-Migration Validation</Text>
       
       {/* Test Color Migration Map */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Color Migration Map Test</Text>
+        <Text style={styles.sectionTitle}>✅ Color Migration Map Test</Text>
         {Object.entries(colorMigrationMap).slice(0, 5).map(([old, newColor]) => (
           <View key={old} style={styles.colorTest}>
             <View style={[styles.colorSwatch, { backgroundColor: old }]} />
@@ -31,6 +31,38 @@ export default function MigrationTestScreen() {
             <View style={[styles.colorSwatch, { backgroundColor: newColor }]} />
           </View>
         ))}
+      </View>
+
+      {/* Test Typography Migration */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>✅ Typography Migration Test</Text>
+        <Text style={Typography.styles.heading('2xl')}>Heading 2xl</Text>
+        <Text style={Typography.styles.subheading('lg')}>Subheading lg</Text>
+        <Text style={Typography.styles.body('base')}>Body base</Text>
+        <Text style={Typography.styles.label('sm')}>Label sm</Text>
+        <Text style={Typography.styles.caption()}>Caption</Text>
+      </View>
+
+      {/* Test Buddhist Semantic Colors */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>✅ Buddhist Semantic Colors Test</Text>
+        <View style={[styles.colorTest, { backgroundColor: DesignSystem.colors.dharmaRed }]}>
+          <Text style={{ color: DesignSystem.colors.textInverse }}>Dharma Red</Text>
+        </View>
+        <View style={[styles.colorTest, { backgroundColor: DesignSystem.colors.wisdomGold }]}>
+          <Text style={{ color: DesignSystem.colors.textInverse }}>Wisdom Gold</Text>
+        </View>
+        <View style={[styles.colorTest, { backgroundColor: DesignSystem.colors.compassionOrange }]}>
+          <Text style={{ color: DesignSystem.colors.textInverse }}>Compassion Orange</Text>
+        </View>
+      </View>
+
+      {/* Test Migration Functions */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>✅ Migration Functions Test</Text>
+        <Text style={styles.testResult}>
+          Migration Result: {JSON.stringify(migrationResult, null, 2)}
+        </Text>
       </View>
 
       {/* Test Buddhist Validation */}
