@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -17,7 +18,7 @@ export default function TabLayoutMigrationTest() {
           Buddhist Five Taras Tab Colors
         </ThemedText>
 
-        {/* Daily Practice Tab - Compassion Orange */}
+        {/* Daily Practice Tab - Orange Tara */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
@@ -31,7 +32,7 @@ export default function TabLayoutMigrationTest() {
           </View>
         </View>
 
-        {/* Study Tab - Wisdom Gold */}
+        {/* Study Tab - Yellow Tara */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
@@ -45,7 +46,7 @@ export default function TabLayoutMigrationTest() {
           </View>
         </View>
 
-        {/* Mindfulness Tab - Dharma Red */}
+        {/* Mindfulness Tab - Red Tara */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
@@ -59,7 +60,7 @@ export default function TabLayoutMigrationTest() {
           </View>
         </View>
 
-        {/* Practice Tab - Success Green */}
+        {/* Practice Tab - Green Tara */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
@@ -73,7 +74,7 @@ export default function TabLayoutMigrationTest() {
           </View>
         </View>
 
-        {/* Stats Tab - Study Progress Blue */}
+        {/* Stats Tab - Blue Tara */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
@@ -127,8 +128,38 @@ export default function TabLayoutMigrationTest() {
           </View>
           <View style={styles.comparisonColumn}>
             <ThemedText variant="label">Active (Practice)</ThemedText>
-            <Ionicons size={24} name="heart" color={DesignSystem.colors.redTara} />
-            <ThemedText variant="caption">The Red Tara</ThemedText>
+            <Ionicons size={24} name="heart" color={DesignSystem.colors.greenTara} />
+            <ThemedText variant="caption">The Green Tara</ThemedText>
+          </View>
+        </View>
+      </View>
+
+      {/* Color Hex Values for Reference */}
+      <View style={styles.section}>
+        <ThemedText variant="subheading" style={styles.sectionTitle}>
+          Five Taras Color Reference
+        </ThemedText>
+
+        <View style={styles.colorReference}>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">Green Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.greenTara}</ThemedText>
+          </View>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">Red Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.redTara}</ThemedText>
+          </View>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">Blue Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.blueTara}</ThemedText>
+          </View>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">Yellow Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.yellowTara}</ThemedText>
+          </View>
+          <View style={styles.colorRefRow}>
+            <ThemedText variant="label">Orange Tara:</ThemedText>
+            <ThemedText variant="caption">{DesignSystem.colors.orangeTara}</ThemedText>
           </View>
         </View>
       </View>
@@ -196,5 +227,18 @@ const styles = StyleSheet.create({
   },
   comparisonColumn: {
     alignItems: 'center',
+  },
+  colorReference: {
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.lg,
+  },
+  colorRefRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: DesignSystem.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: DesignSystem.colors.border,
   },
 });
