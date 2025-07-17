@@ -34,6 +34,11 @@ interface PageTemplateProps {
   contentContainerStyle?: any;
   showHeader?: boolean;
   shadowVariant?: 'none' | 'subtle' | 'elevated';
+  /** 
+   * Configure SafeAreaView edges to prevent double safe area padding
+   * Use 'none' when parent already has SafeAreaView
+   */
+  safeAreaEdges?: 'all' | 'horizontal' | 'none' | Array<'top' | 'right' | 'bottom' | 'left'>;
 }
 
 export default function PageTemplate({
@@ -50,6 +55,7 @@ export default function PageTemplate({
   contentContainerStyle,
   showHeader = true,
   shadowVariant = 'none',
+  safeAreaEdges = 'all',
 }: PageTemplateProps) {
   const insets = useSafeAreaInsets();
 
@@ -92,6 +98,14 @@ export default function PageTemplate({
   const finalBackgroundColor = getBackgroundColor();
   const paddingValue = typeof padding === 'string' ? DesignSystem.spacing[padding] : padding;
 
+  // Configure SafeAreaView edges to prevent double safe area padding
+  const getSafeAreaEdges = () => {
+    if (safeAreaEdges === 'all') return ['left', 'right', 'top', 'bottom'];
+    if (safeAreaEdges === 'horizontal') return ['left', 'right'];
+    if (safeAreaEdges === 'none') return [];
+    return safeAreaEdges;
+  };
+
   const content = (
     <View style={[
       styles.content, 
@@ -103,8 +117,8 @@ export default function PageTemplate({
     </View>
   );
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: finalBackgroundColor }]} edges={['left', 'right', 'top', 'bottom']}>
+  const mainContent = (
+    <>
       <StatusBar 
         barStyle="dark-content" 
         backgroundColor={finalBackgroundColor}
@@ -130,6 +144,22 @@ export default function PageTemplate({
       ) : (
         content
       )}
+    </>
+  );
+
+  // Only wrap with SafeAreaView if edges are configured
+  const safeEdges = getSafeAreaEdges();
+  if (safeEdges.length === 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: finalBackgroundColor }]}>
+        {mainContent}
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: finalBackgroundColor }]} edges={safeEdges}>
+      {mainContent}
     </SafeAreaView>
   );
 }
