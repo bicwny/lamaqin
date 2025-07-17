@@ -1003,11 +1003,11 @@ export default function PracticeConfigScreen() {
 
   return (
     <PageTemplate
-      title={isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
+      title={isEditMode ? `编辑${practiceName}` : practiceName}
       showBackButton={true}
       onBackPress={() => router.back()}
       rightAction={{
-        text: "增加",
+        text: "保存",
         onPress: handleConfirm,
       }}
       scrollable={true}
