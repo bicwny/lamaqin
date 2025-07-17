@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { Typography } from '@/utils/typography';
+import { createStyles } from '@/constants/DesignSystem';
 import { migrationHelpers, colorMigrationMap } from '@/utils/colorMigration';
 
 export default function MigrationTestScreen() {
@@ -36,11 +36,11 @@ export default function MigrationTestScreen() {
       {/* Test Typography Migration */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>✅ Typography Migration Test</Text>
-        <Text style={Typography.styles.heading('2xl')}>Heading 2xl</Text>
-        <Text style={Typography.styles.subheading('lg')}>Subheading lg</Text>
-        <Text style={Typography.styles.body('base')}>Body base</Text>
-        <Text style={Typography.styles.label('sm')}>Label sm</Text>
-        <Text style={Typography.styles.caption()}>Caption</Text>
+        <Text style={createStyles.heading('2xl')}>Heading 2xl</Text>
+        <Text style={createStyles.subheading('lg')}>Subheading lg</Text>
+        <Text style={createStyles.body('base')}>Body base</Text>
+        <Text style={createStyles.label('sm')}>Label sm</Text>
+        <Text style={createStyles.caption()}>Caption</Text>
       </View>
 
       {/* Test Buddhist Semantic Colors */}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   title: {
-    ...Typography.styles.heading('2xl'),
+    ...createStyles.heading('2xl'),
     marginBottom: DesignSystem.spacing.xl,
     textAlign: 'center',
   },
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.borderRadius.lg,
   },
   sectionTitle: {
-    ...Typography.styles.subheading('lg'),
+    ...createStyles.subheading('lg'),
     marginBottom: DesignSystem.spacing.md,
     color: DesignSystem.colors.primary,
   },
@@ -127,16 +127,16 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.border,
   },
   colorText: {
-    ...Typography.styles.body('sm'),
+    ...createStyles.body('sm'),
     fontFamily: 'monospace',
     flex: 1,
   },
   resultText: {
-    ...Typography.styles.body('base'),
+    ...createStyles.body('base'),
     marginBottom: DesignSystem.spacing.xs,
   },
   changeText: {
-    ...Typography.styles.body('sm'),
+    ...createStyles.body('sm'),
     color: DesignSystem.colors.textSecondary,
     fontFamily: 'monospace',
     marginBottom: DesignSystem.spacing.xs,
