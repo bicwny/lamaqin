@@ -1,137 +1,140 @@
 
 /**
- * Color Migration Utilities
- * Provides systematic mapping from hardcoded values to DesignSystem tokens
+ * Updated Color Migration Utilities
+ * Now uses the consolidated 15-token system
  */
 
-import { DesignSystem } from '@/constants/DesignSystem';
+import ConsolidatedDesignSystem, { migrationMap, buddhistSemantics, colorUtils } from '@/constants/ConsolidatedDesignSystem';
 
 // Migration map for hardcoded hex values found in audit
 export const colorMigrationMap = {
   // Text colors
-  '#1a1a1a': DesignSystem.colors.textPrimary,
-  '#1A1A1A': DesignSystem.colors.textPrimary,
-  '#FFFFFF': DesignSystem.colors.textInverse,
-  '#ffffff': DesignSystem.colors.textInverse,
-  '#666666': DesignSystem.colors.textSecondary,
-  '#999999': DesignSystem.colors.textTertiary,
+  '#1a1a1a': ConsolidatedDesignSystem.colors['text-primary'],
+  '#1A1A1A': ConsolidatedDesignSystem.colors['text-primary'],
+  '#FFFFFF': ConsolidatedDesignSystem.colors['text-inverse'],
+  '#ffffff': ConsolidatedDesignSystem.colors['text-inverse'],
+  '#666666': ConsolidatedDesignSystem.colors['text-secondary'],
+  '#999999': ConsolidatedDesignSystem.colors['text-secondary'],
   
   // Background colors
-  '#f8f9fa': DesignSystem.colors.background,
-  '#F8F9FA': DesignSystem.colors.background,
-  '#ffffff': DesignSystem.colors.backgroundSecondary,
-  '#FFFFFF': DesignSystem.colors.backgroundSecondary,
-  '#f0f0f0': DesignSystem.colors.backgroundTertiary,
-  '#F0F0F0': DesignSystem.colors.backgroundTertiary,
+  '#f8f9fa': ConsolidatedDesignSystem.colors['surface-secondary'],
+  '#F8F9FA': ConsolidatedDesignSystem.colors['surface-secondary'],
+  '#ffffff': ConsolidatedDesignSystem.colors['surface-primary'],
+  '#FFFFFF': ConsolidatedDesignSystem.colors['surface-primary'],
+  '#f0f0f0': ConsolidatedDesignSystem.colors['surface-primary'],
+  '#F0F0F0': ConsolidatedDesignSystem.colors['surface-primary'],
   
   // Border colors
-  '#e9ecef': DesignSystem.colors.border,
-  '#E9ECEF': DesignSystem.colors.border,
-  '#f0f0f0': DesignSystem.colors.borderLight,
-  '#F0F0F0': DesignSystem.colors.borderLight,
-  '#dee2e6': DesignSystem.colors.borderDark,
-  '#DEE2E6': DesignSystem.colors.borderDark,
+  '#e9ecef': ConsolidatedDesignSystem.colors['border-default'],
+  '#E9ECEF': ConsolidatedDesignSystem.colors['border-default'],
+  '#dee2e6': ConsolidatedDesignSystem.colors['border-default'],
+  '#DEE2E6': ConsolidatedDesignSystem.colors['border-default'],
   
   // Status colors
-  '#2e7d32': DesignSystem.colors.practiceComplete,
-  '#2E7D32': DesignSystem.colors.practiceComplete,
-  '#e8f5e8': DesignSystem.colors.successBackground,
-  '#E8F5E8': DesignSystem.colors.successBackground,
+  '#2e7d32': ConsolidatedDesignSystem.status.success,
+  '#2E7D32': ConsolidatedDesignSystem.status.success,
+  '#e8f5e8': colorUtils.withOpacity(ConsolidatedDesignSystem.status.success, 0.1),
+  '#E8F5E8': colorUtils.withOpacity(ConsolidatedDesignSystem.status.success, 0.1),
   
   // Primary colors
-  '#da4347': DesignSystem.colors.primary,
-  '#DA4347': DesignSystem.colors.primary,
-  '#b8393d': DesignSystem.colors.primaryDark,
-  '#e66a6d': DesignSystem.colors.primaryLight,
+  '#da4347': ConsolidatedDesignSystem.colors.primary,
+  '#DA4347': ConsolidatedDesignSystem.colors.primary,
+  '#b8393d': colorUtils.darken(ConsolidatedDesignSystem.colors.primary),
+  '#e66a6d': colorUtils.lighten(ConsolidatedDesignSystem.colors.primary),
   
   // Shadow and overlay
-  '#000': DesignSystem.colors.cardShadow,
-  '#000000': DesignSystem.colors.cardShadow,
-  'rgba(0, 0, 0, 0.5)': DesignSystem.colors.overlayDark,
-  'rgba(0,0,0,0.5)': DesignSystem.colors.overlayDark,
+  '#000': ConsolidatedDesignSystem.utility.shadow,
+  '#000000': ConsolidatedDesignSystem.utility.shadow,
+  'rgba(0, 0, 0, 0.5)': ConsolidatedDesignSystem.utility.overlay,
+  'rgba(0,0,0,0.5)': ConsolidatedDesignSystem.utility.overlay,
 };
 
-// Buddhist semantic color helpers
+// Buddhist semantic color helpers - updated for consolidated system
 export const buddhistColors = {
   // Practice type colors
   getPracticeTypeColor: (type: 'count' | 'time') => {
-    return type === 'time' ? DesignSystem.colors.meditationBlue : DesignSystem.colors.dharmaRed;
+    return type === 'time' 
+      ? ConsolidatedDesignSystem.accent['accent-secondary'] 
+      : ConsolidatedDesignSystem.accent['accent-primary'];
   },
   
   // Status colors with Buddhist meaning
   getPracticeStatusColor: (status: 'active' | 'completed' | 'inactive') => {
     switch (status) {
-      case 'active': return DesignSystem.colors.practiceActive;
-      case 'completed': return DesignSystem.colors.practiceComplete;
-      case 'inactive': return DesignSystem.colors.practiceInactive;
-      default: return DesignSystem.colors.textSecondary;
+      case 'active': return ConsolidatedDesignSystem.accent['accent-primary'];
+      case 'completed': return ConsolidatedDesignSystem.status.success;
+      case 'inactive': return ConsolidatedDesignSystem.colors['text-secondary'];
+      default: return ConsolidatedDesignSystem.colors['text-secondary'];
     }
   },
   
   // Feature area colors
   getFeatureColor: (feature: 'practice' | 'study' | 'mindfulness' | 'stats') => {
     switch (feature) {
-      case 'practice': return DesignSystem.colors.dharmaRed;
-      case 'study': return DesignSystem.colors.wisdomGold;
-      case 'mindfulness': return DesignSystem.colors.compassionOrange;
-      case 'stats': return DesignSystem.colors.studyProgress;
-      default: return DesignSystem.colors.primary;
+      case 'practice': return ConsolidatedDesignSystem.accent['accent-primary'];
+      case 'study': return ConsolidatedDesignSystem.accent['accent-secondary'];
+      case 'mindfulness': return ConsolidatedDesignSystem.accent['accent-primary'];
+      case 'stats': return ConsolidatedDesignSystem.status.success;
+      default: return ConsolidatedDesignSystem.colors.primary;
     }
   },
   
   // Achievement colors
   getAchievementColor: (type: 'completion' | 'progress' | 'milestone') => {
     switch (type) {
-      case 'completion': return DesignSystem.colors.practiceComplete;
-      case 'progress': return DesignSystem.colors.studyProgress;
-      case 'milestone': return DesignSystem.colors.wisdomGold;
-      default: return DesignSystem.colors.success;
+      case 'completion': return ConsolidatedDesignSystem.status.success;
+      case 'progress': return ConsolidatedDesignSystem.accent['accent-secondary'];
+      case 'milestone': return colorUtils.adjustHue?.(ConsolidatedDesignSystem.accent['accent-primary'], 45) || '#D4AF37';
+      default: return ConsolidatedDesignSystem.status.success;
     }
   },
 };
 
-// Color contrast utilities
-export const colorUtils = {
+// Color contrast utilities - updated for consolidated system
+export const colorUtilsUpdated = {
   // Get appropriate text color for background
   getContrastText: (backgroundColor: string): string => {
-    // Simple contrast check - in production you might want more sophisticated calculation
     const lightBackgrounds = [
-      DesignSystem.colors.background,
-      DesignSystem.colors.backgroundSecondary,
-      DesignSystem.colors.backgroundTertiary,
-      DesignSystem.colors.successBackground,
-      DesignSystem.colors.warningBackground,
-      DesignSystem.colors.errorBackground,
+      ConsolidatedDesignSystem.colors['surface-primary'],
+      ConsolidatedDesignSystem.colors['surface-secondary'],
+      colorUtils.withOpacity(ConsolidatedDesignSystem.status.success, 0.1),
+      colorUtils.withOpacity(ConsolidatedDesignSystem.status.warning, 0.1),
+      colorUtils.withOpacity(ConsolidatedDesignSystem.status.error, 0.1),
       '#ffffff',
       '#f8f9fa',
       '#f0f0f0',
     ];
     
     return lightBackgrounds.includes(backgroundColor) 
-      ? DesignSystem.colors.textPrimary 
-      : DesignSystem.colors.textInverse;
+      ? ConsolidatedDesignSystem.colors['text-primary']
+      : ConsolidatedDesignSystem.colors['text-inverse'];
   },
   
   // Get hover state color
   getHoverColor: (baseColor: string): string => {
-    if (baseColor === DesignSystem.colors.primary) return DesignSystem.colors.primaryLight;
-    if (baseColor === DesignSystem.colors.primaryLight) return DesignSystem.colors.primary;
-    if (baseColor === DesignSystem.colors.dharmaRed) return DesignSystem.colors.primaryLight;
+    if (baseColor === ConsolidatedDesignSystem.colors.primary) {
+      return colorUtils.lighten(ConsolidatedDesignSystem.colors.primary);
+    }
+    if (baseColor === ConsolidatedDesignSystem.accent['accent-primary']) {
+      return colorUtils.lighten(ConsolidatedDesignSystem.colors.primary);
+    }
     return baseColor;
   },
   
   // Get pressed state color
   getPressedColor: (baseColor: string): string => {
-    if (baseColor === DesignSystem.colors.primary) return DesignSystem.colors.primaryDark;
-    if (baseColor === DesignSystem.colors.primaryLight) return DesignSystem.colors.primary;
-    if (baseColor === DesignSystem.colors.dharmaRed) return DesignSystem.colors.primaryDark;
+    if (baseColor === ConsolidatedDesignSystem.colors.primary) {
+      return colorUtils.darken(ConsolidatedDesignSystem.colors.primary);
+    }
+    if (baseColor === ConsolidatedDesignSystem.accent['accent-primary']) {
+      return colorUtils.darken(ConsolidatedDesignSystem.colors.primary);
+    }
     return baseColor;
   },
   
   // Add opacity to color
   withOpacity: (color: string, opacity: number): string => {
-    const alpha = Math.round(opacity * 255).toString(16).padStart(2, '0');
-    return `${color}${alpha}`;
+    return colorUtils.withOpacity(color, opacity);
   },
 };
 
@@ -163,12 +166,38 @@ export const validateColors = {
     const normalizedColor = hardcodedColor.toLowerCase();
     return colorMigrationMap[normalizedColor] || null;
   },
+  
+  // Check if using old design system tokens
+  hasOldTokens: (styleObject: any): boolean => {
+    const oldTokenPatterns = [
+      /DesignSystem\.colors\./,
+      /textPrimary/,
+      /backgroundSecondary/,
+      /dharmaRed/,
+      /successBackground/,
+    ];
+    
+    const checkValue = (value: any): boolean => {
+      if (typeof value === 'string') {
+        return oldTokenPatterns.some(pattern => pattern.test(value));
+      }
+      if (typeof value === 'object' && value !== null) {
+        return Object.values(value).some(checkValue);
+      }
+      return false;
+    };
+    
+    return checkValue(styleObject);
+  },
 };
 
-// Export all utilities
+// Export all utilities with consolidated system
 export {
   colorMigrationMap,
   buddhistColors,
-  colorUtils,
+  colorUtilsUpdated as colorUtils,
   validateColors,
+  ConsolidatedDesignSystem,
+  buddhistSemantics,
+  migrationMap,
 };
