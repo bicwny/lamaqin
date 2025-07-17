@@ -753,13 +753,13 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
   },
   secondaryButtonNew: {
-    ...componentHelpers.getButtonStyle("secondary", "small"),
+    ...componentHelpers.getButtonStyle("secondary", "medium"),
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   primaryButtonNew: {
-    ...componentHelpers.getButtonStyle("primary", "small"),
+    ...componentHelpers.getButtonStyle("primary", "medium"),
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
