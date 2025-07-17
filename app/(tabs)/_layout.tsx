@@ -65,7 +65,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "sunny" : "sunny-outline"}
-              color={color}
+              color={focused ? DesignSystem.colors.compassionOrange : color}
             />
           ),
         }}
@@ -91,7 +91,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "ellipse" : "ellipse-outline"}
-              color={focused ? DesignSystem.colors.compassionOrange : color}
+              color={focused ? DesignSystem.colors.dharmaRed : color}
             />
           ),
         }}
@@ -104,7 +104,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "heart" : "heart-outline"}
-              color={focused ? DesignSystem.colors.dharmaRed : color}
+              color={focused ? DesignSystem.colors.success : color}
             />
           ),
         }}

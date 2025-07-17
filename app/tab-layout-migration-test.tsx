@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -11,24 +10,24 @@ export default function TabLayoutMigrationTest() {
       <ThemedText variant="heading" style={styles.pageTitle}>
         Tab Layout Buddhist Colors Test
       </ThemedText>
-      
+
       {/* Buddhist Tab Color Semantics */}
       <View style={styles.section}>
         <ThemedText variant="subheading" style={styles.sectionTitle}>
           Buddhist Semantic Tab Colors
         </ThemedText>
-        
-        {/* Daily Practice Tab - Dharma Red */}
+
+        {/* Daily Practice Tab - Compassion Orange */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
             name="sunny"
-            color={DesignSystem.colors.dharmaRed}
+            color={DesignSystem.colors.compassionOrange}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">当日 (Daily) - Dharma Red</ThemedText>
-            <ThemedText variant="caption">Spiritual practice energy</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.dharmaRed }]} />
+            <ThemedText variant="label">当日 (Daily) - Compassion Orange</ThemedText>
+            <ThemedText variant="caption">Daily practice warmth</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.compassionOrange }]} />
           </View>
         </View>
 
@@ -41,36 +40,36 @@ export default function TabLayoutMigrationTest() {
           />
           <View style={styles.tabInfo}>
             <ThemedText variant="label">闻思 (Study) - Wisdom Gold</ThemedText>
-            <ThemedText variant="caption">Learning and wisdom development</ThemedText>
+            <ThemedText variant="caption">Learning and wisdom</ThemedText>
             <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.wisdomGold }]} />
           </View>
         </View>
 
-        {/* Mindfulness Tab - Compassion Orange */}
+        {/* Mindfulness Tab - Dharma Red */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
             name="ellipse"
-            color={DesignSystem.colors.compassionOrange}
+            color={DesignSystem.colors.dharmaRed}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">心性 (Mindfulness) - Compassion Orange</ThemedText>
-            <ThemedText variant="caption">Meditation and loving-kindness</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.compassionOrange }]} />
+            <ThemedText variant="label">心性 (Mindfulness) - Dharma Red</ThemedText>
+            <ThemedText variant="caption">Spiritual practice energy</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.dharmaRed }]} />
           </View>
         </View>
 
-        {/* Practice Tab - Dharma Red */}
+        {/* Practice Tab - Success Green */}
         <View style={styles.tabExample}>
           <Ionicons
             size={32}
             name="heart"
-            color={DesignSystem.colors.dharmaRed}
+            color={DesignSystem.colors.success}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">修行 (Practice) - Dharma Red</ThemedText>
-            <ThemedText variant="caption">Core spiritual practice</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.dharmaRed }]} />
+            <ThemedText variant="label">修行 (Practice) - Success Green</ThemedText>
+            <ThemedText variant="caption">Practice completion and growth</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.success }]} />
           </View>
         </View>
 
@@ -94,7 +93,7 @@ export default function TabLayoutMigrationTest() {
         <ThemedText variant="subheading" style={styles.sectionTitle}>
           Tab Bar Background Colors
         </ThemedText>
-        
+
         <View style={styles.backgroundTest}>
           <ThemedText variant="label">iOS Background (95% opacity)</ThemedText>
           <View style={[styles.backgroundSwatch, { backgroundColor: DesignSystem.colors.backgroundSecondary + 'F2' }]} />
@@ -119,7 +118,7 @@ export default function TabLayoutMigrationTest() {
         <ThemedText variant="subheading" style={styles.sectionTitle}>
           Active vs Inactive Tab Colors
         </ThemedText>
-        
+
         <View style={styles.colorComparison}>
           <View style={styles.comparisonColumn}>
             <ThemedText variant="label">Inactive</ThemedText>
