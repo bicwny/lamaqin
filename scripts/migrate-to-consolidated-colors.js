@@ -114,38 +114,74 @@ function migrateFile(filePath) {
   
   console.log(`\n📁 Processing: ${filePath}`);
   
-  // First, clean up any existing malformed references
+  // Enhanced malformed pattern detection and fixing
   const malformedPatterns = [
-    /ConsolidatedConsolidatedConsolidatedDesignSystem/g,
-    /ConsolidatedConsolidatedDesignSystem/g,
-    /\["surface-primary"\]Secondary/g,
-    /\["border-default"\]Secondary/g,
-    /\["text-primary"\]Secondary/g,
-    /\["text-secondary"\]Secondary/g
+    // Fix duplicated "Consolidated" prefixes
+    {
+      pattern: /ConsolidatedConsolidatedConsolidatedDesignSystem/g,
+      replacement: 'ConsolidatedDesignSystem',
+      description: 'Triple Consolidated prefix'
+    },
+    {
+      pattern: /ConsolidatedConsolidatedDesignSystem/g,
+      replacement: 'ConsolidatedDesignSystem',
+      description: 'Double Consolidated prefix'
+    },
+    // Fix malformed color references with suffixes
+    {
+      pattern: /ConsolidatedDesignSystem\.colors\["([^"]+)"\](\w+)/g,
+      replacement: (match, colorKey, suffix) => {
+        // Map common suffixes to proper color tokens
+        const suffixMap = {
+          'Secondary': 'surface-secondary',
+          'Tertiary': 'surface-tertiary',
+          'Primary': 'surface-primary'
+        };
+        
+        const newColorKey = suffixMap[suffix] || colorKey;
+        return `ConsolidatedDesignSystem.colors["${newColorKey}"]`;
+      },
+      description: 'Malformed color references with suffixes'
+    },
+    // Fix specific broken patterns
+    {
+      pattern: /\["surface-primary"\]Secondary/g,
+      replacement: '["surface-secondary"]',
+      description: 'Surface primary with Secondary suffix'
+    },
+    {
+      pattern: /\["surface-primary"\]Tertiary/g,
+      replacement: '["surface-secondary"]',
+      description: 'Surface primary with Tertiary suffix'
+    },
+    {
+      pattern: /\["border-default"\]Secondary/g,
+      replacement: '["border-default"]',
+      description: 'Border default with Secondary suffix'
+    },
+    {
+      pattern: /\["text-primary"\]Secondary/g,
+      replacement: '["text-secondary"]',
+      description: 'Text primary with Secondary suffix'
+    },
+    {
+      pattern: /\["text-secondary"\]Secondary/g,
+      replacement: '["text-secondary"]',
+      description: 'Text secondary with Secondary suffix'
+    }
   ];
   
-  malformedPatterns.forEach(pattern => {
-    if (content.match(pattern)) {
-      if (pattern.source.includes('Secondary')) {
-        // Fix malformed color references with "Secondary" suffix
-        content = content.replace(pattern, (match) => {
-          if (match.includes('surface-primary')) {
-            return 'ConsolidatedDesignSystem.colors["surface-secondary"]';
-          } else if (match.includes('border-default')) {
-            return 'ConsolidatedDesignSystem.colors["border-default"]';
-          } else if (match.includes('text-primary')) {
-            return 'ConsolidatedDesignSystem.colors["text-secondary"]';
-          } else if (match.includes('text-secondary')) {
-            return 'ConsolidatedDesignSystem.colors["text-secondary"]';
-          }
-          return 'ConsolidatedDesignSystem.colors["surface-secondary"]';
-        });
+  // Apply malformed pattern fixes
+  malformedPatterns.forEach(({ pattern, replacement, description }) => {
+    const matches = content.match(pattern);
+    if (matches) {
+      if (typeof replacement === 'function') {
+        content = content.replace(pattern, replacement);
       } else {
-        // Fix duplicated "Consolidated" prefixes
-        content = content.replace(pattern, 'ConsolidatedDesignSystem');
+        content = content.replace(pattern, replacement);
       }
       hasChanges = true;
-      console.log(`  🔧 Fixed malformed reference: ${pattern.source}`);
+      console.log(`  🔧 Fixed: ${description} (${matches.length} instances)`);
     }
   });
   
@@ -175,6 +211,19 @@ function migrateFile(filePath) {
     console.log(`  🔄 Updated remaining DesignSystem references`);
   }
   
+  // Final validation - check for any remaining malformed patterns
+  const validationPatterns = [
+    /ConsolidatedDesignSystem\.colors\["[^"]+"\]\w+/g,
+    /ConsolidatedConsolidated/g
+  ];
+  
+  validationPatterns.forEach(pattern => {
+    const remainingIssues = content.match(pattern);
+    if (remainingIssues) {
+      console.log(`  ⚠️  Warning: Potential remaining issues found: ${remainingIssues.join(', ')}`);
+    }
+  });
+  
   if (hasChanges) {
     fs.writeFileSync(filePath, content, 'utf8');
     console.log(`  💾 File updated successfully`);
@@ -186,8 +235,9 @@ function migrateFile(filePath) {
 }
 
 function main() {
-  console.log('🚀 Starting Color Consolidation Migration...');
-  console.log('📊 Migrating from 50+ tokens to 15 consolidated tokens\n');
+  console.log('🚀 Starting Enhanced Color Consolidation Migration...');
+  console.log('📊 Migrating from 50+ tokens to 15 consolidated tokens');
+  console.log('🔧 Enhanced to fix malformed references\n');
   
   const projectRoot = process.cwd();
   const allFiles = getAllFiles(projectRoot);
@@ -209,21 +259,23 @@ function main() {
     }
   });
   
-  console.log('\n🎉 Migration Complete!');
+  console.log('\n🎉 Enhanced Migration Complete!');
   console.log(`📊 Summary:`);
   console.log(`   • Files processed: ${filesToMigrate.length}`);
   console.log(`   • Files modified: ${totalChanges}`);
   console.log(`   • Color tokens reduced: 50+ → 15 (70% reduction)`);
+  console.log(`   • Malformed references fixed`);
   console.log(`   • Buddhist semantics preserved through utility functions`);
   
   console.log('\n📝 Next Steps:');
   console.log('   1. Test the application to ensure all colors display correctly');
-  console.log('   2. Update any remaining hardcoded colors');
+  console.log('   2. Check console for any remaining syntax errors');
   console.log('   3. Use Buddhist semantic helpers for practice-related features');
   console.log('   4. Generate color variations using utility functions');
   
   console.log('\n✨ Benefits Achieved:');
   console.log('   • 70% reduction in color tokens');
+  console.log('   • Fixed malformed syntax errors');
   console.log('   • Simplified maintenance');
   console.log('   • Consistent color usage');
   console.log('   • Buddhist semantic meaning preserved');
