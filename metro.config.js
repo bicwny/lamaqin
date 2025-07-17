@@ -8,6 +8,12 @@ const config = getDefaultConfig(__dirname);
 config.resolver.platforms = ['ios', 'android', 'web'];
 
 // Ignore Replit development tools that may cause module resolution issues
-config.resolver.blacklistRE = /__replco/;
+config.resolver.blockList = /__replco/;
+
+// Reset transformation cache to prevent stale module issues
+config.resetCache = true;
+
+// Ensure proper module resolution
+config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
 
 module.exports = withNativeWind(config, { input: './global.css' });
