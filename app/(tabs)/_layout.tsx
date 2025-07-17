@@ -60,7 +60,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "当日",
+          title: "Orange Tara",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -73,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="study"
         options={{
-          title: "闻思",
+          title: "Yellow Tara",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -86,7 +86,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mindfulness"
         options={{
-          title: "心性",
+          title: "Red Tara",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -99,7 +99,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="practice"
         options={{
-          title: "修行",
+          title: "Green Tara",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -112,7 +112,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="stats"
         options={{
-          title: "回向",
+          title: "Blue Tara",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
