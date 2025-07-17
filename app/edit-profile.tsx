@@ -272,11 +272,11 @@ const styles = StyleSheet.create({
   },
   input: {
     ...ComponentTokens.input.standard,
-    ...ConsolidatedDesignSystem.shadow.sm,
+    ...ConsolidatedConsolidatedDesignSystem.shadow.sm,
   },
   saveButton: {
     ...createStyles.primaryButton(),
-    marginTop: ConsolidatedDesignSystem.spacing.xl,
+    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.xl,
   },
   saveButtonDisabled: {
     backgroundColor: '#9CA3AF',

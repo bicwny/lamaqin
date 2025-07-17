@@ -13,7 +13,7 @@ export function DesignTokenPreview() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Color Tokens</Text>
         <View style={styles.colorGrid}>
-          {Object.entries(ConsolidatedDesignSystem.colors).map(([name, color]) => (
+          {Object.entries(ConsolidatedConsolidatedDesignSystem.colors).map(([name, color]) => (
             <View key={name} style={styles.colorItem}>
               <View style={[styles.colorSwatch, { backgroundColor: color }]} />
               <Text style={styles.colorName}>{name}</Text>
@@ -29,7 +29,7 @@ export function DesignTokenPreview() {
         
         {/* Font Sizes */}
         <Text style={styles.subSectionTitle}>Font Sizes</Text>
-        {Object.entries(ConsolidatedDesignSystem.typography.fontSize).map(([size, value]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.typography.fontSize).map(([size, value]) => (
           <View key={size} style={styles.typographyItem}>
             <Text style={[styles.sampleText, { fontSize: value }]}>
               Sample Text ({size}: {value}px)
@@ -39,7 +39,7 @@ export function DesignTokenPreview() {
 
         {/* Font Weights */}
         <Text style={styles.subSectionTitle}>Font Weights</Text>
-        {Object.entries(ConsolidatedDesignSystem.typography.fontWeight).map(([weight, value]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.typography.fontWeight).map(([weight, value]) => (
           <View key={weight} style={styles.typographyItem}>
             <Text style={[styles.sampleText, { fontWeight: value }]}>
               Sample Text ({weight}: {value})
@@ -51,7 +51,7 @@ export function DesignTokenPreview() {
       {/* Spacing Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Spacing Tokens</Text>
-        {Object.entries(ConsolidatedDesignSystem.spacing).map(([size, value]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.spacing).map(([size, value]) => (
           <View key={size} style={styles.spacingItem}>
             <Text style={styles.spacingLabel}>{size}: {value}px</Text>
             <View style={[styles.spacingBox, { width: value, height: 20 }]} />
@@ -62,7 +62,7 @@ export function DesignTokenPreview() {
       {/* Border Radius Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Border Radius Tokens</Text>
-        {Object.entries(ConsolidatedDesignSystem.borderRadius).map(([size, value]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.borderRadius).map(([size, value]) => (
           <View key={size} style={styles.radiusItem}>
             <Text style={styles.radiusLabel}>{size}: {value}px</Text>
             <View style={[styles.radiusBox, { borderRadius: value }]} />
@@ -73,7 +73,7 @@ export function DesignTokenPreview() {
       {/* Shadow Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Shadow Tokens</Text>
-        {Object.entries(ConsolidatedDesignSystem.shadow).map(([size, shadowProps]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.shadow).map(([size, shadowProps]) => (
           <View key={size} style={styles.shadowItem}>
             <Text style={styles.shadowLabel}>{size}</Text>
             <View style={[styles.shadowBox, shadowProps]} />
@@ -87,44 +87,44 @@ export function DesignTokenPreview() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   title: {
     ...Typography.styles.heading('2xl'),
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xl,
     textAlign: 'center',
   },
   section: {
-    marginBottom: ConsolidatedDesignSystem.spacing['3xl'],
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing['3xl'],
   },
   sectionTitle: {
     ...Typography.styles.subheading('xl'),
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   subSectionTitle: {
     ...Typography.styles.subheading('lg'),
-    marginTop: ConsolidatedDesignSystem.spacing.lg,
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.md,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   colorItem: {
     alignItems: 'center',
     width: 100,
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   colorSwatch: {
     width: 60,
     height: 60,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
     borderWidth: 1,
-    borderColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   colorName: {
     ...Typography.styles.label('xs'),
@@ -135,30 +135,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   typographyItem: {
-    paddingVertical: ConsolidatedDesignSystem.spacing.xs,
+    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
   },
   sampleText: {
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
   },
   spacingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
   },
   spacingLabel: {
     ...Typography.styles.label('sm'),
     width: 100,
   },
   spacingBox: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    marginLeft: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginLeft: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   radiusItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   radiusLabel: {
     ...Typography.styles.label('sm'),
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
   radiusBox: {
     width: 60,
     height: 40,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.lighten(ConsolidatedConsolidatedDesignSystem.colors.primary),
-    marginLeft: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.lighten(ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary),
+    marginLeft: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   shadowItem: {
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   shadowLabel: {
     ...Typography.styles.label('sm'),
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
   },
   shadowBox: {
     width: 100,
     height: 60,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
   },
 });

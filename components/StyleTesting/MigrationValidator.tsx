@@ -100,34 +100,34 @@ export function MigrationValidator() {
     // Validate that design tokens are properly structured
     try {
       // Check colors
-      if (Object.keys(ConsolidatedDesignSystem.colors).length > 0) {
+      if (Object.keys(ConsolidatedConsolidatedDesignSystem.colors).length > 0) {
         results.push({
           type: 'success',
-          message: `✅ ConsolidatedDesignSystem.colors loaded (${Object.keys(ConsolidatedDesignSystem.colors).length} colors)`
+          message: `✅ ConsolidatedConsolidatedDesignSystem.colors loaded (${Object.keys(ConsolidatedConsolidatedDesignSystem.colors).length} colors)`
         });
       }
       
       // Check typography
-      if (Object.keys(ConsolidatedDesignSystem.typography.fontSize).length > 0) {
+      if (Object.keys(ConsolidatedConsolidatedDesignSystem.typography.fontSize).length > 0) {
         results.push({
           type: 'success',
-          message: `✅ Typography scales loaded (${Object.keys(ConsolidatedDesignSystem.typography.fontSize).length} sizes)`
+          message: `✅ Typography scales loaded (${Object.keys(ConsolidatedConsolidatedDesignSystem.typography.fontSize).length} sizes)`
         });
       }
       
       // Check spacing
-      if (Object.keys(ConsolidatedDesignSystem.spacing).length > 0) {
+      if (Object.keys(ConsolidatedConsolidatedDesignSystem.spacing).length > 0) {
         results.push({
           type: 'success',
-          message: `✅ Spacing scale loaded (${Object.keys(ConsolidatedDesignSystem.spacing).length} values)`
+          message: `✅ Spacing scale loaded (${Object.keys(ConsolidatedConsolidatedDesignSystem.spacing).length} values)`
         });
       }
       
       // Check component tokens
-      if (Object.keys(ConsolidatedDesignSystem.components).length > 0) {
+      if (Object.keys(ConsolidatedConsolidatedDesignSystem.components).length > 0) {
         results.push({
           type: 'success',
-          message: `✅ Component tokens loaded (${Object.keys(ConsolidatedDesignSystem.components).length} components)`
+          message: `✅ Component tokens loaded (${Object.keys(ConsolidatedConsolidatedDesignSystem.components).length} components)`
         });
       }
       
@@ -241,7 +241,7 @@ export function MigrationValidator() {
         </View>
         
         <View style={styles.checklistItem}>
-          <Text style={styles.checklistLabel}>✅ Phase 2: ConsolidatedDesignSystem.ts Expanded</Text>
+          <Text style={styles.checklistLabel}>✅ Phase 2: ConsolidatedConsolidatedDesignSystem.ts Expanded</Text>
           <Text style={styles.checklistDetails}>
             Typography scales, color tokens, spacing values, component tokens
           </Text>
@@ -275,102 +275,102 @@ export function MigrationValidator() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   title: {
     ...Typography.styles.heading('2xl'),
     textAlign: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
   },
   subtitle: {
     ...Typography.styles.body('base'),
     textAlign: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xl,
   },
   controls: {
     flexDirection: 'row',
-    gap: ConsolidatedDesignSystem.spacing.md,
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xl,
   },
   button: {
     flex: 1,
-    paddingVertical: ConsolidatedDesignSystem.spacing.md,
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   primaryButtonText: {
     ...Typography.styles.buttonText('primary'),
   },
   secondaryButton: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
     borderWidth: 1,
-    borderColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   secondaryButtonText: {
     ...Typography.styles.label('base'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
   resultsContainer: {
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xl,
   },
   resultsTitle: {
     ...Typography.styles.subheading('lg'),
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   resultItem: {
-    padding: ConsolidatedDesignSystem.spacing.md,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
     borderLeftWidth: 4,
   },
   successResult: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.status.successBackground,
-    borderLeftColor: ConsolidatedConsolidatedDesignSystem.status.success,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.successBackground,
+    borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
   },
   warningResult: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.status.warningBackground,
-    borderLeftColor: ConsolidatedConsolidatedDesignSystem.status.warning,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warningBackground,
+    borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
   },
   errorResult: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.status.errorBackground,
-    borderLeftColor: ConsolidatedConsolidatedDesignSystem.status.error,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.errorBackground,
+    borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
   },
   defaultResult: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-    borderLeftColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   resultMessage: {
     ...Typography.styles.body('base'),
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
+    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   resultDetails: {
     ...Typography.styles.caption(),
-    marginTop: ConsolidatedDesignSystem.spacing.xs,
+    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   checklistContainer: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
-    padding: ConsolidatedDesignSystem.spacing.lg,
-    ...ConsolidatedDesignSystem.shadow.sm,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    ...ConsolidatedConsolidatedDesignSystem.shadow.sm,
   },
   checklistTitle: {
     ...Typography.styles.subheading('lg'),
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   checklistItem: {
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
-    paddingBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
   },
   checklistLabel: {
     ...Typography.styles.label('base'),
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   checklistDetails: {
     ...Typography.styles.caption(),

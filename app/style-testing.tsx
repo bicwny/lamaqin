@@ -61,16 +61,16 @@ export default function StyleTestingScreen() {
         <Text style={styles.tokenSectionTitle}>Badge & Pill Tokens</Text>
         <View style={styles.badgeGrid}>
           <View style={componentHelpers.getBadgeStyle('sm', 'filled', 'primary')}>
-            <Text style={{ color: ConsolidatedConsolidatedDesignSystem.colors["text-inverse"] }}>Small Badge</Text>
+            <Text style={{ color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"] }}>Small Badge</Text>
           </View>
           <View style={componentHelpers.getBadgeStyle('md', 'outlined', 'success')}>
-            <Text style={{ color: ConsolidatedConsolidatedDesignSystem.status.success }}>Outlined</Text>
+            <Text style={{ color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success }}>Outlined</Text>
           </View>
           <View style={componentHelpers.getPillStyle('sm', 'filled', 'dharma')}>
-            <Text style={{ color: ConsolidatedConsolidatedDesignSystem.colors["text-inverse"] }}>Dharma Pill</Text>
+            <Text style={{ color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"] }}>Dharma Pill</Text>
           </View>
           <View style={componentHelpers.getBadgeStyle('md', 'soft', 'warning')}>
-            <Text style={{ color: ConsolidatedConsolidatedDesignSystem.status.warning }}>Soft Warning</Text>
+            <Text style={{ color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning }}>Soft Warning</Text>
           </View>
         </View>
       </View>
@@ -98,7 +98,7 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Spacing System</Text>
         <View style={styles.spacingGrid}>
-          {Object.entries(ConsolidatedDesignSystem.spacing).map(([key, value]) => (
+          {Object.entries(ConsolidatedConsolidatedDesignSystem.spacing).map(([key, value]) => (
             <View key={key} style={styles.spacingItem}>
               <View style={[styles.spacingBox, { width: value, height: value }]} />
               <Text style={styles.spacingLabel}>{key}: {value}px</Text>
@@ -111,7 +111,7 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Border Radius</Text>
         <View style={styles.radiusGrid}>
-          {Object.entries(ConsolidatedDesignSystem.borderRadius).map(([key, value]) => (
+          {Object.entries(ConsolidatedConsolidatedDesignSystem.borderRadius).map(([key, value]) => (
             <View key={key} style={styles.radiusItem}>
               <View style={[styles.radiusBox, { borderRadius: value }]} />
               <Text style={styles.radiusLabel}>{key}: {value}px</Text>
@@ -124,7 +124,7 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Shadow System</Text>
         <View style={styles.shadowGrid}>
-          {Object.entries(ConsolidatedDesignSystem.shadow).map(([key, shadow]) => (
+          {Object.entries(ConsolidatedConsolidatedDesignSystem.shadow).map(([key, shadow]) => (
             <View key={key} style={[styles.shadowBox, shadow]}>
               <Text style={styles.shadowLabel}>{key}</Text>
             </View>
@@ -139,7 +139,7 @@ export default function StyleTestingScreen() {
       <Text style={styles.sectionTitle}>Color System</Text>
       
       <View style={styles.colorGrid}>
-        {Object.entries(ConsolidatedDesignSystem.colors).map(([name, color]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.colors).map(([name, color]) => (
           <View key={name} style={styles.colorItem}>
             <View style={[styles.colorSwatch, { backgroundColor: color }]} />
             <Text style={styles.colorName}>{name}</Text>
@@ -196,7 +196,7 @@ export default function StyleTestingScreen() {
       {/* Font Sizes */}
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Font Sizes</Text>
-        {Object.entries(ConsolidatedDesignSystem.typography.fontSize).map(([size, value]) => (
+        {Object.entries(ConsolidatedConsolidatedDesignSystem.typography.fontSize).map(([size, value]) => (
           <Text key={size} style={{ fontSize: value, marginVertical: 4 }}>
             {size}: {value}px - Sample text
           </Text>
@@ -281,7 +281,7 @@ componentHelpers.getPillStyle('small', 'filled', 'dharma')`}
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color={ConsolidatedConsolidatedDesignSystem.colors["text-primary"]} />
+          <Ionicons name="arrow-back" size={24} color={ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"]} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Design System Lab</Text>
@@ -327,138 +327,138 @@ componentHelpers.getPillStyle('small', 'filled', 'dharma')`}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
-    paddingTop: ConsolidatedDesignSystem.spacing.xl + 20, // Account for status bar
+    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    paddingTop: ConsolidatedConsolidatedDesignSystem.spacing.xl + 20, // Account for status bar
   },
   backButton: {
-    marginRight: ConsolidatedDesignSystem.spacing.md,
+    marginRight: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   headerContent: {
     flex: 1,
   },
   headerTitle: {
     ...Typography.styles.heading('xl'),
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   headerSubtitle: {
     ...Typography.styles.body('sm'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
   tabContainer: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
     maxHeight: 80,
   },
   tabContent: {
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
     alignItems: 'center',
   },
   tab: {
     alignItems: 'center',
-    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
-    marginRight: ConsolidatedDesignSystem.spacing.sm,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginRight: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
     minWidth: 80,
     height: 60,
   },
   activeTab: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary + '20',
+    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary + '20',
     borderBottomWidth: 2,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    borderBottomColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   tabIcon: {
     fontSize: 18,
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   tabLabel: {
     ...Typography.styles.label('xs'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
     textAlign: 'center',
     numberOfLines: 1,
   },
   activeTabLabel: {
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
   content: {
     flex: 1,
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   sectionTitle: {
     ...Typography.styles.heading('lg'),
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   tokenSection: {
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xl,
   },
   tokenSectionTitle: {
     ...Typography.styles.subheading('lg'),
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   buttonGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.md,
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   badgeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.md,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.md,
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.md,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   colorItem: {
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
     width: '45%',
   },
   colorSwatch: {
     width: 60,
     height: 60,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
     borderWidth: 1,
-    borderColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   colorName: {
     ...Typography.styles.label('sm'),
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   colorValue: {
     ...Typography.styles.label('xs'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
     fontFamily: 'monospace',
   },
   spacingGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.lg,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   spacingItem: {
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   spacingBox: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   spacingLabel: {
     ...Typography.styles.label('xs'),
@@ -467,17 +467,17 @@ const styles = StyleSheet.create({
   radiusGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.lg,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   radiusItem: {
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   radiusBox: {
     width: 50,
     height: 50,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
   },
   radiusLabel: {
     ...Typography.styles.label('xs'),
@@ -485,41 +485,41 @@ const styles = StyleSheet.create({
   },
   shadowGrid: {
     flexDirection: 'row',
-    gap: ConsolidatedDesignSystem.spacing.lg,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   shadowBox: {
     width: 80,
     height: 80,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
   },
   shadowLabel: {
     ...Typography.styles.label('sm'),
   },
   codeExample: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
-    padding: ConsolidatedDesignSystem.spacing.md,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    padding: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
     borderLeftWidth: 3,
-    borderLeftColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    borderLeftColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   codeText: {
     fontFamily: 'monospace',
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-    lineHeight: ConsolidatedDesignSystem.typography.lineHeight.relaxed * ConsolidatedDesignSystem.typography.fontSize.sm,
+    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.lineHeight.relaxed * ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,
   },
   description: {
     ...Typography.styles.body('base'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
   },
   comparisonGrid: {
     flexDirection: 'row',
-    gap: ConsolidatedDesignSystem.spacing.lg,
+    gap: ConsolidatedConsolidatedDesignSystem.spacing.lg,
   },
   comparisonItem: {
     flex: 1,
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
   },
   comparisonTitle: {
     ...Typography.styles.label('sm'),
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
 });

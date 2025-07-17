@@ -15,14 +15,14 @@ export const IconTokens = {
   },
   
   colors: {
-    primary: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    secondary: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    success: ConsolidatedConsolidatedDesignSystem.status.success,
-    warning: ConsolidatedConsolidatedDesignSystem.status.warning,
-    error: ConsolidatedConsolidatedDesignSystem.status.error,
-    info: ConsolidatedConsolidatedDesignSystem.status.info,
-    neutral: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    inverse: ConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
+    primary: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    secondary: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    success: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+    warning: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
+    error: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
+    info: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
+    neutral: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    inverse: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
   },
   
   // Semantic icon sets for common use cases
@@ -30,49 +30,49 @@ export const IconTokens = {
     success: {
       name: 'checkmark-circle' as const,
       size: 16,
-      color: ConsolidatedConsolidatedDesignSystem.status.success,
+      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
     },
     
     completion: {
       name: 'checkmark-circle' as const,
       size: 20,
-      color: ConsolidatedConsolidatedDesignSystem.status.success,
+      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
     },
     
     warning: {
       name: 'warning' as const,
       size: 16,
-      color: ConsolidatedConsolidatedDesignSystem.status.warning,
+      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
     },
     
     error: {
       name: 'close-circle' as const,
       size: 16,
-      color: ConsolidatedConsolidatedDesignSystem.status.error,
+      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
     },
     
     info: {
       name: 'information-circle' as const,
       size: 16,
-      color: ConsolidatedConsolidatedDesignSystem.status.info,
+      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
     },
     
     navigation: {
       name: 'chevron-forward' as const,
       size: 16,
-      color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+      color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
     },
     
     practice: {
       name: 'flower' as const,
       size: 20,
-      color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+      color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
     },
     
     meditation: {
       name: 'leaf' as const,
       size: 20,
-      color: ConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
+      color: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
     },
   },
 };
