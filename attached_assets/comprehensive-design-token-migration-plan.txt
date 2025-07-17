@@ -122,7 +122,7 @@
    - **Expected Outcome:** 12 semantic text styles with appropriate Tara color context
    - **Test Plan:** Verify all text renders correctly with Tara theming, no visual regressions
 
-#### DAY 2: Header & Modal Foundation
+#### DAY 2: Header, Modal & Icon Foundation
 **Components to Migrate:**
 
 4. **components/Header.tsx** - Page header component
@@ -142,6 +142,12 @@
    - **Tara Migration Approach:** Use componentHelpers.getModalStyle() with Tara overlays
    - **Expected Outcome:** Consistent modal appearance with subtle Tara color context
    - **Test Plan:** Test all modals open/close correctly with Tara theming
+
+7. **components/Icon.tsx** - Icon system consolidation
+   - **Current Issues:** Basic icon tokens, inconsistent Tara color usage
+   - **Tara Migration Approach:** Enhance semantic icon sets with Tara Buddhist colors
+   - **Expected Outcome:** Standardized icons with appropriate Tara color context
+   - **Test Plan:** Verify icon appearance across all screens with Tara theming
 
 **End of Day 2 Milestone:**
 - Foundation components fully migrated to Tara system
