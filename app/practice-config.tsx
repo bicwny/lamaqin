@@ -609,11 +609,7 @@ export default function PracticeConfigScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.durationDisplay}>
-          <Text style={styles.durationDisplayText}>
-            项目时长：{calculatedDays} 天
-          </Text>
-        </View>
+        
 
         {/* DateTimePicker Modal */}
         {practiceType === "count" && (
