@@ -4,31 +4,28 @@ const path = require('path');
 
 const config = getDefaultConfig(__dirname);
 
-// Add more robust module resolution
+// Enable CSS support
+config.isCSSEnabled = true;
+
+// Basic resolver configuration
 config.resolver = {
   ...config.resolver,
-  platforms: ['ios', 'android', 'web'],
   alias: {
     '@': path.resolve(__dirname, './'),
   },
+  platforms: ['ios', 'android', 'web'],
 };
 
-// Add transformer configuration to handle potential issues
+// Reset transformer to default
 config.transformer = {
   ...config.transformer,
-  minifierConfig: {
-    ...config.transformer.minifierConfig,
-    keep_fnames: true,
-    mangle: {
-      keep_fnames: true,
-    },
-  },
+  // Remove any custom transformers that might be causing issues
 };
 
-// Add serializer configuration with error handling
+// Reset serializer to default
 config.serializer = {
   ...config.serializer,
-  customSerializer: undefined, // Reset any custom serializer
+  // Remove custom serializer to fix path issues
 };
 
 module.exports = config;
