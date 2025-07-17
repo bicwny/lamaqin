@@ -68,7 +68,7 @@ export default function Header({
         {/* Left side */}
         {showBackButton ? (
           <TouchableOpacity onPress={onBackPress} style={styles.actionButton}>
-            <Ionicons name="arrow-back" size={24} color={ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary} />
+            <Ionicons name="arrow-back" size={24} color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
           </TouchableOpacity>
         ) : leftAction ? (
           <TouchableOpacity onPress={leftAction.onPress} style={styles.actionButton}>
@@ -110,17 +110,17 @@ export default function Header({
 const styles = StyleSheet.create({
   // Page header styles
   pageContainer: {
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
   },
   pageHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
     minHeight: 60,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"]Light,
   },
   pageTitle: {
     ...Typography.styles.heading('xl'),
@@ -129,17 +129,17 @@ const styles = StyleSheet.create({
 
   // Modal header styles
   modalContainer: {
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
     minHeight: 56,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   modalTitle: {
     ...Typography.styles.heading('lg'),
@@ -155,10 +155,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 0,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: ConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"]Light,
   },
   sectionTitle: {
     ...Typography.styles.subheading('lg'),
@@ -172,9 +172,9 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.styles.label('sm'),
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
     textAlign: 'center',
-    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+    marginTop: ConsolidatedDesignSystem.spacing.xs,
   },
   actionButton: {
     minWidth: 44,
@@ -184,8 +184,8 @@ const styles = StyleSheet.create({
   },
   actionText: {
     ...Typography.styles.label('base'),
-    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
   placeholder: {
     minWidth: 44,

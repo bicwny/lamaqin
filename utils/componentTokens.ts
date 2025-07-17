@@ -12,17 +12,17 @@ export const ComponentTokens = {
     // Base button styles by variant
     variants: {
       primary: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+        backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
         borderWidth: 0,
         borderColor: 'transparent',
-        ...ConsolidatedConsolidatedDesignSystem.shadow.md,
+        ...ConsolidatedDesignSystem.shadow.md,
       },
 
       secondary: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+        backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
         borderWidth: 1.5,
-        borderColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-        ...ConsolidatedConsolidatedDesignSystem.shadow.sm,
+        borderColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+        ...ConsolidatedDesignSystem.shadow.sm,
       },
 
       ghost: {
@@ -35,23 +35,23 @@ export const ComponentTokens = {
     // Size variations
     sizes: {
       small: {
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.base,
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
+        paddingVertical: ConsolidatedDesignSystem.spacing.base,
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.md,
         minHeight: 36,
       },
 
       medium: {
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.xl,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
+        paddingVertical: ConsolidatedDesignSystem.spacing.lg,
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.xl,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
         minHeight: 48,
       },
 
       large: {
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.xl,
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
+        paddingVertical: ConsolidatedDesignSystem.spacing.xl,
+        paddingHorizontal: ConsolidatedDesignSystem.spacing['2xl'],
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
         minHeight: 56,
       },
     },
@@ -71,46 +71,46 @@ export const ComponentTokens = {
     // Base card styles by variant
     variants: {
       outlined: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.utility.shadow,
+        backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        shadowColor: ConsolidatedDesignSystem.utility.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
         borderWidth: 1,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Dark,
+        borderColor: ConsolidatedDesignSystem.colors["border-default"]Dark,
       },
 
       elevated: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.xl,
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.utility.shadow,
+        backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+        borderRadius: ConsolidatedDesignSystem.borderRadius.xl,
+        shadowColor: ConsolidatedDesignSystem.utility.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.12,
         shadowRadius: 16,
         elevation: 6,
         borderWidth: 1,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+        borderColor: ConsolidatedDesignSystem.colors["surface-primary"],
       },
     },
 
     // Padding variations
     padding: {
-      compact: ConsolidatedConsolidatedDesignSystem.spacing.md,      // 12px (was status)
-      comfortable: ConsolidatedConsolidatedDesignSystem.spacing.lg,  // 16px (was practice)
-      spacious: ConsolidatedConsolidatedDesignSystem.spacing.xl,     // 20px (was standard/course)
+      compact: ConsolidatedDesignSystem.spacing.md,      // 12px (was status)
+      comfortable: ConsolidatedDesignSystem.spacing.lg,  // 16px (was practice)
+      spacious: ConsolidatedDesignSystem.spacing.xl,     // 20px (was standard/course)
     },
 
     // Margin variations
     margin: {
       none: 0,                               // No margin
-      tight: ConsolidatedConsolidatedDesignSystem.spacing.xs,        // 4px - minimal spacing
-      compact: ConsolidatedConsolidatedDesignSystem.spacing.sm,      // 8px - close proximity
-      comfortable: ConsolidatedConsolidatedDesignSystem.spacing.md,  // 12px - balanced spacing
-      spacious: ConsolidatedConsolidatedDesignSystem.spacing.lg,     // 16px - generous spacing
-      loose: ConsolidatedConsolidatedDesignSystem.spacing.xl,        // 20px - wide spacing
-      extraLoose: ConsolidatedConsolidatedDesignSystem.spacing['2xl'], // 24px - maximum spacing
+      tight: ConsolidatedDesignSystem.spacing.xs,        // 4px - minimal spacing
+      compact: ConsolidatedDesignSystem.spacing.sm,      // 8px - close proximity
+      comfortable: ConsolidatedDesignSystem.spacing.md,  // 12px - balanced spacing
+      spacious: ConsolidatedDesignSystem.spacing.lg,     // 16px - generous spacing
+      loose: ConsolidatedDesignSystem.spacing.xl,        // 20px - wide spacing
+      extraLoose: ConsolidatedDesignSystem.spacing['2xl'], // 24px - maximum spacing
     },
 
     // Legacy support - maps old variants to new system
@@ -126,51 +126,51 @@ export const ComponentTokens = {
   notification: {
     variants: {
       success: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.successBackground,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-        padding: ConsolidatedConsolidatedDesignSystem.spacing.md,
-        marginHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        marginVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+        backgroundColor: ConsolidatedDesignSystem.status.successBackground,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.md,
+        marginHorizontal: ConsolidatedDesignSystem.spacing.lg,
+        marginVertical: ConsolidatedDesignSystem.spacing.xs,
         borderWidth: 1,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+        borderColor: ConsolidatedDesignSystem.status.success,
         borderLeftWidth: 4,
-        borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+        borderLeftColor: ConsolidatedDesignSystem.status.success,
       },
 
       warning: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warningBackground,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-        padding: ConsolidatedConsolidatedDesignSystem.spacing.md,
-        marginHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        marginVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+        backgroundColor: ConsolidatedDesignSystem.status.warningBackground,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.md,
+        marginHorizontal: ConsolidatedDesignSystem.spacing.lg,
+        marginVertical: ConsolidatedDesignSystem.spacing.xs,
         borderWidth: 1,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warningBorder,
+        borderColor: ConsolidatedDesignSystem.status.warningBorder,
         borderLeftWidth: 4,
-        borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warningBorder,
+        borderLeftColor: ConsolidatedDesignSystem.status.warningBorder,
       },
 
       error: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.errorBackground,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-        padding: ConsolidatedConsolidatedDesignSystem.spacing.md,
-        marginHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        marginVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+        backgroundColor: ConsolidatedDesignSystem.status.errorBackground,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.md,
+        marginHorizontal: ConsolidatedDesignSystem.spacing.lg,
+        marginVertical: ConsolidatedDesignSystem.spacing.xs,
         borderWidth: 1,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.errorBorder,
+        borderColor: ConsolidatedDesignSystem.status.errorBorder,
         borderLeftWidth: 4,
-        borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.errorBorder,
+        borderLeftColor: ConsolidatedDesignSystem.status.errorBorder,
       },
 
       info: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-        padding: ConsolidatedConsolidatedDesignSystem.spacing.md,
-        marginHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        marginVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+        backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.md,
+        marginHorizontal: ConsolidatedDesignSystem.spacing.lg,
+        marginVertical: ConsolidatedDesignSystem.spacing.xs,
         borderWidth: 1,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
+        borderColor: ConsolidatedDesignSystem.status.info,
         borderLeftWidth: 4,
-        borderLeftColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
+        borderLeftColor: ConsolidatedDesignSystem.status.info,
       },
     },
   },
@@ -179,43 +179,43 @@ export const ComponentTokens = {
   input: {
     standard: {
       borderWidth: 1,
-      borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-      borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
-      paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
-      paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
-      fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,
-      fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.normal,
-      color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+      borderColor: ConsolidatedDesignSystem.colors["border-default"],
+      borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+      paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+      paddingVertical: ConsolidatedDesignSystem.spacing.md,
+      fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
+      fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
+      color: ConsolidatedDesignSystem.colors["text-primary"],
+      backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
       minHeight: 48,
-      lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.normal,
+      lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.normal,
     },
 
     search: {
       borderWidth: 1,
-      borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
-      borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-      paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-      paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.base,
-      fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,
-      fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.normal,
-      color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+      borderColor: ConsolidatedDesignSystem.colors["border-default"]Light,
+      borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+      paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+      paddingVertical: ConsolidatedDesignSystem.spacing.base,
+      fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
+      fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
+      color: ConsolidatedDesignSystem.colors["text-primary"],
+      backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
       minHeight: 44,
     },
 
     textarea: {
       borderWidth: 1,
-      borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-      borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
-      paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
-      paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
-      fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,
-      fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.normal,
-      color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+      borderColor: ConsolidatedDesignSystem.colors["border-default"],
+      borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+      paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+      paddingVertical: ConsolidatedDesignSystem.spacing.md,
+      fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
+      fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
+      color: ConsolidatedDesignSystem.colors["text-primary"],
+      backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
       minHeight: 80,
-      lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.normal,
+      lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.normal,
       textAlignVertical: 'top' as const,
     },
   },
@@ -231,9 +231,9 @@ export const ComponentTokens = {
   // Modal tokens - Consolidated
   modal: {
     dialog: {
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-      borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
-      shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.utility.shadow,
+      backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+      borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+      shadowColor: ConsolidatedDesignSystem.utility.shadow,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.25,
       shadowRadius: 8,
@@ -241,7 +241,7 @@ export const ComponentTokens = {
     },
 
     fullscreen: {
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+      backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
       borderRadius: 0,
       padding: 0,
     },
@@ -249,26 +249,26 @@ export const ComponentTokens = {
     // Size-based spacing for dialog modals
     sizes: {
       compact: {
-        padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        margin: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
+        padding: ConsolidatedDesignSystem.spacing.lg,
+        margin: ConsolidatedDesignSystem.spacing.lg,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.md,
       },
       default: {
-        padding: ConsolidatedConsolidatedDesignSystem.spacing.xl,
-        margin: ConsolidatedConsolidatedDesignSystem.spacing.xl,
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.xl,
+        margin: ConsolidatedDesignSystem.spacing.xl,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
       },
       large: {
-        padding: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
-        margin: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.xl,
+        padding: ConsolidatedDesignSystem.spacing['2xl'],
+        margin: ConsolidatedDesignSystem.spacing['2xl'],
+        borderRadius: ConsolidatedDesignSystem.borderRadius.xl,
       },
     },
   },
 
   // Separated overlay utility
   overlay: {
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.utility.overlay,
+    backgroundColor: ConsolidatedDesignSystem.utility.overlay,
   },
 
   // Header tokens - consolidated into single Header component with context variants
@@ -284,15 +284,15 @@ export const ComponentTokens = {
     // Horizontal dividers (default)
     horizontal: {
       height: 1,
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-      marginVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
+      backgroundColor: ConsolidatedDesignSystem.colors["border-default"],
+      marginVertical: ConsolidatedDesignSystem.spacing.md,
     },
 
     // Vertical dividers
     vertical: {
       width: 1,
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-      marginHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
+      backgroundColor: ConsolidatedDesignSystem.colors["border-default"],
+      marginHorizontal: ConsolidatedDesignSystem.spacing.md,
     },
 
     // Thickness variations
@@ -304,41 +304,41 @@ export const ComponentTokens = {
 
     // Color variants
     colors: {
-      light: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
-      default: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-      dark: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Dark,
-      primary: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+      light: ConsolidatedDesignSystem.colors["border-default"]Light,
+      default: ConsolidatedDesignSystem.colors["border-default"],
+      dark: ConsolidatedDesignSystem.colors["border-default"]Dark,
+      primary: ConsolidatedConsolidatedDesignSystem.colors.primary,
     },
 
     // Spacing variations
     spacing: {
       none: 0,
-      tight: ConsolidatedConsolidatedDesignSystem.spacing.xs,
-      normal: ConsolidatedConsolidatedDesignSystem.spacing.md,
-      loose: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+      tight: ConsolidatedDesignSystem.spacing.xs,
+      normal: ConsolidatedDesignSystem.spacing.md,
+      loose: ConsolidatedDesignSystem.spacing.lg,
     },
   },
 
   // Semantic color variants for Buddhist theming
   semantic: {
     // Semantic colors for Buddhist themes
-    dharma: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"],        // For dharma-related elements
-    meditation: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"], // For meditation-related elements
-    wisdom: ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45),       // For wisdom/achievement elements
-    success: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success, // For completion/success elements
+    dharma: ConsolidatedDesignSystem.accent["accent-primary"],        // For dharma-related elements
+    meditation: ConsolidatedDesignSystem.accent["accent-secondary"], // For meditation-related elements
+    wisdom: ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45),       // For wisdom/achievement elements
+    success: ConsolidatedDesignSystem.status.success, // For completion/success elements
   },
 
   // Completed badge tokens (for practice completion indicators)
   completedBadge: {
     container: {
-      backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.successBackground,
-      borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,
-      paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-      paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+      backgroundColor: ConsolidatedDesignSystem.status.successBackground,
+      borderRadius: ConsolidatedDesignSystem.borderRadius.md,
+      paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
+      paddingVertical: ConsolidatedDesignSystem.spacing.xs,
       borderWidth: 1,
-      borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+      borderColor: ConsolidatedDesignSystem.status.success,
       alignSelf: 'flex-start',
-      marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+      marginBottom: ConsolidatedDesignSystem.spacing.sm,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -346,13 +346,13 @@ export const ComponentTokens = {
     },
     icon: {
       size: 16,
-      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+      color: ConsolidatedDesignSystem.status.success,
     },
     text: {
-      fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,
-      fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
-      color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
-      marginLeft: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+      fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,
+      fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+      color: ConsolidatedDesignSystem.status.success,
+      marginLeft: ConsolidatedDesignSystem.spacing.xs,
     },
   },
 
@@ -361,30 +361,30 @@ export const ComponentTokens = {
     // Size variations
     sizes: {
       small: {
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.sm,     // 8px
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,       // 4px
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md,     // 8px
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,     // 8px
+        paddingVertical: ConsolidatedDesignSystem.spacing.xs,       // 4px
+        borderRadius: ConsolidatedDesignSystem.borderRadius.md,     // 8px
         minHeight: 20,
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.xs,  // 12px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.xs,  // 12px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
       },
 
       medium: {
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,     // 12px
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,       // 8px
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,     // 12px
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.md,     // 12px
+        paddingVertical: ConsolidatedDesignSystem.spacing.sm,       // 8px
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,     // 12px
         minHeight: 28,
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,  // 14px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,  // 14px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
       },
 
       large: {
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,     // 16px
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.base,     // 10px
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg,     // 12px
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,     // 16px
+        paddingVertical: ConsolidatedDesignSystem.spacing.base,     // 10px
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,     // 12px
         minHeight: 36,
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base, // 16px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.base, // 16px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
       },
     },
 
@@ -422,30 +422,30 @@ export const ComponentTokens = {
     // Pill variations (fully rounded)
     pill: {
       small: {
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,     // 12px
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.xs,       // 4px
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.full,   // 9999px
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.md,     // 12px
+        paddingVertical: ConsolidatedDesignSystem.spacing.xs,       // 4px
+        borderRadius: ConsolidatedDesignSystem.borderRadius.full,   // 9999px
         minHeight: 20,
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.xs,  // 12px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.xs,  // 12px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
       },
 
       medium: {
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,     // 16px
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,       // 8px
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.full,   // 9999px
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,     // 16px
+        paddingVertical: ConsolidatedDesignSystem.spacing.sm,       // 8px
+        borderRadius: ConsolidatedDesignSystem.borderRadius.full,   // 9999px
         minHeight: 28,
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,  // 14px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,  // 14px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
       },
 
       large: {
-        paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.xl,     // 20px
-        paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.base,     // 10px
-        borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.full,   // 9999px
+        paddingHorizontal: ConsolidatedDesignSystem.spacing.xl,     // 20px
+        paddingVertical: ConsolidatedDesignSystem.spacing.base,     // 10px
+        borderRadius: ConsolidatedDesignSystem.borderRadius.full,   // 9999px
         minHeight: 36,
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base, // 16px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.base, // 16px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
       },
     },
 
@@ -453,129 +453,129 @@ export const ComponentTokens = {
     colors: {
       // Primary theme
       primary: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-        shadowColor: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+        backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+        shadowColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
       },
 
       // Success states
       success: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+        backgroundColor: ConsolidatedDesignSystem.status.success,
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedDesignSystem.status.success,
+        shadowColor: ConsolidatedDesignSystem.status.success,
       },
 
       // Warning states
       warning: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
+        backgroundColor: ConsolidatedDesignSystem.status.warning,
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedDesignSystem.status.warning,
+        shadowColor: ConsolidatedDesignSystem.status.warning,
       },
 
       // Error states
       error: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
+        backgroundColor: ConsolidatedDesignSystem.status.error,
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedDesignSystem.status.error,
+        shadowColor: ConsolidatedDesignSystem.status.error,
       },
 
       // Info states
       info: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
+        backgroundColor: ConsolidatedDesignSystem.status.info,
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedDesignSystem.status.info,
+        shadowColor: ConsolidatedDesignSystem.status.info,
       },
 
       // Neutral/default
       neutral: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.utility.shadow,
+        backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+        color: ConsolidatedDesignSystem.colors["text-secondary"],
+        borderColor: ConsolidatedDesignSystem.colors["border-default"],
+        shadowColor: ConsolidatedDesignSystem.utility.shadow,
       },
 
       // Buddhist semantic colors
       dharma: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"],
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"],
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"],
+        backgroundColor: ConsolidatedDesignSystem.accent["accent-primary"],
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedDesignSystem.accent["accent-primary"],
+        shadowColor: ConsolidatedDesignSystem.accent["accent-primary"],
       },
 
       meditation: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
+        backgroundColor: ConsolidatedDesignSystem.accent["accent-secondary"],
+        color: ConsolidatedDesignSystem.colors["text-inverse"],
+        borderColor: ConsolidatedDesignSystem.accent["accent-secondary"],
+        shadowColor: ConsolidatedDesignSystem.accent["accent-secondary"],
       },
 
       wisdom: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45),
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45),
-        shadowColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45),
+        backgroundColor: ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45),
+        color: ConsolidatedDesignSystem.colors["text-primary"],
+        borderColor: ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45),
+        shadowColor: ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45),
       },
     },
 
     // Soft/ghost color variants (light backgrounds)
     softColors: {
       primary: {
-        backgroundColor: `${ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary}15`, // 15% opacity
-        color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-        borderColor: `${ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary}30`,
+        backgroundColor: `${ConsolidatedConsolidatedDesignSystem.colors.primary}15`, // 15% opacity
+        color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+        borderColor: `${ConsolidatedConsolidatedDesignSystem.colors.primary}30`,
       },
 
       success: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.successBackground,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
+        backgroundColor: ConsolidatedDesignSystem.status.successBackground,
+        color: ConsolidatedDesignSystem.status.success,
+        borderColor: ConsolidatedDesignSystem.status.success,
       },
 
       warning: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warningBackground,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warningBorder,
+        backgroundColor: ConsolidatedDesignSystem.status.warningBackground,
+        color: ConsolidatedDesignSystem.status.warning,
+        borderColor: ConsolidatedDesignSystem.status.warningBorder,
       },
 
       error: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.errorBackground,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.status.errorBorder,
+        backgroundColor: ConsolidatedDesignSystem.status.errorBackground,
+        color: ConsolidatedDesignSystem.status.error,
+        borderColor: ConsolidatedDesignSystem.status.errorBorder,
       },
 
       info: {
-        backgroundColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.status.info}15`,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
-        borderColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.status.info}30`,
+        backgroundColor: `${ConsolidatedDesignSystem.status.info}15`,
+        color: ConsolidatedDesignSystem.status.info,
+        borderColor: `${ConsolidatedDesignSystem.status.info}30`,
       },
 
       neutral: {
-        backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-        borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+        backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+        color: ConsolidatedDesignSystem.colors["text-secondary"],
+        borderColor: ConsolidatedDesignSystem.colors["border-default"]Light,
       },
 
       dharma: {
-        backgroundColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"]}15`,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"],
-        borderColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"]}30`,
+        backgroundColor: `${ConsolidatedDesignSystem.accent["accent-primary"]}15`,
+        color: ConsolidatedDesignSystem.accent["accent-primary"],
+        borderColor: `${ConsolidatedDesignSystem.accent["accent-primary"]}30`,
       },
 
       meditation: {
-        backgroundColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"]}15`,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
-        borderColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"]}30`,
+        backgroundColor: `${ConsolidatedDesignSystem.accent["accent-secondary"]}15`,
+        color: ConsolidatedDesignSystem.accent["accent-secondary"],
+        borderColor: `${ConsolidatedDesignSystem.accent["accent-secondary"]}30`,
       },
 
       wisdom: {
-        backgroundColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45)}20`,
-        color: ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45),
-        borderColor: `${ConsolidatedConsolidatedConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"], 45)}40`,
+        backgroundColor: `${ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45)}20`,
+        color: ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45),
+        borderColor: `${ConsolidatedDesignSystem.colorUtils.adjustHue(ConsolidatedDesignSystem.accent["accent-primary"], 45)}40`,
       },
     },
 
@@ -593,137 +593,137 @@ export const ComponentTextStyles = {
   // 1. PRIMARY TEXT STYLES (4 core styles)
   heading: {
     // Main headings - consolidates pageTitle, sectionTitle, dharmaTitle
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize['2xl'],      // 24px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.bold,    // 700
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-    letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.tight,
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize['2xl'] * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize['2xl'],      // 24px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,    // 700
+    color: ConsolidatedDesignSystem.colors["text-primary"],
+    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tight,
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize['2xl'] * ConsolidatedDesignSystem.typography.lineHeight.tight,
   },
 
   subheading: {
     // Secondary headings - consolidates subtitle, card.title
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.lg,          // 18px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-    letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.tight,
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.lg * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.snug,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.lg,          // 18px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
+    color: ConsolidatedDesignSystem.colors["text-primary"],
+    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tight,
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.lg * ConsolidatedDesignSystem.typography.lineHeight.snug,
   },
 
   body: {
     // Regular content text - consolidates bodyText, content, description
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,        // 16px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.normal,  // 400
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.normal,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,  // 400
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.normal,
   },
 
   label: {
     // Small labels and metadata - consolidates label, metadata, helper
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,          // 14px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.medium,  // 500
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.snug,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,          // 14px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,  // 500
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.sm * ConsolidatedDesignSystem.typography.lineHeight.snug,
   },
 
   // 2. INTERACTIVE TEXT STYLES (3 styles)
   button: {
     variants: {
       primary: {
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,      // 16px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.bold, // 700
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.base,      // 16px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold, // 700
         color: '#ffffff',  // White text for primary buttons
-        letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.tighter,
-        lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+        letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tighter,
+        lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.tight,
       },
 
       secondary: {
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,      // 16px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
-        color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,  // Red text for secondary buttons
-        letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.normal,
-        lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.base,      // 16px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
+        color: ConsolidatedConsolidatedDesignSystem.colors.primary,  // Red text for secondary buttons
+        letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.normal,
+        lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.tight,
       },
 
       ghost: {
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,      // 16px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
-        color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-        letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.normal,
-        lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.base,      // 16px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
+        color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+        letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.normal,
+        lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.tight,
       },
     },
 
     sizes: {
       small: {
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,       // 14px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
-        lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,       // 14px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
+        lineHeight: ConsolidatedDesignSystem.typography.fontSize.sm * ConsolidatedDesignSystem.typography.lineHeight.tight,
       },
 
       medium: {
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,     // 16px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.bold, // 700
-        lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.base,     // 16px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold, // 700
+        lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.tight,
       },
 
       large: {
-        fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.lg,       // 18px
-        fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.bold, // 700
-        lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.lg * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+        fontSize: ConsolidatedDesignSystem.typography.fontSize.lg,       // 18px
+        fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold, // 700
+        lineHeight: ConsolidatedDesignSystem.typography.fontSize.lg * ConsolidatedDesignSystem.typography.lineHeight.tight,
       },
     },
   },
 
   link: {
     // Interactive links - consolidates linkText
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,        // 16px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
-    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-    letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.normal,
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.normal,
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.tight,
   },
 
   // 3. SEMANTIC TEXT STYLES (3 Buddhist-specific styles)
   dharma: {
     // Buddhist practice text - consolidates dharmaTitle, practiceText
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize['2xl'],      // 24px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.bold,    // 700
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-    letterSpacing: ConsolidatedConsolidatedDesignSystem.typography.letterSpacing.tight,
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize['2xl'] * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize['2xl'],      // 24px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,    // 700
+    color: ConsolidatedDesignSystem.colors["text-primary"],
+    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tight,
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize['2xl'] * ConsolidatedDesignSystem.typography.lineHeight.tight,
   },
 
   practice: {
     // Practice content text - optimized for reading Buddhist content
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,        // 16px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.medium,  // 500
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.relaxed,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,  // 500
+    color: ConsolidatedDesignSystem.colors["text-primary"],
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.relaxed,
   },
 
   success: {
     // Completion and success states
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm,          // 14px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.snug,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,          // 14px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold, // 600
+    color: ConsolidatedDesignSystem.status.success,
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.sm * ConsolidatedDesignSystem.typography.lineHeight.snug,
   },
 
   // 4. UTILITY TEXT STYLES (2 styles)
   caption: {
     // Smallest text for fine print - consolidates caption, error
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.xs,          // 12px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.normal,  // 400
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.xs * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.tight,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.xs,          // 12px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,  // 400
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.xs * ConsolidatedDesignSystem.typography.lineHeight.tight,
   },
 
   input: {
     // Form input text
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,        // 16px
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.normal,  // 400
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"],
-    lineHeight: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedConsolidatedDesignSystem.typography.lineHeight.normal,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,        // 16px
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,  // 400
+    color: ConsolidatedDesignSystem.colors["text-primary"],
+    lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.normal,
   },
 
   // LEGACY SUPPORT - maps old styles to new consolidated ones
@@ -786,9 +786,9 @@ export const componentHelpers = {
     
     // Map spacing tokens to actual padding values
     const spacingMap = {
-      'sm': { padding: ConsolidatedConsolidatedDesignSystem.spacing.md },      // 12px (compact)
-      'md': { padding: ConsolidatedConsolidatedDesignSystem.spacing.lg },      // 16px (comfortable)
-      'lg': { padding: ConsolidatedConsolidatedDesignSystem.spacing.xl },      // 20px (spacious)
+      'sm': { padding: ConsolidatedDesignSystem.spacing.md },      // 12px (compact)
+      'md': { padding: ConsolidatedDesignSystem.spacing.lg },      // 16px (comfortable)
+      'lg': { padding: ConsolidatedDesignSystem.spacing.xl },      // 20px (spacious)
     };
     
     const spacingValues = spacingMap[spacing];
@@ -839,9 +839,9 @@ export const componentHelpers = {
     margin: keyof typeof ComponentTokens.card.margin = 'comfortable'
   ) => {
     const spacingMap = {
-      'sm': ConsolidatedConsolidatedDesignSystem.spacing.md,      // 12px (compact)
-      'md': ConsolidatedConsolidatedDesignSystem.spacing.lg,      // 16px (comfortable)
-      'lg': ConsolidatedConsolidatedDesignSystem.spacing.xl,      // 20px (spacious)
+      'sm': ConsolidatedDesignSystem.spacing.md,      // 12px (compact)
+      'md': ConsolidatedDesignSystem.spacing.lg,      // 16px (comfortable)
+      'lg': ConsolidatedDesignSystem.spacing.xl,      // 20px (spacious)
     };
     
     return {
@@ -858,9 +858,9 @@ export const componentHelpers = {
     marginBottom: keyof typeof ComponentTokens.card.margin = 'comfortable'
   ) => {
     const spacingMap = {
-      'sm': ConsolidatedConsolidatedDesignSystem.spacing.md,      // 12px (compact)
-      'md': ConsolidatedConsolidatedDesignSystem.spacing.lg,      // 16px (comfortable)
-      'lg': ConsolidatedConsolidatedDesignSystem.spacing.xl,      // 20px (spacious)
+      'sm': ConsolidatedDesignSystem.spacing.md,      // 12px (compact)
+      'md': ConsolidatedDesignSystem.spacing.lg,      // 16px (comfortable)
+      'lg': ConsolidatedDesignSystem.spacing.xl,      // 20px (spacious)
     };
     
     return {
@@ -994,14 +994,14 @@ export const componentHelpers = {
   ) => {
     const sizeMap = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32, '2xl': 40 };
     const colorMap = {
-      primary: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-      secondary: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-      success: ConsolidatedConsolidatedConsolidatedDesignSystem.status.success,
-      warning: ConsolidatedConsolidatedConsolidatedDesignSystem.status.warning,
-      error: ConsolidatedConsolidatedConsolidatedDesignSystem.status.error,
-      info: ConsolidatedConsolidatedConsolidatedDesignSystem.status.info,
-      neutral: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-      inverse: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
+      primary: ConsolidatedConsolidatedDesignSystem.colors.primary,
+      secondary: ConsolidatedDesignSystem.colors["text-secondary"],
+      success: ConsolidatedDesignSystem.status.success,
+      warning: ConsolidatedDesignSystem.status.warning,
+      error: ConsolidatedDesignSystem.status.error,
+      info: ConsolidatedDesignSystem.status.info,
+      neutral: ConsolidatedDesignSystem.colors["text-secondary"],
+      inverse: ConsolidatedDesignSystem.colors["text-inverse"],
     };
 
     return {

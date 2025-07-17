@@ -251,10 +251,10 @@ export default function PracticeHistoryScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
+        backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
           <Text style={styles.loadingText}>正在加载...</Text>
         </View>
       </PageTemplate>
@@ -270,7 +270,7 @@ export default function PracticeHistoryScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
-      backgroundColor={ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
+      backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
       padding={0}
       contentContainerStyle={{
         refreshControl: (
@@ -347,8 +347,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...ComponentTextStyles.body,
-    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.medium,
+    marginTop: ConsolidatedDesignSystem.spacing.md,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
@@ -357,38 +357,38 @@ const styles = StyleSheet.create({
   summaryTitle: {
     ...ComponentTextStyles.subheading,
     textAlign: 'center',
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedDesignSystem.spacing.lg,
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   progressText: {
     ...ComponentTextStyles.body,
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.medium,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   progressPercentage: {
     ...ComponentTextStyles.body,
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   progressBarContainer: {
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   dailyTarget: {
     ...ComponentTextStyles.label,
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
     textAlign: 'center',
   },
   recordsSection: {
-    // margin: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.xl,
+    // margin: ConsolidatedDesignSystem.spacing.lg,
+    marginTop: ConsolidatedDesignSystem.spacing.xl,
   },
   sectionTitle: {
     ...ComponentTextStyles.subheading,
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   emptyContainer: {
     ...ComponentTokens.card.variants.outlined,
@@ -397,15 +397,15 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...ComponentTextStyles.subheading,
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   emptySubtext: {
     ...ComponentTextStyles.label,
-    color: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
   },
   recordsList: {
-    gap: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    gap: ConsolidatedDesignSystem.spacing.md,
   },
 
 });

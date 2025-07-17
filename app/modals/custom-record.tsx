@@ -244,7 +244,7 @@ export default function CustomRecordScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color={ConsolidatedDesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
               ) : (
                 <Text style={styles.saveHeaderButtonText}>保存</Text>
               )}
@@ -261,7 +261,7 @@ export default function CustomRecordScreen() {
         >
           {loadingRecord ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={ConsolidatedDesignSystem.colors.primary} />
+              <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
               <Text style={styles.loadingText}>正在加载记录...</Text>
             </View>
           ) : (
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   saveHeaderButton: {
     paddingVertical: ConsolidatedDesignSystem.spacing.sm,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedDesignSystem.colors.primary,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
     borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
     minWidth: 60,
     alignItems: 'center',

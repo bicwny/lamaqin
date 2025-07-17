@@ -56,11 +56,11 @@ export default function LessonTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
   },
   content: {
     flex: 1,
-    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    padding: ConsolidatedDesignSystem.spacing.lg,
   },
   scrollViewContent: {
     flexGrow: 1,

@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    padding: ConsolidatedDesignSystem.spacing.lg,
   },
 });

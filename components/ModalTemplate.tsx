@@ -44,8 +44,8 @@ export default function ModalTemplate({
   const modalStyles = componentHelpers.getModalStyle(variant, size);
   
   const defaultBackgroundColor = variant === 'fullscreen' 
-    ? ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"] 
-    : ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary;
+    ? ConsolidatedDesignSystem.colors["surface-primary"] 
+    : ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"];
 
   const content = (
     <View style={[styles.content, modalStyles, contentContainerStyle]}>
@@ -133,17 +133,17 @@ export default function ModalTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   headerLeft: {
     flex: 1,
@@ -161,17 +161,17 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
   },
   actionButton: {
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
   },
   actionButtonText: {
     ...createStyles.body(),
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   content: {
     flex: 1,

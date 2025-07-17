@@ -35,8 +35,8 @@ export const PracticeDetailMigration = {
       new: `
         container: {
           flex: 1,
-          backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
-          padding: ConsolidatedConsolidatedDesignSystem.spacing.xl,
+          backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+          padding: ConsolidatedDesignSystem.spacing.xl,
         },
       `,
     },
@@ -104,7 +104,7 @@ export const PracticeDetailMigration = {
       new: `
         sectionTitle: {
           ...Typography.styles.subheading('lg'),
-          marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+          marginBottom: ConsolidatedDesignSystem.spacing.md,
         },
       `,
     },
@@ -122,7 +122,7 @@ export const PracticeDetailMigration = {
       new: `
         labelText: {
           ...Typography.styles.label('sm'),
-          marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+          marginBottom: ConsolidatedDesignSystem.spacing.sm,
         },
       `,
     },
@@ -144,32 +144,32 @@ export const PracticeDetailMigration = {
   
   // Color reference replacements
   colorReplacements: {
-    "'#f8f9fa'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]',
-    "'#ffffff'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary',
-    "'#1a1a1a'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-primary"]',
-    "'#666666'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.colors["text-secondary"]',
-    "'#da4347'": 'ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary',
-    "'#e9ecef'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]',
-    "'#f0f0f0'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light',
-    "'#2e7d32'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.status.success',
-    "'#000'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.utility.shadow',
-    "'rgba(0, 0, 0, 0.5)'": 'ConsolidatedConsolidatedConsolidatedDesignSystem.utility.overlay',
+    "'#f8f9fa'": 'ConsolidatedDesignSystem.colors["surface-primary"]',
+    "'#ffffff'": 'ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"]',
+    "'#1a1a1a'": 'ConsolidatedDesignSystem.colors["text-primary"]',
+    "'#666666'": 'ConsolidatedDesignSystem.colors["text-secondary"]',
+    "'#da4347'": 'ConsolidatedConsolidatedDesignSystem.colors.primary',
+    "'#e9ecef'": 'ConsolidatedDesignSystem.colors["border-default"]',
+    "'#f0f0f0'": 'ConsolidatedDesignSystem.colors["border-default"]Light',
+    "'#2e7d32'": 'ConsolidatedDesignSystem.status.success',
+    "'#000'": 'ConsolidatedDesignSystem.utility.shadow',
+    "'rgba(0, 0, 0, 0.5)'": 'ConsolidatedDesignSystem.utility.overlay',
   },
   
   // Spacing replacements
   spacingReplacements: {
-    'padding: 20': 'padding: ConsolidatedConsolidatedDesignSystem.spacing.xl',
-    'paddingVertical: 16': 'paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.lg',
-    'paddingHorizontal: 20': 'paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.xl',
-    'marginBottom: 16': 'marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg',
-    'marginBottom: 12': 'marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.md',
-    'marginBottom: 8': 'marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm',
-    'borderRadius: 12': 'borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.lg',
-    'borderRadius: 8': 'borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.md',
-    'fontSize: 16': 'fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base',
-    'fontSize: 18': 'fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.lg',
-    'fontSize: 14': 'fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.sm',
-    'fontSize: 24': 'fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize["2xl"]',
+    'padding: 20': 'padding: ConsolidatedDesignSystem.spacing.xl',
+    'paddingVertical: 16': 'paddingVertical: ConsolidatedDesignSystem.spacing.lg',
+    'paddingHorizontal: 20': 'paddingHorizontal: ConsolidatedDesignSystem.spacing.xl',
+    'marginBottom: 16': 'marginBottom: ConsolidatedDesignSystem.spacing.lg',
+    'marginBottom: 12': 'marginBottom: ConsolidatedDesignSystem.spacing.md',
+    'marginBottom: 8': 'marginBottom: ConsolidatedDesignSystem.spacing.sm',
+    'borderRadius: 12': 'borderRadius: ConsolidatedDesignSystem.borderRadius.lg',
+    'borderRadius: 8': 'borderRadius: ConsolidatedDesignSystem.borderRadius.md',
+    'fontSize: 16': 'fontSize: ConsolidatedDesignSystem.typography.fontSize.base',
+    'fontSize: 18': 'fontSize: ConsolidatedDesignSystem.typography.fontSize.lg',
+    'fontSize: 14': 'fontSize: ConsolidatedDesignSystem.typography.fontSize.sm',
+    'fontSize: 24': 'fontSize: ConsolidatedDesignSystem.typography.fontSize["2xl"]',
   },
 };
 

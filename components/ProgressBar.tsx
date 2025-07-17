@@ -21,11 +21,11 @@ interface ProgressBarProps {
 const SIZE_CONFIG = {
   thin: {
     height: 8,
-    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.sm,
+    borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
   },
   medium: {
     height: 12,
-    borderRadius: ConsolidatedConsolidatedDesignSystem.spacing.xxs,
+    borderRadius: ConsolidatedDesignSystem.spacing.xxs,
   },
   thick: {
     height: 16,
@@ -34,15 +34,15 @@ const SIZE_CONFIG = {
 } as const;
 
 const BACKGROUND_COLORS = {
-  thin: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
-  medium: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
-  thick: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+  thin: ConsolidatedDesignSystem.colors["border-default"],
+  medium: ConsolidatedDesignSystem.colors["border-default"]Light,
+  thick: ConsolidatedDesignSystem.colors["surface-primary"],
 } as const;
 
 const FILL_COLORS = {
-  thin: ConsolidatedConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-  medium: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
-  thick: ConsolidatedConsolidatedConsolidatedDesignSystem.accent["accent-primary"],
+  thin: ConsolidatedConsolidatedDesignSystem.colors.primary,
+  medium: ConsolidatedDesignSystem.accent["accent-secondary"],
+  thick: ConsolidatedDesignSystem.accent["accent-primary"],
 } as const;
 
 export default function ProgressBar({
@@ -94,6 +94,6 @@ const styles = StyleSheet.create({
   },
   thickBorder: {
     borderWidth: 1,
-    borderColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderColor: ConsolidatedDesignSystem.colors["border-default"],
   },
 });

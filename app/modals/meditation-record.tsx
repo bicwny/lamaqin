@@ -220,7 +220,7 @@ export default function MeditationRecordScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color={ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
               ) : (
                 <Text style={styles.saveHeaderButtonText}>保存</Text>
               )}
@@ -312,17 +312,17 @@ export default function MeditationRecordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   headerLeft: {
     flex: 1,
@@ -340,8 +340,8 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
   },
   scrollView: {
     flex: 1,
@@ -351,27 +351,27 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    padding: ConsolidatedDesignSystem.spacing.lg,
   },
   practiceTitle: {
     ...createStyles.dharmaTitle('xl'),
     textAlign: 'center',
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
-    paddingBottom: ConsolidatedConsolidatedDesignSystem.spacing.lg,
+    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
+    paddingBottom: ConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   inputSection: {
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing['2xl'],
+    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
   },
   inputLabel: {
     ...createStyles.subheading('base'),
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+    marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   inputHint: {
     ...createStyles.body('sm'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   textInput: {
     ...ComponentTokens.input.standard,
@@ -379,12 +379,12 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 120,
     textAlignVertical: 'top',
-    paddingTop: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    paddingBottom: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingTop: ConsolidatedDesignSystem.spacing.md,
+    paddingBottom: ConsolidatedDesignSystem.spacing.md,
   },
   topicSelector: {
     ...ComponentTokens.input.standard,
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.md,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -395,22 +395,22 @@ const styles = StyleSheet.create({
   },
   topicSelectorArrow: {
     ...createStyles.body('lg'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
-    marginLeft: ConsolidatedConsolidatedDesignSystem.spacing.sm,
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    marginLeft: ConsolidatedDesignSystem.spacing.sm,
   },
   characterCount: {
     ...createStyles.caption(),
     textAlign: 'right',
-    marginTop: ConsolidatedConsolidatedDesignSystem.spacing.xs,
+    marginTop: ConsolidatedDesignSystem.spacing.xs,
   },
   loadingIndicator: {
-    padding: ConsolidatedConsolidatedDesignSystem.spacing.xl,
+    padding: ConsolidatedDesignSystem.spacing.xl,
   },
   saveHeaderButton: {
-    paddingVertical: ConsolidatedConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
-    borderRadius: ConsolidatedConsolidatedDesignSystem.borderRadius.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
     minWidth: 60,
     alignItems: 'center',
     justifyContent: 'center',
@@ -420,8 +420,8 @@ const styles = StyleSheet.create({
   },
   saveHeaderButtonText: {
     ...createStyles.buttonText('primary'),
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
-    fontSize: ConsolidatedConsolidatedDesignSystem.typography.fontSize.base,
-    fontWeight: ConsolidatedConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedDesignSystem.colors["text-inverse"],
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
 });
