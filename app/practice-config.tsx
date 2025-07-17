@@ -986,6 +986,10 @@ export default function PracticeConfigScreen() {
       title={isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
       showBackButton={true}
       onBackPress={() => router.back()}
+      rightAction={{
+        text: "增加",
+        onPress: handleConfirm,
+      }}
       scrollable={true}
       backgroundColor={DesignSystem.colors.background}
       padding={0}
