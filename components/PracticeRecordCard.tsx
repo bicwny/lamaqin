@@ -184,9 +184,10 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.sm,
   },
   deletingText: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.error, // Standard error color for destructive actions
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.error,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
   },
   header: {
     flexDirection: "row",
@@ -195,20 +196,25 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.sm,
   },
   recordDate: {
-    ...ComponentTextStyles.label,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
   },
   recordTime: {
-    ...ComponentTextStyles.label,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
   },
   content: {
     // marginBottom: DesignSystem.spacing.md,
   },
   recordCount: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textPrimary, // Clear text for practice count display
+    fontSize: DesignSystem.typography.fontSize.base,
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textPrimary,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
   },
   notesContainer: {
     marginTop: DesignSystem.spacing.sm,
@@ -224,12 +230,10 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xs,
   },
   notesText: {
-    ...ComponentTextStyles.body,
     fontSize: DesignSystem.typography.fontSize.sm,
+    fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textSecondary,
-    lineHeight:
-      DesignSystem.typography.fontSize.sm *
-      DesignSystem.typography.lineHeight.relaxed,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.relaxed,
   },
   actions: {
     flexDirection: "row",
@@ -245,7 +249,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.md,
   },
   editButtonText: {
-    ...ComponentTextStyles.button.secondary,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.redTara,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.tight,
   },
   deleteButton: {
     ...ComponentTokens.button.variants.destructive,
@@ -255,7 +262,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.lg,
   },
   deleteButtonText: {
-    ...ComponentTextStyles.button.primary,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textInverse,
+    lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.tight,
   },
   disabledContent: {
     opacity: 0.5,
