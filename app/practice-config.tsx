@@ -1007,7 +1007,7 @@ export default function PracticeConfigScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       rightAction={{
-        text: "增加",
+        text: "保存",
         onPress: handleConfirm,
       }}
       scrollable={true}
