@@ -18,7 +18,7 @@ import { presetProjectNameService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import ProgressBar from '@/components/ProgressBar';
 import PracticeRecordCard from '@/components/PracticeRecordCard';
-import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 
@@ -251,10 +251,10 @@ export default function PracticeHistoryScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>正在加载...</Text>
         </View>
       </PageTemplate>
@@ -270,7 +270,7 @@ export default function PracticeHistoryScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
-      backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
       contentContainerStyle={{
         refreshControl: (
@@ -347,8 +347,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...ComponentTextStyles.body,
-    marginTop: ConsolidatedDesignSystem.spacing.md,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
+    marginTop: DesignSystem.spacing.md,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
@@ -357,38 +357,38 @@ const styles = StyleSheet.create({
   summaryTitle: {
     ...ComponentTextStyles.subheading,
     textAlign: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   progressText: {
     ...ComponentTextStyles.body,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   progressPercentage: {
     ...ComponentTextStyles.body,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
   },
   progressBarContainer: {
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   dailyTarget: {
     ...ComponentTextStyles.label,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
   },
   recordsSection: {
-    // margin: ConsolidatedDesignSystem.spacing.lg,
-    marginTop: ConsolidatedDesignSystem.spacing.xl,
+    // margin: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.xl,
   },
   sectionTitle: {
     ...ComponentTextStyles.subheading,
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   emptyContainer: {
     ...ComponentTokens.card.variants.outlined,
@@ -397,15 +397,15 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...ComponentTextStyles.subheading,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   emptySubtext: {
     ...ComponentTextStyles.label,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    color: DesignSystem.colors.textSecondary,
   },
   recordsList: {
-    gap: ConsolidatedDesignSystem.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
 
 });

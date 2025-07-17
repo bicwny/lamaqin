@@ -526,96 +526,96 @@ export const DesignSystem = {
 // Helper functions for consistent styling with automatic line heights
 export const createStyles = {
   // Text styles with automatic line height calculations
-  heading: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = 'xl') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tight,
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.tight,
+  heading: (size: keyof typeof DesignSystem.typography.fontSize = 'xl') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
   }),
   
-  subheading: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = 'lg') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tight,
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.snug,
+  subheading: (size: keyof typeof DesignSystem.typography.fontSize = 'lg') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.snug,
   }),
   
-  body: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = 'base') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.normal,
+  body: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.normal,
   }),
   
-  label: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = 'sm') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.snug,
+  label: (size: keyof typeof DesignSystem.typography.fontSize = 'sm') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.snug,
   }),
   
   caption: () => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.xs,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize.xs * ConsolidatedDesignSystem.typography.lineHeight.tight,
+    fontSize: DesignSystem.typography.fontSize.xs,
+    fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textTertiary,
+    lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
   }),
   
   // Buddhist semantic text styles with automatic line heights
-  dharmaTitle: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = '2xl') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tight,
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.tight,
+  dharmaTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
   }),
   
-  practiceText: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = 'base') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.relaxed,
+  practiceText: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textPrimary,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.relaxed,
   }),
   
   // Interactive text styles with automatic line heights
   buttonText: (variant: 'primary' | 'secondary' = 'primary') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
-    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.tighter,
-    color: variant === 'primary' ? ConsolidatedDesignSystem.colors["text-inverse"] : ConsolidatedConsolidatedDesignSystem.colors.primary,
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize.base * ConsolidatedDesignSystem.typography.lineHeight.tight,
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    letterSpacing: DesignSystem.typography.letterSpacing.tighter,
+    color: variant === 'primary' ? DesignSystem.colors.textInverse : DesignSystem.colors.primary,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
   }),
   
-  linkText: (size: keyof typeof ConsolidatedDesignSystem.typography.fontSize = 'base') => ({
-    fontSize: ConsolidatedDesignSystem.typography.fontSize[size],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    letterSpacing: ConsolidatedDesignSystem.typography.letterSpacing.normal,
-    lineHeight: ConsolidatedDesignSystem.typography.fontSize[size] * ConsolidatedDesignSystem.typography.lineHeight.tight,
+  linkText: (size: keyof typeof DesignSystem.typography.fontSize = 'base') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
+    letterSpacing: DesignSystem.typography.letterSpacing.normal,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
   }),
   
   // Layout styles
-  container: (padding: keyof typeof ConsolidatedDesignSystem.spacing = 'lg') => ({
+  container: (padding: keyof typeof DesignSystem.spacing = 'lg') => ({
     flex: 1,
-    padding: ConsolidatedDesignSystem.spacing[padding],
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    padding: DesignSystem.spacing[padding],
+    backgroundColor: DesignSystem.colors.background,
   }),
   
-  card: (padding: keyof typeof ConsolidatedDesignSystem.spacing = 'lg') => ({
-    ...ConsolidatedDesignSystem.components.card,
-    padding: ConsolidatedDesignSystem.spacing[padding],
+  card: (padding: keyof typeof DesignSystem.spacing = 'lg') => ({
+    ...DesignSystem.components.card,
+    padding: DesignSystem.spacing[padding],
   }),
   
   // Button styles
   primaryButton: () => ({
-    ...ConsolidatedDesignSystem.components.button.primary,
-    ...ConsolidatedDesignSystem.shadow.md,
+    ...DesignSystem.components.button.primary,
+    ...DesignSystem.shadow.md,
   }),
   
   secondaryButton: () => ({
-    ...ConsolidatedDesignSystem.components.button.secondary,
-    ...ConsolidatedDesignSystem.shadow.sm,
+    ...DesignSystem.components.button.secondary,
+    ...DesignSystem.shadow.sm,
   }),
 };

@@ -132,7 +132,7 @@ const SEMANTIC_COLORS = {
 };
 
 // Export unified color system
-import ConsolidatedDesignSystem from './DesignSystem';
+import { DesignSystem } from './DesignSystem';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
@@ -165,18 +165,18 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   // App-specific colors - now using design system
-  primary: ConsolidatedConsolidatedDesignSystem.colors.primary,
-  secondary: ConsolidatedDesignSystem.colors["surface-primary"],
-  text: ConsolidatedDesignSystem.colors["text-primary"],
-  textSecondary: ConsolidatedDesignSystem.colors["text-secondary"],
-  textPrimary: ConsolidatedDesignSystem.colors["text-primary"],
-  background: ConsolidatedDesignSystem.colors["surface-primary"],
-  surface: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
-  border: ConsolidatedDesignSystem.colors["border-default"],
-  success: ConsolidatedDesignSystem.status.success,
-  warning: ConsolidatedDesignSystem.status.warning,
-  error: ConsolidatedDesignSystem.status.error,
-  info: ConsolidatedDesignSystem.status.info,
+  primary: DesignSystem.colors.primary,
+  secondary: DesignSystem.colors.background,
+  text: DesignSystem.colors.textPrimary,
+  textSecondary: DesignSystem.colors.textSecondary,
+  textPrimary: DesignSystem.colors.textPrimary,
+  background: DesignSystem.colors.background,
+  surface: DesignSystem.colors.backgroundSecondary,
+  border: DesignSystem.colors.border,
+  success: DesignSystem.colors.success,
+  warning: DesignSystem.colors.warning,
+  error: DesignSystem.colors.error,
+  info: DesignSystem.colors.info,
 
   // Utility functions
   opacity: (color: string, opacity: number) => `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`,

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { Typography } from '@/utils/typography';
 
 export function DesignTokenPreview() {
@@ -13,7 +13,7 @@ export function DesignTokenPreview() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Color Tokens</Text>
         <View style={styles.colorGrid}>
-          {Object.entries(ConsolidatedDesignSystem.colors).map(([name, color]) => (
+          {Object.entries(DesignSystem.colors).map(([name, color]) => (
             <View key={name} style={styles.colorItem}>
               <View style={[styles.colorSwatch, { backgroundColor: color }]} />
               <Text style={styles.colorName}>{name}</Text>
@@ -29,7 +29,7 @@ export function DesignTokenPreview() {
         
         {/* Font Sizes */}
         <Text style={styles.subSectionTitle}>Font Sizes</Text>
-        {Object.entries(ConsolidatedDesignSystem.typography.fontSize).map(([size, value]) => (
+        {Object.entries(DesignSystem.typography.fontSize).map(([size, value]) => (
           <View key={size} style={styles.typographyItem}>
             <Text style={[styles.sampleText, { fontSize: value }]}>
               Sample Text ({size}: {value}px)
@@ -39,7 +39,7 @@ export function DesignTokenPreview() {
 
         {/* Font Weights */}
         <Text style={styles.subSectionTitle}>Font Weights</Text>
-        {Object.entries(ConsolidatedDesignSystem.typography.fontWeight).map(([weight, value]) => (
+        {Object.entries(DesignSystem.typography.fontWeight).map(([weight, value]) => (
           <View key={weight} style={styles.typographyItem}>
             <Text style={[styles.sampleText, { fontWeight: value }]}>
               Sample Text ({weight}: {value})
@@ -51,7 +51,7 @@ export function DesignTokenPreview() {
       {/* Spacing Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Spacing Tokens</Text>
-        {Object.entries(ConsolidatedDesignSystem.spacing).map(([size, value]) => (
+        {Object.entries(DesignSystem.spacing).map(([size, value]) => (
           <View key={size} style={styles.spacingItem}>
             <Text style={styles.spacingLabel}>{size}: {value}px</Text>
             <View style={[styles.spacingBox, { width: value, height: 20 }]} />
@@ -62,7 +62,7 @@ export function DesignTokenPreview() {
       {/* Border Radius Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Border Radius Tokens</Text>
-        {Object.entries(ConsolidatedDesignSystem.borderRadius).map(([size, value]) => (
+        {Object.entries(DesignSystem.borderRadius).map(([size, value]) => (
           <View key={size} style={styles.radiusItem}>
             <Text style={styles.radiusLabel}>{size}: {value}px</Text>
             <View style={[styles.radiusBox, { borderRadius: value }]} />
@@ -73,7 +73,7 @@ export function DesignTokenPreview() {
       {/* Shadow Tokens */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Shadow Tokens</Text>
-        {Object.entries(ConsolidatedDesignSystem.shadow).map(([size, shadowProps]) => (
+        {Object.entries(DesignSystem.shadow).map(([size, shadowProps]) => (
           <View key={size} style={styles.shadowItem}>
             <Text style={styles.shadowLabel}>{size}</Text>
             <View style={[styles.shadowBox, shadowProps]} />
@@ -87,44 +87,44 @@ export function DesignTokenPreview() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.background,
+    padding: DesignSystem.spacing.lg,
   },
   title: {
     ...Typography.styles.heading('2xl'),
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
     textAlign: 'center',
   },
   section: {
-    marginBottom: ConsolidatedDesignSystem.spacing['3xl'],
+    marginBottom: DesignSystem.spacing['3xl'],
   },
   sectionTitle: {
     ...Typography.styles.subheading('xl'),
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    marginBottom: DesignSystem.spacing.lg,
+    color: DesignSystem.colors.primary,
   },
   subSectionTitle: {
     ...Typography.styles.subheading('lg'),
-    marginTop: ConsolidatedDesignSystem.spacing.lg,
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.md,
   },
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: ConsolidatedDesignSystem.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   colorItem: {
     alignItems: 'center',
     width: 100,
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   colorSwatch: {
     width: 60,
     height: 60,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    borderRadius: DesignSystem.borderRadius.md,
+    marginBottom: DesignSystem.spacing.xs,
     borderWidth: 1,
-    borderColor: ConsolidatedDesignSystem.colors["border-default"],
+    borderColor: DesignSystem.colors.border,
   },
   colorName: {
     ...Typography.styles.label('xs'),
@@ -135,30 +135,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   typographyItem: {
-    paddingVertical: ConsolidatedDesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.xs,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   sampleText: {
-    color: ConsolidatedDesignSystem.colors["text-primary"],
+    color: DesignSystem.colors.textPrimary,
   },
   spacingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   spacingLabel: {
     ...Typography.styles.label('sm'),
     width: 100,
   },
   spacingBox: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    marginLeft: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.primary,
+    marginLeft: DesignSystem.spacing.md,
   },
   radiusItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   radiusLabel: {
     ...Typography.styles.label('sm'),
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
   radiusBox: {
     width: 60,
     height: 40,
-    backgroundColor: ConsolidatedDesignSystem.colorUtils.lighten(ConsolidatedConsolidatedDesignSystem.colors.primary),
-    marginLeft: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.primaryLight,
+    marginLeft: DesignSystem.spacing.md,
   },
   shadowItem: {
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   shadowLabel: {
     ...Typography.styles.label('sm'),
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   shadowBox: {
     width: 100,
     height: 60,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
   },
 });

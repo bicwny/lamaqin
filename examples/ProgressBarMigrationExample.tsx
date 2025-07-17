@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import ProgressBar from '@/components/ProgressBar';
-import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 /**
  * Example showing how to migrate from old progress patterns to new ProgressBar component
@@ -85,40 +85,40 @@ import ProgressBar from '@/components/ProgressBar';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: ConsolidatedDesignSystem.spacing.lg,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    padding: DesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.background,
   },
   title: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize['2xl'],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
+    fontSize: DesignSystem.typography.fontSize['2xl'],
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    marginBottom: DesignSystem.spacing.xl,
+    color: DesignSystem.colors.textPrimary,
   },
   section: {
-    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
+    marginBottom: DesignSystem.spacing['2xl'],
   },
   sectionTitle: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.lg,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
+    fontSize: DesignSystem.typography.fontSize.lg,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.lg,
+    color: DesignSystem.colors.textPrimary,
   },
   example: {
-    marginBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   label: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    fontSize: DesignSystem.typography.fontSize.sm,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    marginBottom: DesignSystem.spacing.sm,
+    color: DesignSystem.colors.textSecondary,
   },
   code: {
     fontFamily: 'monospace',
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
-    padding: ConsolidatedDesignSystem.spacing.md,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    lineHeight: ConsolidatedDesignSystem.typography.lineHeight.relaxed * ConsolidatedDesignSystem.typography.fontSize.sm,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    padding: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    color: DesignSystem.colors.textPrimary,
+    lineHeight: DesignSystem.typography.lineHeight.relaxed * DesignSystem.typography.fontSize.sm,
   },
 });

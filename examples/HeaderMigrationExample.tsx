@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Header from '@/components/Header';
 import PageHeader from '@/components/PageHeader';
-import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 /**
  * Example showing how to migrate from old header patterns to new consolidated Header component
@@ -87,44 +87,44 @@ export default function HeaderMigrationExample() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: DesignSystem.colors.background,
   },
   title: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize['2xl'],
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
+    fontSize: DesignSystem.typography.fontSize['2xl'],
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
     textAlign: 'center',
-    padding: ConsolidatedDesignSystem.spacing.xl,
+    padding: DesignSystem.spacing.xl,
   },
   section: {
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   sectionTitle: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.lg,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    fontSize: DesignSystem.typography.fontSize.lg,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
   },
   benefitsSection: {
-    margin: ConsolidatedDesignSystem.spacing.lg,
-    padding: ConsolidatedDesignSystem.spacing.lg,
-    backgroundColor: ConsolidatedDesignSystem.status.successBackground,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+    margin: DesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.successBackground,
+    borderRadius: DesignSystem.borderRadius.lg,
     borderLeftWidth: 4,
-    borderLeftColor: ConsolidatedDesignSystem.status.success,
+    borderLeftColor: DesignSystem.colors.practiceComplete,
   },
   benefitsTitle: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.lg,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    fontSize: DesignSystem.typography.fontSize.lg,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.md,
   },
   benefitItem: {
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
-    color: ConsolidatedDesignSystem.colors["text-primary"],
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.xs,
     lineHeight: 24,
   },
 });

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 
@@ -230,78 +230,78 @@ export function ComponentComparison() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.background,
+    padding: DesignSystem.spacing.lg,
   },
   title: {
     ...Typography.styles.heading('2xl'),
     textAlign: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
     ...Typography.styles.body('base'),
     textAlign: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   categorySelector: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: ConsolidatedDesignSystem.spacing.xl,
-    gap: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.xl,
+    gap: DesignSystem.spacing.sm,
   },
   categoryButton: {
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
-    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.borderRadius.md,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderWidth: 1,
-    borderColor: ConsolidatedDesignSystem.colors["border-default"],
+    borderColor: DesignSystem.colors.border,
   },
   categoryButtonActive: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    borderColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
+    borderColor: DesignSystem.colors.primary,
   },
   categoryButtonText: {
     ...Typography.styles.label('sm'),
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
+    color: DesignSystem.colors.textSecondary,
   },
   categoryButtonTextActive: {
-    color: ConsolidatedDesignSystem.colors["text-inverse"],
+    color: DesignSystem.colors.textInverse,
   },
   comparisonsContainer: {
-    gap: ConsolidatedDesignSystem.spacing.xl,
+    gap: DesignSystem.spacing.xl,
   },
   comparisonContainer: {
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
-    borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
-    padding: ConsolidatedDesignSystem.spacing.lg,
-    ...ConsolidatedDesignSystem.shadow.sm,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.lg,
+    ...DesignSystem.shadow.sm,
   },
   comparisonTitle: {
     ...Typography.styles.subheading('lg'),
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   comparisonDescription: {
     ...Typography.styles.body('sm'),
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedDesignSystem.spacing.md,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.md,
   },
   comparisonRow: {
     flexDirection: 'row',
-    gap: ConsolidatedDesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   comparisonColumn: {
     flex: 1,
   },
   columnLabel: {
     ...Typography.styles.label('sm'),
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
     textAlign: 'center',
   },
   componentContainer: {
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
-    borderRadius: ConsolidatedDesignSystem.borderRadius.md,
-    padding: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.md,
     alignItems: 'center',
     minHeight: 80,
     justifyContent: 'center',

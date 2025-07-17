@@ -3,7 +3,7 @@ import { View, StyleSheet, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
-import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
 
 interface LessonTemplateProps {
   title?: string;
@@ -56,11 +56,11 @@ export default function LessonTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: DesignSystem.colors.background,
   },
   content: {
     flex: 1,
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.lg,
   },
   scrollViewContent: {
     flexGrow: 1,

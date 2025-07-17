@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -17,7 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
@@ -219,7 +220,7 @@ export default function CustomRecordScreen() {
     >
       <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
         <Stack.Screen options={{ headerShown: false }} />
-
+        
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -244,7 +245,7 @@ export default function CustomRecordScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
               ) : (
                 <Text style={styles.saveHeaderButtonText}>保存</Text>
               )}
@@ -261,7 +262,7 @@ export default function CustomRecordScreen() {
         >
           {loadingRecord ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
+              <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
               <Text style={styles.loadingText}>正在加载记录...</Text>
             </View>
           ) : (
@@ -311,17 +312,17 @@ export default function CustomRecordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: DesignSystem.colors.border,
   },
   headerLeft: {
     flex: 1,
@@ -339,8 +340,8 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
   },
   scrollView: {
     flex: 1,
@@ -350,27 +351,27 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: ConsolidatedDesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.lg,
   },
   practiceTitle: {
     ...createStyles.dharmaTitle('xl'),
     textAlign: 'center',
-    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
-    paddingBottom: ConsolidatedDesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing['2xl'],
+    paddingBottom: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: DesignSystem.colors.border,
   },
   inputSection: {
-    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
+    marginBottom: DesignSystem.spacing['2xl'],
   },
   inputLabel: {
     ...createStyles.subheading('base'),
-    marginBottom: ConsolidatedDesignSystem.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   inputHint: {
     ...createStyles.body('sm'),
-    color: ConsolidatedDesignSystem.colors["text-secondary"],
-    marginBottom: ConsolidatedDesignSystem.spacing.sm,
+    color: DesignSystem.colors.textTertiary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   textInput: {
     ...ComponentTokens.input.standard,
@@ -378,31 +379,31 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 120,
     textAlignVertical: 'top',
-    paddingTop: ConsolidatedDesignSystem.spacing.md,
-    paddingBottom: ConsolidatedDesignSystem.spacing.md,
+    paddingTop: DesignSystem.spacing.md,
+    paddingBottom: DesignSystem.spacing.md,
   },
   characterCount: {
     ...createStyles.caption(),
     textAlign: 'right',
-    marginTop: ConsolidatedDesignSystem.spacing.xs,
+    marginTop: DesignSystem.spacing.xs,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: ConsolidatedDesignSystem.spacing['4xl'],
+    padding: DesignSystem.spacing['4xl'],
     minHeight: 200,
   },
   loadingText: {
-    marginTop: ConsolidatedDesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.md,
     ...Typography.styles.body('base'),
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   saveHeaderButton: {
-    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
-    borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.primary,
+    borderRadius: DesignSystem.borderRadius.sm,
     minWidth: 60,
     alignItems: 'center',
     justifyContent: 'center',
@@ -412,8 +413,8 @@ const styles = StyleSheet.create({
   },
   saveHeaderButtonText: {
     ...createStyles.buttonText('primary'),
-    color: ConsolidatedDesignSystem.colors["text-inverse"],
-    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textInverse,
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
 });

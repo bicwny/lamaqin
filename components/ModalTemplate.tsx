@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/ConsolidatedDesignSystem';
+import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
 
 interface ModalTemplateProps {
@@ -44,8 +44,8 @@ export default function ModalTemplate({
   const modalStyles = componentHelpers.getModalStyle(variant, size);
   
   const defaultBackgroundColor = variant === 'fullscreen' 
-    ? ConsolidatedDesignSystem.colors["surface-primary"] 
-    : ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"];
+    ? DesignSystem.colors.background 
+    : DesignSystem.colors.backgroundSecondary;
 
   const content = (
     <View style={[styles.content, modalStyles, contentContainerStyle]}>
@@ -133,17 +133,17 @@ export default function ModalTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
+    backgroundColor: DesignSystem.colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
-    paddingVertical: ConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
+    borderBottomColor: DesignSystem.colors.border,
   },
   headerLeft: {
     flex: 1,
@@ -161,17 +161,17 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
   },
   actionButton: {
-    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
-    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   actionButtonText: {
     ...createStyles.body(),
-    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.primary,
   },
   content: {
     flex: 1,
