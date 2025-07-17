@@ -374,7 +374,7 @@ export default function PracticeConfigScreen() {
         message: "开始您的修行之路吧！",
         onPress: () => router.replace("/(tabs)/practice")
       });
-
+      
       // Navigate after a short delay to allow user to see the toast
       setTimeout(() => {
         router.replace("/(tabs)/practice");
@@ -616,7 +616,7 @@ export default function PracticeConfigScreen() {
           </TouchableOpacity>
         </View>
 
-
+        
 
         {/* DateTimePicker Modal */}
         {practiceType === "count" && (
@@ -966,7 +966,7 @@ export default function PracticeConfigScreen() {
           message: "您的修行计划已成功调整",
           onPress: () => router.push("/(tabs)/practice")
         });
-
+        
         setTimeout(() => {
           router.push("/(tabs)/practice");
         }, 1500);
@@ -984,7 +984,8 @@ export default function PracticeConfigScreen() {
           title: "修行项目已添加",
           message: "开始您的修行之路吧！",
           onPress: () => router.push("/(tabs)/practice")
-        });```
+        });
+        
         setTimeout(() => {
           router.push("/(tabs)/practice");
         }, 1500);
@@ -1006,7 +1007,7 @@ export default function PracticeConfigScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       rightAction={{
-        text: isEditMode ? "更新" : "增加",
+        text: "增加",
         onPress: handleConfirm,
       }}
       scrollable={true}
@@ -1058,7 +1059,7 @@ export default function PracticeConfigScreen() {
         {renderTimePlanning()}
         {renderSmartSummary()}
 
-
+        
 
       {/* Project Selection Modal */}
       <Modal
@@ -1300,7 +1301,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.label,
     textAlign: "center",
   },
-
+  
   previewHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -1458,9 +1459,9 @@ const styles = StyleSheet.create({
   modalEmptyText: {
     ...ComponentTextStyles.body,
     textAlign: "center",
-    fontStyle: "italic",
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
   },
-
+  
   helpText: {
     ...ComponentTextStyles.caption,
     textAlign: "center",
