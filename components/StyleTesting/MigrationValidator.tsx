@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { Typography } from '@/utils/typography';
 import { colorMigrationMap } from '@/utils/colorMigration';
 import { spacingMigrationMap } from '@/utils/spacingMigration';
 
@@ -16,13 +18,13 @@ export function MigrationValidator() {
 
   const validateColorMigration = (): ValidationResult[] => {
     const results: ValidationResult[] = [];
-
+    
     // Check if all hardcoded colors have migrations
     const hardcodedColors = [
       '#da4347', '#ffffff', '#1a1a1a', '#666666', '#999999',
       '#f8f9fa', '#e9ecef', '#2e7d32', '#000000'
     ];
-
+    
     hardcodedColors.forEach(color => {
       if (colorMigrationMap[color]) {
         results.push({
@@ -38,48 +40,41 @@ export function MigrationValidator() {
         });
       }
     });
-
+    
     return results;
   };
 
   const validateTypographyMigration = (): ValidationResult[] => {
     const results: ValidationResult[] = [];
-
-    // Check if typography scales exist in DesignSystem
-    const typographyChecks = [
-      { path: 'fontSize.xs', value: DesignSystem.typography.fontSize.xs },
-      { path: 'fontSize.sm', value: DesignSystem.typography.fontSize.sm },
-      { path: 'fontSize.base', value: DesignSystem.typography.fontSize.base },
-      { path: 'fontSize.lg', value: DesignSystem.typography.fontSize.lg },
-      { path: 'fontSize.xl', value: DesignSystem.typography.fontSize.xl },
-      { path: 'fontSize.2xl', value: DesignSystem.typography.fontSize['2xl'] }
-    ];
-
-    typographyChecks.forEach(({ path, value }) => {
-      if (value !== undefined && value !== null) {
+    
+    // Check if all common font sizes have migrations
+    const commonFontSizes = [12, 14, 16, 18, 20, 24];
+    
+    commonFontSizes.forEach(size => {
+      if (Typography.migrationMap.fontSize[size]) {
         results.push({
           type: 'success',
-          message: `✅ Typography ${path} exists`,
-          details: `Value: ${value}px`
+          message: `✅ Font size ${size}px has migration mapping`,
+          details: `Maps to: ${Typography.migrationMap.fontSize[size]}px`
         });
       } else {
         results.push({
           type: 'error',
-          message: `❌ Typography ${path} missing`,
-          details: 'Add to DesignSystem.typography'
+          message: `❌ Font size ${size}px missing migration mapping`,
+          details: 'Add to Typography.migrationMap.fontSize'
         });
       }
     });
-
+    
     return results;
   };
 
   const validateSpacingMigration = (): ValidationResult[] => {
     const results: ValidationResult[] = [];
-
+    
     // Check if all common spacing values have migrations
     const commonSpacing = [4, 6, 8, 10, 12, 16, 20, 24];
-
+    
     commonSpacing.forEach(size => {
       if (spacingMigrationMap[size]) {
         results.push({
@@ -95,45 +90,62 @@ export function MigrationValidator() {
         });
       }
     });
-
-  return results;
+    
+    return results;
   };
 
   const validateDesignTokens = (): ValidationResult[] => {
     const results: ValidationResult[] = [];
-
-    // Check if essential design tokens exist
-    const essentialTokens = [
-      { path: 'colors.primary', value: DesignSystem.colors.primary },
-      { path: 'colors.textPrimary', value: DesignSystem.colors.textPrimary },
-      { path: 'colors.background', value: DesignSystem.colors.background },
-      { path: 'typography.fontSize.base', value: DesignSystem.typography.fontSize.base },
-      { path: 'spacing.md', value: DesignSystem.spacing.md }
-    ];
-
-    essentialTokens.forEach(({ path, value }) => {
-      if (value !== undefined && value !== null) {
+    
+    // Validate that design tokens are properly structured
+    try {
+      // Check colors
+      if (Object.keys(DesignSystem.colors).length > 0) {
         results.push({
           type: 'success',
-          message: `✅ ${path} exists`,
-          details: `Value: ${value}`
-        });
-      } else {
-        results.push({
-          type: 'error',
-          message: `❌ ${path} missing`,
-          details: 'Add to DesignSystem'
+          message: `✅ DesignSystem.colors loaded (${Object.keys(DesignSystem.colors).length} colors)`
         });
       }
-    });
-
+      
+      // Check typography
+      if (Object.keys(DesignSystem.typography.fontSize).length > 0) {
+        results.push({
+          type: 'success',
+          message: `✅ Typography scales loaded (${Object.keys(DesignSystem.typography.fontSize).length} sizes)`
+        });
+      }
+      
+      // Check spacing
+      if (Object.keys(DesignSystem.spacing).length > 0) {
+        results.push({
+          type: 'success',
+          message: `✅ Spacing scale loaded (${Object.keys(DesignSystem.spacing).length} values)`
+        });
+      }
+      
+      // Check component tokens
+      if (Object.keys(DesignSystem.components).length > 0) {
+        results.push({
+          type: 'success',
+          message: `✅ Component tokens loaded (${Object.keys(DesignSystem.components).length} components)`
+        });
+      }
+      
+    } catch (error) {
+      results.push({
+        type: 'error',
+        message: '❌ Error loading design tokens',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+    
     return results;
   };
 
   const runValidation = async () => {
     setIsValidating(true);
     setValidationResults([]);
-
+    
     try {
       const results = [
         ...validateDesignTokens(),
@@ -141,19 +153,19 @@ export function MigrationValidator() {
         ...validateTypographyMigration(),
         ...validateSpacingMigration(),
       ];
-
+      
       setValidationResults(results);
-
+      
       // Show summary
       const successCount = results.filter(r => r.type === 'success').length;
       const warningCount = results.filter(r => r.type === 'warning').length;
       const errorCount = results.filter(r => r.type === 'error').length;
-
+      
       Alert.alert(
         'Validation Complete',
         `✅ ${successCount} passed\n⚠️ ${warningCount} warnings\n❌ ${errorCount} errors`
       );
-
+      
     } catch (error) {
       Alert.alert('Validation Error', 'Failed to run validation');
     } finally {
@@ -192,7 +204,7 @@ export function MigrationValidator() {
             {isValidating ? 'Validating...' : 'Run Validation'}
           </Text>
         </TouchableOpacity>
-
+        
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
           onPress={clearResults}
@@ -205,7 +217,7 @@ export function MigrationValidator() {
       {validationResults.length > 0 && (
         <View style={styles.resultsContainer}>
           <Text style={styles.resultsTitle}>Validation Results</Text>
-
+          
           {validationResults.map((result, index) => (
             <View key={index} style={[styles.resultItem, getResultStyle(result.type)]}>
               <Text style={styles.resultMessage}>{result.message}</Text>
@@ -220,35 +232,35 @@ export function MigrationValidator() {
       {/* Migration Checklist */}
       <View style={styles.checklistContainer}>
         <Text style={styles.checklistTitle}>Migration Checklist</Text>
-
+        
         <View style={styles.checklistItem}>
           <Text style={styles.checklistLabel}>✅ Phase 1: Audit Complete</Text>
           <Text style={styles.checklistDetails}>
             Style inventory, typography audit, color usage audit, spacing analysis
           </Text>
         </View>
-
+        
         <View style={styles.checklistItem}>
           <Text style={styles.checklistLabel}>✅ Phase 2: DesignSystem.ts Expanded</Text>
           <Text style={styles.checklistDetails}>
             Typography scales, color tokens, spacing values, component tokens
           </Text>
         </View>
-
+        
         <View style={styles.checklistItem}>
           <Text style={styles.checklistLabel}>✅ Phase 3: Migration Utilities</Text>
           <Text style={styles.checklistDetails}>
             Style mapping functions, component templates, migration helpers
           </Text>
         </View>
-
+        
         <View style={styles.checklistItem}>
           <Text style={styles.checklistLabel}>🔄 Phase 4: File Migration</Text>
           <Text style={styles.checklistDetails}>
             Ready to migrate practice-detail and other high-priority files
           </Text>
         </View>
-
+        
         <View style={styles.checklistItem}>
           <Text style={styles.checklistLabel}>🔄 Phase 5: Testing & Validation</Text>
           <Text style={styles.checklistDetails}>
@@ -267,12 +279,12 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   title: {
-    ...createStyles.heading('2xl'),
+    ...Typography.styles.heading('2xl'),
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...createStyles.body('base'),
+    ...Typography.styles.body('base'),
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.xl,
   },
@@ -292,9 +304,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary,
   },
   primaryButtonText: {
-    ...createStyles.label('base'),
-    color: DesignSystem.colors.textInverse,
-    fontWeight: DesignSystem.typography.fontWeight.bold,
+    ...Typography.styles.buttonText('primary'),
   },
   secondaryButton: {
     backgroundColor: DesignSystem.colors.backgroundSecondary,
@@ -302,14 +312,14 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.border,
   },
   secondaryButtonText: {
-    ...createStyles.label('base'),
+    ...Typography.styles.label('base'),
     color: DesignSystem.colors.textSecondary,
   },
   resultsContainer: {
     marginBottom: DesignSystem.spacing.xl,
   },
   resultsTitle: {
-    ...createStyles.subheading('lg'),
+    ...Typography.styles.subheading('lg'),
     marginBottom: DesignSystem.spacing.md,
   },
   resultItem: {
@@ -335,11 +345,11 @@ const styles = StyleSheet.create({
     borderLeftColor: DesignSystem.colors.border,
   },
   resultMessage: {
-    ...createStyles.body('base'),
+    ...Typography.styles.body('base'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   resultDetails: {
-    ...createStyles.caption(),
+    ...Typography.styles.caption(),
     marginTop: DesignSystem.spacing.xs,
   },
   checklistContainer: {
@@ -349,7 +359,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.shadow.sm,
   },
   checklistTitle: {
-    ...createStyles.subheading('lg'),
+    ...Typography.styles.subheading('lg'),
     marginBottom: DesignSystem.spacing.md,
   },
   checklistItem: {
@@ -359,10 +369,10 @@ const styles = StyleSheet.create({
     borderBottomColor: DesignSystem.colors.borderLight,
   },
   checklistLabel: {
-    ...createStyles.label('base'),
+    ...Typography.styles.label('base'),
     marginBottom: DesignSystem.spacing.xs,
   },
   checklistDetails: {
-    ...createStyles.caption(),
+    ...Typography.styles.caption(),
   },
 });

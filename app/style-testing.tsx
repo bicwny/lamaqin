@@ -5,7 +5,6 @@ import { router } from 'expo-router';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Typography } from '@/utils/typography';
 import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
-import { MigrationValidator } from '@/components/StyleTesting/MigrationValidator';
 import { Ionicons } from '@expo/vector-icons';
 
 type TabType = 'tokens' | 'components' | 'migration' | 'colors' | 'typography';
@@ -29,17 +28,17 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Button Tokens</Text>
         <View style={styles.buttonGrid}>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'sm')}>
-            <Text style={componentHelpers.getButtonTextStyle('primary', 'sm')}>Primary Small</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'small')}>
+            <Text style={componentHelpers.getButtonTextStyle('primary', 'small')}>Primary Small</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'md')}>
-            <Text style={componentHelpers.getButtonTextStyle('primary', 'md')}>Primary Medium</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'medium')}>
+            <Text style={componentHelpers.getButtonTextStyle('primary', 'medium')}>Primary Medium</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('secondary', 'md')}>
-            <Text style={componentHelpers.getButtonTextStyle('secondary', 'md')}>Secondary</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('secondary', 'medium')}>
+            <Text style={componentHelpers.getButtonTextStyle('secondary', 'medium')}>Secondary</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={componentHelpers.getButtonStyle('ghost', 'md')}>
-            <Text style={componentHelpers.getButtonTextStyle('ghost', 'md')}>Ghost</Text>
+          <TouchableOpacity style={componentHelpers.getButtonStyle('ghost', 'medium')}>
+            <Text style={componentHelpers.getButtonTextStyle('ghost', 'medium')}>Ghost</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -47,13 +46,13 @@ export default function StyleTestingScreen() {
       {/* Card Tokens */}
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Card Tokens</Text>
-        <View style={componentHelpers.getCardStyle('outlined', 'md')}>
-          <Text style={ComponentTextStyles.subheading}>Outlined Card</Text>
-          <Text style={ComponentTextStyles.body}>This is an outlined card with medium padding</Text>
+        <View style={componentHelpers.getCardStyle('outlined', 'comfortable')}>
+          <Text style={ComponentTextStyles.card.title}>Outlined Card</Text>
+          <Text style={ComponentTextStyles.card.body}>This is an outlined card with comfortable padding</Text>
         </View>
-        <View style={componentHelpers.getCardStyle('elevated', 'lg')}>
-          <Text style={ComponentTextStyles.subheading}>Elevated Card</Text>
-          <Text style={ComponentTextStyles.body}>This is an elevated card with large padding</Text>
+        <View style={componentHelpers.getCardStyle('elevated', 'spacious')}>
+          <Text style={ComponentTextStyles.card.title}>Elevated Card</Text>
+          <Text style={ComponentTextStyles.card.body}>This is an elevated card with spacious padding</Text>
         </View>
       </View>
 
@@ -61,16 +60,16 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Badge & Pill Tokens</Text>
         <View style={styles.badgeGrid}>
-          <View style={componentHelpers.getBadgeStyle('sm', 'filled', 'primary')}>
+          <View style={componentHelpers.getBadgeStyle('small', 'filled', 'primary')}>
             <Text style={{ color: DesignSystem.colors.textInverse }}>Small Badge</Text>
           </View>
-          <View style={componentHelpers.getBadgeStyle('md', 'outlined', 'success')}>
+          <View style={componentHelpers.getBadgeStyle('medium', 'outlined', 'success')}>
             <Text style={{ color: DesignSystem.colors.practiceComplete }}>Outlined</Text>
           </View>
-          <View style={componentHelpers.getPillStyle('sm', 'filled', 'dharma')}>
+          <View style={componentHelpers.getPillStyle('small', 'filled', 'dharma')}>
             <Text style={{ color: DesignSystem.colors.textInverse }}>Dharma Pill</Text>
           </View>
-          <View style={componentHelpers.getBadgeStyle('md', 'soft', 'warning')}>
+          <View style={componentHelpers.getBadgeStyle('medium', 'soft', 'warning')}>
             <Text style={{ color: DesignSystem.colors.warning }}>Soft Warning</Text>
           </View>
         </View>
@@ -80,12 +79,12 @@ export default function StyleTestingScreen() {
       <View style={styles.tokenSection}>
         <Text style={styles.tokenSectionTitle}>Notification Tokens</Text>
         <View style={ComponentTokens.notification.variants.success}>
-          <Text style={ComponentTextStyles.subheading}>Success Notification</Text>
-          <Text style={ComponentTextStyles.body}>This is a success message example</Text>
+          <Text style={ComponentTextStyles.notification.title}>Success Notification</Text>
+          <Text style={ComponentTextStyles.notification.message}>This is a success message example</Text>
         </View>
         <View style={ComponentTokens.notification.variants.warning}>
-          <Text style={ComponentTextStyles.subheading}>Warning Notification</Text>
-          <Text style={ComponentTextStyles.body}>This is a warning message example</Text>
+          <Text style={ComponentTextStyles.notification.title}>Warning Notification</Text>
+          <Text style={ComponentTextStyles.notification.message}>This is a warning message example</Text>
         </View>
       </View>
     </ScrollView>
@@ -207,7 +206,54 @@ export default function StyleTestingScreen() {
   );
 
   const renderMigrationTools = () => (
-    <MigrationValidator />
+    <ScrollView style={styles.content}>
+      <Text style={styles.sectionTitle}>Migration Tools & Helpers</Text>
+      
+      {/* Component Helper Examples */}
+      <View style={styles.tokenSection}>
+        <Text style={styles.tokenSectionTitle}>Component Helpers</Text>
+        <View style={styles.codeExample}>
+          <Text style={styles.codeText}>
+            {`// Button Helper
+componentHelpers.getButtonStyle('primary', 'medium')
+componentHelpers.getLegacyButtonStyle('dharma')
+
+// Card Helper  
+componentHelpers.getCardStyle('outlined', 'comfortable')
+componentHelpers.getCardWithMargin('elevated', 'spacious', 'comfortable')
+
+// Badge Helper
+componentHelpers.getBadgeStyle('medium', 'filled', 'primary')
+componentHelpers.getPillStyle('small', 'filled', 'dharma')`}
+          </Text>
+        </View>
+      </View>
+
+      {/* Legacy Support */}
+      <View style={styles.tokenSection}>
+        <Text style={styles.tokenSectionTitle}>Legacy Support</Text>
+        <Text style={styles.description}>
+          The component system maintains backward compatibility while encouraging migration to the new consolidated system.
+        </Text>
+        
+        {/* Legacy vs New Comparison */}
+        <View style={styles.comparisonGrid}>
+          <View style={styles.comparisonItem}>
+            <Text style={styles.comparisonTitle}>❌ Old Pattern</Text>
+            <TouchableOpacity style={componentHelpers.getLegacyButtonStyle('dharma')}>
+              <Text style={componentHelpers.getLegacyButtonTextStyle('dharma')}>Legacy Dharma</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.comparisonItem}>
+            <Text style={styles.comparisonTitle}>✅ New Pattern</Text>
+            <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'large')}>
+              <Text style={componentHelpers.getButtonTextStyle('primary', 'large')}>New Primary Large</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
   );
 
   const renderContent = () => {
@@ -310,20 +356,16 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border,
-    maxHeight: 80,
   },
   tabContent: {
     paddingHorizontal: DesignSystem.spacing.md,
-    alignItems: 'center',
   },
   tab: {
     alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
     marginRight: DesignSystem.spacing.sm,
     borderRadius: DesignSystem.borderRadius.md,
-    minWidth: 80,
-    height: 60,
   },
   activeTab: {
     backgroundColor: DesignSystem.colors.primary + '20',
@@ -335,10 +377,8 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xs,
   },
   tabLabel: {
-    ...Typography.styles.label('xs'),
+    ...Typography.styles.label('sm'),
     color: DesignSystem.colors.textSecondary,
-    textAlign: 'center',
-    numberOfLines: 1,
   },
   activeTabLabel: {
     color: DesignSystem.colors.primary,

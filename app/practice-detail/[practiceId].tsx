@@ -428,7 +428,9 @@ export default function PracticeDetailScreen() {
 
         return (
           <View style={styles.progressDetails}>
-            <Text style={styles.progressText}>每周目标：{weeklyTarget}座</Text>
+            <Text style={styles.progressText}>
+              每周目标：{weeklyTarget}座
+            </Text>
             {todayCount > 0 && todayDetails && (
               <Text style={styles.sessionDetails}>今日：{todayDetails}</Text>
             )}
@@ -460,7 +462,7 @@ export default function PracticeDetailScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.redTara} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -572,7 +574,6 @@ export default function PracticeDetailScreen() {
                   <ProgressBar
                     progress={progress.percentage}
                     size="thick"
-                    fillColor={DesignSystem.colors.redTara}
                     containerStyle={{ flex: 1 }}
                   />
                   <Text style={styles.progressPercentage}>
@@ -618,7 +619,7 @@ export default function PracticeDetailScreen() {
               <Ionicons
                 name="chevron-forward"
                 size={16}
-                color={DesignSystem.colors.redTara}
+                color={DesignSystem.colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -640,7 +641,6 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     fontWeight: DesignSystem.typography.fontWeight.medium,
     marginTop: DesignSystem.spacing.md,
-    color: DesignSystem.colors.textPrimary,
   },
   emptyContainer: {
     flex: 1,
@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
   },
   mainCard: componentHelpers.getCardWithBottomMargin(
     "outlined",
-    "md",
+    "comfortable",
     "comfortable",
   ),
 
@@ -680,7 +680,6 @@ const styles = StyleSheet.create({
   practiceTitle: {
     ...ComponentTextStyles.dharma,
     marginBottom: DesignSystem.spacing.xs,
-    color: DesignSystem.colors.redTara, // Buddhist semantic color for practice titles
   },
   programName: {
     ...ComponentTextStyles.label,
@@ -710,7 +709,7 @@ const styles = StyleSheet.create({
   currentCount: {
     ...Typography.styles.heading("xl"),
     fontWeight: DesignSystem.typography.fontWeight.bold,
-    color: DesignSystem.colors.redTara, // Buddhist semantic color for active practice counts
+    color: DesignSystem.colors.textPrimary,
   },
   totalCountAndDays: {
     ...ComponentTextStyles.body,
@@ -729,7 +728,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     ...Typography.styles.body("base"),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.redTara, // Buddhist semantic color for progress indicators
+    color: DesignSystem.colors.primary,
     minWidth: 50,
     textAlign: "right",
   },
@@ -739,7 +738,6 @@ const styles = StyleSheet.create({
   progressText: {
     ...ComponentTextStyles.subheading,
     marginBottom: DesignSystem.spacing.xs,
-    color: DesignSystem.colors.textPrimary,
   },
   sessionDetails: {
     ...ComponentTextStyles.label,
@@ -764,19 +762,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: DesignSystem.colors.redTara, // Red Tara for practice energy and action
   },
   secondaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("secondary", "medium"),
   },
   primaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("primary", "medium"),
-    color: DesignSystem.colors.whiteTara, // White Tara for purity and clarity on Red Tara background
   },
-  recordsCard: componentHelpers.getCardWithBottomMargin(
+  recordsCard: componentHelpers.getCardWithMargin(
     "outlined",
-    "md",
     "comfortable",
+    "0",
   ),
   recordsHeader: {
     flexDirection: "row",
@@ -786,7 +782,6 @@ const styles = StyleSheet.create({
   },
   recordsTitle: {
     ...ComponentTextStyles.subheading,
-    color: DesignSystem.colors.textPrimary,
   },
   viewAllButton: {
     flexDirection: "row",
@@ -796,7 +791,6 @@ const styles = StyleSheet.create({
   viewAllText: {
     ...ComponentTextStyles.link,
     fontSize: DesignSystem.typography.fontSize.sm,
-    color: DesignSystem.colors.redTara, // Red Tara for practice navigation links
   },
   recordsList: {
     gap: DesignSystem.spacing.sm,

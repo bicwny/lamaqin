@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { DesignSystem } from "@/constants/DesignSystem";
+import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
@@ -17,42 +17,42 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: DesignSystem.colors.redTara,
-        tabBarInactiveTintColor: DesignSystem.colors.textTertiary,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            backgroundColor: DesignSystem.colors.backgroundSecondary + 'F2', // 95% opacity
+            backgroundColor: "rgba(255, 255, 255, 0.95)",
             borderTopWidth: 0.5,
-            borderTopColor: DesignSystem.colors.border,
-            shadowColor: DesignSystem.colors.cardShadow,
+            borderTopColor: Colors.border,
+            shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: DesignSystem.opacity[10],
-            shadowRadius: DesignSystem.spacing.sm,
-            paddingTop: DesignSystem.spacing.sm,
-            paddingBottom: DesignSystem.spacing.xs,
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            paddingTop: 8,
+            paddingBottom: 4,
             height: 88,
           },
           default: {
-            backgroundColor: DesignSystem.colors.backgroundSecondary,
+            backgroundColor: "#fff",
             borderTopWidth: 0.5,
-            borderTopColor: DesignSystem.colors.border,
+            borderTopColor: Colors.border,
             elevation: 8,
-            shadowColor: DesignSystem.colors.cardShadow,
+            shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: DesignSystem.opacity[10],
-            shadowRadius: DesignSystem.spacing.sm,
-            paddingTop: DesignSystem.spacing.sm,
-            paddingBottom: DesignSystem.spacing.xs,
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            paddingTop: 8,
+            paddingBottom: 4,
             height: 68,
           },
         }),
         tabBarLabelStyle: {
-          fontSize: DesignSystem.typography.fontSize.xs,
-          fontWeight: DesignSystem.typography.fontWeight.semibold,
-          marginTop: DesignSystem.spacing.xxs / 3, // 2px equivalent
+          fontSize: 12,
+          fontWeight: "600",
+          marginTop: 2,
         },
       }}
       initialRouteName="index"
@@ -61,12 +61,11 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "当日",
-          tabBarActiveTintColor: DesignSystem.colors.orangeTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
               name={focused ? "sunny" : "sunny-outline"}
-              color={focused ? DesignSystem.colors.orangeTara : color}
+              color={color}
             />
           ),
         }}
@@ -75,12 +74,11 @@ export default function TabLayout() {
         name="study"
         options={{
           title: "闻思",
-          tabBarActiveTintColor: DesignSystem.colors.yellowTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
               name={focused ? "ear" : "ear-outline"}
-              color={focused ? DesignSystem.colors.yellowTara : color}
+              color={color}
             />
           ),
         }}
@@ -89,12 +87,11 @@ export default function TabLayout() {
         name="mindfulness"
         options={{
           title: "心性",
-          tabBarActiveTintColor: DesignSystem.colors.redTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
               name={focused ? "ellipse" : "ellipse-outline"}
-              color={focused ? DesignSystem.colors.redTara : color}
+              color={color}
             />
           ),
         }}
@@ -103,12 +100,11 @@ export default function TabLayout() {
         name="practice"
         options={{
           title: "修行",
-          tabBarActiveTintColor: DesignSystem.colors.greenTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
               name={focused ? "heart" : "heart-outline"}
-              color={focused ? DesignSystem.colors.greenTara : color}
+              color={color}
             />
           ),
         }}
@@ -117,12 +113,11 @@ export default function TabLayout() {
         name="stats"
         options={{
           title: "回向",
-          tabBarActiveTintColor: DesignSystem.colors.blueTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
               name={focused ? "moon" : "moon-outline"}
-              color={focused ? DesignSystem.colors.blueTara : color}
+              color={color}
             />
           ),
         }}
