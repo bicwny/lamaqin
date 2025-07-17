@@ -699,135 +699,133 @@ export default function PracticeConfigScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>项目预览</Text>
-        <View style={styles.previewCard}>
-          {practiceType === "count" ? (
-            <View>
-              <View style={styles.previewHeader}>
-                <Text style={styles.previewPracticeName}>{practiceName}</Text>
-                {projectName && (
-                  <View style={styles.previewProjectPill}>
-                    <Text style={styles.previewProjectPillText}>
-                      {projectName}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              <View style={styles.previewDetails}>
-                <Text style={styles.previewDetailItem}>
-                  <Text>
-                    📅 {formatDate(startDate)} →{" "}
-                    {formatDate(
-                      durationMode === "自定义"
-                        ? customEndDate
-                        : new Date(
-                            startDate.getTime() +
-                              (durationMode === "60天"
-                                ? 60
-                                : durationMode === "100天"
-                                  ? 100
-                                  : durationMode === "1年"
-                                    ? 365
-                                    : 60) *
-                                24 *
-                                60 *
-                                60 *
-                                1000,
-                          ),
-                    )}{" "}
-                    ({days} 天)
+        {practiceType === "count" ? (
+          <View>
+            <View style={styles.previewHeader}>
+              <Text style={styles.previewPracticeName}>{practiceName}</Text>
+              {projectName && (
+                <View style={styles.previewProjectPill}>
+                  <Text style={styles.previewProjectPillText}>
+                    {projectName}
                   </Text>
-                </Text>
-
-                {configMode === "total" && totalTarget ? (
-                  <View>
-                    <Text style={styles.previewDetailItem}>
-                      <Text>
-                        🎯 总目标: {parseInt(totalTarget).toLocaleString()}{" "}
-                        {practiceUnit}
-                      </Text>
-                    </Text>
-                    <Text style={styles.previewDetailItem}>
-                      <Text>
-                        📊 每日目标: {suggestedDaily.toLocaleString()}{" "}
-                        {practiceUnit}
-                      </Text>
-                    </Text>
-                  </View>
-                ) : configMode === "daily" && dailyTarget ? (
-                  <View>
-                    <Text style={styles.previewDetailItem}>
-                      <Text>
-                        🎯 每日目标: {parseInt(dailyTarget).toLocaleString()}{" "}
-                        {practiceUnit}
-                      </Text>
-                    </Text>
-                    <Text style={styles.previewDetailItem}>
-                      <Text>
-                        📊 预计总数: {projectedTotal.toLocaleString()}{" "}
-                        {practiceUnit}
-                      </Text>
-                    </Text>
-                  </View>
-                ) : (
-                  <Text style={styles.previewPlaceholder}>
-                    请设置目标以查看详情
-                  </Text>
-                )}
-              </View>
+                </View>
+              )}
             </View>
-          ) : (
-            <View>
-              <View style={styles.previewHeader}>
-                <Text style={styles.previewPracticeName}>{practiceName}</Text>
-                {projectName && (
-                  <View style={styles.previewProjectPill}>
-                    <Text style={styles.previewProjectPillText}>
-                      {projectName}
-                    </Text>
-                  </View>
-                )}
-              </View>
 
-              <View style={styles.previewDetails}>
-                <Text style={styles.previewDetailItem}>
-                  <Text>
-                    📅 {formatDate(startDate)} →{" "}
-                    {formatDate(
-                      durationMode === "自定义"
-                        ? customEndDate
-                        : new Date(
-                            startDate.getTime() +
-                              (durationMode === "60天"
-                                ? 60
-                                : durationMode === "100天"
-                                  ? 100
-                                  : durationMode === "1年"
-                                    ? 365
-                                    : 60) *
-                                24 *
-                                60 *
-                                60 *
-                                1000,
-                          ),
-                    )}{" "}
-                    ({days} 天)
-                  </Text>
+            <View style={styles.previewDetails}>
+              <Text style={styles.previewDetailItem}>
+                <Text>
+                  📅 {formatDate(startDate)} →{" "}
+                  {formatDate(
+                    durationMode === "自定义"
+                      ? customEndDate
+                      : new Date(
+                          startDate.getTime() +
+                            (durationMode === "60天"
+                              ? 60
+                              : durationMode === "100天"
+                                ? 100
+                                : durationMode === "1年"
+                                  ? 365
+                                  : 60) *
+                              24 *
+                              60 *
+                              60 *
+                              1000,
+                        ),
+                  )}{" "}
+                  ({days} 天)
                 </Text>
+              </Text>
 
-                {sessionsTarget ? (
+              {configMode === "total" && totalTarget ? (
+                <View>
                   <Text style={styles.previewDetailItem}>
-                    <Text>🎯 每周目标: {sessionsTarget} 座</Text>
+                    <Text>
+                      🎯 总目标: {parseInt(totalTarget).toLocaleString()}{" "}
+                      {practiceUnit}
+                    </Text>
                   </Text>
-                ) : (
-                  <Text style={styles.previewPlaceholder}>
-                    请设置目标以查看详情
+                  <Text style={styles.previewDetailItem}>
+                    <Text>
+                      📊 每日目标: {suggestedDaily.toLocaleString()}{" "}
+                      {practiceUnit}
+                    </Text>
                   </Text>
-                )}
-              </View>
+                </View>
+              ) : configMode === "daily" && dailyTarget ? (
+                <View>
+                  <Text style={styles.previewDetailItem}>
+                    <Text>
+                      🎯 每日目标: {parseInt(dailyTarget).toLocaleString()}{" "}
+                      {practiceUnit}
+                    </Text>
+                  </Text>
+                  <Text style={styles.previewDetailItem}>
+                    <Text>
+                      📊 预计总数: {projectedTotal.toLocaleString()}{" "}
+                      {practiceUnit}
+                    </Text>
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.previewPlaceholder}>
+                  请设置目标以查看详情
+                </Text>
+              )}
             </View>
-          )}
-        </View>
+          </View>
+        ) : (
+          <View>
+            <View style={styles.previewHeader}>
+              <Text style={styles.previewPracticeName}>{practiceName}</Text>
+              {projectName && (
+                <View style={styles.previewProjectPill}>
+                  <Text style={styles.previewProjectPillText}>
+                    {projectName}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.previewDetails}>
+              <Text style={styles.previewDetailItem}>
+                <Text>
+                  📅 {formatDate(startDate)} →{" "}
+                  {formatDate(
+                    durationMode === "自定义"
+                      ? customEndDate
+                      : new Date(
+                          startDate.getTime() +
+                            (durationMode === "60天"
+                              ? 60
+                              : durationMode === "100天"
+                                ? 100
+                                : durationMode === "1年"
+                                  ? 365
+                                  : 60) *
+                              24 *
+                              60 *
+                              60 *
+                              1000,
+                        ),
+                  )}{" "}
+                  ({days} 天)
+                </Text>
+              </Text>
+
+              {sessionsTarget ? (
+                <Text style={styles.previewDetailItem}>
+                  <Text>🎯 每周目标: {sessionsTarget} 座</Text>
+                </Text>
+              ) : (
+                <Text style={styles.previewPlaceholder}>
+                  请设置目标以查看详情
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
       </View>
     );
   };
@@ -1281,13 +1279,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.label,
     textAlign: "center",
   },
-  previewCard: {
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.lg,
-    padding: DesignSystem.spacing.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: DesignSystem.colors.primary,
-  },
+  
   previewHeader: {
     flexDirection: "row",
     alignItems: "center",
