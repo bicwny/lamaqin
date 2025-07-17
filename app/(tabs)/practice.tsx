@@ -294,7 +294,7 @@ export default function PracticeScreen() {
             <Text style={styles.secondaryButtonText}>详情</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.primaryButton, { backgroundColor: DesignSystem.colors.redTara }]}
+            style={[styles.primaryButton, { backgroundColor: DesignSystem.colors.redTara }]} // Red Tara for practice recording energy
             onPress={() => handleCustomRecord(item.id, item.practices.name)}
           >
             <Text style={styles.primaryButtonText}>记录</Text>
