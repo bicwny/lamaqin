@@ -61,6 +61,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "当日",
+          tabBarActiveTintColor: DesignSystem.colors.orangeTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -74,6 +75,7 @@ export default function TabLayout() {
         name="study"
         options={{
           title: "闻思",
+          tabBarActiveTintColor: DesignSystem.colors.yellowTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -87,6 +89,7 @@ export default function TabLayout() {
         name="mindfulness"
         options={{
           title: "心性",
+          tabBarActiveTintColor: DesignSystem.colors.redTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -100,6 +103,7 @@ export default function TabLayout() {
         name="practice"
         options={{
           title: "修行",
+          tabBarActiveTintColor: DesignSystem.colors.greenTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
@@ -113,6 +117,7 @@ export default function TabLayout() {
         name="stats"
         options={{
           title: "回向",
+          tabBarActiveTintColor: DesignSystem.colors.blueTara,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
