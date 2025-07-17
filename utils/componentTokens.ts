@@ -781,9 +781,17 @@ export const ComponentTextStyles = {
 
 export const componentHelpers = {
   // Get card style with variant and spacing
-  getCardStyle: (variant: 'elevated' | 'outlined' | 'filled' = 'outlined', spacing: 'tight' | 'comfortable' | 'spacious' = 'comfortable') => {
+  getCardStyle: (variant: 'elevated' | 'outlined' | 'filled' = 'outlined', spacing: 'sm' | 'md' | 'lg' = 'md') => {
     const base = ComponentTokens.card.variants[variant];
-    const spacingValues = ComponentTokens.card.spacing[spacing];
+    
+    // Map spacing tokens to actual padding values
+    const spacingMap = {
+      'sm': { padding: DesignSystem.spacing.md },      // 12px (compact)
+      'md': { padding: DesignSystem.spacing.lg },      // 16px (comfortable)
+      'lg': { padding: DesignSystem.spacing.xl },      // 20px (spacious)
+    };
+    
+    const spacingValues = spacingMap[spacing];
 
     return {
       ...base,
@@ -827,24 +835,40 @@ export const componentHelpers = {
   // Get card with custom margin
   getCardWithMargin: (
     variant: 'outlined' | 'elevated',
-    padding: 'compact' | 'comfortable' | 'spacious' = 'comfortable',
+    padding: 'sm' | 'md' | 'lg' = 'md',
     margin: keyof typeof ComponentTokens.card.margin = 'comfortable'
-  ) => ({
-    ...ComponentTokens.card.variants[variant],
-    padding: ComponentTokens.card.padding[padding],
-    margin: ComponentTokens.card.margin[margin],
-  }),
+  ) => {
+    const spacingMap = {
+      'sm': DesignSystem.spacing.md,      // 12px (compact)
+      'md': DesignSystem.spacing.lg,      // 16px (comfortable)
+      'lg': DesignSystem.spacing.xl,      // 20px (spacious)
+    };
+    
+    return {
+      ...ComponentTokens.card.variants[variant],
+      padding: spacingMap[padding],
+      margin: ComponentTokens.card.margin[margin],
+    };
+  },
 
   // Get card with bottom margin only
   getCardWithBottomMargin: (
     variant: 'outlined' | 'elevated',
-    padding: 'compact' | 'comfortable' | 'spacious' = 'comfortable',
+    padding: 'sm' | 'md' | 'lg' = 'md',
     marginBottom: keyof typeof ComponentTokens.card.margin = 'comfortable'
-  ) => ({
-    ...ComponentTokens.card.variants[variant],
-    padding: ComponentTokens.card.padding[padding],
-    marginBottom: ComponentTokens.card.margin[marginBottom],
-  }),
+  ) => {
+    const spacingMap = {
+      'sm': DesignSystem.spacing.md,      // 12px (compact)
+      'md': DesignSystem.spacing.lg,      // 16px (comfortable)
+      'lg': DesignSystem.spacing.xl,      // 20px (spacious)
+    };
+    
+    return {
+      ...ComponentTokens.card.variants[variant],
+      padding: spacingMap[padding],
+      marginBottom: ComponentTokens.card.margin[marginBottom],
+    };
+  },
 
   // Legacy card style support
   getLegacyCardStyle: (legacyVariant: 'standard' | 'practice' | 'course') => {
@@ -852,7 +876,15 @@ export const componentHelpers = {
     if (typeof mapping === 'string') {
       throw new Error(`Legacy variant '${legacyVariant}' should use Notification component instead`);
     }
-    return componentHelpers.getCardStyle(mapping.variant, mapping.padding);
+    
+    // Map legacy padding to new spacing system
+    const paddingMap = {
+      'compact': 'sm' as const,
+      'comfortable': 'md' as const,
+      'spacious': 'lg' as const,
+    };
+    
+    return componentHelpers.getCardStyle(mapping.variant, paddingMap[mapping.padding]);
   },
 
   // Get notification style (replaces status cards)
