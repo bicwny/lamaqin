@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, StatusBar, Platform } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import PageHeader from './PageHeader';
 import { DesignSystem } from '@/constants/DesignSystem';
+import { componentHelpers } from '@/utils/componentTokens';
 
 interface PageTemplateProps {
   title: string;
@@ -16,10 +17,12 @@ interface PageTemplateProps {
   subtitle?: string;
   children: React.ReactNode;
   scrollable?: boolean;
-  padding?: number;
+  padding?: keyof typeof DesignSystem.spacing;
   backgroundColor?: string;
+  backgroundVariant?: 'default' | 'secondary' | 'tertiary' | 'dharma' | 'practice' | 'meditation';
   contentContainerStyle?: any;
   showHeader?: boolean;
+  shadowVariant?: 'none' | 'subtle' | 'elevated';
 }
 
 export default function PageTemplate({
@@ -30,24 +33,66 @@ export default function PageTemplate({
   subtitle,
   children,
   scrollable = true,
-  padding = DesignSystem.spacing.lg,
-  backgroundColor = DesignSystem.colors.background,
+  padding = 'lg',
+  backgroundColor,
+  backgroundVariant = 'default',
   contentContainerStyle,
   showHeader = true,
+  shadowVariant = 'none',
 }: PageTemplateProps) {
   const insets = useSafeAreaInsets();
 
+  // Buddhist semantic background colors
+  const getBackgroundColor = () => {
+    if (backgroundColor) return backgroundColor;
+    
+    switch (backgroundVariant) {
+      case 'secondary':
+        return DesignSystem.colors.backgroundSecondary;
+      case 'tertiary':
+        return DesignSystem.colors.backgroundTertiary;
+      case 'dharma':
+        return `${DesignSystem.colors.redTara}05`; // 5% opacity Red Tara background
+      case 'practice':
+        return `${DesignSystem.colors.practiceComplete}05`; // 5% opacity Green Tara background
+      case 'meditation':
+        return `${DesignSystem.colors.meditationBlue}05`; // 5% opacity Blue Tara background
+      default:
+        return DesignSystem.colors.background;
+    }
+  };
+
+  // Get shadow styles using component tokens
+  const getShadowStyle = () => {
+    switch (shadowVariant) {
+      case 'subtle':
+        return DesignSystem.shadow.sm;
+      case 'elevated':
+        return DesignSystem.shadow.md;
+      default:
+        return {};
+    }
+  };
+
+  const finalBackgroundColor = getBackgroundColor();
+  const paddingValue = typeof padding === 'string' ? DesignSystem.spacing[padding] : padding;
+
   const content = (
-    <View style={[styles.content, { padding }, contentContainerStyle]}>
+    <View style={[
+      styles.content, 
+      { padding: paddingValue }, 
+      getShadowStyle(),
+      contentContainerStyle
+    ]}>
       {children}
     </View>
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['left', 'right', 'top', 'bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: finalBackgroundColor }]} edges={['left', 'right', 'top', 'bottom']}>
       <StatusBar 
         barStyle="dark-content" 
-        backgroundColor={backgroundColor}
+        backgroundColor={finalBackgroundColor}
         translucent={false}
       />
       {showHeader && (
@@ -62,7 +107,7 @@ export default function PageTemplate({
       {scrollable ? (
         <ScrollView 
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { padding: paddingValue }]}
           showsVerticalScrollIndicator={false}
         >
           {content}
@@ -81,8 +126,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
-    padding: DesignSystem.spacing.lg,
   },
 });
