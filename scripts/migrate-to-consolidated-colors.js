@@ -71,16 +71,20 @@ const colorMigrationMap = {
 };
 
 // Import statement updates
-const importUpdates = {
-  "import { DesignSystem } from '@/constants/DesignSystem';": 
-    "import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';",
-  
-  "import { DesignSystem }": 
-    "import ConsolidatedDesignSystem",
-    
-  "from '@/constants/DesignSystem'": 
-    "from '@/constants/ConsolidatedDesignSystem'",
-};
+const importUpdates = [
+  {
+    old: "import { DesignSystem } from '@/constants/DesignSystem';",
+    new: "import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';"
+  },
+  {
+    old: "import { DesignSystem }",
+    new: "import ConsolidatedDesignSystem"
+  },
+  {
+    old: "from '@/constants/DesignSystem'",
+    new: "from '@/constants/ConsolidatedDesignSystem'"
+  }
+];
 
 function getAllFiles(dirPath, arrayOfFiles = []) {
   const files = fs.readdirSync(dirPath);
@@ -110,16 +114,51 @@ function migrateFile(filePath) {
   
   console.log(`\n📁 Processing: ${filePath}`);
   
-  // Update imports first
-  Object.entries(importUpdates).forEach(([oldImport, newImport]) => {
-    if (content.includes(oldImport)) {
-      content = content.replace(new RegExp(oldImport.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newImport);
+  // First, clean up any existing malformed references
+  const malformedPatterns = [
+    /ConsolidatedConsolidatedConsolidatedDesignSystem/g,
+    /ConsolidatedConsolidatedDesignSystem/g,
+    /\["surface-primary"\]Secondary/g,
+    /\["border-default"\]Secondary/g,
+    /\["text-primary"\]Secondary/g,
+    /\["text-secondary"\]Secondary/g
+  ];
+  
+  malformedPatterns.forEach(pattern => {
+    if (content.match(pattern)) {
+      if (pattern.source.includes('Secondary')) {
+        // Fix malformed color references with "Secondary" suffix
+        content = content.replace(pattern, (match) => {
+          if (match.includes('surface-primary')) {
+            return 'ConsolidatedDesignSystem.colors["surface-secondary"]';
+          } else if (match.includes('border-default')) {
+            return 'ConsolidatedDesignSystem.colors["border-default"]';
+          } else if (match.includes('text-primary')) {
+            return 'ConsolidatedDesignSystem.colors["text-secondary"]';
+          } else if (match.includes('text-secondary')) {
+            return 'ConsolidatedDesignSystem.colors["text-secondary"]';
+          }
+          return 'ConsolidatedDesignSystem.colors["surface-secondary"]';
+        });
+      } else {
+        // Fix duplicated "Consolidated" prefixes
+        content = content.replace(pattern, 'ConsolidatedDesignSystem');
+      }
       hasChanges = true;
-      console.log(`  ✅ Updated import: ${oldImport} → ${newImport}`);
+      console.log(`  🔧 Fixed malformed reference: ${pattern.source}`);
     }
   });
   
-  // Update color references
+  // Update imports
+  importUpdates.forEach(({ old, new: newImport }) => {
+    if (content.includes(old)) {
+      content = content.replace(new RegExp(old.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newImport);
+      hasChanges = true;
+      console.log(`  ✅ Updated import: ${old} → ${newImport}`);
+    }
+  });
+  
+  // Update color references - but only if they haven't been processed already
   Object.entries(colorMigrationMap).forEach(([oldColor, newColor]) => {
     const regex = new RegExp(oldColor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
     if (content.match(regex)) {
@@ -129,11 +168,11 @@ function migrateFile(filePath) {
     }
   });
   
-  // Update DesignSystem references to ConsolidatedDesignSystem
-  if (content.includes('DesignSystem.')) {
+  // Only update remaining DesignSystem references if they haven't been processed
+  if (content.includes('DesignSystem.') && !content.includes('ConsolidatedDesignSystem.')) {
     content = content.replace(/DesignSystem\./g, 'ConsolidatedDesignSystem.');
     hasChanges = true;
-    console.log(`  🔄 Updated DesignSystem references to ConsolidatedDesignSystem`);
+    console.log(`  🔄 Updated remaining DesignSystem references`);
   }
   
   if (hasChanges) {
