@@ -18,7 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { DesignSystem, createStyles } from '@/constants/ConsolidatedDesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
@@ -245,7 +245,7 @@ export default function CustomRecordScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
               ) : (
                 <Text style={styles.saveHeaderButtonText}>保存</Text>
               )}
@@ -262,7 +262,7 @@ export default function CustomRecordScreen() {
         >
           {loadingRecord ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+              <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
               <Text style={styles.loadingText}>正在加载记录...</Text>
             </View>
           ) : (
@@ -312,17 +312,17 @@ export default function CustomRecordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   headerLeft: {
     flex: 1,
@@ -340,8 +340,8 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
   },
   scrollView: {
     flex: 1,
@@ -351,27 +351,27 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: DesignSystem.spacing.lg,
+    padding: ConsolidatedDesignSystem.spacing.lg,
   },
   practiceTitle: {
     ...createStyles.dharmaTitle('xl'),
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing['2xl'],
-    paddingBottom: DesignSystem.spacing.lg,
+    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
+    paddingBottom: ConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   inputSection: {
-    marginBottom: DesignSystem.spacing['2xl'],
+    marginBottom: ConsolidatedDesignSystem.spacing['2xl'],
   },
   inputLabel: {
     ...createStyles.subheading('base'),
-    marginBottom: DesignSystem.spacing.xs,
+    marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   inputHint: {
     ...createStyles.body('sm'),
-    color: DesignSystem.colors.textTertiary,
-    marginBottom: DesignSystem.spacing.sm,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   textInput: {
     ...ComponentTokens.input.standard,
@@ -379,31 +379,31 @@ const styles = StyleSheet.create({
   multilineInput: {
     height: 120,
     textAlignVertical: 'top',
-    paddingTop: DesignSystem.spacing.md,
-    paddingBottom: DesignSystem.spacing.md,
+    paddingTop: ConsolidatedDesignSystem.spacing.md,
+    paddingBottom: ConsolidatedDesignSystem.spacing.md,
   },
   characterCount: {
     ...createStyles.caption(),
     textAlign: 'right',
-    marginTop: DesignSystem.spacing.xs,
+    marginTop: ConsolidatedDesignSystem.spacing.xs,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: DesignSystem.spacing['4xl'],
+    padding: ConsolidatedDesignSystem.spacing['4xl'],
     minHeight: 200,
   },
   loadingText: {
-    marginTop: DesignSystem.spacing.md,
+    marginTop: ConsolidatedDesignSystem.spacing.md,
     ...Typography.styles.body('base'),
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   saveHeaderButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.primary,
-    borderRadius: DesignSystem.borderRadius.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
     minWidth: 60,
     alignItems: 'center',
     justifyContent: 'center',
@@ -413,8 +413,8 @@ const styles = StyleSheet.create({
   },
   saveHeaderButtonText: {
     ...createStyles.buttonText('primary'),
-    color: DesignSystem.colors.textInverse,
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.base,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
 });

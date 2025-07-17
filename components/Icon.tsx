@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/constants/DesignSystem';
+import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
 
 // Icon design tokens
 export const IconTokens = {
@@ -15,14 +15,14 @@ export const IconTokens = {
   },
   
   colors: {
-    primary: DesignSystem.colors.primary,
-    secondary: DesignSystem.colors.textSecondary,
-    success: DesignSystem.colors.practiceComplete,
-    warning: DesignSystem.colors.warning,
-    error: DesignSystem.colors.error,
-    info: DesignSystem.colors.info,
-    neutral: DesignSystem.colors.textSecondary,
-    inverse: DesignSystem.colors.textInverse,
+    primary: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    secondary: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    success: ConsolidatedConsolidatedDesignSystem.status.success,
+    warning: ConsolidatedConsolidatedDesignSystem.status.warning,
+    error: ConsolidatedConsolidatedDesignSystem.status.error,
+    info: ConsolidatedConsolidatedDesignSystem.status.info,
+    neutral: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    inverse: ConsolidatedConsolidatedDesignSystem.colors["text-inverse"],
   },
   
   // Semantic icon sets for common use cases
@@ -30,49 +30,49 @@ export const IconTokens = {
     success: {
       name: 'checkmark-circle' as const,
       size: 16,
-      color: DesignSystem.colors.practiceComplete,
+      color: ConsolidatedConsolidatedDesignSystem.status.success,
     },
     
     completion: {
       name: 'checkmark-circle' as const,
       size: 20,
-      color: DesignSystem.colors.practiceComplete,
+      color: ConsolidatedConsolidatedDesignSystem.status.success,
     },
     
     warning: {
       name: 'warning' as const,
       size: 16,
-      color: DesignSystem.colors.warning,
+      color: ConsolidatedConsolidatedDesignSystem.status.warning,
     },
     
     error: {
       name: 'close-circle' as const,
       size: 16,
-      color: DesignSystem.colors.error,
+      color: ConsolidatedConsolidatedDesignSystem.status.error,
     },
     
     info: {
       name: 'information-circle' as const,
       size: 16,
-      color: DesignSystem.colors.info,
+      color: ConsolidatedConsolidatedDesignSystem.status.info,
     },
     
     navigation: {
       name: 'chevron-forward' as const,
       size: 16,
-      color: DesignSystem.colors.primary,
+      color: ConsolidatedConsolidatedDesignSystem.colors.primary,
     },
     
     practice: {
       name: 'flower' as const,
       size: 20,
-      color: DesignSystem.colors.primary,
+      color: ConsolidatedConsolidatedDesignSystem.colors.primary,
     },
     
     meditation: {
       name: 'leaf' as const,
       size: 20,
-      color: DesignSystem.colors.meditationBlue,
+      color: ConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
     },
   },
 };

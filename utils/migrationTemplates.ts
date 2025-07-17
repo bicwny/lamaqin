@@ -4,7 +4,7 @@
  * Provides systematic templates for migrating components to use DesignSystem tokens
  */
 
-import { DesignSystem } from '@/constants/DesignSystem';
+import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
 import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import { colorMigrationMap } from '@/utils/colorMigration';
@@ -314,7 +314,7 @@ export const MigrationTemplates = {
       },
       newPattern: {
         ...Typography.components.practiceDetail.title,
-        marginBottom: DesignSystem.spacing.lg,
+        marginBottom: ConsolidatedDesignSystem.spacing.lg,
       },
       apply: () => Typography.styles.heading('2xl'),
     },
@@ -329,7 +329,7 @@ export const MigrationTemplates = {
       },
       newPattern: {
         ...Typography.components.practiceDetail.sectionTitle,
-        marginBottom: DesignSystem.spacing.md,
+        marginBottom: ConsolidatedDesignSystem.spacing.md,
       },
       apply: () => Typography.styles.subheading('lg'),
     },
@@ -356,7 +356,7 @@ export const MigrationTemplates = {
       },
       newPattern: {
         ...Typography.components.practiceDetail.label,
-        marginBottom: DesignSystem.spacing.sm,
+        marginBottom: ConsolidatedDesignSystem.spacing.sm,
       },
       apply: () => Typography.styles.label('sm'),
     },
@@ -373,8 +373,8 @@ export const MigrationTemplates = {
       },
       newPattern: {
         flex: 1,
-        backgroundColor: DesignSystem.colors.background,
-        padding: DesignSystem.spacing.xl,
+        backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+        padding: ConsolidatedDesignSystem.spacing.xl,
       },
       apply: () => Typography.styles.container('xl'),
     },
@@ -388,16 +388,16 @@ export const MigrationTemplates = {
         marginBottom: 16,
       },
       newPattern: {
-        backgroundColor: DesignSystem.colors.backgroundSecondary,
-        borderRadius: DesignSystem.borderRadius.lg,
-        padding: DesignSystem.spacing.lg,
-        marginBottom: DesignSystem.spacing.lg,
+        backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.lg,
+        marginBottom: ConsolidatedDesignSystem.spacing.lg,
       },
       apply: () => ({
-        backgroundColor: DesignSystem.colors.backgroundSecondary,
-        borderRadius: DesignSystem.borderRadius.lg,
-        padding: DesignSystem.spacing.lg,
-        marginBottom: DesignSystem.spacing.lg,
+        backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+        borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
+        padding: ConsolidatedDesignSystem.spacing.lg,
+        marginBottom: ConsolidatedDesignSystem.spacing.lg,
       }),
     },
   },
@@ -554,8 +554,8 @@ export const FileMigrationTemplates = {
       },
       newPattern: {
         flex: 1,
-        backgroundColor: DesignSystem.colors.background,
-        padding: DesignSystem.spacing.xl,
+        backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+        padding: ConsolidatedDesignSystem.spacing.xl,
       },
     },
     
@@ -657,25 +657,25 @@ export const ImportReplacements = {
   
   // New import patterns
   newImports: [
-    "import { DesignSystem } from '@/constants/DesignSystem';",
+    "import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';",
     "import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';",
     "import { Typography } from '@/utils/typography';",
   ],
   
   // Color reference replacements
   colorReplacements: {
-    'Colors.light.text': 'DesignSystem.colors.textPrimary',
-    'Colors.light.background': 'DesignSystem.colors.background',
-    'Colors.light.tint': 'DesignSystem.colors.primary',
-    'Colors.light.tabIconDefault': 'DesignSystem.colors.textTertiary',
-    'Colors.light.tabIconSelected': 'DesignSystem.colors.primary',
-    'Colors.dark.text': 'DesignSystem.colors.textInverse',
-    'Colors.dark.background': 'DesignSystem.colors.backgroundSecondary',
-    'Colors.primary': 'DesignSystem.colors.primary',
-    'Colors.secondary': 'DesignSystem.colors.textSecondary',
-    'Colors.background': 'DesignSystem.colors.background',
-    'Colors.white': 'DesignSystem.colors.backgroundSecondary',
-    'Colors.black': 'DesignSystem.colors.textPrimary',
+    'Colors.light.text': 'ConsolidatedConsolidatedDesignSystem.colors["text-primary"]',
+    'Colors.light.background': 'ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]',
+    'Colors.light.tint': 'ConsolidatedConsolidatedDesignSystem.colors.primary',
+    'Colors.light.tabIconDefault': 'ConsolidatedConsolidatedDesignSystem.colors["text-secondary"]',
+    'Colors.light.tabIconSelected': 'ConsolidatedConsolidatedDesignSystem.colors.primary',
+    'Colors.dark.text': 'ConsolidatedConsolidatedDesignSystem.colors["text-inverse"]',
+    'Colors.dark.background': 'ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary',
+    'Colors.primary': 'ConsolidatedConsolidatedDesignSystem.colors.primary',
+    'Colors.secondary': 'ConsolidatedConsolidatedDesignSystem.colors["text-secondary"]',
+    'Colors.background': 'ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]',
+    'Colors.white': 'ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary',
+    'Colors.black': 'ConsolidatedConsolidatedDesignSystem.colors["text-primary"]',
   },
 };
 

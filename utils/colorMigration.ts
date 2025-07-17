@@ -9,44 +9,44 @@ import ConsolidatedDesignSystem, { migrationMap, buddhistSemantics, colorUtils }
 // Migration map for hardcoded hex values found in audit
 export const colorMigrationMap = {
   // Text colors
-  '#1a1a1a': ConsolidatedDesignSystem.colors['text-primary'],
-  '#1A1A1A': ConsolidatedDesignSystem.colors['text-primary'],
-  '#FFFFFF': ConsolidatedDesignSystem.colors['text-inverse'],
-  '#ffffff': ConsolidatedDesignSystem.colors['text-inverse'],
-  '#666666': ConsolidatedDesignSystem.colors['text-secondary'],
-  '#999999': ConsolidatedDesignSystem.colors['text-secondary'],
+  '#1a1a1a': ConsolidatedConsolidatedDesignSystem.colors['text-primary'],
+  '#1A1A1A': ConsolidatedConsolidatedDesignSystem.colors['text-primary'],
+  '#FFFFFF': ConsolidatedConsolidatedDesignSystem.colors['text-inverse'],
+  '#ffffff': ConsolidatedConsolidatedDesignSystem.colors['text-inverse'],
+  '#666666': ConsolidatedConsolidatedDesignSystem.colors['text-secondary'],
+  '#999999': ConsolidatedConsolidatedDesignSystem.colors['text-secondary'],
   
   // Background colors
-  '#f8f9fa': ConsolidatedDesignSystem.colors['surface-secondary'],
-  '#F8F9FA': ConsolidatedDesignSystem.colors['surface-secondary'],
-  '#ffffff': ConsolidatedDesignSystem.colors['surface-primary'],
-  '#FFFFFF': ConsolidatedDesignSystem.colors['surface-primary'],
-  '#f0f0f0': ConsolidatedDesignSystem.colors['surface-primary'],
-  '#F0F0F0': ConsolidatedDesignSystem.colors['surface-primary'],
+  '#f8f9fa': ConsolidatedConsolidatedDesignSystem.colors['surface-secondary'],
+  '#F8F9FA': ConsolidatedConsolidatedDesignSystem.colors['surface-secondary'],
+  '#ffffff': ConsolidatedConsolidatedDesignSystem.colors['surface-primary'],
+  '#FFFFFF': ConsolidatedConsolidatedDesignSystem.colors['surface-primary'],
+  '#f0f0f0': ConsolidatedConsolidatedDesignSystem.colors['surface-primary'],
+  '#F0F0F0': ConsolidatedConsolidatedDesignSystem.colors['surface-primary'],
   
   // Border colors
-  '#e9ecef': ConsolidatedDesignSystem.colors['border-default'],
-  '#E9ECEF': ConsolidatedDesignSystem.colors['border-default'],
-  '#dee2e6': ConsolidatedDesignSystem.colors['border-default'],
-  '#DEE2E6': ConsolidatedDesignSystem.colors['border-default'],
+  '#e9ecef': ConsolidatedConsolidatedDesignSystem.colors['border-default'],
+  '#E9ECEF': ConsolidatedConsolidatedDesignSystem.colors['border-default'],
+  '#dee2e6': ConsolidatedConsolidatedDesignSystem.colors['border-default'],
+  '#DEE2E6': ConsolidatedConsolidatedDesignSystem.colors['border-default'],
   
   // Status colors
-  '#2e7d32': ConsolidatedDesignSystem.status.success,
-  '#2E7D32': ConsolidatedDesignSystem.status.success,
-  '#e8f5e8': colorUtils.withOpacity(ConsolidatedDesignSystem.status.success, 0.1),
-  '#E8F5E8': colorUtils.withOpacity(ConsolidatedDesignSystem.status.success, 0.1),
+  '#2e7d32': ConsolidatedConsolidatedDesignSystem.status.success,
+  '#2E7D32': ConsolidatedConsolidatedDesignSystem.status.success,
+  '#e8f5e8': colorUtils.withOpacity(ConsolidatedConsolidatedDesignSystem.status.success, 0.1),
+  '#E8F5E8': colorUtils.withOpacity(ConsolidatedConsolidatedDesignSystem.status.success, 0.1),
   
   // Primary colors
-  '#da4347': ConsolidatedDesignSystem.colors.primary,
-  '#DA4347': ConsolidatedDesignSystem.colors.primary,
-  '#b8393d': colorUtils.darken(ConsolidatedDesignSystem.colors.primary),
-  '#e66a6d': colorUtils.lighten(ConsolidatedDesignSystem.colors.primary),
+  '#da4347': ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+  '#DA4347': ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary,
+  '#b8393d': colorUtils.darken(ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary),
+  '#e66a6d': colorUtils.lighten(ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary),
   
   // Shadow and overlay
-  '#000': ConsolidatedDesignSystem.utility.shadow,
-  '#000000': ConsolidatedDesignSystem.utility.shadow,
-  'rgba(0, 0, 0, 0.5)': ConsolidatedDesignSystem.utility.overlay,
-  'rgba(0,0,0,0.5)': ConsolidatedDesignSystem.utility.overlay,
+  '#000': ConsolidatedConsolidatedDesignSystem.utility.shadow,
+  '#000000': ConsolidatedConsolidatedDesignSystem.utility.shadow,
+  'rgba(0, 0, 0, 0.5)': ConsolidatedConsolidatedDesignSystem.utility.overlay,
+  'rgba(0,0,0,0.5)': ConsolidatedConsolidatedDesignSystem.utility.overlay,
 };
 
 // Buddhist semantic color helpers - updated for consolidated system
@@ -54,38 +54,38 @@ export const buddhistColors = {
   // Practice type colors
   getPracticeTypeColor: (type: 'count' | 'time') => {
     return type === 'time' 
-      ? ConsolidatedDesignSystem.accent['accent-secondary'] 
-      : ConsolidatedDesignSystem.accent['accent-primary'];
+      ? ConsolidatedConsolidatedDesignSystem.accent['accent-secondary'] 
+      : ConsolidatedConsolidatedDesignSystem.accent['accent-primary'];
   },
   
   // Status colors with Buddhist meaning
   getPracticeStatusColor: (status: 'active' | 'completed' | 'inactive') => {
     switch (status) {
-      case 'active': return ConsolidatedDesignSystem.accent['accent-primary'];
-      case 'completed': return ConsolidatedDesignSystem.status.success;
-      case 'inactive': return ConsolidatedDesignSystem.colors['text-secondary'];
-      default: return ConsolidatedDesignSystem.colors['text-secondary'];
+      case 'active': return ConsolidatedConsolidatedDesignSystem.accent['accent-primary'];
+      case 'completed': return ConsolidatedConsolidatedDesignSystem.status.success;
+      case 'inactive': return ConsolidatedConsolidatedDesignSystem.colors['text-secondary'];
+      default: return ConsolidatedConsolidatedDesignSystem.colors['text-secondary'];
     }
   },
   
   // Feature area colors
   getFeatureColor: (feature: 'practice' | 'study' | 'mindfulness' | 'stats') => {
     switch (feature) {
-      case 'practice': return ConsolidatedDesignSystem.accent['accent-primary'];
-      case 'study': return ConsolidatedDesignSystem.accent['accent-secondary'];
-      case 'mindfulness': return ConsolidatedDesignSystem.accent['accent-primary'];
-      case 'stats': return ConsolidatedDesignSystem.status.success;
-      default: return ConsolidatedDesignSystem.colors.primary;
+      case 'practice': return ConsolidatedConsolidatedDesignSystem.accent['accent-primary'];
+      case 'study': return ConsolidatedConsolidatedDesignSystem.accent['accent-secondary'];
+      case 'mindfulness': return ConsolidatedConsolidatedDesignSystem.accent['accent-primary'];
+      case 'stats': return ConsolidatedConsolidatedDesignSystem.status.success;
+      default: return ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary;
     }
   },
   
   // Achievement colors
   getAchievementColor: (type: 'completion' | 'progress' | 'milestone') => {
     switch (type) {
-      case 'completion': return ConsolidatedDesignSystem.status.success;
-      case 'progress': return ConsolidatedDesignSystem.accent['accent-secondary'];
-      case 'milestone': return colorUtils.adjustHue?.(ConsolidatedDesignSystem.accent['accent-primary'], 45) || '#D4AF37';
-      default: return ConsolidatedDesignSystem.status.success;
+      case 'completion': return ConsolidatedConsolidatedDesignSystem.status.success;
+      case 'progress': return ConsolidatedConsolidatedDesignSystem.accent['accent-secondary'];
+      case 'milestone': return colorUtils.adjustHue?.(ConsolidatedConsolidatedDesignSystem.accent['accent-primary'], 45) || '#D4AF37';
+      default: return ConsolidatedConsolidatedDesignSystem.status.success;
     }
   },
 };
@@ -95,39 +95,39 @@ export const colorUtilsUpdated = {
   // Get appropriate text color for background
   getContrastText: (backgroundColor: string): string => {
     const lightBackgrounds = [
-      ConsolidatedDesignSystem.colors['surface-primary'],
-      ConsolidatedDesignSystem.colors['surface-secondary'],
-      colorUtils.withOpacity(ConsolidatedDesignSystem.status.success, 0.1),
-      colorUtils.withOpacity(ConsolidatedDesignSystem.status.warning, 0.1),
-      colorUtils.withOpacity(ConsolidatedDesignSystem.status.error, 0.1),
+      ConsolidatedConsolidatedDesignSystem.colors['surface-primary'],
+      ConsolidatedConsolidatedDesignSystem.colors['surface-secondary'],
+      colorUtils.withOpacity(ConsolidatedConsolidatedDesignSystem.status.success, 0.1),
+      colorUtils.withOpacity(ConsolidatedConsolidatedDesignSystem.status.warning, 0.1),
+      colorUtils.withOpacity(ConsolidatedConsolidatedDesignSystem.status.error, 0.1),
       '#ffffff',
       '#f8f9fa',
       '#f0f0f0',
     ];
     
     return lightBackgrounds.includes(backgroundColor) 
-      ? ConsolidatedDesignSystem.colors['text-primary']
-      : ConsolidatedDesignSystem.colors['text-inverse'];
+      ? ConsolidatedConsolidatedDesignSystem.colors['text-primary']
+      : ConsolidatedConsolidatedDesignSystem.colors['text-inverse'];
   },
   
   // Get hover state color
   getHoverColor: (baseColor: string): string => {
-    if (baseColor === ConsolidatedDesignSystem.colors.primary) {
-      return colorUtils.lighten(ConsolidatedDesignSystem.colors.primary);
+    if (baseColor === ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary) {
+      return colorUtils.lighten(ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary);
     }
-    if (baseColor === ConsolidatedDesignSystem.accent['accent-primary']) {
-      return colorUtils.lighten(ConsolidatedDesignSystem.colors.primary);
+    if (baseColor === ConsolidatedConsolidatedDesignSystem.accent['accent-primary']) {
+      return colorUtils.lighten(ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary);
     }
     return baseColor;
   },
   
   // Get pressed state color
   getPressedColor: (baseColor: string): string => {
-    if (baseColor === ConsolidatedDesignSystem.colors.primary) {
-      return colorUtils.darken(ConsolidatedDesignSystem.colors.primary);
+    if (baseColor === ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary) {
+      return colorUtils.darken(ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary);
     }
-    if (baseColor === ConsolidatedDesignSystem.accent['accent-primary']) {
-      return colorUtils.darken(ConsolidatedDesignSystem.colors.primary);
+    if (baseColor === ConsolidatedConsolidatedDesignSystem.accent['accent-primary']) {
+      return colorUtils.darken(ConsolidatedConsolidatedConsolidatedDesignSystem.colors.primary);
     }
     return baseColor;
   },

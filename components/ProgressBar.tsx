@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { DesignSystem } from '@/constants/DesignSystem';
+import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
 
 export type ProgressBarSize = 'thin' | 'medium' | 'thick';
 
@@ -21,11 +21,11 @@ interface ProgressBarProps {
 const SIZE_CONFIG = {
   thin: {
     height: 8,
-    borderRadius: DesignSystem.borderRadius.sm,
+    borderRadius: ConsolidatedDesignSystem.borderRadius.sm,
   },
   medium: {
     height: 12,
-    borderRadius: DesignSystem.spacing.xxs,
+    borderRadius: ConsolidatedDesignSystem.spacing.xxs,
   },
   thick: {
     height: 16,
@@ -34,15 +34,15 @@ const SIZE_CONFIG = {
 } as const;
 
 const BACKGROUND_COLORS = {
-  thin: DesignSystem.colors.border,
-  medium: DesignSystem.colors.borderLight,
-  thick: DesignSystem.colors.background,
+  thin: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
+  medium: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+  thick: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
 } as const;
 
 const FILL_COLORS = {
-  thin: DesignSystem.colors.primary,
-  medium: DesignSystem.colors.studyProgress,
-  thick: DesignSystem.colors.dharmaRed,
+  thin: ConsolidatedConsolidatedDesignSystem.colors.primary,
+  medium: ConsolidatedConsolidatedDesignSystem.accent["accent-secondary"],
+  thick: ConsolidatedConsolidatedDesignSystem.accent["accent-primary"],
 } as const;
 
 export default function ProgressBar({
@@ -94,6 +94,6 @@ const styles = StyleSheet.create({
   },
   thickBorder: {
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
 });

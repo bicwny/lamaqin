@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { DesignSystem } from "@/constants/DesignSystem";
+import ConsolidatedDesignSystem from "@/constants/DesignSystem";
 import { ComponentTokens, ComponentTextStyles } from "@/utils/componentTokens";
 
 interface PracticeRecordCardProps {
@@ -86,7 +86,7 @@ export default function PracticeRecordCard({
       {isDeleting && (
         <View style={styles.deletingOverlay}>
           <ActivityIndicator
-            color={DesignSystem.colors.destructive}
+            color={ConsolidatedDesignSystem.colors.destructive}
             size="small"
           />
           <Text style={styles.deletingText}>删除中...</Text>
@@ -159,7 +159,7 @@ export default function PracticeRecordCard({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: DesignSystem.spacing.md,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
   },
   containerWithDivider: {
     borderBottomWidth: ComponentTokens.divider.thickness.thin,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   containerCard: {
     ...ComponentTokens.card.variants.outlined,
-    padding: DesignSystem.spacing.lg,
+    padding: ConsolidatedDesignSystem.spacing.lg,
   },
   containerDeleting: {
     opacity: 0.6,
@@ -184,70 +184,70 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: DesignSystem.borderRadius.lg,
+    borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
     flexDirection: "row",
-    gap: DesignSystem.spacing.sm,
+    gap: ConsolidatedDesignSystem.spacing.sm,
   },
   deletingText: {
     ...ComponentTextStyles.label,
-    color: DesignSystem.colors.destructive,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: ConsolidatedDesignSystem.colors.destructive,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   recordDate: {
     ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
   },
   recordTime: {
     ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.normal,
   },
   content: {
-    // marginBottom: DesignSystem.spacing.md,
+    // marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   recordCount: {
     ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textPrimary,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
   },
   notesContainer: {
-    marginTop: DesignSystem.spacing.sm,
-    padding: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    // borderRadius: DesignSystem.borderRadius.md,
+    marginTop: ConsolidatedDesignSystem.spacing.sm,
+    padding: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    // borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     borderLeftWidth: 2,
-    borderLeftColor: DesignSystem.colors.primary,
+    borderLeftColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   notesLabel: {
     ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    marginBottom: DesignSystem.spacing.xs,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   notesText: {
     ...ComponentTextStyles.body,
-    fontSize: DesignSystem.typography.fontSize.sm,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
     lineHeight:
-      DesignSystem.typography.fontSize.sm *
-      DesignSystem.typography.lineHeight.relaxed,
+      ConsolidatedDesignSystem.typography.fontSize.sm *
+      ConsolidatedDesignSystem.typography.lineHeight.relaxed,
   },
   actions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.sm,
+    gap: ConsolidatedDesignSystem.spacing.md,
+    marginTop: ConsolidatedDesignSystem.spacing.sm,
   },
   editButton: {
     ...ComponentTokens.button.variants.secondary,
     ...ComponentTokens.button.sizes.small,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: DesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
   },
   editButtonText: {
     ...ComponentTextStyles.button.secondary,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     ...ComponentTokens.button.sizes.small,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
   },
   deleteButtonText: {
     ...ComponentTextStyles.button.primary,

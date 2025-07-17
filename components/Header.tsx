@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/constants/DesignSystem';
+import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';
 import { Typography } from '@/utils/typography';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -68,7 +68,7 @@ export default function Header({
         {/* Left side */}
         {showBackButton ? (
           <TouchableOpacity onPress={onBackPress} style={styles.actionButton}>
-            <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.primary} />
+            <Ionicons name="arrow-back" size={24} color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
           </TouchableOpacity>
         ) : leftAction ? (
           <TouchableOpacity onPress={leftAction.onPress} style={styles.actionButton}>
@@ -110,17 +110,17 @@ export default function Header({
 const styles = StyleSheet.create({
   // Page header styles
   pageContainer: {
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
   },
   pageHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
     minHeight: 60,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
+    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
   },
   pageTitle: {
     ...Typography.styles.heading('xl'),
@@ -129,17 +129,17 @@ const styles = StyleSheet.create({
 
   // Modal header styles
   modalContainer: {
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
     minHeight: 56,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   modalTitle: {
     ...Typography.styles.heading('lg'),
@@ -155,10 +155,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 0,
-    paddingVertical: DesignSystem.spacing.sm,
-    marginBottom: DesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: ConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
+    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
   },
   sectionTitle: {
     ...Typography.styles.subheading('lg'),
@@ -172,9 +172,9 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...Typography.styles.label('sm'),
-    color: DesignSystem.colors.textSecondary,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
     textAlign: 'center',
-    marginTop: DesignSystem.spacing.xs,
+    marginTop: ConsolidatedDesignSystem.spacing.xs,
   },
   actionButton: {
     minWidth: 44,
@@ -184,8 +184,8 @@ const styles = StyleSheet.create({
   },
   actionText: {
     ...Typography.styles.label('base'),
-    color: DesignSystem.colors.primary,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
   placeholder: {
     minWidth: 44,

@@ -73,8 +73,8 @@ export const practiceDetailProgressMigration = {
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.sm,
+    gap: ConsolidatedDesignSystem.spacing.md,
+    marginTop: ConsolidatedDesignSystem.spacing.sm,
   },
   progressBar: {
     ...ComponentTokens.progress.practice.container,
@@ -103,8 +103,8 @@ export const practiceDetailProgressMigration = {
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.sm,
+    gap: ConsolidatedDesignSystem.spacing.md,
+    marginTop: ConsolidatedDesignSystem.spacing.sm,
   },
   `,
 };

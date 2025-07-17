@@ -13,7 +13,7 @@ import {
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { DesignSystem, createStyles } from '@/constants/ConsolidatedDesignSystem';
 import { ComponentTokens } from '@/utils/componentTokens';
 import { useAuth } from '@/contexts/AuthContext';
 import PageTemplate from '@/components/PageTemplate';
@@ -272,11 +272,11 @@ const styles = StyleSheet.create({
   },
   input: {
     ...ComponentTokens.input.standard,
-    ...DesignSystem.shadow.sm,
+    ...ConsolidatedDesignSystem.shadow.sm,
   },
   saveButton: {
     ...createStyles.primaryButton(),
-    marginTop: DesignSystem.spacing.xl,
+    marginTop: ConsolidatedDesignSystem.spacing.xl,
   },
   saveButtonDisabled: {
     backgroundColor: '#9CA3AF',

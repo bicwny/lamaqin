@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { presetProjectNameService } from "@/lib/database";
 import PageTemplate from "@/components/PageTemplate";
 import { toastService } from "@/lib/toast";
-import { DesignSystem } from "@/constants/DesignSystem";
+import ConsolidatedDesignSystem from "@/constants/DesignSystem";
 import {
   ComponentTokens,
   ComponentTextStyles,
@@ -67,7 +67,7 @@ interface IconProps {
 const Icon: React.FC<IconProps> = ({ semantic }) => {
   // Replace this with your actual icon implementation
   // This is a placeholder, so it just returns a simple Text component
-  const color = DesignSystem.colors.practiceComplete;
+  const color = ConsolidatedConsolidatedDesignSystem.status.success;
   return <Ionicons name="checkmark-circle" size={16} color={color} />;
 };
 
@@ -459,10 +459,10 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -476,7 +476,7 @@ export default function PracticeDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到修行项目</Text>
@@ -500,7 +500,7 @@ export default function PracticeDetailScreen() {
       title={project.practices.name}
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={DesignSystem.colors.background}
+      backgroundColor={ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
       padding={0}
     >
       <ScrollView
@@ -528,7 +528,7 @@ export default function PracticeDetailScreen() {
                 <Ionicons
                   name="checkmark-circle"
                   size={24}
-                  color={DesignSystem.colors.practiceComplete}
+                  color={ConsolidatedConsolidatedDesignSystem.status.success}
                 />
               )}
             </View>
@@ -619,7 +619,7 @@ export default function PracticeDetailScreen() {
               <Ionicons
                 name="chevron-forward"
                 size={16}
-                color={DesignSystem.colors.primary}
+                color={ConsolidatedConsolidatedDesignSystem.colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -639,24 +639,24 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-    marginTop: DesignSystem.spacing.md,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
+    marginTop: ConsolidatedDesignSystem.spacing.md,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: DesignSystem.spacing["4xl"],
+    padding: ConsolidatedDesignSystem.spacing["4xl"],
   },
   emptyText: {
     ...ComponentTextStyles.subheading,
-    color: DesignSystem.colors.textSecondary,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
   scrollContainer: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: DesignSystem.spacing.xl,
+    paddingBottom: ConsolidatedDesignSystem.spacing.xl,
   },
   mainCard: componentHelpers.getCardWithBottomMargin(
     "outlined",
@@ -666,28 +666,28 @@ const styles = StyleSheet.create({
 
   // Section 1: Practice & Timeline
   section1: {
-    // paddingBottom: DesignSystem.spacing.lg,
+    // paddingBottom: ConsolidatedDesignSystem.spacing.lg,
   },
   practiceHeaderRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   practiceInfo: {
     flex: 1,
   },
   practiceTitle: {
     ...ComponentTextStyles.dharma,
-    marginBottom: DesignSystem.spacing.xs,
+    marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   programName: {
     ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
   timelineText: {
     ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textSecondary,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
 
   // Divider
@@ -703,53 +703,53 @@ const styles = StyleSheet.create({
   countRow: {
     flexDirection: "row",
     alignItems: "baseline",
-    gap: DesignSystem.spacing.sm,
-    marginBottom: DesignSystem.spacing.sm,
+    gap: ConsolidatedDesignSystem.spacing.sm,
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
   currentCount: {
     ...Typography.styles.heading("xl"),
-    fontWeight: DesignSystem.typography.fontWeight.bold,
-    color: DesignSystem.colors.textPrimary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.bold,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
   },
   totalCountAndDays: {
     ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textSecondary,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
   dailyTargetText: {
     ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.md,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   progressBarContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: DesignSystem.spacing.md,
+    gap: ConsolidatedDesignSystem.spacing.md,
   },
   progressPercentage: {
     ...Typography.styles.body("base"),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
     minWidth: 50,
     textAlign: "right",
   },
   progressDetails: {
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   progressText: {
     ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.xs,
+    marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   sessionDetails: {
     ...ComponentTextStyles.label,
     fontStyle: "italic",
-    color: DesignSystem.colors.textSecondary,
-    marginTop: DesignSystem.spacing.xs,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    marginTop: ConsolidatedDesignSystem.spacing.xs,
   },
 
   // Section 3: Action Buttons
   section3: {
     flexDirection: "row",
-    gap: DesignSystem.spacing.md,
+    gap: ConsolidatedDesignSystem.spacing.md,
   },
   secondaryButtonNew: {
     ...componentHelpers.getButtonStyle("secondary", "medium"),
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: ConsolidatedDesignSystem.spacing.md,
   },
   recordsTitle: {
     ...ComponentTextStyles.subheading,
@@ -786,26 +786,26 @@ const styles = StyleSheet.create({
   viewAllButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: DesignSystem.spacing.xs,
+    gap: ConsolidatedDesignSystem.spacing.xs,
   },
   viewAllText: {
     ...ComponentTextStyles.link,
-    fontSize: DesignSystem.typography.fontSize.sm,
+    fontSize: ConsolidatedDesignSystem.typography.fontSize.sm,
   },
   recordsList: {
-    gap: DesignSystem.spacing.sm,
+    gap: ConsolidatedDesignSystem.spacing.sm,
   },
   noRecordsText: {
     ...ComponentTextStyles.body,
     textAlign: "center",
-    paddingVertical: DesignSystem.spacing["2xl"],
+    paddingVertical: ConsolidatedDesignSystem.spacing["2xl"],
     fontStyle: "italic",
-    color: DesignSystem.colors.textSecondary,
+    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
   },
   programRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.sm,
+    marginBottom: ConsolidatedDesignSystem.spacing.sm,
   },
 });

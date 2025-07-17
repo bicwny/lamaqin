@@ -15,7 +15,7 @@ export const PracticeDetailMigration = {
       "import Colors from '@/constants/Colors';",
     ],
     new: [
-      "import { DesignSystem } from '@/constants/DesignSystem';",
+      "import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';",
       "import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';",
       "import { Typography } from '@/utils/typography';",
     ],
@@ -35,8 +35,8 @@ export const PracticeDetailMigration = {
       new: `
         container: {
           flex: 1,
-          backgroundColor: DesignSystem.colors.background,
-          padding: DesignSystem.spacing.xl,
+          backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
+          padding: ConsolidatedDesignSystem.spacing.xl,
         },
       `,
     },
@@ -104,7 +104,7 @@ export const PracticeDetailMigration = {
       new: `
         sectionTitle: {
           ...Typography.styles.subheading('lg'),
-          marginBottom: DesignSystem.spacing.md,
+          marginBottom: ConsolidatedDesignSystem.spacing.md,
         },
       `,
     },
@@ -122,7 +122,7 @@ export const PracticeDetailMigration = {
       new: `
         labelText: {
           ...Typography.styles.label('sm'),
-          marginBottom: DesignSystem.spacing.sm,
+          marginBottom: ConsolidatedDesignSystem.spacing.sm,
         },
       `,
     },
@@ -144,32 +144,32 @@ export const PracticeDetailMigration = {
   
   // Color reference replacements
   colorReplacements: {
-    "'#f8f9fa'": 'DesignSystem.colors.background',
-    "'#ffffff'": 'DesignSystem.colors.backgroundSecondary',
-    "'#1a1a1a'": 'DesignSystem.colors.textPrimary',
-    "'#666666'": 'DesignSystem.colors.textSecondary',
-    "'#da4347'": 'DesignSystem.colors.primary',
-    "'#e9ecef'": 'DesignSystem.colors.border',
-    "'#f0f0f0'": 'DesignSystem.colors.borderLight',
-    "'#2e7d32'": 'DesignSystem.colors.practiceComplete',
-    "'#000'": 'DesignSystem.colors.cardShadow',
-    "'rgba(0, 0, 0, 0.5)'": 'DesignSystem.colors.overlayDark',
+    "'#f8f9fa'": 'ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]',
+    "'#ffffff'": 'ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary',
+    "'#1a1a1a'": 'ConsolidatedConsolidatedDesignSystem.colors["text-primary"]',
+    "'#666666'": 'ConsolidatedConsolidatedDesignSystem.colors["text-secondary"]',
+    "'#da4347'": 'ConsolidatedConsolidatedDesignSystem.colors.primary',
+    "'#e9ecef'": 'ConsolidatedConsolidatedDesignSystem.colors["border-default"]',
+    "'#f0f0f0'": 'ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light',
+    "'#2e7d32'": 'ConsolidatedConsolidatedDesignSystem.status.success',
+    "'#000'": 'ConsolidatedConsolidatedDesignSystem.utility.shadow',
+    "'rgba(0, 0, 0, 0.5)'": 'ConsolidatedConsolidatedDesignSystem.utility.overlay',
   },
   
   // Spacing replacements
   spacingReplacements: {
-    'padding: 20': 'padding: DesignSystem.spacing.xl',
-    'paddingVertical: 16': 'paddingVertical: DesignSystem.spacing.lg',
-    'paddingHorizontal: 20': 'paddingHorizontal: DesignSystem.spacing.xl',
-    'marginBottom: 16': 'marginBottom: DesignSystem.spacing.lg',
-    'marginBottom: 12': 'marginBottom: DesignSystem.spacing.md',
-    'marginBottom: 8': 'marginBottom: DesignSystem.spacing.sm',
-    'borderRadius: 12': 'borderRadius: DesignSystem.borderRadius.lg',
-    'borderRadius: 8': 'borderRadius: DesignSystem.borderRadius.md',
-    'fontSize: 16': 'fontSize: DesignSystem.typography.fontSize.base',
-    'fontSize: 18': 'fontSize: DesignSystem.typography.fontSize.lg',
-    'fontSize: 14': 'fontSize: DesignSystem.typography.fontSize.sm',
-    'fontSize: 24': 'fontSize: DesignSystem.typography.fontSize["2xl"]',
+    'padding: 20': 'padding: ConsolidatedDesignSystem.spacing.xl',
+    'paddingVertical: 16': 'paddingVertical: ConsolidatedDesignSystem.spacing.lg',
+    'paddingHorizontal: 20': 'paddingHorizontal: ConsolidatedDesignSystem.spacing.xl',
+    'marginBottom: 16': 'marginBottom: ConsolidatedDesignSystem.spacing.lg',
+    'marginBottom: 12': 'marginBottom: ConsolidatedDesignSystem.spacing.md',
+    'marginBottom: 8': 'marginBottom: ConsolidatedDesignSystem.spacing.sm',
+    'borderRadius: 12': 'borderRadius: ConsolidatedDesignSystem.borderRadius.lg',
+    'borderRadius: 8': 'borderRadius: ConsolidatedDesignSystem.borderRadius.md',
+    'fontSize: 16': 'fontSize: ConsolidatedDesignSystem.typography.fontSize.base',
+    'fontSize: 18': 'fontSize: ConsolidatedDesignSystem.typography.fontSize.lg',
+    'fontSize: 14': 'fontSize: ConsolidatedDesignSystem.typography.fontSize.sm',
+    'fontSize: 24': 'fontSize: ConsolidatedDesignSystem.typography.fontSize["2xl"]',
   },
 };
 
@@ -212,7 +212,7 @@ export const FileTransformer = {
     });
     
     // Add new imports
-    const hasDesignSystemImport = transformed.includes("import { DesignSystem }");
+    const hasDesignSystemImport = transformed.includes("import ConsolidatedDesignSystem");
     const hasComponentTokensImport = transformed.includes("import { ComponentTokens");
     const hasTypographyImport = transformed.includes("import { Typography }");
     
@@ -220,7 +220,7 @@ export const FileTransformer = {
       const importInsertPoint = transformed.indexOf('import {') === -1 ? 0 : transformed.lastIndexOf('import ') + transformed.substring(transformed.lastIndexOf('import ')).indexOf('\n') + 1;
       
       const newImports = [];
-      if (!hasDesignSystemImport) newImports.push("import { DesignSystem } from '@/constants/DesignSystem';");
+      if (!hasDesignSystemImport) newImports.push("import ConsolidatedDesignSystem from '@/constants/ConsolidatedDesignSystem';");
       if (!hasComponentTokensImport) newImports.push("import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';");
       if (!hasTypographyImport) newImports.push("import { Typography } from '@/utils/typography';");
       

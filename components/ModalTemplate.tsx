@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
+import { DesignSystem, createStyles } from '@/constants/ConsolidatedDesignSystem';
 import { ComponentTokens, componentHelpers } from '@/utils/componentTokens';
 
 interface ModalTemplateProps {
@@ -44,8 +44,8 @@ export default function ModalTemplate({
   const modalStyles = componentHelpers.getModalStyle(variant, size);
   
   const defaultBackgroundColor = variant === 'fullscreen' 
-    ? DesignSystem.colors.background 
-    : DesignSystem.colors.backgroundSecondary;
+    ? ConsolidatedConsolidatedDesignSystem.colors["surface-primary"] 
+    : ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary;
 
   const content = (
     <View style={[styles.content, modalStyles, contentContainerStyle]}>
@@ -133,17 +133,17 @@ export default function ModalTemplate({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"],
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
+    paddingVertical: ConsolidatedDesignSystem.spacing.md,
+    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"],
   },
   headerLeft: {
     flex: 1,
@@ -161,17 +161,17 @@ const styles = StyleSheet.create({
     ...createStyles.heading('lg'),
   },
   closeButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
   },
   actionButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: ConsolidatedDesignSystem.spacing.sm,
+    paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
   },
   actionButtonText: {
     ...createStyles.body(),
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
+    fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
+    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
   },
   content: {
     flex: 1,
