@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { componentHelpers } from '@/utils/componentTokens';
+import { ComponentTextStyles } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
@@ -42,7 +45,7 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
 
   if (showOnlyIcon) {
     return isCompleted ? (
-      <Ionicons name="checkmark-done" size={18} color="#28a745" style={{ marginLeft: 8 }} />
+      <Ionicons name="checkmark-done" size={18} color={DesignSystem.colors.greenTara} style={{ marginLeft: DesignSystem.spacing.xs }} />
     ) : null;
   }
 
@@ -174,7 +177,7 @@ export default function CourseDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
@@ -191,7 +194,7 @@ export default function CourseDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>课程未找到</Text>
@@ -206,7 +209,7 @@ export default function CourseDetailScreen() {
       subtitle="课程详情与学习记录"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
 
@@ -291,83 +294,62 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: DesignSystem.spacing.lg,
   },
   loadingText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    marginTop: 16,
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textSecondary,
+    marginTop: DesignSystem.spacing.md,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginTop: 16,
-    marginBottom: 8,
-    paddingHorizontal: 20,
+    ...ComponentTextStyles.heading,
+    color: DesignSystem.colors.textPrimary,
+    marginTop: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   courseInfoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...componentHelpers.getCardStyle('elevated', 'lg'),
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    marginBottom: DesignSystem.spacing.md,
+    borderLeftWidth: 4,
+    borderLeftColor: DesignSystem.colors.yellowTara, // Yellow Tara for wisdom and learning
   },
   courseInfoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginBottom: 12,
+    ...ComponentTextStyles.subheading,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   courseInfoText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-    marginBottom: 4,
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.xxs,
   },
   lessonItem: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...componentHelpers.getCardStyle('elevated', 'md'),
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    marginHorizontal: DesignSystem.spacing.lg,
   },
   lessonHeader: {
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.sm,
   },
   lessonTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginBottom: 6,
+    ...ComponentTextStyles.subheading,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.xxs,
+    flex: 1,
   },
   lessonProgressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
+    marginTop: DesignSystem.spacing.xxs,
   },
   lessonProgress: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-    fontWeight: '500',
+    ...ComponentTextStyles.caption,
+    color: DesignSystem.colors.textSecondary,
     flex: 1,
   },
-  
   lessonTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -375,36 +357,27 @@ const styles = StyleSheet.create({
   },
   recordButtons: {
     flexDirection: 'row',
-    gap: 10,
+    gap: DesignSystem.spacing.sm,
   },
   recordButton: {
+    ...componentHelpers.getButtonStyle('primary', 'md'),
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 10,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
   listenButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: DesignSystem.colors.greenTara, // Green Tara for completion and growth
   },
   readButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.yellowTara, // Yellow Tara for wisdom and study
   },
   viewButton: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: DesignSystem.colors.orangeTara, // Orange Tara for compassionate access to teachings
   },
   recordButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    ...ComponentTextStyles.button,
+    color: DesignSystem.colors.textInverse,
   },
   lessonItemSpacing: {
-    marginTop: 12,
+    marginTop: DesignSystem.spacing.sm,
   },
 });
