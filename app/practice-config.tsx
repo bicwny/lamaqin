@@ -1039,19 +1039,7 @@ export default function PracticeConfigScreen() {
         {renderTimePlanning()}
         {renderSmartSummary()}
 
-        <TouchableOpacity
-          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-          onPress={handleConfirm}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>
-              {isEditMode ? "更新项目" : "确认添加项目"}
-            </Text>
-          )}
-        </TouchableOpacity>
+        
 
       {/* Project Selection Modal */}
       <Modal
@@ -1459,11 +1447,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
   },
-  saveButton: componentHelpers.getButtonStyle('primary', 'medium'),
-  saveButtonDisabled: {
-    backgroundColor: DesignSystem.colors.textTertiary,
-  },
-  saveButtonText: componentHelpers.getButtonTextStyle('primary', 'medium'),
+  
   helpText: {
     ...ComponentTextStyles.caption,
     textAlign: "center",
