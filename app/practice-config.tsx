@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   ActivityIndicator,
   Platform,
   Modal,
@@ -27,6 +26,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { getCurrentWeekStart } from "@/lib/topic-progress";
 import { practiceService, presetProjectNameService } from "@/lib/database";
 import ModalDatetimePicker from "react-native-modal-datetime-picker";
+import { toastService } from "@/lib/toast";
 
 interface Practice {
   id: string;
@@ -169,7 +169,7 @@ export default function PracticeConfigScreen() {
       setCustomEndDate(newEndDate);
       setDurationMode("自定义");
     } else if (!isNaN(days) && days <= 0) {
-      Alert.alert("输入错误", "天数必须大于0");
+      toastService.error("天数必须大于0");
     }
   };
 
@@ -191,7 +191,7 @@ export default function PracticeConfigScreen() {
         setPresetProjectNames(presets);
       } catch (error) {
         console.error("Failed to fetch preset project names:", error);
-        Alert.alert("错误", "Failed to load preset project names.");
+        toastService.error("加载预设项目名称失败");
       } finally {
         setLoadingPresets(false);
       }
@@ -277,23 +277,23 @@ export default function PracticeConfigScreen() {
 
   const handleSave = async () => {
     if (!user) {
-      Alert.alert("错误", "用户未登录");
+      toastService.error("用户未登录");
       return;
     }
 
     // Validation
     if (practiceType === "count") {
       if (configMode === "total" && !totalTarget) {
-        Alert.alert("错误", "请输入总目标数量");
+        toastService.error("请输入总目标数量");
         return;
       }
       if (configMode === "daily" && !dailyTarget) {
-        Alert.alert("错误", "请输入每日目标数量");
+        toastService.error("请输入每日目标数量");
         return;
       }
     } else {
       if (!sessionsTarget) {
-        Alert.alert("错误", "请输入每周目标座数");
+        toastService.error("请输入每周目标座数");
         return;
       }
     }
@@ -369,15 +369,22 @@ export default function PracticeConfigScreen() {
         }
       }
 
-      Alert.alert("成功", "修行项目已添加", [
-        {
-          text: "确定",
-          onPress: () => router.replace("/(tabs)/practice"),
-        },
-      ]);
+      toastService.success({
+        title: "修行项目已添加",
+        message: "开始您的修行之路吧！",
+        onPress: () => router.replace("/(tabs)/practice")
+      });
+      
+      // Navigate after a short delay to allow user to see the toast
+      setTimeout(() => {
+        router.replace("/(tabs)/practice");
+      }, 1500);
     } catch (error) {
       console.error("Error saving practice project:", error);
-      Alert.alert("错误", "保存失败，请重试");
+      toastService.error({
+        title: "保存失败",
+        message: "请检查网络连接后重试"
+      });
     } finally {
       setLoading(false);
     }
@@ -518,7 +525,7 @@ export default function PracticeConfigScreen() {
     // Ensure end date is not before start date
     const minDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
     if (date < minDate) {
-      Alert.alert("日期错误", "结束日期不能早于开始日期");
+      toastService.error("结束日期不能早于开始日期");
       return;
     }
     setCustomEndDate(date);
@@ -867,18 +874,18 @@ export default function PracticeConfigScreen() {
     // Validation
     if (practiceType === "time") {
       if (!sessionsTarget || parseInt(sessionsTarget) <= 0) {
-        Alert.alert("错误", "请输入有效的座数");
+        toastService.error("请输入有效的座数");
         return;
       }
     } else {
       if (configMode === "total") {
         if (!totalTarget || parseInt(totalTarget) <= 0) {
-          Alert.alert("错误", "请输入有效的总目标数量");
+          toastService.error("请输入有效的总目标数量");
           return;
         }
       } else {
         if (!dailyTarget || parseInt(dailyTarget) <= 0) {
-          Alert.alert("错误", "请输入有效的每日目标数量");
+          toastService.error("请输入有效的每日目标数量");
           return;
         }
       }
@@ -954,9 +961,15 @@ export default function PracticeConfigScreen() {
         if (error) throw error;
 
         console.log("✅ Practice project updated:", data);
-        Alert.alert("成功", "修行项目已更新！", [
-          { text: "确定", onPress: () => router.push("/(tabs)/practice") },
-        ]);
+        toastService.success({
+          title: "修行项目已更新",
+          message: "您的修行计划已成功调整",
+          onPress: () => router.push("/(tabs)/practice")
+        });
+        
+        setTimeout(() => {
+          router.push("/(tabs)/practice");
+        }, 1500);
       } else {
         // Create new project
         const { data, error } = await supabase
@@ -967,13 +980,22 @@ export default function PracticeConfigScreen() {
         if (error) throw error;
 
         console.log("✅ Practice project created:", data);
-        Alert.alert("成功", "修行项目已添加！", [
-          { text: "确定", onPress: () => router.push("/(tabs)/(tabs)/practice") },
-        ]);
+        toastService.success({
+          title: "修行项目已添加",
+          message: "开始您的修行之路吧！",
+          onPress: () => router.push("/(tabs)/practice")
+        });
+        
+        setTimeout(() => {
+          router.push("/(tabs)/practice");
+        }, 1500);
       }
     } catch (error) {
       console.error("❌ Error creating practice project:", error);
-      Alert.alert("错误", "创建修行项目失败");
+      toastService.error({
+        title: "操作失败",
+        message: "创建修行项目失败，请检查网络连接后重试"
+      });
     } finally {
       setLoading(false);
     }
