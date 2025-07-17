@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 /**
  * Automated Color Consolidation Migration Script
  * Migrates from 50+ color tokens to 15 consolidated tokens
