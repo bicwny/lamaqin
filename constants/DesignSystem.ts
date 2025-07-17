@@ -39,6 +39,9 @@ export const DesignSystem = {
     error: '#dc3545',
     info: '#3b82f6',
     
+    // Practice completion status
+    practiceComplete: '#2e7d32',
+    
     // Buddhist semantic colors - The Five Taras
     redTara: '#da4347',             // The Red Tara - Primary practice energy
     orangeTara: '#FF6B35',          // The Orange Tara - Mindfulness and compassion
