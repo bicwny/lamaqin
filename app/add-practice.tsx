@@ -106,10 +106,10 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
+        backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={ConsolidatedDesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
         </View>
       </PageTemplate>
@@ -123,7 +123,7 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
+        backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
@@ -146,7 +146,7 @@ export default function AddPracticeScreen() {
       title="添加修法"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]}
+      backgroundColor={ConsolidatedDesignSystem.colors["surface-primary"]}
       padding={0}
     >
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     fontWeight: ConsolidatedDesignSystem.typography.fontWeight.medium,
     marginTop: ConsolidatedDesignSystem.spacing.lg,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    color: ConsolidatedDesignSystem.colors["text-primary"],
   },
   emptyContainer: {
     flex: 1,
@@ -180,13 +180,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     ...ComponentTextStyles.heading,
     fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    color: ConsolidatedDesignSystem.colors["text-primary"],
     marginBottom: ConsolidatedDesignSystem.spacing.lg,
     textAlign: 'center',
   },
   emptyDescription: {
     ...ComponentTextStyles.body,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
     textAlign: 'center',
     marginBottom: ConsolidatedDesignSystem.spacing['4xl'],
   },
@@ -199,13 +199,13 @@ const styles = StyleSheet.create({
     ...componentHelpers.getButtonTextStyle('primary', 'medium'),
   },
   practiceSection: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors["surface-primary"]Secondary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     marginBottom: ConsolidatedDesignSystem.spacing.xl,
   },
   sectionTitle: {
     ...ComponentTextStyles.subheading,
     fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    color: ConsolidatedDesignSystem.colors["text-primary"],
     marginBottom: ConsolidatedDesignSystem.spacing.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
   },
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
     paddingVertical: ConsolidatedDesignSystem.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   practiceInfo: {
     flex: 1,
@@ -226,23 +226,23 @@ const styles = StyleSheet.create({
   practiceName: {
     ...ComponentTextStyles.body,
     fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-primary"],
+    color: ConsolidatedDesignSystem.colors["text-primary"],
     marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   practiceType: {
     ...ComponentTextStyles.label,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
     marginBottom: ConsolidatedDesignSystem.spacing.xs,
   },
   practiceDescription: {
     ...ComponentTextStyles.caption,
-    color: ConsolidatedConsolidatedDesignSystem.colors["text-secondary"],
+    color: ConsolidatedDesignSystem.colors["text-secondary"],
   },
   practiceChevron: {
     marginLeft: ConsolidatedDesignSystem.spacing.md,
   },
   chevronText: {
     fontSize: ConsolidatedDesignSystem.typography.fontSize.xl,
-    color: ConsolidatedConsolidatedDesignSystem.colors["border-default"]Light,
+    color: ConsolidatedDesignSystem.colors["border-default"],
   },
 });
