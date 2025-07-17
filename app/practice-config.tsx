@@ -1376,7 +1376,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    backgroundColor: DesignSystem.colors.background,
   },
   modalHeader: {
     flexDirection: "row",
@@ -1410,7 +1410,16 @@ const styles = StyleSheet.create({
     borderBottomColor: DesignSystem.colors.border,
   },
   modalSearchInput: {
-    ...ComponentTokens.input.search,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.borderLight,
+    borderRadius: DesignSystem.borderRadius.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.base,
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textPrimary,
+    backgroundColor: DesignSystem.colors.background,
+    minHeight: 44,
   },
   modalPresetList: {
     flex: 1,
@@ -1470,9 +1479,10 @@ const styles = StyleSheet.create({
   },
   webDateInput: {
     fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textPrimary,
     backgroundColor: "transparent",
     borderWidth: 0,
-    outlineWidth: 0,
+    padding: DesignSystem.spacing.sm,
   },
 });
