@@ -9,13 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.buddhistpractice",
-      "buildNumber": "1.0.0",
-      "infoPlist": {
-        "NSCameraUsageDescription": "This app uses camera for profile pictures.",
-        "NSMicrophoneUsageDescription": "This app uses microphone for meditation recordings."
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {

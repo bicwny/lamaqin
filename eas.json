@@ -9,22 +9,9 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "ios": {
-        "simulator": false
-      }
+      "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true,
-      "ios": {
-        "simulator": false
-      }
-    },
-    "testflight": {
-      "distribution": "store",
-      "ios": {
-        "simulator": false
-      },
       "autoIncrement": true
     }
   },
