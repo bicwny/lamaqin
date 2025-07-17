@@ -4,14 +4,10 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
-// Keep default asset extensions only
+// Simplify resolver configuration
 config.resolver.platforms = ['ios', 'android', 'web'];
 
-// Use blockList instead of deprecated blacklistRE
-config.resolver.blockList = [
-  /\/__replco\/.*/,
-  /\/\.replit$/,
-  /\/replit\.nix$/,
-];
+// Remove problematic blockList that might interfere with module resolution
+// config.resolver.blockList = [];
 
 module.exports = withNativeWind(config, { input: './global.css' });
