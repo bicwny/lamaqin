@@ -1,9 +1,11 @@
 
 import { StyleSheet, Text, type TextProps } from 'react-native';
 import { DesignSystem, colorWithOpacity } from '@/constants/DesignSystem';
+import { ComponentTextStyles } from '@/utils/componentTokens';
 
 export type ThemedTextProps = TextProps & {
-  variant?: 'heading' | 'subheading' | 'body' | 'label' | 'caption' | 'button' | 'link' | 'dharma' | 'practice' | 'success' | 'warning' | 'error';
+  variant?: 'heading' | 'subheading' | 'body' | 'label' | 'caption' | 'input' | 'button' | 'link' | 'dharma' | 'practice' | 'success' | 'warning' | 'error';
+  buttonVariant?: 'primary' | 'secondary';
   size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
   color?: keyof typeof DesignSystem.colors;
   opacity?: keyof typeof DesignSystem.opacity;
@@ -17,6 +19,7 @@ export type ThemedTextProps = TextProps & {
 export function ThemedText({
   style,
   variant = 'body',
+  buttonVariant = 'primary',
   size,
   color,
   opacity,
@@ -47,91 +50,49 @@ export function ThemedText({
   // Determine which variant to use (new system takes precedence)
   const effectiveVariant = variant || getVariantFromLegacyType(type);
   
-  // Get base text styles with proper semantic colors
+  // Get consolidated text styles from ComponentTextStyles
   const getTextStyle = () => {
-    const styles = {
-      heading: {
-        fontSize: DesignSystem.typography.fontSize['2xl'],
-        fontWeight: DesignSystem.typography.fontWeight.bold,
-        color: DesignSystem.colors.textPrimary,
-        letterSpacing: DesignSystem.typography.letterSpacing.tight,
-        lineHeight: DesignSystem.typography.fontSize['2xl'] * DesignSystem.typography.lineHeight.tight,
-      },
-      subheading: {
-        fontSize: DesignSystem.typography.fontSize.xl,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        color: DesignSystem.colors.textPrimary,
-        letterSpacing: DesignSystem.typography.letterSpacing.tight,
-        lineHeight: DesignSystem.typography.fontSize.xl * DesignSystem.typography.lineHeight.snug,
-      },
-      body: {
-        fontSize: DesignSystem.typography.fontSize.base,
-        fontWeight: DesignSystem.typography.fontWeight.normal,
-        color: DesignSystem.colors.textSecondary,
-        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
-      },
-      label: {
-        fontSize: DesignSystem.typography.fontSize.sm,
-        fontWeight: DesignSystem.typography.fontWeight.medium,
-        color: DesignSystem.colors.textSecondary,
-        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
-      },
-      caption: {
-        fontSize: DesignSystem.typography.fontSize.xs,
-        fontWeight: DesignSystem.typography.fontWeight.normal,
-        color: DesignSystem.colors.textTertiary,
-        lineHeight: DesignSystem.typography.fontSize.xs * DesignSystem.typography.lineHeight.tight,
-      },
-      button: {
-        fontSize: DesignSystem.typography.fontSize.base,
-        fontWeight: DesignSystem.typography.fontWeight.bold,
-        color: DesignSystem.colors.textInverse,
-        letterSpacing: DesignSystem.typography.letterSpacing.tighter,
-        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
-      },
-      link: {
-        fontSize: DesignSystem.typography.fontSize.base,
-        fontWeight: DesignSystem.typography.fontWeight.semibold,
-        color: DesignSystem.colors.primary,
-        letterSpacing: DesignSystem.typography.letterSpacing.normal,
-        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
-      },
-      // Buddhist semantic variants
-      dharma: {
-        fontSize: DesignSystem.typography.fontSize.lg,
-        fontWeight: DesignSystem.typography.fontWeight.bold,
-        color: DesignSystem.colors.redTara,
-        letterSpacing: DesignSystem.typography.letterSpacing.tight,
-        lineHeight: DesignSystem.typography.fontSize.lg * DesignSystem.typography.lineHeight.tight,
-      },
-      practice: {
-        fontSize: DesignSystem.typography.fontSize.base,
-        fontWeight: DesignSystem.typography.fontWeight.medium,
-        color: DesignSystem.colors.practiceActive,
-        lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
-      },
-      // Status variants with semantic colors
-      success: {
-        fontSize: DesignSystem.typography.fontSize.sm,
-        fontWeight: DesignSystem.typography.fontWeight.medium,
-        color: DesignSystem.colors.greenTara,
-        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
-      },
-      warning: {
-        fontSize: DesignSystem.typography.fontSize.sm,
-        fontWeight: DesignSystem.typography.fontWeight.medium,
-        color: DesignSystem.colors.warning,
-        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
-      },
-      error: {
-        fontSize: DesignSystem.typography.fontSize.sm,
-        fontWeight: DesignSystem.typography.fontWeight.medium,
-        color: DesignSystem.colors.error,
-        lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
-      },
-    };
-    
-    return styles[effectiveVariant] || styles.body;
+    switch (effectiveVariant) {
+      case 'heading':
+        return ComponentTextStyles.heading;
+      case 'subheading':
+        return ComponentTextStyles.subheading;
+      case 'body':
+        return ComponentTextStyles.body;
+      case 'label':
+        return ComponentTextStyles.label;
+      case 'caption':
+        return ComponentTextStyles.caption;
+      case 'input':
+        return ComponentTextStyles.input;
+      case 'button':
+        return ComponentTextStyles.button[buttonVariant];
+      case 'link':
+        return ComponentTextStyles.link;
+      // Tara Buddhist semantic variants
+      case 'dharma':
+        return ComponentTextStyles.dharma;
+      case 'practice':
+        return ComponentTextStyles.practice;
+      case 'success':
+        return ComponentTextStyles.success;
+      case 'warning':
+        return {
+          fontSize: DesignSystem.typography.fontSize.sm,
+          fontWeight: DesignSystem.typography.fontWeight.medium,
+          color: DesignSystem.colors.warning,
+          lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
+        };
+      case 'error':
+        return {
+          fontSize: DesignSystem.typography.fontSize.sm,
+          fontWeight: DesignSystem.typography.fontWeight.medium,
+          color: DesignSystem.colors.error,
+          lineHeight: DesignSystem.typography.fontSize.sm * DesignSystem.typography.lineHeight.snug,
+        };
+      default:
+        return ComponentTextStyles.body;
+    }
   };
 
   const baseTextStyle = getTextStyle();
@@ -176,8 +137,28 @@ export function ThemedText({
   );
 }
 
-// Text style utility functions for common use cases
+// Enhanced text style utility functions with Tara semantic system
 export const TextStyleUtils = {
+  // Quick access to consolidated text styles
+  heading: () => ComponentTextStyles.heading,
+  subheading: () => ComponentTextStyles.subheading,
+  body: () => ComponentTextStyles.body,
+  label: () => ComponentTextStyles.label,
+  caption: () => ComponentTextStyles.caption,
+  input: () => ComponentTextStyles.input,
+  
+  // Button text styles
+  primaryButton: () => ComponentTextStyles.button.primary,
+  secondaryButton: () => ComponentTextStyles.button.secondary,
+  
+  // Interactive styles
+  link: () => ComponentTextStyles.link,
+  
+  // Tara Buddhist semantic styles
+  dharma: () => ComponentTextStyles.dharma,
+  practice: () => ComponentTextStyles.practice,
+  success: () => ComponentTextStyles.success,
+  
   // Quick access to common text styles with opacity support
   primaryText: (opacity?: keyof typeof DesignSystem.opacity) => ({
     color: opacity 
@@ -197,23 +178,47 @@ export const TextStyleUtils = {
       : DesignSystem.colors.textTertiary,
   }),
   
-  // Buddhist semantic text colors with opacity
-  dharmaText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+  // Tara Buddhist semantic text colors with opacity
+  redTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
     color: opacity 
       ? colorWithOpacity.textWithOpacity(DesignSystem.colors.redTara, opacity)
       : DesignSystem.colors.redTara,
   }),
   
-  practiceText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+  orangeTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
     color: opacity 
-      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.practiceActive, opacity)
-      : DesignSystem.colors.practiceActive,
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.orangeTara, opacity)
+      : DesignSystem.colors.orangeTara,
   }),
   
-  successText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+  yellowTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.yellowTara, opacity)
+      : DesignSystem.colors.yellowTara,
+  }),
+  
+  blueTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.blueTara, opacity)
+      : DesignSystem.colors.blueTara,
+  }),
+  
+  greenTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
     color: opacity 
       ? colorWithOpacity.textWithOpacity(DesignSystem.colors.greenTara, opacity)
       : DesignSystem.colors.greenTara,
+  }),
+  
+  blackTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.blackTara, opacity)
+      : DesignSystem.colors.blackTara,
+  }),
+  
+  whiteTaraText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.whiteTara, opacity)
+      : DesignSystem.colors.whiteTara,
   }),
   
   // Text hierarchy helpers
@@ -237,6 +242,7 @@ export const TextStyleUtils = {
     color: DesignSystem.colors.textPrimary,
   }),
   
+  // Text on Tara color backgrounds
   onTara: (taraColor: 'red' | 'orange' | 'yellow' | 'blue' | 'green' | 'black' | 'white') => {
     const textColors = {
       red: DesignSystem.colors.textInverse,
@@ -251,36 +257,32 @@ export const TextStyleUtils = {
       color: textColors[taraColor],
     };
   },
+  
+  // Status text colors
+  warningText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.warning, opacity)
+      : DesignSystem.colors.warning,
+  }),
+  
+  errorText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.error, opacity)
+      : DesignSystem.colors.error,
+  }),
+  
+  infoText: (opacity?: keyof typeof DesignSystem.opacity) => ({
+    color: opacity 
+      ? colorWithOpacity.textWithOpacity(DesignSystem.colors.info, opacity)
+      : DesignSystem.colors.info,
+  }),
 };
 
 // Legacy styles for backward compatibility - will be removed in future versions
 const legacyStyles = StyleSheet.create({
-  default: {
-    fontSize: DesignSystem.typography.fontSize.base,
-    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
-    color: DesignSystem.colors.textSecondary,
-  },
-  defaultSemiBold: {
-    fontSize: DesignSystem.typography.fontSize.base,
-    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.normal,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.textPrimary,
-  },
-  title: {
-    fontSize: DesignSystem.typography.fontSize['4xl'],
-    fontWeight: DesignSystem.typography.fontWeight.bold,
-    lineHeight: DesignSystem.typography.fontSize['4xl'] * DesignSystem.typography.lineHeight.tight,
-    color: DesignSystem.colors.textPrimary,
-  },
-  subtitle: {
-    fontSize: DesignSystem.typography.fontSize.xl,
-    fontWeight: DesignSystem.typography.fontWeight.bold,
-    color: DesignSystem.colors.textPrimary,
-  },
-  link: {
-    fontSize: DesignSystem.typography.fontSize.base,
-    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.tight,
-    color: DesignSystem.colors.primary,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
+  default: ComponentTextStyles.body,
+  defaultSemiBold: ComponentTextStyles.label,
+  title: ComponentTextStyles.heading,
+  subtitle: ComponentTextStyles.subheading,
+  link: ComponentTextStyles.link,
 });
