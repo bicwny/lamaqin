@@ -16,6 +16,7 @@ import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { ComponentTokens } from '@/utils/componentTokens';
 import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTextStyles } from '@/utils/componentTokens';
 import { ComponentTextStyles } from '@/utils/typography';
 
 // Error types for better categorization
