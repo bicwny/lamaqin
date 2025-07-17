@@ -655,6 +655,14 @@ export const createStyles = {
   }),
   
   // Buddhist semantic text styles with automatic line heights
+  dharmaTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
+    fontSize: DesignSystem.typography.fontSize[size],
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
+    letterSpacing: DesignSystem.typography.letterSpacing.tight,
+    lineHeight: DesignSystem.typography.fontSize[size] * DesignSystem.typography.lineHeight.tight,
+  }),
+  
   redTaraTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.bold,
