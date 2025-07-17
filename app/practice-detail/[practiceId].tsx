@@ -429,7 +429,7 @@ export default function PracticeDetailScreen() {
         return (
           <View style={styles.progressDetails}>
             <Text style={styles.progressText}>
-              每周目标：{weeklyCount}/{weeklyTarget}座
+              本周进度：{weeklyCount}/{weeklyTarget}座
               {weeklyCount >= weeklyTarget ? " ✅" : ""}
             </Text>
             {todayCount > 0 && todayDetails && (
