@@ -19,7 +19,18 @@ interface PageTemplateProps {
   scrollable?: boolean;
   padding?: keyof typeof DesignSystem.spacing;
   backgroundColor?: string;
-  backgroundVariant?: 'default' | 'secondary' | 'tertiary' | 'dharma' | 'practice' | 'meditation';
+  /** 
+   * Background variant using Tara Buddhist semantic colors:
+   * - default: Standard background
+   * - secondary: Card-like background
+   * - tertiary: Subtle background
+   * - dharma: Red Tara (practice energy & determination)
+   * - practice: Green Tara (growth & completion)
+   * - meditation: Blue Tara (contemplation & deep practice)
+   * - study: Yellow Tara (wisdom & achievement)
+   * - mindfulness: Orange Tara (mindfulness & compassion)
+   */
+  backgroundVariant?: 'default' | 'secondary' | 'tertiary' | 'dharma' | 'practice' | 'meditation' | 'study' | 'mindfulness';
   contentContainerStyle?: any;
   showHeader?: boolean;
   shadowVariant?: 'none' | 'subtle' | 'elevated';
@@ -42,7 +53,7 @@ export default function PageTemplate({
 }: PageTemplateProps) {
   const insets = useSafeAreaInsets();
 
-  // Buddhist semantic background colors
+  // Buddhist semantic background colors using Tara system
   const getBackgroundColor = () => {
     if (backgroundColor) return backgroundColor;
     
@@ -52,11 +63,15 @@ export default function PageTemplate({
       case 'tertiary':
         return DesignSystem.colors.backgroundTertiary;
       case 'dharma':
-        return `${DesignSystem.colors.redTara}05`; // 5% opacity Red Tara background
+        return `${DesignSystem.colors.redTara}0D`; // 5% opacity Red Tara - practice energy & determination
       case 'practice':
-        return `${DesignSystem.colors.practiceComplete}05`; // 5% opacity Green Tara background
+        return `${DesignSystem.colors.greenTara}0D`; // 5% opacity Green Tara - growth & completion
       case 'meditation':
-        return `${DesignSystem.colors.meditationBlue}05`; // 5% opacity Blue Tara background
+        return `${DesignSystem.colors.blueTara}0D`; // 5% opacity Blue Tara - contemplation & deep practice
+      case 'study':
+        return `${DesignSystem.colors.yellowTara}0D`; // 5% opacity Yellow Tara - wisdom & achievement
+      case 'mindfulness':
+        return `${DesignSystem.colors.orangeTara}0D`; // 5% opacity Orange Tara - mindfulness & compassion
       default:
         return DesignSystem.colors.background;
     }
