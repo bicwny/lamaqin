@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -220,7 +219,7 @@ export default function CustomRecordScreen() {
     >
       <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
         <Stack.Screen options={{ headerShown: false }} />
-        
+
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -245,7 +244,7 @@ export default function CustomRecordScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator size="small" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={ConsolidatedDesignSystem.colors.primary} />
               ) : (
                 <Text style={styles.saveHeaderButtonText}>保存</Text>
               )}
@@ -262,7 +261,7 @@ export default function CustomRecordScreen() {
         >
           {loadingRecord ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={ConsolidatedConsolidatedDesignSystem.colors.primary} />
+              <ActivityIndicator size="large" color={ConsolidatedDesignSystem.colors.primary} />
               <Text style={styles.loadingText}>正在加载记录...</Text>
             </View>
           ) : (
