@@ -45,23 +45,28 @@ export function MigrationValidator() {
   const validateTypographyMigration = (): ValidationResult[] => {
     const results: ValidationResult[] = [];
 
-    // Check if all common font sizes have migrations
-    const commonFontSizes = [12, 14, 16, 18, 20, 24];
+    // Check if typography scales exist in DesignSystem
+    const typographyChecks = [
+      { path: 'fontSize.xs', value: DesignSystem.typography.fontSize.xs },
+      { path: 'fontSize.sm', value: DesignSystem.typography.fontSize.sm },
+      { path: 'fontSize.base', value: DesignSystem.typography.fontSize.base },
+      { path: 'fontSize.lg', value: DesignSystem.typography.fontSize.lg },
+      { path: 'fontSize.xl', value: DesignSystem.typography.fontSize.xl },
+      { path: 'fontSize.2xl', value: DesignSystem.typography.fontSize['2xl'] }
+    ];
 
-    commonFontSizes.forEach(size => {
-      // Accessing Typography.migrationMap requires Typography to be imported and defined
-      // Assuming that Typography is meant to access fontSizes defined in DesignSystem.typography
-      if (DesignSystem.typography.fontSize[size]) {
+    typographyChecks.forEach(({ path, value }) => {
+      if (value !== undefined && value !== null) {
         results.push({
           type: 'success',
-          message: `✅ Font size ${size}px has migration mapping`,
-          details: `Maps to: ${DesignSystem.typography.fontSize[size]}px`
+          message: `✅ Typography ${path} exists`,
+          details: `Value: ${value}px`
         });
       } else {
         results.push({
           type: 'error',
-          message: `❌ Font size ${size}px missing migration mapping`,
-          details: 'Add to Typography.migrationMap.fontSize'
+          message: `❌ Typography ${path} missing`,
+          details: 'Add to DesignSystem.typography'
         });
       }
     });
@@ -262,16 +267,12 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   title: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access headings defined in DesignSystem.typography
-    ...DesignSystem.typography.heading['2xl'],
+    ...createStyles.heading('2xl'),
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access body defined in DesignSystem.typography
-    ...DesignSystem.typography.body['base'],
+    ...createStyles.body('base'),
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.xl,
   },
@@ -291,9 +292,9 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary,
   },
   primaryButtonText: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access buttonText defined in DesignSystem.typography
-    ...DesignSystem.typography.buttonText['primary'],
+    ...createStyles.label('base'),
+    color: DesignSystem.colors.textInverse,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
   },
   secondaryButton: {
     backgroundColor: DesignSystem.colors.backgroundSecondary,
@@ -301,18 +302,14 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.border,
   },
   secondaryButtonText: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access label defined in DesignSystem.typography
-    ...DesignSystem.typography.label['base'],
+    ...createStyles.label('base'),
     color: DesignSystem.colors.textSecondary,
   },
   resultsContainer: {
     marginBottom: DesignSystem.spacing.xl,
   },
   resultsTitle: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access subheading defined in DesignSystem.typography
-    ...DesignSystem.typography.subheading['lg'],
+    ...createStyles.subheading('lg'),
     marginBottom: DesignSystem.spacing.md,
   },
   resultItem: {
@@ -338,15 +335,11 @@ const styles = StyleSheet.create({
     borderLeftColor: DesignSystem.colors.border,
   },
   resultMessage: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access body defined in DesignSystem.typography
-    ...DesignSystem.typography.body['base'],
+    ...createStyles.body('base'),
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   resultDetails: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access caption defined in DesignSystem.typography
-    ...DesignSystem.typography.caption(),
+    ...createStyles.caption(),
     marginTop: DesignSystem.spacing.xs,
   },
   checklistContainer: {
@@ -356,9 +349,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.shadow.sm,
   },
   checklistTitle: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access subheading defined in DesignSystem.typography
-    ...DesignSystem.typography.subheading['lg'],
+    ...createStyles.subheading('lg'),
     marginBottom: DesignSystem.spacing.md,
   },
   checklistItem: {
@@ -368,14 +359,10 @@ const styles = StyleSheet.create({
     borderBottomColor: DesignSystem.colors.borderLight,
   },
   checklistLabel: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access label defined in DesignSystem.typography
-    ...DesignSystem.typography.label['base'],
+    ...createStyles.label('base'),
     marginBottom: DesignSystem.spacing.xs,
   },
   checklistDetails: {
-    // Accessing Typography.styles requires Typography to be imported and defined
-    // Assuming that Typography is meant to access caption defined in DesignSystem.typography
-    ...DesignSystem.typography.caption(),
+    ...createStyles.caption(),
   },
 });
