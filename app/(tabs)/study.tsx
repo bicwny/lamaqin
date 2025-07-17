@@ -560,7 +560,8 @@ export default function StudyScreen() {
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.backgroundPrimary}
+        variant="study"
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -670,7 +671,8 @@ export default function StudyScreen() {
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.backgroundPrimary}
+        variant="study"
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
@@ -1130,5 +1132,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.2,
     marginLeft: 8,
+  },
+  deletingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: DesignSystem.colors.overlay,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deletingText: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.error,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
 });
