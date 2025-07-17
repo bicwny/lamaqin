@@ -159,8 +159,6 @@ export default function AddPracticeScreen() {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    // paddingTop: DesignSystem.spacing.lg,
-    
   },
   loadingContainer: {
     flex: 1,
@@ -208,12 +206,11 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.subheading,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
     color: DesignSystem.colors.textPrimary,
-    // marginBottom: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
     paddingHorizontal: DesignSystem.spacing.lg,
   },
   practiceList: {
     paddingVertical: DesignSystem.spacing.base,
-    color: DesignSystem.colors.textSecondary,
   },
   practiceItem: {
     flexDirection: 'row',
@@ -235,7 +232,7 @@ const styles = StyleSheet.create({
   practiceType: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
-    // marginBottom: DesignSystem.spacing.xxs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   practiceDescription: {
     ...ComponentTextStyles.caption,
