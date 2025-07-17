@@ -254,7 +254,7 @@ export default function PracticeHistoryScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.redTara} />
           <Text style={styles.loadingText}>正在加载...</Text>
         </View>
       </PageTemplate>
@@ -296,6 +296,7 @@ export default function PracticeHistoryScreen() {
               progress={progress.percentage} 
               size="thick" 
               containerStyle={{ flex: 1 }}
+              color={DesignSystem.colors.greenTara} // Green Tara for practice progress and growth
             />
           </View>
 
@@ -349,6 +350,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     marginTop: DesignSystem.spacing.md,
     fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textSecondary, // Clear loading text color
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
@@ -372,7 +374,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     ...ComponentTextStyles.body,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
+    color: DesignSystem.colors.greenTara, // Green Tara for progress completion indicators
   },
   progressBarContainer: {
     marginBottom: DesignSystem.spacing.md,
@@ -383,8 +385,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recordsSection: {
-    // margin: DesignSystem.spacing.lg,
     marginTop: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg, // Proper section padding
   },
   sectionTitle: {
     ...ComponentTextStyles.subheading,
