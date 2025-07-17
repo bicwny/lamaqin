@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Typography } from '@/utils/typography';
 import { ComponentTokens, ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
+import { MigrationValidator } from '@/components/StyleTesting/MigrationValidator';
 import { Ionicons } from '@expo/vector-icons';
 
 type TabType = 'tokens' | 'components' | 'migration' | 'colors' | 'typography';
@@ -206,54 +207,7 @@ export default function StyleTestingScreen() {
   );
 
   const renderMigrationTools = () => (
-    <ScrollView style={styles.content}>
-      <Text style={styles.sectionTitle}>Migration Tools & Helpers</Text>
-      
-      {/* Component Helper Examples */}
-      <View style={styles.tokenSection}>
-        <Text style={styles.tokenSectionTitle}>Component Helpers</Text>
-        <View style={styles.codeExample}>
-          <Text style={styles.codeText}>
-            {`// Button Helper
-componentHelpers.getButtonStyle('primary', 'medium')
-componentHelpers.getLegacyButtonStyle('dharma')
-
-// Card Helper  
-componentHelpers.getCardStyle('outlined', 'comfortable')
-componentHelpers.getCardWithMargin('elevated', 'spacious', 'comfortable')
-
-// Badge Helper
-componentHelpers.getBadgeStyle('medium', 'filled', 'primary')
-componentHelpers.getPillStyle('small', 'filled', 'dharma')`}
-          </Text>
-        </View>
-      </View>
-
-      {/* Legacy Support */}
-      <View style={styles.tokenSection}>
-        <Text style={styles.tokenSectionTitle}>Legacy Support</Text>
-        <Text style={styles.description}>
-          The component system maintains backward compatibility while encouraging migration to the new consolidated system.
-        </Text>
-        
-        {/* Legacy vs New Comparison */}
-        <View style={styles.comparisonGrid}>
-          <View style={styles.comparisonItem}>
-            <Text style={styles.comparisonTitle}>❌ Old Pattern</Text>
-            <TouchableOpacity style={componentHelpers.getLegacyButtonStyle('dharma')}>
-              <Text style={componentHelpers.getLegacyButtonTextStyle('dharma')}>Legacy Dharma</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.comparisonItem}>
-            <Text style={styles.comparisonTitle}>✅ New Pattern</Text>
-            <TouchableOpacity style={componentHelpers.getButtonStyle('primary', 'lg')}>
-              <Text style={componentHelpers.getButtonTextStyle('primary', 'lg')}>New Primary Large</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </ScrollView>
+    <MigrationValidator />
   );
 
   const renderContent = () => {
