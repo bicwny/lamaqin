@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.base,
   },
   title: {
-    ...ComponentTextStyles.heading.h1,
+    ...ComponentTextStyles.heading,
     color: DesignSystem.colors.primary,
     marginBottom: DesignSystem.spacing.base,
   },
