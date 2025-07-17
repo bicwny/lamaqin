@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, StatusBar, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/Colors';
 import PageHeader from './PageHeader';
 import { DesignSystem } from '@/constants/DesignSystem';
 
@@ -31,8 +30,8 @@ export default function PageTemplate({
   subtitle,
   children,
   scrollable = true,
-  padding = 16,
-  backgroundColor = '#f8f9fa',
+  padding = DesignSystem.spacing.lg,
+  backgroundColor = DesignSystem.colors.background,
   contentContainerStyle,
   showHeader = true,
 }: PageTemplateProps) {

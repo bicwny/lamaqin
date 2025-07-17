@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
+import { DesignSystem } from "@/constants/DesignSystem";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
@@ -17,16 +17,16 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textTertiary,
+        tabBarActiveTintColor: DesignSystem.colors.dharmaRed,
+        tabBarInactiveTintColor: DesignSystem.colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            backgroundColor: DesignSystem.colors.backgroundSecondary + 'F2', // 95% opacity
             borderTopWidth: 0.5,
-            borderTopColor: Colors.border,
+            borderTopColor: DesignSystem.colors.border,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
             shadowOpacity: 0.1,
@@ -36,9 +36,9 @@ export default function TabLayout() {
             height: 88,
           },
           default: {
-            backgroundColor: "#fff",
+            backgroundColor: DesignSystem.colors.backgroundSecondary,
             borderTopWidth: 0.5,
-            borderTopColor: Colors.border,
+            borderTopColor: DesignSystem.colors.border,
             elevation: 8,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -2 },
@@ -78,7 +78,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "ear" : "ear-outline"}
-              color={color}
+              color={focused ? DesignSystem.colors.wisdomGold : color}
             />
           ),
         }}
@@ -91,7 +91,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "ellipse" : "ellipse-outline"}
-              color={color}
+              color={focused ? DesignSystem.colors.compassionOrange : color}
             />
           ),
         }}
@@ -104,7 +104,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "heart" : "heart-outline"}
-              color={color}
+              color={focused ? DesignSystem.colors.dharmaRed : color}
             />
           ),
         }}
@@ -117,7 +117,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "moon" : "moon-outline"}
-              color={color}
+              color={focused ? DesignSystem.colors.studyProgress : color}
             />
           ),
         }}
