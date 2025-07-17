@@ -572,6 +572,7 @@ export default function PracticeDetailScreen() {
                   <ProgressBar
                     progress={progress.percentage}
                     size="thick"
+                    fillColor={DesignSystem.colors.redTara}
                     containerStyle={{ flex: 1 }}
                   />
                   <Text style={styles.progressPercentage}>
