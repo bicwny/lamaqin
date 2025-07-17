@@ -1,5 +1,15 @@
 
 export const DesignSystem = {
+  // Opacity scale for consistent transparency
+  opacity: {
+    5: 0.05,    // Subtle overlays
+    10: 0.1,    // Light backgrounds
+    20: 0.2,    // Card shadows
+    50: 0.5,    // Modal overlays
+    80: 0.8,    // Active states
+    90: 0.9,    // Pressed states
+  },
+
   // Colors
   colors: {
     // Primary colors
@@ -42,6 +52,14 @@ export const DesignSystem = {
     practiceInactive: '#999999',    // Inactive practice
     studyProgress: '#4A90E2',       // Learning progress (meditation blue)
     mindfulnessAlert: '#f59e0b',    // Mindful attention needed
+    mindfulnessCalm: '#4A90E2',     // Calm meditation state
+    
+    // Extended Buddhist contextual colors
+    dharmaRedLight: '#e66a6d',      // Light dharma red for hover states
+    dharmaRedDark: '#b8393d',       // Dark dharma red for pressed states
+    compassionLight: '#FF8C5A',     // Light compassion for gentle states
+    wisdomLight: '#E6C757',         // Light wisdom for progress indicators
+    meditationLight: '#6BA3F0',     // Light meditation for calm states
     
     // Success state variations
     successBackground: '#e8f5e8',   // Light success background
@@ -519,6 +537,64 @@ export const DesignSystem = {
         borderColor: '#2e7d32',      // Will reference colors.practiceComplete
         alignSelf: 'flex-start',
       },
+    },
+  },
+};
+
+// Color-with-opacity utility functions
+export const colorWithOpacity = {
+  // Background color with opacity
+  backgroundWithOpacity: (color: string, opacity: keyof typeof DesignSystem.opacity): string => {
+    const opacityValue = DesignSystem.opacity[opacity];
+    const alpha = Math.round(opacityValue * 255).toString(16).padStart(2, '0');
+    return `${color}${alpha}`;
+  },
+
+  // Text color with opacity  
+  textWithOpacity: (color: string, opacity: keyof typeof DesignSystem.opacity): string => {
+    const opacityValue = DesignSystem.opacity[opacity];
+    const alpha = Math.round(opacityValue * 255).toString(16).padStart(2, '0');
+    return `${color}${alpha}`;
+  },
+
+  // Overlay color with opacity
+  overlayWithOpacity: (color: string, opacity: keyof typeof DesignSystem.opacity): string => {
+    const opacityValue = DesignSystem.opacity[opacity];
+    const alpha = Math.round(opacityValue * 255).toString(16).padStart(2, '0');
+    return `${color}${alpha}`;
+  },
+
+  // Border color with opacity
+  borderWithOpacity: (color: string, opacity: keyof typeof DesignSystem.opacity): string => {
+    const opacityValue = DesignSystem.opacity[opacity];
+    const alpha = Math.round(opacityValue * 255).toString(16).padStart(2, '0');
+    return `${color}${alpha}`;
+  },
+
+  // Buddhist semantic colors with opacity variants
+  buddhist: {
+    dharmaWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.dharmaRed, opacity);
+    },
+    
+    compassionWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.compassionOrange, opacity);
+    },
+    
+    wisdomWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.wisdomGold, opacity);
+    },
+    
+    meditationWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.meditationBlue, opacity);
+    },
+
+    practiceActiveOverlay: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.overlayWithOpacity(DesignSystem.colors.practiceActive, opacity);
+    },
+
+    practiceCompleteBackground: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.practiceComplete, opacity);
     },
   },
 };
