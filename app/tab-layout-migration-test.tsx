@@ -14,7 +14,7 @@ export default function TabLayoutMigrationTest() {
       {/* Buddhist Tab Color Semantics */}
       <View style={styles.section}>
         <ThemedText variant="subheading" style={styles.sectionTitle}>
-          Buddhist Semantic Tab Colors
+          Buddhist Five Taras Tab Colors
         </ThemedText>
 
         {/* Daily Practice Tab - Compassion Orange */}
@@ -22,12 +22,12 @@ export default function TabLayoutMigrationTest() {
           <Ionicons
             size={32}
             name="sunny"
-            color={DesignSystem.colors.compassionOrange}
+            color={DesignSystem.colors.orangeTara}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">当日 (Daily) - Compassion Orange</ThemedText>
-            <ThemedText variant="caption">Daily practice warmth</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.compassionOrange }]} />
+            <ThemedText variant="label">当日 (Daily) - The Orange Tara</ThemedText>
+            <ThemedText variant="caption">Daily practice warmth and compassion</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.orangeTara }]} />
           </View>
         </View>
 
@@ -36,12 +36,12 @@ export default function TabLayoutMigrationTest() {
           <Ionicons
             size={32}
             name="ear"
-            color={DesignSystem.colors.wisdomGold}
+            color={DesignSystem.colors.yellowTara}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">闻思 (Study) - Wisdom Gold</ThemedText>
-            <ThemedText variant="caption">Learning and wisdom</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.wisdomGold }]} />
+            <ThemedText variant="label">闻思 (Study) - The Yellow Tara</ThemedText>
+            <ThemedText variant="caption">Learning and wisdom cultivation</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.yellowTara }]} />
           </View>
         </View>
 
@@ -50,12 +50,12 @@ export default function TabLayoutMigrationTest() {
           <Ionicons
             size={32}
             name="ellipse"
-            color={DesignSystem.colors.dharmaRed}
+            color={DesignSystem.colors.redTara}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">心性 (Mindfulness) - Dharma Red</ThemedText>
-            <ThemedText variant="caption">Spiritual practice energy</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.dharmaRed }]} />
+            <ThemedText variant="label">心性 (Mindfulness) - The Red Tara</ThemedText>
+            <ThemedText variant="caption">Spiritual practice energy and power</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.redTara }]} />
           </View>
         </View>
 
@@ -64,12 +64,12 @@ export default function TabLayoutMigrationTest() {
           <Ionicons
             size={32}
             name="heart"
-            color={DesignSystem.colors.success}
+            color={DesignSystem.colors.greenTara}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">修行 (Practice) - Success Green</ThemedText>
-            <ThemedText variant="caption">Practice completion and growth</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.success }]} />
+            <ThemedText variant="label">修行 (Practice) - The Green Tara</ThemedText>
+            <ThemedText variant="caption">Practice completion and enlightened activity</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.greenTara }]} />
           </View>
         </View>
 
@@ -78,12 +78,12 @@ export default function TabLayoutMigrationTest() {
           <Ionicons
             size={32}
             name="moon"
-            color={DesignSystem.colors.studyProgress}
+            color={DesignSystem.colors.blueTara}
           />
           <View style={styles.tabInfo}>
-            <ThemedText variant="label">回向 (Stats) - Study Progress</ThemedText>
-            <ThemedText variant="caption">Progress analytics and reflection</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.studyProgress }]} />
+            <ThemedText variant="label">回向 (Stats) - The Blue Tara</ThemedText>
+            <ThemedText variant="caption">Deep contemplation and analytical wisdom</ThemedText>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.blueTara }]} />
           </View>
         </View>
       </View>
@@ -127,8 +127,8 @@ export default function TabLayoutMigrationTest() {
           </View>
           <View style={styles.comparisonColumn}>
             <ThemedText variant="label">Active (Practice)</ThemedText>
-            <Ionicons size={24} name="heart" color={DesignSystem.colors.dharmaRed} />
-            <ThemedText variant="caption">Dharma Red</ThemedText>
+            <Ionicons size={24} name="heart" color={DesignSystem.colors.redTara} />
+            <ThemedText variant="caption">The Red Tara</ThemedText>
           </View>
         </View>
       </View>

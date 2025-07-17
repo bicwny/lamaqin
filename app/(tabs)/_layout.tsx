@@ -17,7 +17,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: DesignSystem.colors.dharmaRed,
+        tabBarActiveTintColor: DesignSystem.colors.redTara,
         tabBarInactiveTintColor: DesignSystem.colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
@@ -65,7 +65,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "sunny" : "sunny-outline"}
-              color={focused ? DesignSystem.colors.compassionOrange : color}
+              color={focused ? DesignSystem.colors.orangeTara : color}
             />
           ),
         }}
@@ -78,7 +78,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "ear" : "ear-outline"}
-              color={focused ? DesignSystem.colors.wisdomGold : color}
+              color={focused ? DesignSystem.colors.yellowTara : color}
             />
           ),
         }}
@@ -91,7 +91,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "ellipse" : "ellipse-outline"}
-              color={focused ? DesignSystem.colors.dharmaRed : color}
+              color={focused ? DesignSystem.colors.redTara : color}
             />
           ),
         }}
@@ -104,7 +104,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "heart" : "heart-outline"}
-              color={focused ? DesignSystem.colors.success : color}
+              color={focused ? DesignSystem.colors.greenTara : color}
             />
           ),
         }}
@@ -117,7 +117,7 @@ export default function TabLayout() {
             <Ionicons
               size={28}
               name={focused ? "moon" : "moon-outline"}
-              color={focused ? DesignSystem.colors.studyProgress : color}
+              color={focused ? DesignSystem.colors.blueTara : color}
             />
           ),
         }}

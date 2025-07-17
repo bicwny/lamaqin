@@ -39,31 +39,31 @@ export const DesignSystem = {
     error: '#dc3545',
     info: '#3b82f6',
     
-    // Buddhist semantic colors
-    dharmaRed: '#da4347',           // Primary practice energy
-    compassionOrange: '#FF6B35',    // Mindfulness and compassion
-    wisdomGold: '#D4AF37',          // Study achievements and wisdom
-    meditationBlue: '#4A90E2',      // Deep contemplation
+    // Buddhist semantic colors - The Five Taras
+    redTara: '#da4347',             // The Red Tara - Primary practice energy
+    orangeTara: '#FF6B35',          // The Orange Tara - Mindfulness and compassion
+    yellowTara: '#D4AF37',          // The Yellow Tara - Study achievements and wisdom
+    blueTara: '#4A90E2',            // The Blue Tara - Deep contemplation
     enlightenmentWhite: '#ffffff',  // Purity and clarity
     
     // Practice status colors with Buddhist meaning
-    practiceComplete: '#2e7d32',    // Completed practice (wisdom green)
-    practiceActive: '#da4347',      // Active practice (dharma red)
+    greenTara: '#2e7d32',           // The Green Tara - Completed practice and growth
+    practiceActive: '#da4347',      // Active practice (Red Tara)
     practiceInactive: '#999999',    // Inactive practice
-    studyProgress: '#4A90E2',       // Learning progress (meditation blue)
+    studyProgress: '#4A90E2',       // Learning progress (Blue Tara)
     mindfulnessAlert: '#f59e0b',    // Mindful attention needed
-    mindfulnessCalm: '#4A90E2',     // Calm meditation state
+    mindfulnessCalm: '#4A90E2',     // Calm meditation state (Blue Tara)
     
-    // Extended Buddhist contextual colors
-    dharmaRedLight: '#e66a6d',      // Light dharma red for hover states
-    dharmaRedDark: '#b8393d',       // Dark dharma red for pressed states
-    compassionLight: '#FF8C5A',     // Light compassion for gentle states
-    wisdomLight: '#E6C757',         // Light wisdom for progress indicators
-    meditationLight: '#6BA3F0',     // Light meditation for calm states
+    // Extended Buddhist contextual colors - Tara variations
+    redTaraLight: '#e66a6d',        // Light Red Tara for hover states
+    redTaraDark: '#b8393d',         // Dark Red Tara for pressed states
+    orangeTaraLight: '#FF8C5A',     // Light Orange Tara for gentle states
+    yellowTaraLight: '#E6C757',     // Light Yellow Tara for progress indicators
+    blueTaraLight: '#6BA3F0',       // Light Blue Tara for calm states
     
-    // Success state variations
-    successBackground: '#e8f5e8',   // Light success background
-    successBorder: '#2e7d32',       // Success border
+    // Success state variations - Green Tara
+    successBackground: '#e8f5e8',   // Light Green Tara background
+    successBorder: '#2e7d32',       // Green Tara border
     
     // Warning state variations  
     warningBackground: '#fff3cd',   // Light warning background
@@ -472,15 +472,15 @@ export const DesignSystem = {
 
     // Buddhist-specific component tokens
     buddhist: {
-      // Dharma practice cards
-      dharmaCard: {
+      // Red Tara practice cards
+      redTaraCard: {
         backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
         borderRadius: 12,            // Will reference borderRadius.lg
         padding: 20,                 // Will reference spacing.xl
         marginHorizontal: 16,        // Will reference spacing.lg
         marginVertical: 8,           // Will reference spacing.sm
         borderLeftWidth: 4,
-        borderLeftColor: '#da4347',  // Will reference colors.dharmaRed
+        borderLeftColor: '#da4347',  // Will reference colors.redTara
         shadowColor: '#000',         // Will reference colors.cardShadow
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
@@ -488,53 +488,53 @@ export const DesignSystem = {
         elevation: 4,
       },
       
-      // Meditation session cards
-      meditationCard: {
+      // Blue Tara meditation session cards
+      blueTaraCard: {
         backgroundColor: '#ffffff',  // Will reference colors.backgroundSecondary
         borderRadius: 16,            // Will reference borderRadius.xl
         padding: 20,                 // Will reference spacing.xl
         marginHorizontal: 16,        // Will reference spacing.lg
         marginVertical: 8,           // Will reference spacing.sm
         borderWidth: 2,
-        borderColor: '#4A90E2',      // Will reference colors.meditationBlue
-        shadowColor: '#4A90E2',      // Will reference colors.meditationBlue
+        borderColor: '#4A90E2',      // Will reference colors.blueTara
+        shadowColor: '#4A90E2',      // Will reference colors.blueTara
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
         shadowRadius: 8,
         elevation: 4,
       },
       
-      // Wisdom achievement badges
-      wisdomBadge: {
-        backgroundColor: '#D4AF37',  // Will reference colors.wisdomGold
+      // Yellow Tara wisdom achievement badges
+      yellowTaraBadge: {
+        backgroundColor: '#D4AF37',  // Will reference colors.yellowTara
         borderRadius: 20,            // Will reference spacing.xl
         paddingHorizontal: 12,       // Will reference spacing.md
         paddingVertical: 4,          // Will reference spacing.xs
-        shadowColor: '#D4AF37',      // Will reference colors.wisdomGold
+        shadowColor: '#D4AF37',      // Will reference colors.yellowTara
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 3,
       },
       
-      // Completion status indicators
-      completionBadge: {
+      // Green Tara completion status indicators
+      greenTaraBadge: {
         backgroundColor: '#e8f5e8',  // Will reference colors.successBackground
         borderRadius: 12,            // Will reference borderRadius.lg
         paddingHorizontal: 12,       // Will reference spacing.md
         paddingVertical: 4,          // Will reference spacing.xs
         borderWidth: 1,
-        borderColor: '#2e7d32',      // Will reference colors.practiceComplete
+        borderColor: '#2e7d32',      // Will reference colors.greenTara
       },
 
-      // Completed practice badge (top-right indicator)
+      // Green Tara completed practice badge (top-right indicator)
       completedBadge: {
         backgroundColor: '#e8f5e8',  // Will reference colors.successBackground
         borderRadius: 8,             // Will reference borderRadius.md
         paddingHorizontal: 8,        // Will reference spacing.sm
         paddingVertical: 4,          // Will reference spacing.xs
         borderWidth: 1,
-        borderColor: '#2e7d32',      // Will reference colors.practiceComplete
+        borderColor: '#2e7d32',      // Will reference colors.greenTara
         alignSelf: 'flex-start',
       },
     },
@@ -571,22 +571,26 @@ export const colorWithOpacity = {
     return `${color}${alpha}`;
   },
 
-  // Buddhist semantic colors with opacity variants
+  // Buddhist semantic colors with opacity variants - The Five Taras
   buddhist: {
-    dharmaWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.dharmaRed, opacity);
+    redTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.redTara, opacity);
     },
     
-    compassionWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.compassionOrange, opacity);
+    orangeTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.orangeTara, opacity);
     },
     
-    wisdomWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.wisdomGold, opacity);
+    yellowTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.yellowTara, opacity);
     },
     
-    meditationWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.meditationBlue, opacity);
+    blueTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.blueTara, opacity);
+    },
+
+    greenTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.greenTara, opacity);
     },
 
     practiceActiveOverlay: (opacity: keyof typeof DesignSystem.opacity): string => {
@@ -594,7 +598,7 @@ export const colorWithOpacity = {
     },
 
     practiceCompleteBackground: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.practiceComplete, opacity);
+      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.greenTara, opacity);
     },
   },
 };
@@ -640,7 +644,7 @@ export const createStyles = {
   }),
   
   // Buddhist semantic text styles with automatic line heights
-  dharmaTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
+  redTaraTitle: (size: keyof typeof DesignSystem.typography.fontSize = '2xl') => ({
     fontSize: DesignSystem.typography.fontSize[size],
     fontWeight: DesignSystem.typography.fontWeight.bold,
     color: DesignSystem.colors.textPrimary,
