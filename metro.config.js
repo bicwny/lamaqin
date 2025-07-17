@@ -26,8 +26,7 @@ config.serializer = {
 // Reset transformer to minimal configuration
 config.transformer = {
   ...config.transformer,
-  // Ensure we have basic transformer options
-  babelTransformerPath: require.resolve('metro-react-native-babel-transformer'),
+  // Use default Expo transformer (don't specify babelTransformerPath)
 };
 
 module.exports = config;
