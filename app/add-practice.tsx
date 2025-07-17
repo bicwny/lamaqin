@@ -12,8 +12,8 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
-import { ComponentTokens } from '@/utils/componentTokens';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 import PageTemplate from '@/components/PageTemplate';
 
 interface Practice {
@@ -28,7 +28,6 @@ export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     loadPractices();
@@ -100,8 +99,6 @@ export default function AddPracticeScreen() {
     </View>
   );
 
-
-
   if (loading) {
     return (
       <PageTemplate
@@ -109,10 +106,10 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
         </View>
       </PageTemplate>
@@ -126,7 +123,7 @@ export default function AddPracticeScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
@@ -149,7 +146,7 @@ export default function AddPracticeScreen() {
       title="添加修法"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -162,7 +159,7 @@ export default function AddPracticeScreen() {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    paddingTop: 16,
+    paddingTop: DesignSystem.spacing.lg,
   },
   loadingContainer: {
     flex: 1,
@@ -170,165 +167,83 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: Colors.text,
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    marginTop: DesignSystem.spacing.lg,
+    color: DesignSystem.colors.textPrimary,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: DesignSystem.spacing['4xl'],
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 16,
+    ...ComponentTextStyles.heading,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: 16,
-    color: Colors.textSecondary,
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: DesignSystem.spacing['4xl'],
   },
   backButton: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    ...componentHelpers.getButtonStyle('primary', 'medium'),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    ...componentHelpers.getButtonTextStyle('primary', 'medium'),
   },
   practiceSection: {
-    backgroundColor: 'white',
-    marginBottom: 20,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    marginBottom: DesignSystem.spacing.xl,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 12,
-    paddingHorizontal: 16,
+    ...ComponentTextStyles.subheading,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   practiceList: {
-    paddingVertical: 10,
+    paddingVertical: DesignSystem.spacing.base,
   },
   practiceItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   practiceInfo: {
     flex: 1,
   },
   practiceName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 4,
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   practiceType: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 2,
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.xxs,
   },
   practiceDescription: {
-    fontSize: 12,
-    color: Colors.textSecondary,
+    ...ComponentTextStyles.caption,
+    color: DesignSystem.colors.textSecondary,
   },
   practiceChevron: {
-    marginLeft: 12,
+    marginLeft: DesignSystem.spacing.md,
   },
   chevronText: {
-    fontSize: 20,
-    color: '#ccc',
-  },
-  configForm: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  input: {
-    ...ComponentTokens.input.standard,
-  },
-  periodSelector: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  periodButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    backgroundColor: 'white',
-    alignItems: 'center',
-  },
-  selectedPeriodButton: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  periodButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.text,
-  },
-  selectedPeriodButtonText: {
-    color: 'white',
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
-    backgroundColor: 'white',
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.surface,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
+    fontSize: DesignSystem.typography.fontSize.xl,
+    color: DesignSystem.colors.borderLight,
   },
 });
