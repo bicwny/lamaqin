@@ -86,7 +86,7 @@ export default function PracticeRecordCard({
       {isDeleting && (
         <View style={styles.deletingOverlay}>
           <ActivityIndicator
-            color={DesignSystem.colors.destructive}
+            color={DesignSystem.colors.error} // Using standard error color for destructive actions
             size="small"
           />
           <Text style={styles.deletingText}>删除中...</Text>
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   },
   deletingText: {
     ...ComponentTextStyles.label,
-    color: DesignSystem.colors.destructive,
+    color: DesignSystem.colors.error, // Standard error color for destructive actions
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   header: {
@@ -212,16 +212,16 @@ const styles = StyleSheet.create({
   },
   recordCount: {
     ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textPrimary,
+    color: DesignSystem.colors.textPrimary, // Clear text for practice count display
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   notesContainer: {
     marginTop: DesignSystem.spacing.sm,
     padding: DesignSystem.spacing.md,
     backgroundColor: DesignSystem.colors.backgroundSecondary,
-    // borderRadius: DesignSystem.borderRadius.md,
+    borderRadius: DesignSystem.borderRadius.md,
     borderLeftWidth: 2,
-    borderLeftColor: DesignSystem.colors.primary,
+    borderLeftColor: DesignSystem.colors.redTara, // Red Tara for practice energy and notes
   },
   notesLabel: {
     ...ComponentTextStyles.label,
