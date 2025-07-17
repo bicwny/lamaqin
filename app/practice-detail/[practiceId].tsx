@@ -764,14 +764,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: DesignSystem.colors.redTara, // Buddhist semantic color for primary actions
+    backgroundColor: DesignSystem.colors.redTara, // Red Tara for practice energy and action
   },
   secondaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("secondary", "medium"),
   },
   primaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("primary", "medium"),
-    color: DesignSystem.colors.white, // Ensure contrast with dharmaRed background
+    color: DesignSystem.colors.whiteTara, // White Tara for purity and clarity on Red Tara background
   },
   recordsCard: componentHelpers.getCardWithBottomMargin(
     "outlined",
@@ -796,7 +796,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     ...ComponentTextStyles.link,
     fontSize: DesignSystem.typography.fontSize.sm,
-    color: DesignSystem.colors.redTara, // Buddhist semantic color for links
+    color: DesignSystem.colors.redTara, // Red Tara for practice navigation links
   },
   recordsList: {
     gap: DesignSystem.spacing.sm,
