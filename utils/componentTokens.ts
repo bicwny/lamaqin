@@ -832,6 +832,12 @@ export const componentHelpers = {
     return componentHelpers.getButtonStyle(mapping.variant, mapping.size);
   },
 
+  // Legacy button text style support
+  getLegacyButtonTextStyle: (legacyVariant: 'primary' | 'secondary' | 'small' | 'text' | 'dharma') => {
+    const mapping = ComponentTokens.button.legacy[legacyVariant];
+    return componentHelpers.getButtonTextStyle(mapping.variant, mapping.size);
+  },
+
   // Get card with custom margin
   getCardWithMargin: (
     variant: 'outlined' | 'elevated',
