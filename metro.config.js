@@ -12,7 +12,29 @@ config.resolver.blockList = /__replco/;
 // Reset cache to ensure clean state
 config.resetCache = true;
 
-// Remove complex serializer configurations that might cause issues
-delete config.serializer;
+// Configure transformer to handle source maps better
+config.transformer = {
+  ...config.transformer,
+  minifierConfig: {
+    mangle: {
+      keep_fnames: true,
+    },
+    output: {
+      ascii_only: true,
+      quote_keys: true,
+      wrap_iife: true,
+    },
+    sourceMap: {
+      includeSources: false,
+    },
+  },
+};
+
+// Configure serializer to handle anonymous files better
+config.serializer = {
+  ...config.serializer,
+  customSerializer: undefined,
+  getModulesRunBeforeMainModule: () => [],
+};
 
 module.exports = withNativeWind(config, { input: './global.css' });
