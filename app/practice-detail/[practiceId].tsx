@@ -460,7 +460,7 @@ export default function PracticeDetailScreen() {
         backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.dharmaRed} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -617,7 +617,7 @@ export default function PracticeDetailScreen() {
               <Ionicons
                 name="chevron-forward"
                 size={16}
-                color={DesignSystem.colors.primary}
+                color={DesignSystem.colors.dharmaRed}
               />
             </TouchableOpacity>
           </View>
@@ -639,6 +639,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     fontWeight: DesignSystem.typography.fontWeight.medium,
     marginTop: DesignSystem.spacing.md,
+    color: DesignSystem.colors.textPrimary,
   },
   emptyContainer: {
     flex: 1,
@@ -678,6 +679,7 @@ const styles = StyleSheet.create({
   practiceTitle: {
     ...ComponentTextStyles.dharma,
     marginBottom: DesignSystem.spacing.xs,
+    color: DesignSystem.colors.dharmaRed, // Buddhist semantic color for practice titles
   },
   programName: {
     ...ComponentTextStyles.label,
@@ -707,7 +709,7 @@ const styles = StyleSheet.create({
   currentCount: {
     ...Typography.styles.heading("xl"),
     fontWeight: DesignSystem.typography.fontWeight.bold,
-    color: DesignSystem.colors.textPrimary,
+    color: DesignSystem.colors.dharmaRed, // Buddhist semantic color for active practice counts
   },
   totalCountAndDays: {
     ...ComponentTextStyles.body,
@@ -726,7 +728,7 @@ const styles = StyleSheet.create({
   progressPercentage: {
     ...Typography.styles.body("base"),
     fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
+    color: DesignSystem.colors.dharmaRed, // Buddhist semantic color for progress indicators
     minWidth: 50,
     textAlign: "right",
   },
@@ -736,6 +738,7 @@ const styles = StyleSheet.create({
   progressText: {
     ...ComponentTextStyles.subheading,
     marginBottom: DesignSystem.spacing.xs,
+    color: DesignSystem.colors.textPrimary,
   },
   sessionDetails: {
     ...ComponentTextStyles.label,
@@ -760,12 +763,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: DesignSystem.colors.dharmaRed, // Buddhist semantic color for primary actions
   },
   secondaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("secondary", "medium"),
   },
   primaryButtonTextNew: {
     ...componentHelpers.getButtonTextStyle("primary", "medium"),
+    color: DesignSystem.colors.white, // Ensure contrast with dharmaRed background
   },
   recordsCard: componentHelpers.getCardWithBottomMargin(
     "outlined",
@@ -780,6 +785,7 @@ const styles = StyleSheet.create({
   },
   recordsTitle: {
     ...ComponentTextStyles.subheading,
+    color: DesignSystem.colors.textPrimary,
   },
   viewAllButton: {
     flexDirection: "row",
@@ -789,6 +795,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     ...ComponentTextStyles.link,
     fontSize: DesignSystem.typography.fontSize.sm,
+    color: DesignSystem.colors.dharmaRed, // Buddhist semantic color for links
   },
   recordsList: {
     gap: DesignSystem.spacing.sm,
