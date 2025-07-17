@@ -1,28 +1,13 @@
 
 const { getDefaultConfig } = require('expo/metro-config');
-const path = require('path');
+const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
-// Ensure stable resolver configuration
-config.resolver = {
-  ...config.resolver,
-  alias: {
-    '@': path.resolve(__dirname, './'),
-  },
-  platforms: ['ios', 'android', 'web'],
-};
+// Keep default asset extensions only
+config.resolver.platforms = ['ios', 'android', 'web'];
 
-// Ensure stable transformer configuration
-config.transformer = {
-  ...config.transformer,
-  minifierPath: 'metro-minify-terser',
-  minifierConfig: {
-    keep_fnames: true,
-    mangle: {
-      keep_fnames: true,
-    },
-  },
-};
+// Ignore Replit development tools that may cause module resolution issues
+config.resolver.blacklistRE = /__replco/;
 
-module.exports = config;
+module.exports = withNativeWind(config, { input: './global.css' });
