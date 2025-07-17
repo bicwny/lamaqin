@@ -16,8 +16,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Colors } from "@/constants/Colors";
-import { ComponentTokens } from '@/utils/componentTokens';
+import { DesignSystem } from "@/constants/DesignSystem";
+import {
+  ComponentTokens,
+  ComponentTextStyles,
+  componentHelpers,
+} from '@/utils/componentTokens';
 import PageTemplate from "@/components/PageTemplate";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getCurrentWeekStart } from "@/lib/topic-progress";
@@ -523,11 +527,11 @@ export default function PracticeConfigScreen() {
 
   const renderTimePlanning = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>时间规划</Text>
+      <Text style={styles.sectionTitle}>项目时长</Text>
 
       {/* Start date - always defaults to today, but editable */}
-      <View style={styles.timeInputContainer}>
-        <Text style={styles.timeInputLabel}>开始日期</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>开始日期</Text>
         <TouchableOpacity
           style={styles.simpleDateButton}
           onPress={showStartDatepicker}
@@ -579,41 +583,35 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      {/* End date - smart duration input */}
-      <View style={styles.timeInputContainer}>
-        <Text style={styles.timeInputLabel}>结束日期</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>项目时长</Text>
 
-        {/* Smart duration input */}
         <View style={styles.smartDurationContainer}>
           <View style={styles.daysInputContainer}>
             <TextInput
               style={styles.daysInput}
               value={customDays}
               onChangeText={handleDaysInputChange}
-              placeholder="天数"
               keyboardType="numeric"
+              placeholder="60"
             />
             <Text style={styles.daysInputLabel}>天</Text>
           </View>
-
-          <Text style={styles.durationSeparator}>或</Text>
-
+          <Text style={styles.durationSeparator}>至</Text>
           <TouchableOpacity
             style={styles.endDatePickerButton}
-            onPress={showCustomDatepicker}
+            onPress={() => setCustomDatePickerVisibility(true)}
           >
             <Text style={styles.endDatePickerButtonText}>
-              {formatDate(customEndDate)}
+              {customEndDate.toLocaleDateString('zh-CN')}
             </Text>
             <Text style={styles.dateButtonIcon}>📅</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Duration display */}
         <View style={styles.durationDisplay}>
           <Text style={styles.durationDisplayText}>
-            {formatDate(startDate)} → {formatDate(customEndDate)} (共{" "}
-            {calculatedDays} 天)
+            项目时长：{calculatedDays} 天
           </Text>
         </View>
 
@@ -976,7 +974,7 @@ export default function PracticeConfigScreen() {
 
         console.log("✅ Practice project created:", data);
         Alert.alert("成功", "修行项目已添加！", [
-          { text: "确定", onPress: () => router.push("/(tabs)/practice") },
+          { text: "确定", onPress: () => router.push("/(tabs)/(tabs)/practice") },
         ]);
       }
     } catch (error) {
@@ -993,10 +991,9 @@ export default function PracticeConfigScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
-        {/* The problematic empty line that was here has been removed. */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
@@ -1129,642 +1126,351 @@ export default function PracticeConfigScreen() {
 }
 
 const styles = StyleSheet.create({
-  section: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 20,
-    margin: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  section: componentHelpers.getCardWithBottomMargin(
+    'outlined',
+    'comfortable',
+    'comfortable'
+  ),
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 16,
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.lg,
   },
   segmentedControl: {
     flexDirection: "row",
-    backgroundColor: "#f1f3f4",
-    borderRadius: 8,
-    padding: 4,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.xs,
   },
   segmentButton: {
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.sm,
     alignItems: "center",
   },
   segmentButtonActive: {
-    backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    ...DesignSystem.shadow.sm,
   },
   segmentButtonText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#666",
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
   },
   segmentButtonTextActive: {
-    color: "#333",
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textPrimary,
   },
   inputContainer: {
-    marginTop: 16,
+    marginTop: DesignSystem.spacing.lg,
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#333",
-    marginBottom: 4,
-  },
-  inputHelper: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 8,
-    fontStyle: 'italic',
+    ...ComponentTextStyles.label,
+    marginBottom: DesignSystem.spacing.xs,
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
   },
   inputPrefix: {
-    fontSize: 16,
-    color: "#666",
-    marginRight: 8,
+    ...ComponentTextStyles.body,
+    marginRight: DesignSystem.spacing.sm,
   },
   textInput: {
     flex: 1,
-    paddingVertical: ComponentTokens.input.standard.paddingVertical,
-    fontSize: ComponentTokens.input.standard.fontSize,
-    color: ComponentTokens.input.standard.color,
+    paddingVertical: DesignSystem.spacing.md,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
   },
   inputUnit: {
-    fontSize: 16,
-    color: "#666",
-    marginLeft: 8,
+    ...ComponentTextStyles.body,
+    marginLeft: DesignSystem.spacing.sm,
   },
-  dateButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: "#e9ecef",
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  dateButtonIcon: {
-    fontSize: 16,
-  },
-  durationOptions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 12,
-  },
-  durationButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#f1f3f4",
-    borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  durationButtonActive: {
-    backgroundColor: Colors.primary,
-  },
-  durationButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#666",
-  },
-  durationButtonTextActive: {
-    color: "white",
-  },
-  customButton: {
-    backgroundColor: "#d4af37",
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  customButtonActive: {
-    backgroundColor: "#b8941f",
-  },
-  customButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "white",
-  },
-  customButtonTextActive: {
-    color: "white",
-  },
-  customInputContainer: {
-    marginTop: 12,
-    padding: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: "#007AFF",
-  },
-  customInputLabel: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#333",
-    marginBottom: 8,
-  },
-  customDateButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: "#e9ecef",
-  },
-  customDateButtonText: {
-    fontSize: 16,
-    color: "#333",
-  },
-
-  summaryContainer: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
-  },
-  summaryTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 12,
-  },
-  summaryText: {
-    fontSize: 15,
-    color: "#555",
-    lineHeight: 22,
-    marginBottom: 4,
-  },
-  summaryHighlight: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: Colors.primary,
-    lineHeight: 22,
-    marginTop: 8,
-  },
-  topicProgressInfo: {
-    backgroundColor: "#f0f8ff",
-    borderRadius: 8,
-    padding: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: "#4a90e2",
-    marginTop: 8,
-  },
-  topicProgressText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2c3e50",
-    marginBottom: 8,
-  },
-  topicProgressSubtext: {
-    fontSize: 14,
-    color: "#7f8c8d",
-    lineHeight: 20,
-  },
-  saveButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  saveButtonDisabled: {
-    backgroundColor: "#ccc",
-  },
-  saveButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  specialSection: {
-    marginTop: 24,
-    padding: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-  },
-  topicProgressConfig: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e9ecef",
-  },
-  configLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 4,
-  },
-  configDescription: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 16,
-  },
-  numberInput: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    textAlign: "center",
-    minWidth: 60,
-    backgroundColor: "#fff",
-  },
-  helpText: {
-    fontSize: 12,
-    color: "#666",
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  // Simplified count-based config styles
   goalTypeContainer: {
-    marginBottom: 20,
+    marginBottom: DesignSystem.spacing.xl,
   },
   goalInputContainer: {
-    marginTop: 8,
+    marginTop: DesignSystem.spacing.sm,
   },
   goalInputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.sm,
   },
   goalInputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
   },
   goalTextInput: {
     flex: 1,
-    paddingVertical: ComponentTokens.input.standard.paddingVertical,
-    fontSize: ComponentTokens.input.standard.fontSize,
-    color: ComponentTokens.input.standard.color,
+    paddingVertical: DesignSystem.spacing.md,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
   },
   goalInputUnit: {
-    fontSize: 16,
-    color: "#666",
-    marginLeft: 8,
-  },
-  // Simplified time planning styles
-  timeInputContainer: {
-    marginBottom: 16,
-  },
-  timeInputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
+    ...ComponentTextStyles.body,
+    marginLeft: DesignSystem.spacing.sm,
   },
   simpleDateButton: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
   },
   simpleDateButtonText: {
-    fontSize: 16,
-    color: "#333",
+    ...ComponentTextStyles.body,
   },
   dateButtonIcon: {
-    fontSize: 16,
+    ...ComponentTextStyles.body,
   },
-  quickDurationButtons: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 8,
-  },
-  quickDurationButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#f1f3f4",
-    borderRadius: 20,
-  },
-  quickDurationButtonActive: {
-    backgroundColor: Colors.primary,
-  },
-  quickDurationButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#666",
-  },
-  quickDurationButtonTextActive: {
-    color: "white",
-  },
-  customDatePickerButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: "#e9ecef",
-    marginTop: 8,
-  },
-  customDatePickerButtonActive: {
-    backgroundColor: "#e8f4fd",
-    borderColor: Colors.primary,
-  },
-  customDatePickerButtonText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  // Smart duration input styles
   smartDurationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
+    gap: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   daysInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
     flex: 1,
   },
   daysInput: {
     flex: 1,
-    paddingVertical: ComponentTokens.input.standard.paddingVertical,
-    fontSize: ComponentTokens.input.standard.fontSize,
-    color: ComponentTokens.input.standard.color,
+    paddingVertical: DesignSystem.spacing.md,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
     textAlign: "center",
   },
   daysInputLabel: {
-    fontSize: 16,
-    color: "#666",
-    marginLeft: 4,
+    ...ComponentTextStyles.body,
+    marginLeft: DesignSystem.spacing.xs,
   },
   durationSeparator: {
-    fontSize: 14,
-    color: "#999",
-    fontWeight: "500",
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textTertiary,
   },
   endDatePickerButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
     flex: 2,
     justifyContent: "space-between",
   },
   endDatePickerButtonText: {
-    fontSize: 16,
-    color: "#333",
+    ...ComponentTextStyles.body,
   },
   durationDisplay: {
-    backgroundColor: "#f0f8ff",
-    borderRadius: 6,
-    padding: 8,
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.sm,
+    padding: DesignSystem.spacing.sm,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: DesignSystem.colors.primary,
   },
   durationDisplayText: {
-    fontSize: 14,
-    color: "#555",
+    ...ComponentTextStyles.label,
     textAlign: "center",
   },
-  // Preview card styles
   previewCard: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.lg,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
+    borderLeftColor: DesignSystem.colors.primary,
   },
   previewHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.md,
     flexWrap: "wrap",
-    gap: 8,
+    gap: DesignSystem.spacing.sm,
   },
   previewPracticeName: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
+    ...ComponentTextStyles.subheading,
   },
   previewProjectPill: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: DesignSystem.colors.primary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   previewProjectPillText: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "white",
+    ...ComponentTextStyles.caption,
+    color: DesignSystem.colors.textInverse,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   previewDetails: {
-    gap: 6,
+    gap: DesignSystem.spacing.xxs,
   },
   previewDetailItem: {
-    fontSize: 14,
-    color: "#555",
-    lineHeight: 20,
+    ...ComponentTextStyles.body,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
   },
   previewPlaceholder: {
-    fontSize: 14,
-    color: "#999",
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textTertiary,
     fontStyle: "italic",
-  },
-  projectNameInput: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#333",
-    borderWidth: 1,
-    borderColor: "#e9ecef",
   },
   projectNameContainer: {
     position: "relative",
   },
   projectNameButton: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   projectNameButtonText: {
-    fontSize: 16,
-    color: "#333",
+    ...ComponentTextStyles.body,
     flex: 1,
   },
   projectNamePlaceholder: {
-    color: "#999",
+    color: DesignSystem.colors.textTertiary,
   },
   projectNameButtonIcon: {
-    fontSize: 14,
-    color: "#666",
-    marginLeft: 8,
+    ...ComponentTextStyles.label,
+    marginLeft: DesignSystem.spacing.sm,
   },
   clearButton: {
     position: "absolute",
-    right: 32,
-    top: 12,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#dc3545",
+    right: DesignSystem.spacing['3xl'],
+    top: DesignSystem.spacing.md,
+    width: DesignSystem.spacing['2xl'],
+    height: DesignSystem.spacing['2xl'],
+    borderRadius: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.error,
     justifyContent: "center",
     alignItems: "center",
   },
   clearButtonText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
+    color: DesignSystem.colors.textInverse,
+    fontSize: DesignSystem.typography.fontSize.xs,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "white",
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
+    borderBottomColor: DesignSystem.colors.border,
   },
   modalCancelButton: {
-    fontSize: 16,
-    color: "#666",
-    fontWeight: "500",
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
+    ...ComponentTextStyles.subheading,
   },
   modalConfirmButton: {
-    fontSize: 16,
-    color: Colors.primary,
-    fontWeight: "600",
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   modalConfirmButtonDisabled: {
-    color: "#ccc",
+    color: DesignSystem.colors.textTertiary,
   },
   modalSearchContainer: {
-    padding: 16,
-    backgroundColor: "white",
+    padding: DesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
+    borderBottomColor: DesignSystem.colors.border,
   },
   modalSearchInput: {
     ...ComponentTokens.input.search,
   },
   modalPresetList: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
   },
   modalPresetItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: "#f1f3f4",
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   modalPresetContent: {
     flex: 1,
   },
   modalPresetName: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#333",
+    ...ComponentTextStyles.body,
   },
   modalPresetCategory: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
+    ...ComponentTextStyles.caption,
+    marginTop: DesignSystem.spacing.xs,
   },
   modalPresetArrow: {
-    fontSize: 16,
-    color: "#ccc",
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textTertiary,
   },
   modalEmptyState: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
-    paddingHorizontal: 32,
+    paddingVertical: DesignSystem.spacing['5xl'],
+    paddingHorizontal: DesignSystem.spacing['3xl'],
   },
   modalEmptyText: {
-    fontSize: 16,
-    color: "#666",
+    ...ComponentTextStyles.body,
     textAlign: "center",
-    lineHeight: 24,
+    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
+  },
+  saveButton: componentHelpers.getButtonStyle('primary', 'medium'),
+  saveButtonDisabled: {
+    backgroundColor: DesignSystem.colors.textTertiary,
+  },
+  saveButtonText: componentHelpers.getButtonTextStyle('primary', 'medium'),
+  helpText: {
+    ...ComponentTextStyles.caption,
+    textAlign: "center",
+    fontStyle: "italic",
   },
   webDatePicker: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    padding: 12,
-    marginTop: 8,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.sm,
     borderWidth: 1,
-    borderColor: "#e9ecef",
+    borderColor: DesignSystem.colors.border,
   },
   webDateInput: {
-    fontSize: ComponentTokens.input.standard.fontSize,
-    color: ComponentTokens.input.standard.color,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
     backgroundColor: "transparent",
     borderWidth: 0,
     outlineWidth: 0,
