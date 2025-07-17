@@ -1145,7 +1145,7 @@ const styles = StyleSheet.create({
   },
   segmentedControl: {
     flexDirection: "row",
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     padding: ConsolidatedDesignSystem.spacing.xs,
   },
@@ -1157,7 +1157,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   segmentButtonActive: {
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"],
     ...ConsolidatedDesignSystem.shadow.sm,
   },
   segmentButtonText: {
@@ -1178,7 +1178,7 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
     borderWidth: 1,
@@ -1211,7 +1211,7 @@ const styles = StyleSheet.create({
   goalInputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
     borderWidth: 1,
@@ -1231,7 +1231,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
     paddingVertical: ConsolidatedDesignSystem.spacing.md,
@@ -1253,7 +1253,7 @@ const styles = StyleSheet.create({
   daysInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
     borderWidth: 1,
@@ -1278,7 +1278,7 @@ const styles = StyleSheet.create({
   endDatePickerButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
     paddingVertical: ConsolidatedDesignSystem.spacing.md,
@@ -1313,7 +1313,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.subheading,
   },
   previewProjectPill: {
-    backgroundColor: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    backgroundColor: ConsolidatedDesignSystem.colors.primary,
     borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.sm,
     paddingVertical: ConsolidatedDesignSystem.spacing.xs,
@@ -1339,7 +1339,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   projectNameButton: {
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.md,
     paddingVertical: ConsolidatedDesignSystem.spacing.md,
@@ -1386,7 +1386,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
     paddingVertical: ConsolidatedDesignSystem.spacing.md,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderBottomWidth: 1,
     borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
@@ -1399,7 +1399,7 @@ const styles = StyleSheet.create({
   },
   modalConfirmButton: {
     ...ComponentTextStyles.label,
-    color: ConsolidatedConsolidatedDesignSystem.colors.primary,
+    color: ConsolidatedDesignSystem.colors.primary,
     fontWeight: ConsolidatedDesignSystem.typography.fontWeight.semibold,
   },
   modalConfirmButtonDisabled: {
@@ -1407,13 +1407,13 @@ const styles = StyleSheet.create({
   },
   modalSearchContainer: {
     padding: ConsolidatedDesignSystem.spacing.lg,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderBottomWidth: 1,
     borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   modalSearchInput: {
     borderWidth: 1,
-    borderColor: ConsolidatedDesignSystem.colors["border-default"]Light,
+    borderColor: ConsolidatedDesignSystem.colors["border-default"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.lg,
     paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
     paddingVertical: ConsolidatedDesignSystem.spacing.base,
@@ -1425,7 +1425,7 @@ const styles = StyleSheet.create({
   },
   modalPresetList: {
     flex: 1,
-    backgroundColor: ConsolidatedDesignSystem.colorsConsolidatedDesignSystem.colors["surface-secondary"],
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
   },
   modalPresetItem: {
     flexDirection: "row",
@@ -1433,7 +1433,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: ConsolidatedDesignSystem.spacing.lg,
     paddingVertical: ConsolidatedDesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"]Light,
+    borderBottomColor: ConsolidatedDesignSystem.colors["border-default"],
   },
   modalPresetContent: {
     flex: 1,
@@ -1468,7 +1468,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   webDatePicker: {
-    backgroundColor: ConsolidatedDesignSystem.colors["surface-primary"]Tertiary,
+    backgroundColor: ConsolidatedDesignSystem.colors["surface-secondary"],
     borderRadius: ConsolidatedDesignSystem.borderRadius.md,
     padding: ConsolidatedDesignSystem.spacing.md,
     marginTop: ConsolidatedDesignSystem.spacing.sm,
