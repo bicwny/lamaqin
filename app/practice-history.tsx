@@ -8,19 +8,16 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  SafeAreaView,
   ToastAndroid,
   Platform,
 } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { Colors } from '@/constants/Colors';
 import { presetProjectNameService } from '@/lib/database';
-import PageTemplate from '@/components/PageTemplate';
-import ProgressBar from '@/components/ProgressBar';
-import PracticeRecordCard from '@/components/PracticeRecordCard';
-import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
-import { Typography } from '@/utils/typography';
+import PageHeader from '@/components/PageHeader';
 
 interface DailyRecord {
   id: string;
@@ -245,39 +242,33 @@ export default function PracticeHistoryScreen() {
 
   if (loading) {
     return (
-      <PageTemplate
-        title={`${practiceName} - 详情`}
-        subtitle={undefined}
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
-      >
+      <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>正在加载...</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   const progress = calculateProgress();
 
   return (
-    <PageTemplate
-      title={`${practiceName} - 详情`}
-      subtitle={undefined}
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      scrollable={true}
-      backgroundColor={DesignSystem.colors.background}
-      padding={0}
-      contentContainerStyle={{
-        refreshControl: (
+    <SafeAreaView style={styles.container}>
+      <PageHeader 
+        title={`📿 ${practiceName} - 详情`}
+        subtitle={projectInfo && (projectInfo.project_name || projectInfo.preset_project_id) ? 
+          `项目：${getDisplayProjectName(projectInfo)}` : undefined}
+        showBackButton={true}
+        onBackPress={() => router.back()}
+      />
+
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        )
-      }}
-    >
+        }
+      >
         {/* Progress Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>总体进度</Text>
@@ -291,11 +282,12 @@ export default function PracticeHistoryScreen() {
             </Text>
           </View>
 
-          <View style={styles.progressBarContainer}>
-            <ProgressBar 
-              progress={progress.percentage} 
-              size="thick" 
-              containerStyle={{ flex: 1 }}
+          <View style={styles.progressBar}>
+            <View 
+              style={[
+                styles.progressFill, 
+                { width: `${Math.min(progress.percentage, 100)}%` }
+              ]} 
             />
           </View>
 
@@ -320,92 +312,291 @@ export default function PracticeHistoryScreen() {
               {records.map((record) => {
                 const isDeleting = deletingRecords.has(record.id);
                 return (
-                  <PracticeRecordCard
-                    key={record.id}
-                    record={record}
-                    practiceType="count"
-                    practiceUnit={projectInfo?.practices?.unit || '次'}
-                    isDeleting={isDeleting}
-                    showActions={true}
-                    onEdit={() => handleEdit(record)}
-                    onDelete={() => handleDelete(record)}
-                  />
+                  <View 
+                    key={record.id} 
+                    style={[
+                      styles.recordCard,
+                      isDeleting && styles.recordCardDeleting
+                    ]}
+                  >
+                    {isDeleting && (
+                      <View style={styles.deletingOverlay}>
+                        <ActivityIndicator color="#dc3545" size="small" />
+                        <Text style={styles.deletingText}>删除中...</Text>
+                      </View>
+                    )}
+
+                    <View style={[styles.recordHeader, isDeleting && styles.disabledContent]}>
+                      <Text style={styles.recordDate}>
+                        {formatDate(record.record_date)}
+                      </Text>
+                      <Text style={styles.recordTime}>
+                        {formatTime(record.created_at)}
+                      </Text>
+                    </View>
+
+                    <View style={[styles.recordContent, isDeleting && styles.disabledContent]}>
+                      <Text style={styles.recordCount}>
+                        数量: {record.count.toLocaleString()} {projectInfo?.practices?.unit || '次'}
+                      </Text>
+
+                      {record.notes && (
+                        <View style={styles.notesContainer}>
+                          <Text style={styles.notesLabel}>备注:</Text>
+                          <Text style={styles.notesText} numberOfLines={3}>
+                            {record.notes}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={styles.recordActions}>
+                      <TouchableOpacity
+                        style={[styles.editButton, isDeleting && styles.disabledButton]}
+                        onPress={() => handleEdit(record)}
+                        disabled={isDeleting}
+                      >
+                        <Text style={[styles.editButtonText, isDeleting && styles.disabledButtonText]}>
+                          编辑
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.deleteButton, isDeleting && styles.disabledButton]}
+                        onPress={() => handleDelete(record)}
+                        disabled={isDeleting}
+                      >
+                        <Text style={[styles.deleteButtonText, isDeleting && styles.disabledButtonText]}>
+                          删除
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 );
               })}
             </View>
           )}
         </View>
-    </PageTemplate>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
-    ...ComponentTextStyles.body,
-    marginTop: DesignSystem.spacing.md,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  scrollView: {
+    flex: 1,
   },
   summaryCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
+    backgroundColor: 'white',
+    margin: 16,
+    marginBottom: 8,
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   summaryTitle: {
-    ...ComponentTextStyles.subheading,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing.lg,
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: 12,
   },
   progressText: {
-    ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
   },
   progressPercentage: {
-    ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary,
   },
-  progressBarContainer: {
-    marginBottom: DesignSystem.spacing.md,
+  progressBar: {
+    height: 8,
+    backgroundColor: '#e9ecef',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: Colors.primary,
+    borderRadius: 4,
   },
   dailyTarget: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 14,
+    color: '#666',
     textAlign: 'center',
   },
   recordsSection: {
-    // margin: DesignSystem.spacing.lg,
-    marginTop: DesignSystem.spacing.xl,
+    margin: 16,
+    marginTop: 8,
   },
   sectionTitle: {
-    ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.md,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
   },
   emptyContainer: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 40,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   emptyText: {
-    ...ComponentTextStyles.subheading,
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.sm,
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 8,
   },
   emptySubtext: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 14,
+    color: '#999',
   },
   recordsList: {
-    gap: DesignSystem.spacing.md,
+    gap: 12,
   },
-
+  recordCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  recordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  recordDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  recordTime: {
+    fontSize: 14,
+    color: '#666',
+  },
+  recordContent: {
+    marginBottom: 12,
+  },
+  recordCount: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 8,
+  },
+  notesContainer: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  notesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  notesText: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  recordActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  editButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  deleteButton: {
+    backgroundColor: '#dc3545',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  recordCardDeleting: {
+    opacity: 0.6,
+    position: 'relative',
+  },
+  deletingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deletingText: {
+    color: '#dc3545',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  disabledContent: {
+    opacity: 0.5,
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  disabledButtonText: {
+    opacity: 0.5,
+  },
 });

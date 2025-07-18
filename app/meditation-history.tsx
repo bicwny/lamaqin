@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  SafeAreaView,
   ToastAndroid,
   Platform,
 } from 'react-native';
@@ -15,7 +16,7 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
-import PageTemplate from '@/components/PageTemplate';
+import PageHeader from '@/components/PageHeader';
 
 export default function MeditationHistoryScreen() {
   const { user } = useAuth();
@@ -269,32 +270,20 @@ export default function MeditationHistoryScreen() {
 
   if (loading) {
     return (
-      <PageTemplate
-        title={`📿 ${practiceName} - 历史记录`}
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>正在加载记录...</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   return (
-    <PageTemplate
-      title={`📿 ${practiceName} - 历史记录`}
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      scrollable={true}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
-      {/* View Mode Toggle */}
-      <View style={styles.viewToggleContainer}>
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <PageHeader title={`📿 ${practiceName} - 历史记录`} showBackButton>
+        {/* View Mode Toggle */}
         <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[
@@ -321,7 +310,23 @@ export default function MeditationHistoryScreen() {
             ]}>主题</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </PageHeader>
+
+      {/* Records List */}
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+          const paddingToBottom = 20;
+          if (layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom) {
+            handleLoadMore();
+          }
+        }}
+        scrollEventThrottle={400}
+      >
         {viewMode === 'chronological' ? (
           // Chronological View
           records.length === 0 ? (
@@ -483,11 +488,16 @@ export default function MeditationHistoryScreen() {
             </View>
           )
         )}
-    </PageTemplate>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -498,9 +508,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textSecondary,
   },
-  viewToggleContainer: {
-    padding: 16,
-    paddingBottom: 0,
+  scrollView: {
+    flex: 1,
   },
   emptyContainer: {
     flex: 1,

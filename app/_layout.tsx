@@ -2,33 +2,11 @@ import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
-import { router, useSegments } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '@/lib/toast';
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
-  const segments = useSegments();
-
-  useEffect(() => {
-    if (loading) return;
-
-    const inAuthGroup = segments[0] === 'auth';
-
-    console.log('🔒 Auth Guard - User:', user?.email || 'none');
-    console.log('🔒 Auth Guard - Current segments:', segments);
-    console.log('🔒 Auth Guard - In auth group:', inAuthGroup);
-
-    if (!user && !inAuthGroup) {
-      // No user and not in auth group, redirect to login
-      console.log('🔒 Auth Guard - Redirecting to login');
-      router.replace('/auth/login');
-    } else if (user && inAuthGroup) {
-      // User is authenticated but still in auth group, redirect to main app
-      console.log('🔒 Auth Guard - Redirecting to main app');
-      router.replace('/');
-    }
-  }, [user, loading, segments]);
 
   if (loading) {
     return (

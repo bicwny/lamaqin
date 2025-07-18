@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import PageTemplate from '@/components/PageTemplate';
+import PageHeader from '@/components/PageHeader';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 
@@ -168,47 +169,45 @@ export default function CourseDetailScreen() {
 
   if (loading) {
     return (
-      <PageTemplate
-        title="课程详情" 
-        subtitle="加载中..."
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="课程详情" 
+          subtitle="加载中..."
+          showBackButton={true}
+          onBackPress={() => router.back()}
+        />
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   if (!userCourse) {
     return (
-      <PageTemplate
-        title="课程详情" 
-        subtitle="课程未找到"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="课程详情" 
+          subtitle="课程未找到"
+          showBackButton={true}
+          onBackPress={() => router.back()}
+        />
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>课程未找到</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   return (
-    <PageTemplate
-      title={userCourse.course.name}
-      subtitle="课程详情与学习记录"
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
+    <SafeAreaView style={styles.container}>
+      <PageHeader 
+        title={userCourse.course.name}
+        subtitle="课程详情与学习记录"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+      />
+      <ScrollView style={styles.scrollView}>
 
         <View style={styles.courseInfoCard}>
           <Text style={styles.courseInfoTitle}>课程信息：</Text>
@@ -219,8 +218,8 @@ export default function CourseDetailScreen() {
 
         <Text style={styles.sectionTitle}>课程内容：</Text>
 
-        {lessons.map((lesson, index) => (
-          <View key={lesson.id} style={[styles.lessonItem, index > 0 && styles.lessonItemSpacing]}>
+        {lessons.map(lesson => (
+          <View key={lesson.id} style={styles.lessonItem}>
             <View style={styles.lessonHeader}>
               <View style={styles.lessonTitleRow}>
                 <Text style={styles.lessonTitle}>
@@ -282,11 +281,19 @@ export default function CourseDetailScreen() {
           </View>
         ))}
 
-    </PageTemplate>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -303,15 +310,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.3,
+    marginHorizontal: 16,
     marginTop: 16,
     marginBottom: 8,
-    paddingHorizontal: 20,
   },
   courseInfoCard: {
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
-    marginBottom: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -337,6 +345,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -403,8 +413,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: -0.2,
-  },
-  lessonItemSpacing: {
-    marginTop: 12,
   },
 });

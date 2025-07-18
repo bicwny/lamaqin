@@ -10,13 +10,12 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  ScrollView
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { ComponentTokens } from '@/utils/componentTokens';
 import { useAuth } from '@/contexts/AuthContext';
-import PageTemplate from '@/components/PageTemplate';
 
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
@@ -70,9 +69,16 @@ export default function ProfileSetupScreen() {
         return;
       }
 
-      // For profile setup, navigate directly without alert to avoid staying on page
-      console.log('✅ Profile saved successfully, navigating to main app');
-      router.replace('/(tabs)');
+      // For profile setup, we still navigate since it's initial setup
+      Alert.alert('保存成功', '个人资料已更新', [
+        {
+          text: '确定',
+          onPress: () => {
+            // Navigate to tabs - AuthContext will handle proper routing
+            router.replace('/(tabs)');
+          }
+        }
+      ]);
     } catch (error) {
       console.error('Profile save error:', error);
       Alert.alert('保存失败', '网络错误，请稍后重试');
@@ -82,24 +88,31 @@ export default function ProfileSetupScreen() {
   };
 
   const handleSkip = () => {
-    console.log('⏭️ Skipping profile setup, navigating to main app');
-    router.replace('/(tabs)');
+    Alert.alert(
+      '跳过设置',
+      '您可以稍后在个人资料页面完善信息',
+      [
+        { text: '继续设置', style: 'cancel' },
+        { 
+          text: '跳过', 
+          onPress: () => router.replace('/(tabs)') 
+        }
+      ]
+    );
   };
 
   return (
-    <PageTemplate
-      title="完善个人资料"
-      subtitle="帮助我们更好地了解您的修行情况"
-      showBackButton={false}
-      scrollable={true}
-      backgroundColor={Colors.background}
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <KeyboardAvoidingView 
-        style={styles.container} 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.logo}>🌸</Text>
+          <Text style={styles.title}>完善个人资料</Text>
+          <Text style={styles.subtitle}>
+            帮助我们更好地了解您的修行情况
+          </Text>
         </View>
 
         <View style={styles.form}>
@@ -187,14 +200,20 @@ export default function ProfileSetupScreen() {
             </Text>
           </View>
         </View>
-      </KeyboardAvoidingView>
-    </PageTemplate>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
   },
   header: {
     alignItems: 'center',
@@ -203,6 +222,18 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 48,
     marginBottom: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   form: {
     width: '100%',
@@ -217,7 +248,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   input: {
-    ...ComponentTokens.input.standard,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 16,
+    backgroundColor: Colors.surface,
+    color: Colors.text,
   },
   saveButton: {
     backgroundColor: Colors.primary,

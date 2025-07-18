@@ -8,13 +8,12 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  SafeAreaView,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
-import PageTemplate from '@/components/PageTemplate';
+import { Colors } from '@/constants/Colors';
 
 interface Practice {
   id: string;
@@ -28,6 +27,7 @@ export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     loadPractices();
@@ -99,32 +99,24 @@ export default function AddPracticeScreen() {
     </View>
   );
 
+  
+
   if (loading) {
     return (
-      <PageTemplate
-        title="添加修法"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
-      >
+      <SafeAreaView style={styles.container}>
+        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   if (practices.length === 0) {
     return (
-      <PageTemplate
-        title="添加修法"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
-      >
+      <SafeAreaView style={styles.container}>
+        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
           <Text style={styles.emptyDescription}>
@@ -137,29 +129,29 @@ export default function AddPracticeScreen() {
             <Text style={styles.backButtonText}>返回</Text>
           </TouchableOpacity>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   return (
-    <PageTemplate
-      title="添加修法"
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      backgroundColor={DesignSystem.colors.background}
-      padding={0}
-    >
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
+
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {renderPracticeSelector()}
       </ScrollView>
-    </PageTemplate>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
   content: {
     flex: 1,
-    paddingTop: DesignSystem.spacing.lg,
+    paddingTop: 16,
   },
   loadingContainer: {
     flex: 1,
@@ -167,83 +159,170 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-    marginTop: DesignSystem.spacing.lg,
-    color: DesignSystem.colors.textPrimary,
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.text,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: DesignSystem.spacing['4xl'],
+    padding: 32,
   },
   emptyTitle: {
-    ...ComponentTextStyles.heading,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: DesignSystem.spacing.lg,
+    fontSize: 24,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 16,
     textAlign: 'center',
   },
   emptyDescription: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 16,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing['4xl'],
+    marginBottom: 32,
   },
   backButton: {
-    ...componentHelpers.getButtonStyle('primary', 'medium'),
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
   },
   backButtonText: {
-    ...componentHelpers.getButtonTextStyle('primary', 'medium'),
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   practiceSection: {
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    marginBottom: DesignSystem.spacing.xl,
+    backgroundColor: 'white',
+    marginBottom: 20,
   },
   sectionTitle: {
-    ...ComponentTextStyles.subheading,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 12,
+    paddingHorizontal: 16,
   },
   practiceList: {
-    paddingVertical: DesignSystem.spacing.base,
+    paddingVertical: 10,
   },
   practiceItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingVertical: DesignSystem.spacing.lg,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
+    borderBottomColor: '#f0f0f0',
   },
   practiceInfo: {
     flex: 1,
   },
   practiceName: {
-    ...ComponentTextStyles.body,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    color: DesignSystem.colors.textPrimary,
-    marginBottom: DesignSystem.spacing.xs,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
   },
   practiceType: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.xxs,
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 2,
   },
   practiceDescription: {
-    ...ComponentTextStyles.caption,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 12,
+    color: Colors.textSecondary,
   },
   practiceChevron: {
-    marginLeft: DesignSystem.spacing.md,
+    marginLeft: 12,
   },
   chevronText: {
-    fontSize: DesignSystem.typography.fontSize.xl,
-    color: DesignSystem.colors.borderLight,
+    fontSize: 20,
+    color: '#ccc',
+  },
+  configForm: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  periodSelector: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  periodButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    alignItems: 'center',
+  },
+  selectedPeriodButton: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  periodButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedPeriodButtonText: {
+    color: 'white',
+  },
+  footer: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+    backgroundColor: 'white',
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
   },
 });

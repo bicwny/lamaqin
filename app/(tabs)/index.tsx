@@ -756,50 +756,44 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {courseLessons.length === 0 ? (
-              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
-                <Text style={styles.noStudyText}>暂无课程</Text>
-              </TouchableOpacity>
-            ) : (
-              courseLessons.map((nextLesson, index) => (
-                <View 
-                  key={index} 
-                  style={styles.studyCard}
-                >
-                  <View style={styles.studyCardHeader}>
-                    <View style={styles.studyCardTitleContainer}>
-                      <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
-                        <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.progressText}>{nextLesson.progress}</Text>
-                  <View style={styles.quickActionButtons}>
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.listenButton]}
-                      onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                    >
-                      <Text style={styles.quickActionButtonText}>听传承</Text>
+            {courseLessons.map((nextLesson, index) => (
+              <View 
+                key={index} 
+                style={styles.studyCard}
+              >
+                <View style={styles.studyCardHeader}>
+                  <View style={styles.studyCardTitleContainer}>
+                    <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
+                      <Text style={styles.courseName}>{nextLesson.courseName}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.readButton]}
-                      onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                    >
-                      <Text style={styles.quickActionButtonText}>看法本</Text>
-                    </TouchableOpacity>
-                    {nextLesson.url ? (
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.onlineButton]}
-                        onPress={() => Linking.openURL(nextLesson.url || '')}
-                      >
-                        <Text style={styles.quickActionButtonText}>在线课程</Text>
-                      </TouchableOpacity>
-                    ) : null}
+                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
                   </View>
                 </View>
-              ))
-            )}
+                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+                <View style={styles.quickActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.listenButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
+                  >
+                    <Text style={styles.quickActionButtonText}>听传承</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.readButton]}
+                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
+                  >
+                    <Text style={styles.quickActionButtonText}>看法本</Text>
+                  </TouchableOpacity>
+                  {nextLesson.url ? (
+                    <TouchableOpacity 
+                      style={[styles.quickActionButton, styles.onlineButton]}
+                      onPress={() => Linking.openURL(nextLesson.url || '')}
+                    >
+                      <Text style={styles.quickActionButtonText}>在线课程</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              </View>
+            ))}
           </View>
 
           {/* Practice Section */}
@@ -914,7 +908,11 @@ export default function HomeScreen() {
               ))}
             </View>
 
-            
+            {courseLessons.length === 0 && (
+              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
+                <Text style={styles.noStudyText}>暂无进行中的课程，点击查看课程库</Text>
+              </TouchableOpacity>
+            )}
 
             {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
               <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>

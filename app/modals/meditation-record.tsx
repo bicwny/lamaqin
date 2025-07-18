@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -8,19 +7,15 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  Platform,
   ScrollView,
+  Platform,
+  SafeAreaView,
   KeyboardAvoidingView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
-import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
 import TopicSelectionModal from '@/components/TopicSelectionModal';
 
@@ -179,249 +174,257 @@ export default function MeditationRecordScreen() {
     setSessionNumber(topic.topic_number.toString());
   };
 
-  const handleClose = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)/practice');
-    }
-  };
-
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
-    >
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
-        <Stack.Screen options={{ headerShown: false }} />
-        
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleClose}
-            >
-              <Ionicons name="close" size={24} color={Colors.text} />
-            </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/practice');
+          }
+        }} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          📝 {isEditing ? '编辑观修记录' : '记录新的观修'}
+        </Text>
+      </View>
+
+      <KeyboardAvoidingView 
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.formContainer}>
+          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+
+          {/* Duration Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+            <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
+            <TextInput
+              style={styles.textInput}
+              value={duration}
+              onChangeText={setDuration}
+              keyboardType="numeric"
+              placeholder="30"
+            />
           </View>
 
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>
-              {isEditing ? '编辑观修记录' : '记录新的观修'}
+          {/* Topic Selection - only show if there are topics or still loading */}
+          {(loadingTopics || meditationTopics.length > 0) && (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>选择观修内容</Text>
+              {loadingTopics ? (
+                <ActivityIndicator style={styles.loadingIndicator} />
+              ) : meditationTopics.length > 0 ? (
+                <TouchableOpacity
+                  style={styles.topicSelector}
+                  onPress={() => setShowTopicModal(true)}
+                >
+                  <Text style={styles.topicSelectorText}>
+                    {selectedTopic ? selectedTopic.title : '请选择观修内容'}
+                  </Text>
+                  <Text style={styles.topicSelectorArrow}>›</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          )}
+
+          {/* Reflection Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>观后感（可选）</Text>
+            <Text style={styles.inputHint}>
+              记录您在这次观修中的体验、感悟和思考...
+            </Text>
+            <TextInput
+              style={[styles.textInput, styles.multilineInput]}
+              value={reflection}
+              onChangeText={setReflection}
+              multiline
+              numberOfLines={6}
+              placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
+              textAlignVertical="top"
+            />
+            <Text style={styles.characterCount}>
+              {reflection.length} 字
             </Text>
           </View>
 
-          <View style={styles.headerRight}>
-            <TouchableOpacity 
-              style={[styles.saveHeaderButton, loading && styles.saveHeaderButtonDisabled]}
-              onPress={handleSave}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
-              ) : (
-                <Text style={styles.saveHeaderButtonText}>保存</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Content */}
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.content}>
-            <Text style={styles.practiceTitle}>{practiceName}</Text>
-
-            {/* Duration Input */}
-            <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-              <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
-              <TextInput
-                style={styles.textInput}
-                value={duration}
-                onChangeText={setDuration}
-                keyboardType="numeric"
-                placeholder="30"
-              />
-            </View>
-
-            {/* Topic Selection - only show if there are topics or still loading */}
-            {(loadingTopics || meditationTopics.length > 0) && (
-              <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>选择观修内容</Text>
-                {loadingTopics ? (
-                  <ActivityIndicator style={styles.loadingIndicator} />
-                ) : meditationTopics.length > 0 ? (
-                  <TouchableOpacity
-                    style={styles.topicSelector}
-                    onPress={() => setShowTopicModal(true)}
-                  >
-                    <Text style={styles.topicSelectorText}>
-                      {selectedTopic ? selectedTopic.title : '请选择观修内容'}
-                    </Text>
-                    <Text style={styles.topicSelectorArrow}>›</Text>
-                  </TouchableOpacity>
-                ) : null}
-              </View>
+          {/* Save Button - now inside scroll content */}
+          <TouchableOpacity 
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>💾 保存记录</Text>
             )}
-
-            {/* Reflection Input */}
-            <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>观后感（可选）</Text>
-              <Text style={styles.inputHint}>
-                记录您在这次观修中的体验、感悟和思考...
-              </Text>
-              <TextInput
-                style={[styles.textInput, styles.multilineInput]}
-                value={reflection}
-                onChangeText={setReflection}
-                multiline
-                numberOfLines={6}
-                placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
-                textAlignVertical="top"
-              />
-              <Text style={styles.characterCount}>
-                {reflection.length} 字
-              </Text>
-            </View>
-
-            
-          </View>
+          </TouchableOpacity>
+        </View>
         </ScrollView>
-        
-        {/* Topic Selection Modal */}
-        <TopicSelectionModal
-          visible={showTopicModal}
-          onClose={() => setShowTopicModal(false)}
-          onSelect={handleTopicSelect}
-          topics={meditationTopics}
-          selectedTopicNumber={selectedTopic?.topic_number}
-          loading={loadingTopics}
-        />
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+
+      {/* Topic Selection Modal */}
+      <TopicSelectionModal
+        visible={showTopicModal}
+        onClose={() => setShowTopicModal(false)}
+        onSelect={handleTopicSelect}
+        topics={meditationTopics}
+        selectedTopicNumber={selectedTopic?.topic_number}
+        loading={loadingTopics}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: '#f8f9fa'
+  },
+  keyboardAvoidingView: {
+    flex: 1
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
   },
-  headerLeft: {
-    flex: 1,
-    alignItems: 'flex-start',
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
   },
-  headerCenter: {
-    flex: 2,
-    alignItems: 'center',
-  },
-  headerRight: {
-    flex: 1,
-    alignItems: 'flex-end',
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500'
   },
   headerTitle: {
-    ...createStyles.heading('lg'),
-  },
-  closeButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.sm,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 4
   },
   content: {
     flex: 1,
-    padding: DesignSystem.spacing.lg,
+    padding: 16
+  },
+  formContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
   },
   practiceTitle: {
-    ...createStyles.dharmaTitle('xl'),
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing['2xl'],
-    paddingBottom: DesignSystem.spacing.lg,
+    marginBottom: 24,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: '#e9ecef'
   },
   inputSection: {
-    marginBottom: DesignSystem.spacing['2xl'],
+    marginBottom: 24
   },
   inputLabel: {
-    ...createStyles.subheading('base'),
-    marginBottom: DesignSystem.spacing.xs,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6
   },
   inputHint: {
-    ...createStyles.body('sm'),
-    color: DesignSystem.colors.textTertiary,
-    marginBottom: DesignSystem.spacing.sm,
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 8,
+    lineHeight: 20
   },
   textInput: {
-    ...ComponentTokens.input.standard,
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+    color: '#333'
   },
   multilineInput: {
     height: 120,
     textAlignVertical: 'top',
-    paddingTop: DesignSystem.spacing.md,
-    paddingBottom: DesignSystem.spacing.md,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   topicSelector: {
-    ...ComponentTokens.input.standard,
-    paddingVertical: DesignSystem.spacing.md,
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    paddingHorizontal: 12,
+    paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   topicSelectorText: {
-    ...createStyles.body('base'),
+    fontSize: 16,
+    color: '#333',
     flex: 1,
   },
   topicSelectorArrow: {
-    ...createStyles.body('lg'),
-    color: DesignSystem.colors.textSecondary,
-    marginLeft: DesignSystem.spacing.sm,
+    fontSize: 18,
+    color: '#999',
+    marginLeft: 8,
   },
   characterCount: {
-    ...createStyles.caption(),
+    fontSize: 12,
+    color: '#6c757d',
     textAlign: 'right',
-    marginTop: DesignSystem.spacing.xs,
+    marginTop: 4
   },
   loadingIndicator: {
-    padding: DesignSystem.spacing.xl,
+    padding: 20
   },
-  saveHeaderButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.primary,
-    borderRadius: DesignSystem.borderRadius.sm,
-    minWidth: 60,
+  saveButton: {
+    backgroundColor: '#ffc107',
+    borderRadius: 8,
+    paddingVertical: 16,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 24,
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
   },
-  saveHeaderButtonDisabled: {
-    opacity: 0.6,
+  saveButtonDisabled: {
+    opacity: 0.6
   },
-  saveHeaderButtonText: {
-    ...createStyles.buttonText('primary'),
-    color: DesignSystem.colors.textInverse,
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
+  saveButtonText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '600'
+  }
 });

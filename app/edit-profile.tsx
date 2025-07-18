@@ -8,15 +8,15 @@ import {
   Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
-import { ComponentTokens } from '@/utils/componentTokens';
 import { useAuth } from '@/contexts/AuthContext';
-import PageTemplate from '@/components/PageTemplate';
+import PageHeader from '@/components/PageHeader';
+import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { toastService } from '@/lib/toast';
 
@@ -127,36 +127,35 @@ export default function EditProfileScreen() {
 
   if (initialLoading) {
     return (
-      <PageTemplate
-        title="编辑个人资料"
-        subtitle="正在加载..."
-        showBackButton={true}
-        onBackPress={goBack}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <ThemedView style={styles.container}>
+        <PageHeader 
+          title="编辑个人资料"
+          subtitle="正在加载..."
+          showBackButton={true}
+          onBackPress={goBack}
+        />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </PageTemplate>
+      </ThemedView>
     );
   }
 
   return (
-    <PageTemplate
-      title="编辑个人资料"
-      subtitle="更新您的个人信息"
-      showBackButton={true}
-      onBackPress={goBack}
-      scrollable={true}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
+    <ThemedView style={styles.container}>
+      <PageHeader 
+        title="编辑个人资料"
+        subtitle="更新您的个人信息"
+        showBackButton={true}
+        onBackPress={goBack}
+      />
+
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.formContainer}>
 
             <View style={styles.inputGroup}>
@@ -238,13 +237,21 @@ export default function EditProfileScreen() {
             </TouchableOpacity>
 
           </View>
+        </ScrollView>
       </KeyboardAvoidingView>
-    </PageTemplate>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
   keyboardView: {
+    flex: 1,
+  },
+  scrollView: {
     flex: 1,
   },
   loadingContainer: {
@@ -271,12 +278,31 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   input: {
-    ...ComponentTokens.input.standard,
-    ...DesignSystem.shadow.sm,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#e1e5e9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   saveButton: {
-    ...createStyles.primaryButton(),
-    marginTop: DesignSystem.spacing.xl,
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   saveButtonDisabled: {
     backgroundColor: '#9CA3AF',

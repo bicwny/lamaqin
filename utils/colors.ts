@@ -72,7 +72,7 @@ export const COLOR_COMBINATIONS = {
     border: '#DC2626',
   },
   dharma: {
-    background: Colors.primary,
+    background: Colors.dharmaRed,
     text: '#FFFFFF',
     border: Colors.primaryDark,
   },

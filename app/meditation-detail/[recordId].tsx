@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -11,13 +12,14 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { meditationService } from '@/lib/database';
-import PageTemplate from '@/components/PageTemplate';
+import PageHeader from '@/components/PageHeader';
 import { toastService } from '@/lib/toast';
 
 interface MeditationRecord {
@@ -44,7 +46,7 @@ interface Practice {
 export default function MeditationDetailScreen() {
   const { user } = useAuth();
   const { recordId } = useLocalSearchParams<{ recordId: string }>();
-
+  
   const [record, setRecord] = useState<MeditationRecord | null>(null);
   const [practice, setPractice] = useState<Practice | null>(null);
   const [loading, setLoading] = useState(true);
@@ -103,7 +105,7 @@ export default function MeditationDetailScreen() {
 
       setRecord(updatedRecord);
       setIsEditing(false);
-
+      
       toastService.success({ 
         title: '✅ 保存成功', 
         message: '观后感已保存' 
@@ -134,7 +136,7 @@ export default function MeditationDetailScreen() {
           onPress: async () => {
             try {
               await meditationService.deleteMeditationRecord(record.id, user.id);
-
+              
               toastService.success({ 
                 title: '✅ 删除成功', 
                 message: '观修记录已删除' 
@@ -174,49 +176,48 @@ export default function MeditationDetailScreen() {
 
   if (loading) {
     return (
-      <PageTemplate
-        title="观修详情"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="观修详情"
+          showBackButton={true}
+          onBackPress={() => router.back()}
+        />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   if (!record || !practice) {
     return (
-      <PageTemplate
-        title="观修详情"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <SafeAreaView style={styles.container}>
+        <PageHeader 
+          title="观修详情"
+          showBackButton={true}
+          onBackPress={() => router.back()}
+        />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到观修记录</Text>
         </View>
-      </PageTemplate>
+      </SafeAreaView>
     );
   }
 
   return (
-    <PageTemplate
-      title="观修详情"
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      rightAction={{
-        text: "删除",
-        onPress: handleDeleteRecord
-      }}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
+    <SafeAreaView style={styles.container}>
+      <PageHeader 
+        title="观修详情"
+        showBackButton={true}
+        onBackPress={() => router.back()}
+        rightAction={{
+          text: "删除",
+          onPress: handleDeleteRecord,
+          color: '#dc3545'
+        }}
+      />
+
       <KeyboardAvoidingView 
         style={styles.keyboardContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -292,7 +293,7 @@ export default function MeditationDetailScreen() {
                   numberOfLines={6}
                   textAlignVertical="top"
                 />
-
+                
                 <View style={styles.editingActions}>
                   <TouchableOpacity
                     style={styles.cancelButton}
@@ -303,7 +304,7 @@ export default function MeditationDetailScreen() {
                   >
                     <Text style={styles.cancelButtonText}>取消</Text>
                   </TouchableOpacity>
-
+                  
                   <TouchableOpacity
                     style={[styles.saveButton, savingReflection && styles.disabledButton]}
                     onPress={handleSaveReflection}
@@ -340,11 +341,15 @@ export default function MeditationDetailScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </PageTemplate>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
   keyboardContainer: {
     flex: 1,
   },
@@ -461,7 +466,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     minHeight: 120,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f8f9fa',
   },
   editingActions: {
     flexDirection: 'row',

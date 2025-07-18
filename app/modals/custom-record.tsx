@@ -1,26 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
   TouchableOpacity,
   TextInput,
   Alert,
   ActivityIndicator,
-  Platform,
-  ScrollView,
-  KeyboardAvoidingView,
+  SafeAreaView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
-import { DesignSystem, createStyles } from '@/constants/DesignSystem';
-import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
-import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
 
 export default function CustomRecordScreen() {
@@ -70,7 +63,7 @@ export default function CustomRecordScreen() {
       }
     } catch (error) {
       console.error('❌ Error loading existing record:', error);
-      toastService.error({ title: '❌ 加载失败', message: '记录加载失败，请重试' });
+      Alert.alert('错误', '加载记录失败');
     } finally {
       setLoadingRecord(false);
     }
@@ -79,7 +72,7 @@ export default function CustomRecordScreen() {
   const validateForm = () => {
     const countNum = parseInt(count);
     if (isNaN(countNum) || countNum <= 0) {
-      toastService.error({ title: '⚠️ 输入错误', message: '请输入有效的数量（大于0）' });
+      Alert.alert('提示', '请输入有效的数量（大于0）');
       return false;
     }
 
@@ -103,13 +96,13 @@ export default function CustomRecordScreen() {
       }
 
       toastService.success({
-        title: isEditing ? '✅ 记录已更新' : `✅ 已记录 ${countNum} 次`,
+        title: isEditing ? '记录已更新' : `已记录 ${countNum} 次`,
         message: isEditing ? undefined : '继续加油！'
       });
       router.back();
     } catch (error) {
       console.error('❌ Error saving count record:', error);
-      toastService.error({ title: '❌ 保存失败', message: '记录保存失败，请检查网络后重试' });
+      Alert.alert('错误', `保存失败，请重试: ${error.message || '未知错误'}`);
     } finally {
       setLoading(false);
     }
@@ -204,217 +197,208 @@ export default function CustomRecordScreen() {
     }
   };
 
-  const handleClose = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)/practice');
-    }
-  };
-
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
-    >
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
-        <Stack.Screen options={{ headerShown: false }} />
-        
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleClose}
-            >
-              <Ionicons name="close" size={24} color={Colors.text} />
-            </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/practice');
+          }
+        }} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          📝 {isEditing ? '编辑修行记录' : '记录修行数量'}
+        </Text>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {loadingRecord ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>正在加载记录...</Text>
+          </View>
+        ) : (
+        <View style={styles.formContainer}>
+          <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+
+          {/* Count Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>本次修行数量</Text>
+            <Text style={styles.inputHint}>请输入本次修行的数量，如：108</Text>
+            <TextInput
+              style={styles.textInput}
+              value={count}
+              onChangeText={setCount}
+              keyboardType="numeric"
+              placeholder="108"
+            />
           </View>
 
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>
-              {isEditing ? '编辑修行记录' : '记录修行数量'}
+          {/* Notes Input */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>备注（可选）</Text>
+            <Text style={styles.inputHint}>
+              记录您在这次修行中的体验、感悟...
+            </Text>
+            <TextInput
+              style={[styles.textInput, styles.multilineInput]}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              numberOfLines={4}
+              placeholder="例如：今日顶礼时心境平静，体会到三宝的加持..."
+              textAlignVertical="top"
+            />
+            <Text style={styles.characterCount}>
+              {notes.length} 字
             </Text>
           </View>
 
-          <View style={styles.headerRight}>
-            <TouchableOpacity 
-              style={[styles.saveHeaderButton, loading && styles.saveHeaderButtonDisabled]}
-              onPress={handleSave}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
-              ) : (
-                <Text style={styles.saveHeaderButtonText}>保存</Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>
+                {isEditing ? '更新记录' : '保存记录'}
+              </Text>
+            )}
+          </TouchableOpacity>
         </View>
-
-        {/* Content */}
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {loadingRecord ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
-              <Text style={styles.loadingText}>正在加载记录...</Text>
-            </View>
-          ) : (
-            <View style={styles.content}>
-              <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
-
-              {/* Count Input */}
-              <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>本次修行数量</Text>
-                <Text style={styles.inputHint}>请输入本次修行的数量，如：108</Text>
-                <TextInput
-                  style={styles.textInput}
-                  value={count}
-                  onChangeText={setCount}
-                  keyboardType="numeric"
-                  placeholder="108"
-                />
-              </View>
-
-              {/* Notes Input */}
-              <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>备注（可选）</Text>
-                <Text style={styles.inputHint}>
-                  记录您在这次修行中的体验、感悟...
-                </Text>
-                <TextInput
-                  style={[styles.textInput, styles.multilineInput]}
-                  value={notes}
-                  onChangeText={setNotes}
-                  multiline
-                  numberOfLines={6}
-                  placeholder="例如：今日顶礼时心境平静，体会到三宝的加持..."
-                  textAlignVertical="top"
-                />
-                <Text style={styles.characterCount}>
-                  {notes.length} 字
-                </Text>
-              </View>
-            </View>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: '#f8f9fa'
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: '#e9ecef',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2
   },
-  headerLeft: {
-    flex: 1,
-    alignItems: 'flex-start',
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
   },
-  headerCenter: {
-    flex: 2,
-    alignItems: 'center',
-  },
-  headerRight: {
-    flex: 1,
-    alignItems: 'flex-end',
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '500'
   },
   headerTitle: {
-    ...createStyles.heading('lg'),
-  },
-  closeButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.sm,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 4
   },
   content: {
     flex: 1,
-    padding: DesignSystem.spacing.lg,
+    padding: 16
+  },
+  formContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3
   },
   practiceTitle: {
-    ...createStyles.dharmaTitle('xl'),
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing['2xl'],
-    paddingBottom: DesignSystem.spacing.lg,
+    marginBottom: 24,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: '#e9ecef'
   },
   inputSection: {
-    marginBottom: DesignSystem.spacing['2xl'],
+    marginBottom: 24
   },
   inputLabel: {
-    ...createStyles.subheading('base'),
-    marginBottom: DesignSystem.spacing.xs,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6
   },
   inputHint: {
-    ...createStyles.body('sm'),
-    color: DesignSystem.colors.textTertiary,
-    marginBottom: DesignSystem.spacing.sm,
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 8,
+    lineHeight: 20
   },
   textInput: {
-    ...ComponentTokens.input.standard,
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+    color: '#333'
   },
   multilineInput: {
-    height: 120,
-    textAlignVertical: 'top',
-    paddingTop: DesignSystem.spacing.md,
-    paddingBottom: DesignSystem.spacing.md,
+    height: 100,
+    textAlignVertical: 'top'
   },
   characterCount: {
-    ...createStyles.caption(),
+    fontSize: 12,
+    color: '#6c757d',
     textAlign: 'right',
-    marginTop: DesignSystem.spacing.xs,
+    marginTop: 4
+  },
+  saveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 32,
+    marginHorizontal: 16,
+  },
+  saveButtonDisabled: {
+    opacity: 0.6
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600'
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: DesignSystem.spacing['4xl'],
+    padding: 40,
     minHeight: 200,
   },
   loadingText: {
-    marginTop: DesignSystem.spacing.md,
-    ...Typography.styles.body('base'),
-    fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  saveHeaderButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.primary,
-    borderRadius: DesignSystem.borderRadius.sm,
-    minWidth: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveHeaderButtonDisabled: {
-    opacity: 0.6,
-  },
-  saveHeaderButtonText: {
-    ...createStyles.buttonText('primary'),
-    color: DesignSystem.colors.textInverse,
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  }
 });

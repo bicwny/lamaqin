@@ -447,9 +447,9 @@ export default function StudyScreen() {
                 <Ionicons name="ear-outline" size={80} color="#9CA3AF" />
               </View>
 
-              <Text style={styles.emptyTitle}>开始你的学习之旅</Text>
+              <Text style={styles.emptyTitle}>还没有课程，开始学习吧</Text>
               <Text style={styles.emptyDescription}>
-                添加你的第一门课程，开始系统的闻思学习历程
+                选择您感兴趣的课程，开始系统的闻思学习
               </Text>
 
               <TouchableOpacity 
@@ -972,7 +972,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  joinButtonLoading:{
+  joinButtonLoading: {
     backgroundColor: '#9CA3AF',
   },
   joinButtonText: {
@@ -1088,47 +1088,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     flex: 1,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    minHeight: 500,
-  },
-  iconContainer: {
-    marginBottom: 24,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  emptyDescription: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-    maxWidth: 280,
-  },
-  browseButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
-  browseButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-    marginLeft: 8,
   },
 });

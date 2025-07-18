@@ -1,11 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import PageTemplate from '@/components/PageTemplate';
+import PageHeader from '@/components/PageHeader';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import Avatar from '@/components/Avatar';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -36,11 +39,11 @@ export default function ProfileScreen() {
 
     try {
       console.log('🔍 Loading profile for user:', user.id);
-
+      
       // Add timeout to prevent hanging requests
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
-
+      
       const { data, error: fetchError } = await supabase
         .from('users')
         .select('*')
@@ -57,7 +60,7 @@ export default function ProfileScreen() {
           message: fetchError.message,
           details: fetchError.details
         });
-
+        
         // Check if it's a network/timeout error vs data error
         if (fetchError.code === '23503' || fetchError.message?.includes('timeout') || 
             fetchError.message?.includes('network') || fetchError.message?.includes('fetch')) {
@@ -65,7 +68,7 @@ export default function ProfileScreen() {
         } else {
           setError('数据加载失败，使用本地数据');
         }
-
+        
         // Use fallback data from user auth context
         const fallbackProfile = {
           id: user.id,
@@ -88,7 +91,7 @@ export default function ProfileScreen() {
     } catch (err: any) {
       console.error('❌ Profile loading error:', err);
       console.error('❌ Error type:', err.name, 'Message:', err.message);
-
+      
       // Determine error type for better user feedback
       let errorMessage = '网络连接异常，使用本地数据';
       if (err.name === 'AbortError') {
@@ -96,9 +99,9 @@ export default function ProfileScreen() {
       } else if (err.message?.includes('Failed to fetch')) {
         errorMessage = '网络连接失败，使用本地数据';
       }
-
+      
       setError(errorMessage);
-
+      
       // Use fallback data from user auth context
       const fallbackProfile = {
         id: user.id,
@@ -136,52 +139,55 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <PageTemplate
-        title="个人中心"
-        subtitle="正在加载..."
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>加载中...</Text>
-        </View>
-      </PageTemplate>
+      <SafeAreaView style={styles.container}>
+        <ThemedView style={styles.container}>
+          <PageHeader 
+            title="个人中心"
+            subtitle="正在加载..."
+            showBackButton={true}
+            onBackPress={() => router.back()}
+          />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>加载中...</Text>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
     );
   }
 
   if (error && !profile) {
     return (
-      <PageTemplate
-        title="个人中心"
-        subtitle="加载失败"
-        showBackButton={true}
-        onBackPress={() => router.back()}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
-            <Text style={styles.retryButtonText}>重试</Text>
-          </TouchableOpacity>
-        </View>
-      </PageTemplate>
+      <SafeAreaView style={styles.container}>
+        <ThemedView style={styles.container}>
+          <PageHeader 
+            title="个人中心"
+            subtitle="加载失败"
+            showBackButton={true}
+            onBackPress={() => router.back()}
+          />
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
+              <Text style={styles.retryButtonText}>重试</Text>
+            </TouchableOpacity>
+          </View>
+        </ThemedView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <PageTemplate
-      title="个人中心"
-      subtitle="管理您的账户信息"
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      scrollable={true}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
+    <SafeAreaView style={styles.container}>
+      <ThemedView style={styles.container}>
+        <PageHeader 
+          title="个人中心"
+          subtitle="管理您的账户信息"
+          showBackButton={true}
+          onBackPress={() => router.back()}
+        />
+        
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Network Error Banner */}
           {error && (
             <View style={styles.errorBanner}>
@@ -191,7 +197,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
           )}
-
+          
           {/* Profile Header */}
           <View style={styles.profileHeader}>
             <Avatar 
@@ -211,7 +217,7 @@ export default function ProfileScreen() {
                 </ThemedText>
               )}
             </View>
-
+            
           </View>
 
           {/* Profile Details */}
@@ -222,7 +228,7 @@ export default function ProfileScreen() {
                 <Text style={styles.detailValue}>{profile.current_class}</Text>
               </View>
             )}
-
+            
             {profile?.practice_years && (
               <View style={styles.detailItem}>
                 <Text style={styles.detailLabel}>修行年限</Text>
@@ -270,11 +276,20 @@ export default function ProfileScreen() {
               <Text style={[styles.actionButtonText, styles.signOutText]}>退出登录</Text>
             </TouchableOpacity>
           </View>
-        </PageTemplate>
+        </ScrollView>
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

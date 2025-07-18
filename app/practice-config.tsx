@@ -6,27 +6,21 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Alert,
   ActivityIndicator,
   Platform,
   Modal,
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { DesignSystem } from "@/constants/DesignSystem";
-import {
-  ComponentTokens,
-  ComponentTextStyles,
-  componentHelpers,
-} from '@/utils/componentTokens';
-import PageTemplate from "@/components/PageTemplate";
+import { Colors } from "@/constants/Colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getCurrentWeekStart } from "@/lib/topic-progress";
 import { practiceService, presetProjectNameService } from "@/lib/database";
 import ModalDatetimePicker from "react-native-modal-datetime-picker";
-import { toastService } from "@/lib/toast";
 
 interface Practice {
   id: string;
@@ -169,7 +163,7 @@ export default function PracticeConfigScreen() {
       setCustomEndDate(newEndDate);
       setDurationMode("自定义");
     } else if (!isNaN(days) && days <= 0) {
-      toastService.error("天数必须大于0");
+      Alert.alert("输入错误", "天数必须大于0");
     }
   };
 
@@ -191,7 +185,7 @@ export default function PracticeConfigScreen() {
         setPresetProjectNames(presets);
       } catch (error) {
         console.error("Failed to fetch preset project names:", error);
-        toastService.error("加载预设项目名称失败");
+        Alert.alert("错误", "Failed to load preset project names.");
       } finally {
         setLoadingPresets(false);
       }
@@ -277,23 +271,23 @@ export default function PracticeConfigScreen() {
 
   const handleSave = async () => {
     if (!user) {
-      toastService.error("用户未登录");
+      Alert.alert("错误", "用户未登录");
       return;
     }
 
     // Validation
     if (practiceType === "count") {
       if (configMode === "total" && !totalTarget) {
-        toastService.error("请输入总目标数量");
+        Alert.alert("错误", "请输入总目标数量");
         return;
       }
       if (configMode === "daily" && !dailyTarget) {
-        toastService.error("请输入每日目标数量");
+        Alert.alert("错误", "请输入每日目标数量");
         return;
       }
     } else {
       if (!sessionsTarget) {
-        toastService.error("请输入每周目标座数");
+        Alert.alert("错误", "请输入每周目标座数");
         return;
       }
     }
@@ -369,22 +363,15 @@ export default function PracticeConfigScreen() {
         }
       }
 
-      toastService.success({
-        title: "修行项目已添加",
-        message: "开始您的修行之路吧！",
-        onPress: () => router.replace("/(tabs)/practice")
-      });
-      
-      // Navigate after a short delay to allow user to see the toast
-      setTimeout(() => {
-        router.replace("/(tabs)/practice");
-      }, 1500);
+      Alert.alert("成功", "修行项目已添加", [
+        {
+          text: "确定",
+          onPress: () => router.replace("/(tabs)/practice"),
+        },
+      ]);
     } catch (error) {
       console.error("Error saving practice project:", error);
-      toastService.error({
-        title: "保存失败",
-        message: "请检查网络连接后重试"
-      });
+      Alert.alert("错误", "保存失败，请重试");
     } finally {
       setLoading(false);
     }
@@ -525,7 +512,7 @@ export default function PracticeConfigScreen() {
     // Ensure end date is not before start date
     const minDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
     if (date < minDate) {
-      toastService.error("结束日期不能早于开始日期");
+      Alert.alert("日期错误", "结束日期不能早于开始日期");
       return;
     }
     setCustomEndDate(date);
@@ -534,11 +521,11 @@ export default function PracticeConfigScreen() {
 
   const renderTimePlanning = () => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>项目时长</Text>
+      <Text style={styles.sectionTitle}>时间规划</Text>
 
       {/* Start date - always defaults to today, but editable */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>开始日期</Text>
+      <View style={styles.timeInputContainer}>
+        <Text style={styles.timeInputLabel}>开始日期</Text>
         <TouchableOpacity
           style={styles.simpleDateButton}
           onPress={showStartDatepicker}
@@ -590,33 +577,43 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>项目时长</Text>
+      {/* End date - smart duration input */}
+      <View style={styles.timeInputContainer}>
+        <Text style={styles.timeInputLabel}>结束日期</Text>
 
+        {/* Smart duration input */}
         <View style={styles.smartDurationContainer}>
           <View style={styles.daysInputContainer}>
             <TextInput
               style={styles.daysInput}
               value={customDays}
               onChangeText={handleDaysInputChange}
+              placeholder="天数"
               keyboardType="numeric"
-              placeholder="60"
             />
             <Text style={styles.daysInputLabel}>天</Text>
           </View>
-          <Text style={styles.durationSeparator}>至</Text>
+
+          <Text style={styles.durationSeparator}>或</Text>
+
           <TouchableOpacity
             style={styles.endDatePickerButton}
-            onPress={() => setCustomDatePickerVisibility(true)}
+            onPress={showCustomDatepicker}
           >
             <Text style={styles.endDatePickerButtonText}>
-              {customEndDate.toLocaleDateString('zh-CN')}
+              {formatDate(customEndDate)}
             </Text>
             <Text style={styles.dateButtonIcon}>📅</Text>
           </TouchableOpacity>
         </View>
 
-        
+        {/* Duration display */}
+        <View style={styles.durationDisplay}>
+          <Text style={styles.durationDisplayText}>
+            {formatDate(startDate)} → {formatDate(customEndDate)} (共{" "}
+            {calculatedDays} 天)
+          </Text>
+        </View>
 
         {/* DateTimePicker Modal */}
         {practiceType === "count" && (
@@ -706,133 +703,135 @@ export default function PracticeConfigScreen() {
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>项目预览</Text>
-        {practiceType === "count" ? (
-          <View>
-            <View style={styles.previewHeader}>
-              <Text style={styles.previewPracticeName}>{practiceName}</Text>
-              {projectName && (
-                <View style={styles.previewProjectPill}>
-                  <Text style={styles.previewProjectPillText}>
-                    {projectName}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.previewDetails}>
-              <Text style={styles.previewDetailItem}>
-                <Text>
-                  📅 {formatDate(startDate)} →{" "}
-                  {formatDate(
-                    durationMode === "自定义"
-                      ? customEndDate
-                      : new Date(
-                          startDate.getTime() +
-                            (durationMode === "60天"
-                              ? 60
-                              : durationMode === "100天"
-                                ? 100
-                                : durationMode === "1年"
-                                  ? 365
-                                  : 60) *
-                              24 *
-                              60 *
-                              60 *
-                              1000,
-                        ),
-                  )}{" "}
-                  ({days} 天)
-                </Text>
-              </Text>
-
-              {configMode === "total" && totalTarget ? (
-                <View>
-                  <Text style={styles.previewDetailItem}>
-                    <Text>
-                      🎯 总目标: {parseInt(totalTarget).toLocaleString()}{" "}
-                      {practiceUnit}
+        <View style={styles.previewCard}>
+          {practiceType === "count" ? (
+            <View>
+              <View style={styles.previewHeader}>
+                <Text style={styles.previewPracticeName}>{practiceName}</Text>
+                {projectName && (
+                  <View style={styles.previewProjectPill}>
+                    <Text style={styles.previewProjectPillText}>
+                      {projectName}
                     </Text>
-                  </Text>
-                  <Text style={styles.previewDetailItem}>
-                    <Text>
-                      📊 每日目标: {suggestedDaily.toLocaleString()}{" "}
-                      {practiceUnit}
-                    </Text>
-                  </Text>
-                </View>
-              ) : configMode === "daily" && dailyTarget ? (
-                <View>
-                  <Text style={styles.previewDetailItem}>
-                    <Text>
-                      🎯 每日目标: {parseInt(dailyTarget).toLocaleString()}{" "}
-                      {practiceUnit}
-                    </Text>
-                  </Text>
-                  <Text style={styles.previewDetailItem}>
-                    <Text>
-                      📊 预计总数: {projectedTotal.toLocaleString()}{" "}
-                      {practiceUnit}
-                    </Text>
-                  </Text>
-                </View>
-              ) : (
-                <Text style={styles.previewPlaceholder}>
-                  请设置目标以查看详情
-                </Text>
-              )}
-            </View>
-          </View>
-        ) : (
-          <View>
-            <View style={styles.previewHeader}>
-              <Text style={styles.previewPracticeName}>{practiceName}</Text>
-              {projectName && (
-                <View style={styles.previewProjectPill}>
-                  <Text style={styles.previewProjectPillText}>
-                    {projectName}
-                  </Text>
-                </View>
-              )}
-            </View>
+                  </View>
+                )}
+              </View>
 
-            <View style={styles.previewDetails}>
-              <Text style={styles.previewDetailItem}>
-                <Text>
-                  📅 {formatDate(startDate)} →{" "}
-                  {formatDate(
-                    durationMode === "自定义"
-                      ? customEndDate
-                      : new Date(
-                          startDate.getTime() +
-                            (durationMode === "60天"
-                              ? 60
-                              : durationMode === "100天"
-                                ? 100
-                                : durationMode === "1年"
-                                  ? 365
-                                  : 60) *
-                              24 *
-                              60 *
-                              60 *
-                              1000,
-                        ),
-                  )}{" "}
-                  ({days} 天)
-                </Text>
-              </Text>
-
-              {sessionsTarget ? (
+              <View style={styles.previewDetails}>
                 <Text style={styles.previewDetailItem}>
-                  <Text>🎯 每周目标: {sessionsTarget} 座</Text>
+                  <Text>
+                    📅 {formatDate(startDate)} →{" "}
+                    {formatDate(
+                      durationMode === "自定义"
+                        ? customEndDate
+                        : new Date(
+                            startDate.getTime() +
+                              (durationMode === "60天"
+                                ? 60
+                                : durationMode === "100天"
+                                  ? 100
+                                  : durationMode === "1年"
+                                    ? 365
+                                    : 60) *
+                                24 *
+                                60 *
+                                60 *
+                                1000,
+                          ),
+                    )}{" "}
+                    ({days} 天)
+                  </Text>
                 </Text>
-              ) : (
-                <Text style={styles.previewPlaceholder}>
-                  请设置目标以查看详情
-                </Text>
-              )}
+
+                {configMode === "total" && totalTarget ? (
+                  <View>
+                    <Text style={styles.previewDetailItem}>
+                      <Text>
+                        🎯 总目标: {parseInt(totalTarget).toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
+                    </Text>
+                    <Text style={styles.previewDetailItem}>
+                      <Text>
+                        📊 每日目标: {suggestedDaily.toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
+                    </Text>
+                  </View>
+                ) : configMode === "daily" && dailyTarget ? (
+                  <View>
+                    <Text style={styles.previewDetailItem}>
+                      <Text>
+                        🎯 每日目标: {parseInt(dailyTarget).toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
+                    </Text>
+                    <Text style={styles.previewDetailItem}>
+                      <Text>
+                        📊 预计总数: {projectedTotal.toLocaleString()}{" "}
+                        {practiceUnit}
+                      </Text>
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={styles.previewPlaceholder}>
+                    请设置目标以查看详情
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
-        )}
+          ) : (
+            <View>
+              <View style={styles.previewHeader}>
+                <Text style={styles.previewPracticeName}>{practiceName}</Text>
+                {projectName && (
+                  <View style={styles.previewProjectPill}>
+                    <Text style={styles.previewProjectPillText}>
+                      {projectName}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.previewDetails}>
+                <Text style={styles.previewDetailItem}>
+                  <Text>
+                    📅 {formatDate(startDate)} →{" "}
+                    {formatDate(
+                      durationMode === "自定义"
+                        ? customEndDate
+                        : new Date(
+                            startDate.getTime() +
+                              (durationMode === "60天"
+                                ? 60
+                                : durationMode === "100天"
+                                  ? 100
+                                  : durationMode === "1年"
+                                    ? 365
+                                    : 60) *
+                                24 *
+                                60 *
+                                60 *
+                                1000,
+                          ),
+                    )}{" "}
+                    ({days} 天)
+                  </Text>
+                </Text>
+
+                {sessionsTarget ? (
+                  <Text style={styles.previewDetailItem}>
+                    <Text>🎯 每周目标: {sessionsTarget} 座</Text>
+                  </Text>
+                ) : (
+                  <Text style={styles.previewPlaceholder}>
+                    请设置目标以查看详情
+                  </Text>
+                )}
+              </View>
+            </View>
+          )}
+        </View>
       </View>
     );
   };
@@ -874,18 +873,18 @@ export default function PracticeConfigScreen() {
     // Validation
     if (practiceType === "time") {
       if (!sessionsTarget || parseInt(sessionsTarget) <= 0) {
-        toastService.error("请输入有效的座数");
+        Alert.alert("错误", "请输入有效的座数");
         return;
       }
     } else {
       if (configMode === "total") {
         if (!totalTarget || parseInt(totalTarget) <= 0) {
-          toastService.error("请输入有效的总目标数量");
+          Alert.alert("错误", "请输入有效的总目标数量");
           return;
         }
       } else {
         if (!dailyTarget || parseInt(dailyTarget) <= 0) {
-          toastService.error("请输入有效的每日目标数量");
+          Alert.alert("错误", "请输入有效的每日目标数量");
           return;
         }
       }
@@ -961,15 +960,9 @@ export default function PracticeConfigScreen() {
         if (error) throw error;
 
         console.log("✅ Practice project updated:", data);
-        toastService.success({
-          title: "修行项目已更新",
-          message: "您的修行计划已成功调整",
-          onPress: () => router.push("/(tabs)/practice")
-        });
-        
-        setTimeout(() => {
-          router.push("/(tabs)/practice");
-        }, 1500);
+        Alert.alert("成功", "修行项目已更新！", [
+          { text: "确定", onPress: () => router.push("/(tabs)/practice") },
+        ]);
       } else {
         // Create new project
         const { data, error } = await supabase
@@ -980,40 +973,36 @@ export default function PracticeConfigScreen() {
         if (error) throw error;
 
         console.log("✅ Practice project created:", data);
-        toastService.success({
-          title: "修行项目已添加",
-          message: "开始您的修行之路吧！",
-          onPress: () => router.push("/(tabs)/practice")
-        });
-        
-        setTimeout(() => {
-          router.push("/(tabs)/practice");
-        }, 1500);
+        Alert.alert("成功", "修行项目已添加！", [
+          { text: "确定", onPress: () => router.push("/(tabs)/practice") },
+        ]);
       }
     } catch (error) {
       console.error("❌ Error creating practice project:", error);
-      toastService.error({
-        title: "操作失败",
-        message: "创建修行项目失败，请检查网络连接后重试"
-      });
+      Alert.alert("错误", "创建修行项目失败");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <PageTemplate
-      title={isEditMode ? `编辑${practiceName}` : practiceName}
-      showBackButton={true}
-      onBackPress={() => router.back()}
-      rightAction={{
-        text: "保存",
-        onPress: handleConfirm,
-      }}
-      scrollable={true}
-      backgroundColor={DesignSystem.colors.background}
-      padding={0}
-    >
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>← 返回</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {isEditMode ? `编辑"${practiceName}"` : `配置"${practiceName}"`}
+        </Text>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* The problematic empty line that was here has been removed. */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
@@ -1059,7 +1048,20 @@ export default function PracticeConfigScreen() {
         {renderTimePlanning()}
         {renderSmartSummary()}
 
-        
+        <TouchableOpacity
+          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+          onPress={handleConfirm}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.saveButtonText}>
+              {isEditMode ? "更新项目" : "确认添加项目"}
+            </Text>
+          )}
+        </TouchableOpacity>
+      </ScrollView>
 
       {/* Project Selection Modal */}
       <Modal
@@ -1129,358 +1131,685 @@ export default function PracticeConfigScreen() {
           />
         </SafeAreaView>
       </Modal>
-    </PageTemplate>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  section: componentHelpers.getCardWithBottomMargin(
-    'outlined',
-    'comfortable',
-    'comfortable'
-  ),
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  header: {
+    backgroundColor: "white",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e9ecef",
+  },
+  backButton: {
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  backButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   sectionTitle: {
-    ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.lg,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 16,
   },
   segmentedControl: {
     flexDirection: "row",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    padding: DesignSystem.spacing.xs,
+    backgroundColor: "#f1f3f4",
+    borderRadius: 8,
+    padding: 4,
   },
   segmentButton: {
     flex: 1,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    borderRadius: DesignSystem.borderRadius.sm,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
     alignItems: "center",
   },
   segmentButtonActive: {
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    ...DesignSystem.shadow.sm,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   segmentButtonText: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#666",
   },
   segmentButtonTextActive: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textPrimary,
+    color: "#333",
   },
   inputContainer: {
-    marginTop: DesignSystem.spacing.lg,
+    marginTop: 16,
   },
   inputLabel: {
-    ...ComponentTextStyles.label,
-    marginBottom: DesignSystem.spacing.xs,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 4,
+  },
+  inputHelper: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+    fontStyle: 'italic',
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
   },
   inputPrefix: {
-    ...ComponentTextStyles.body,
-    marginRight: DesignSystem.spacing.sm,
+    fontSize: 16,
+    color: "#666",
+    marginRight: 8,
   },
   textInput: {
     flex: 1,
-    paddingVertical: DesignSystem.spacing.md,
-    fontSize: DesignSystem.typography.fontSize.base,
-    color: DesignSystem.colors.textPrimary,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#333",
   },
   inputUnit: {
-    ...ComponentTextStyles.body,
-    marginLeft: DesignSystem.spacing.sm,
+    fontSize: 16,
+    color: "#666",
+    marginLeft: 8,
   },
+  dateButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  dateButtonIcon: {
+    fontSize: 16,
+  },
+  durationOptions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 12,
+  },
+  durationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#f1f3f4",
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  durationButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  durationButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#666",
+  },
+  durationButtonTextActive: {
+    color: "white",
+  },
+  customButton: {
+    backgroundColor: "#d4af37",
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  customButtonActive: {
+    backgroundColor: "#b8941f",
+  },
+  customButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+  },
+  customButtonTextActive: {
+    color: "white",
+  },
+  customInputContainer: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#007AFF",
+  },
+  customInputLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 8,
+  },
+  customDateButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  customDateButtonText: {
+    fontSize: 16,
+    color: "#333",
+  },
+
+  summaryContainer: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
+  summaryTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 12,
+  },
+  summaryText: {
+    fontSize: 15,
+    color: "#555",
+    lineHeight: 22,
+    marginBottom: 4,
+  },
+  summaryHighlight: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.primary,
+    lineHeight: 22,
+    marginTop: 8,
+  },
+  topicProgressInfo: {
+    backgroundColor: "#f0f8ff",
+    borderRadius: 8,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: "#4a90e2",
+    marginTop: 8,
+  },
+  topicProgressText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#2c3e50",
+    marginBottom: 8,
+  },
+  topicProgressSubtext: {
+    fontSize: 14,
+    color: "#7f8c8d",
+    lineHeight: 20,
+  },
+  saveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 24,
+    marginBottom: 32,
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  specialSection: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+  },
+  topicProgressConfig: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+  },
+  configLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 4,
+  },
+  configDescription: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 16,
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    textAlign: "center",
+    minWidth: 60,
+    backgroundColor: "#fff",
+  },
+  helpText: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  // Simplified count-based config styles
   goalTypeContainer: {
-    marginBottom: DesignSystem.spacing.xl,
+    marginBottom: 20,
   },
   goalInputContainer: {
-    marginTop: DesignSystem.spacing.sm,
+    marginTop: 8,
   },
   goalInputLabel: {
-    ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.sm,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
   },
   goalInputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
   },
   goalTextInput: {
     flex: 1,
-    paddingVertical: DesignSystem.spacing.md,
-    fontSize: DesignSystem.typography.fontSize.base,
-    color: DesignSystem.colors.textPrimary,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#333",
   },
   goalInputUnit: {
-    ...ComponentTextStyles.body,
-    marginLeft: DesignSystem.spacing.sm,
+    fontSize: 16,
+    color: "#666",
+    marginLeft: 8,
+  },
+  // Simplified time planning styles
+  timeInputContainer: {
+    marginBottom: 16,
+  },
+  timeInputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
   },
   simpleDateButton: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
   },
   simpleDateButtonText: {
-    ...ComponentTextStyles.body,
+    fontSize: 16,
+    color: "#333",
   },
   dateButtonIcon: {
-    ...ComponentTextStyles.body,
+    fontSize: 16,
   },
+  quickDurationButtons: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 8,
+  },
+  quickDurationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#f1f3f4",
+    borderRadius: 20,
+  },
+  quickDurationButtonActive: {
+    backgroundColor: Colors.primary,
+  },
+  quickDurationButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#666",
+  },
+  quickDurationButtonTextActive: {
+    color: "white",
+  },
+  customDatePickerButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
+    marginTop: 8,
+  },
+  customDatePickerButtonActive: {
+    backgroundColor: "#e8f4fd",
+    borderColor: Colors.primary,
+  },
+  customDatePickerButtonText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  // Smart duration input styles
   smartDurationContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: DesignSystem.spacing.md,
-    marginBottom: DesignSystem.spacing.md,
+    gap: 12,
+    marginBottom: 12,
   },
   daysInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
     flex: 1,
   },
   daysInput: {
     flex: 1,
-    paddingVertical: DesignSystem.spacing.md,
-    fontSize: DesignSystem.typography.fontSize.base,
-    color: DesignSystem.colors.textPrimary,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#333",
     textAlign: "center",
   },
   daysInputLabel: {
-    ...ComponentTextStyles.body,
-    marginLeft: DesignSystem.spacing.xs,
+    fontSize: 16,
+    color: "#666",
+    marginLeft: 4,
   },
   durationSeparator: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textTertiary,
+    fontSize: 14,
+    color: "#999",
+    fontWeight: "500",
   },
   endDatePickerButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
     flex: 2,
     justifyContent: "space-between",
   },
   endDatePickerButtonText: {
-    ...ComponentTextStyles.body,
+    fontSize: 16,
+    color: "#333",
   },
   durationDisplay: {
-    backgroundColor: DesignSystem.colors.background,
-    borderRadius: DesignSystem.borderRadius.sm,
-    padding: DesignSystem.spacing.sm,
+    backgroundColor: "#f0f8ff",
+    borderRadius: 6,
+    padding: 8,
     borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.primary,
+    borderLeftColor: Colors.primary,
   },
   durationDisplayText: {
-    ...ComponentTextStyles.label,
+    fontSize: 14,
+    color: "#555",
     textAlign: "center",
   },
-  
+  // Preview card styles
+  previewCard: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+  },
   previewHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: 12,
     flexWrap: "wrap",
-    gap: DesignSystem.spacing.sm,
+    gap: 8,
   },
   previewPracticeName: {
-    ...ComponentTextStyles.subheading,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
   previewProjectPill: {
-    backgroundColor: DesignSystem.colors.primary,
-    borderRadius: DesignSystem.borderRadius.lg,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   previewProjectPillText: {
-    ...ComponentTextStyles.caption,
-    color: DesignSystem.colors.textInverse,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontSize: 12,
+    fontWeight: "500",
+    color: "white",
   },
   previewDetails: {
-    gap: DesignSystem.spacing.xxs,
+    gap: 6,
   },
   previewDetailItem: {
-    ...ComponentTextStyles.body,
-    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
+    fontSize: 14,
+    color: "#555",
+    lineHeight: 20,
   },
   previewPlaceholder: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textTertiary,
+    fontSize: 14,
+    color: "#999",
     fontStyle: "italic",
+  },
+  projectNameInput: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#333",
+    borderWidth: 1,
+    borderColor: "#e9ecef",
   },
   projectNameContainer: {
     position: "relative",
   },
   projectNameButton: {
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.md,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   projectNameButtonText: {
-    ...ComponentTextStyles.body,
+    fontSize: 16,
+    color: "#333",
     flex: 1,
   },
   projectNamePlaceholder: {
-    color: DesignSystem.colors.textTertiary,
+    color: "#999",
   },
   projectNameButtonIcon: {
-    ...ComponentTextStyles.label,
-    marginLeft: DesignSystem.spacing.sm,
+    fontSize: 14,
+    color: "#666",
+    marginLeft: 8,
   },
   clearButton: {
     position: "absolute",
-    right: DesignSystem.spacing['3xl'],
-    top: DesignSystem.spacing.md,
-    width: DesignSystem.spacing['2xl'],
-    height: DesignSystem.spacing['2xl'],
-    borderRadius: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.error,
+    right: 32,
+    top: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#dc3545",
     justifyContent: "center",
     alignItems: "center",
   },
   clearButtonText: {
-    color: DesignSystem.colors.textInverse,
-    fontSize: DesignSystem.typography.fontSize.xs,
-    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background,
+    backgroundColor: "#f8f9fa",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "white",
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: "#e9ecef",
   },
   modalCancelButton: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "500",
   },
   modalTitle: {
-    ...ComponentTextStyles.subheading,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
   modalConfirmButton: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.primary,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: "600",
   },
   modalConfirmButtonDisabled: {
-    color: DesignSystem.colors.textTertiary,
+    color: "#ccc",
   },
   modalSearchContainer: {
-    padding: DesignSystem.spacing.lg,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    padding: 16,
+    backgroundColor: "white",
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    borderBottomColor: "#e9ecef",
   },
   modalSearchInput: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#333",
     borderWidth: 1,
-    borderColor: DesignSystem.colors.borderLight,
-    borderRadius: DesignSystem.borderRadius.lg,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.base,
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
-    color: DesignSystem.colors.textPrimary,
-    backgroundColor: DesignSystem.colors.background,
-    minHeight: 44,
+    borderColor: "#e9ecef",
   },
   modalPresetList: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    backgroundColor: "white",
   },
   modalPresetItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.lg,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
+    borderBottomColor: "#f1f3f4",
   },
   modalPresetContent: {
     flex: 1,
   },
   modalPresetName: {
-    ...ComponentTextStyles.body,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
   },
   modalPresetCategory: {
-    ...ComponentTextStyles.caption,
-    marginTop: DesignSystem.spacing.xs,
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
   },
   modalPresetArrow: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textTertiary,
+    fontSize: 16,
+    color: "#ccc",
   },
   modalEmptyState: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: DesignSystem.spacing['5xl'],
-    paddingHorizontal: DesignSystem.spacing['3xl'],
+    paddingVertical: 60,
+    paddingHorizontal: 32,
   },
   modalEmptyText: {
-    ...ComponentTextStyles.body,
+    fontSize: 16,
+    color: "#666",
     textAlign: "center",
-    lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
-  },
-  
-  helpText: {
-    ...ComponentTextStyles.caption,
-    textAlign: "center",
-    fontStyle: "italic",
+    lineHeight: 24,
   },
   webDatePicker: {
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    padding: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.sm,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    borderColor: "#e9ecef",
   },
   webDateInput: {
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
-    color: DesignSystem.colors.textPrimary,
+    fontSize: 16,
+    color: "#333",
     backgroundColor: "transparent",
     borderWidth: 0,
-    padding: DesignSystem.spacing.sm,
+    outlineWidth: 0,
   },
 });
