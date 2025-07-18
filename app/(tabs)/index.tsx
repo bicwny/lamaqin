@@ -527,9 +527,9 @@ export default function HomeScreen() {
 
 
 
-  // Handle tapping the whole practice card to view history
+  // Handle tapping the whole practice card to view details
   const handlePracticeCardTap = (practice: any) => {
-    // Navigate directly to practice detail screen for all practice types
+    // All practice types now use the unified practice-detail page
     router.push({
       pathname: '/practice-detail/[practiceId]',
       params: {
@@ -586,27 +586,13 @@ export default function HomeScreen() {
     // Track when user is going to record
     setLastRecordTime(Date.now());
 
-    if (practice.type === 'time' || practice.weekSessions !== undefined) {
-      // For meditation practices (both daily and weekly), navigate to meditation record modal
-      router.push({
-        pathname: '/modals/meditation-record',
-        params: {
-          projectId: practice.id,
-          practiceId: practice.practiceId || practice.id,
-          practiceName: practice.name,
-        },
-      });
-    } else {
-      // For count-based practices, show custom record modal
-      router.push({
-        pathname: '/modals/custom-record',
-        params: {
-          projectId: practice.id,
-          practiceName: practice.name,
-          practiceType: practice.type,
-        },
-      });
-    }
+    // All practice types now use the unified practice-detail page
+        router.push({
+          pathname: '/practice-detail/[practiceId]',
+          params: {
+            practiceId: practice.id,
+          },
+        });
   };
 
   // Optimistic update helper function
@@ -745,7 +731,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-          
+
 
           {/* Study Section */}
           <View style={styles.section}>
