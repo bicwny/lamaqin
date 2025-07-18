@@ -17,7 +17,7 @@ localPort = 8083
 externalPort = 3001
 
 [workflows]
-runButton = "EAS Publish Preview iOS"
+runButton = "Expo Doctor Check"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -66,4 +66,4 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx expo doctor"
+args = "npx expo-doctor"
