@@ -529,7 +529,7 @@ export default function HomeScreen() {
 
   // Handle tapping the whole practice card to view history
   const handlePracticeCardTap = (practice: any) => {
-    // Navigate directly to practice detail screen
+    // Navigate directly to practice detail screen for all practice types
     router.push({
       pathname: '/practice-detail/[practiceId]',
       params: {
