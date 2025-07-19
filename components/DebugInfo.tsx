@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { supabase } from '@/lib/supabase';
-import { iPhone16CrashTest } from './iPhone16CrashTest';
 
 export function DebugInfo() {
   const [practices, setPractices] = useState([]);
@@ -30,8 +29,6 @@ export function DebugInfo() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>调试信息</Text>
-
-      <iPhone16CrashTest />
 
       <TouchableOpacity style={styles.button} onPress={loadPractices}>
         <Text style={styles.buttonText}>

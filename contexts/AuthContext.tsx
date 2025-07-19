@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
@@ -25,8 +26,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<Session | null>(null);
-  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for existing session
@@ -138,7 +137,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 Checking auth state...');
       setLoading(true);
-      setAuthError(null);
 
       // First try to get session from storage directly
       let storedSession = null;
@@ -162,7 +160,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('❌ Auth session error:', error);
         setUser(null);
         setLoading(false);
-        setAuthError(error.message);
         return;
       }
 
@@ -219,7 +216,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('❌ Auth check error:', error);
       // Don't let auth errors prevent the app from loading
       setUser(null);
-      setAuthError(error instanceof Error ? error.message : 'Unknown auth error');
     } finally {
       setLoading(false);
     }
@@ -476,7 +472,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const dbOperation = async () => {
         // First test basic connectivity with a simple health check
         console.log('🏥 AuthContext: Testing database health...');
-
+        
         try {
           const { data: healthCheck, error: healthError } = await supabase
             .from('users')
@@ -492,7 +488,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
             throw new Error(`Database connection failed: ${healthError.message}`);
           }
-
+          
           console.log('✅ AuthContext: Database health check passed');
         } catch (fetchError) {
           console.error('❌ AuthContext: Network fetch error during health check:', fetchError);

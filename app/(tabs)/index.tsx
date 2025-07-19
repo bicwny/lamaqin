@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -16,8 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { RefreshControl } from 'react-native';
 import Avatar from '@/components/Avatar';
-import { Button } from 'react-native';
-import * as Sentry from '@sentry/react-native';
 
 interface NextLesson {
   courseId: string;
@@ -529,9 +527,9 @@ export default function HomeScreen() {
 
 
 
-  // Handle tapping the whole practice card to view details
+  // Handle tapping the whole practice card to view history
   const handlePracticeCardTap = (practice: any) => {
-    // All practice types now use the unified practice-detail page
+    // Navigate directly to practice detail screen
     router.push({
       pathname: '/practice-detail/[practiceId]',
       params: {
@@ -588,13 +586,27 @@ export default function HomeScreen() {
     // Track when user is going to record
     setLastRecordTime(Date.now());
 
-    // All practice types now use the unified practice-detail page
-        router.push({
-          pathname: '/practice-detail/[practiceId]',
-          params: {
-            practiceId: practice.id,
-          },
-        });
+    if (practice.type === 'time' || practice.weekSessions !== undefined) {
+      // For meditation practices (both daily and weekly), navigate to meditation record modal
+      router.push({
+        pathname: '/modals/meditation-record',
+        params: {
+          projectId: practice.id,
+          practiceId: practice.practiceId || practice.id,
+          practiceName: practice.name,
+        },
+      });
+    } else {
+      // For count-based practices, show custom record modal
+      router.push({
+        pathname: '/modals/custom-record',
+        params: {
+          projectId: practice.id,
+          practiceName: practice.name,
+          practiceType: practice.type,
+        },
+      });
+    }
   };
 
   // Optimistic update helper function
@@ -733,7 +745,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-
+          
 
           {/* Study Section */}
           <View style={styles.section}>
@@ -909,22 +921,6 @@ export default function HomeScreen() {
             )}
           </View>
         </ScrollView>
-
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-          <ThemedText>
-            Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-            Press{' '}
-            <ThemedText type="defaultSemiBold">
-              {Platform.select({
-                ios: 'cmd + d',
-                android: 'cmd + m',
-                web: 'F12'
-              })}
-            </ThemedText>{' '}
-            to open developer tools.
-          </ThemedText>
-        </ThemedView>
     </PageTemplate>
   );
 }
@@ -1165,12 +1161,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  testDescription: {
-    marginBottom: 12,
   },
 });
