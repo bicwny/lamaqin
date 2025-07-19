@@ -55,6 +55,29 @@ function RootLayoutNav() {
         level: 'info',
         data: deviceInfo
       });
+      
+      // iPhone 16 specific monitoring
+      Sentry.setTag('device_category', 'iphone16');
+      Sentry.setLevel('debug');
+      
+      // Monitor memory warnings
+      if (Platform.OS === 'ios') {
+        const memoryWarningHandler = () => {
+          console.log('⚠️ iPhone 16 Memory Warning');
+          Sentry.addBreadcrumb({
+            message: 'Memory warning on iPhone 16',
+            level: 'warning',
+            category: 'memory'
+          });
+        };
+        
+        // Add memory monitoring if available
+        try {
+          require('react-native').AppState.addEventListener('memoryWarning', memoryWarningHandler);
+        } catch (e) {
+          console.log('Memory warning listener not available');
+        }
+      }
     }
 
     // Global error handler
