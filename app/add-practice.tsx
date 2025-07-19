@@ -70,32 +70,31 @@ export default function AddPracticeScreen() {
   };
 
   const renderPracticeSelector = () => (
-    <View style={styles.practiceSection}>
+    <View style={styles.section}>
       <Text style={styles.sectionTitle}>选择修行项目</Text>
-      <View style={styles.practiceList}>
+      <ScrollView style={styles.practiceList} showsVerticalScrollIndicator={false}>
         {practices.map((practice) => (
           <TouchableOpacity
             key={practice.id}
-            style={styles.practiceItem}
+            style={[
+              styles.practiceCard,
+            ]}
             onPress={() => handlePracticeSelect(practice)}
           >
-            <View style={styles.practiceInfo}>
-              <Text style={styles.practiceName}>
-                {practice.name}
-              </Text>
-              <Text style={styles.practiceType}>
-                {practice.type === 'count' ? '计数类' : '计时类'} • {practice.unit}
-              </Text>
-              {practice.description && (
-                <Text style={styles.practiceDescription}>{practice.description}</Text>
-              )}
-            </View>
-            <View style={styles.practiceChevron}>
-              <Text style={styles.chevronText}>›</Text>
-            </View>
+            <Text style={[
+              styles.practiceName,
+            ]}>
+              {practice.name}
+            </Text>
+            <Text style={styles.practiceType}>
+              {practice.type === 'count' ? '计数类' : '计时类'} • {practice.unit}
+            </Text>
+            {practice.description && (
+              <Text style={styles.practiceDescription}>{practice.description}</Text>
+            )}
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 
@@ -151,7 +150,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 16,
+    padding: 16,
   },
   loadingContainer: {
     flex: 1,
@@ -193,30 +192,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  practiceSection: {
-    backgroundColor: 'white',
-    marginBottom: 20,
+  section: {
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: Colors.text,
     marginBottom: 12,
-    paddingHorizontal: 16,
   },
   practiceList: {
-    paddingVertical: 10,
-  },
-  practiceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  practiceInfo: {
     flex: 1,
+  },
+  practiceCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   practiceName: {
     fontSize: 16,
@@ -227,18 +221,11 @@ const styles = StyleSheet.create({
   practiceType: {
     fontSize: 14,
     color: Colors.textSecondary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   practiceDescription: {
     fontSize: 12,
     color: Colors.textSecondary,
-  },
-  practiceChevron: {
-    marginLeft: 12,
-  },
-  chevronText: {
-    fontSize: 20,
-    color: '#ccc',
   },
   configForm: {
     backgroundColor: 'white',
