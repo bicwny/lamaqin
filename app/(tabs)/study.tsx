@@ -464,7 +464,7 @@ export default function StudyScreen() {
                 onPress={() => setViewMode('manage')}
               >
                 <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-                <Text style={styles.browseButtonText}>管理课程</Text>
+                <Text style={styles.browseButtonText}>管理</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -477,7 +477,7 @@ export default function StudyScreen() {
         title="闻思学习"
         subtitle="系统学习佛法课程"
         rightAction={{
-          text: "管理课程",
+          text: "管理",
           onPress: () => setViewMode('manage')
         }}
         scrollable={false}
