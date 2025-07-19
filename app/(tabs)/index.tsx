@@ -731,7 +731,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-
+          
 
           {/* Study Section */}
           <View style={styles.section}>
