@@ -8,13 +8,8 @@ import { toastConfig } from '../lib/toast';
 function RootLayoutNav() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  // Don't block the entire app loading - let screens handle their own states
+  // This allows the health check endpoint to respond immediately
 
   return (
     <Stack>

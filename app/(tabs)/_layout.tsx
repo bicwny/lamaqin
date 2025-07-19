@@ -10,9 +10,24 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { user, loading } = useAuth();
 
-  console.log("🏠 TabLayout rendering at:", new Date().toISOString());
+  console.log('🏠 TabLayout rendering at:', new Date().toISOString());
+
+  // Show tabs immediately without waiting for full auth check
+  // Let individual screens handle their own loading states
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  // Redirect to auth if not authenticated
+  if (!user) {
+    return <Redirect href="/auth/unified" />;
+  }
 
   return (
     <Tabs

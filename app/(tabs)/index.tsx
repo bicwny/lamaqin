@@ -50,8 +50,25 @@ interface WeeklyPractice {
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const [practiceProjects, setPracticeProjects] = useState<any[]>([]);
+  const [userCourses, setUserCourses] = useState<any[]>([]);
+  const [mindfulnessRecords, setMindfulnessRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Defer data loading until component is focused or user interacts
+  useEffect(() => {
+    if (user?.id && !dataLoaded) {
+      // Add a small delay to allow the page to render first
+      const timer = setTimeout(() => {
+        setDataLoaded(true);
+        loadDashboardData();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [user?.id, dataLoaded]);
+
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
   const [courseLessons, setCourseLessons] = useState<Array<{
