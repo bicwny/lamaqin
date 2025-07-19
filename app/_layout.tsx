@@ -1,4 +1,3 @@
-
 import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ActivityIndicator, View, Platform, Dimensions } from 'react-native';
@@ -96,7 +95,7 @@ function RootLayoutNav() {
   );
 }
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   return (
     <CrashBoundary>
       <AuthProvider>
@@ -104,4 +103,4 @@ export default function RootLayout() {
       </AuthProvider>
     </CrashBoundary>
   );
-}
+});
