@@ -20,7 +20,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "server",
+      "output": "static",
       "fontDisplay": "swap"
     },
     "plugins": [
