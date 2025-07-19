@@ -40,14 +40,14 @@ function RootLayoutNav() {
         sessionId: Constants.sessionId,
       }
     };
-    
+
     console.log('🔍 Device Debug Info:', JSON.stringify(deviceInfo, null, 2));
-    
+
     // Add device context to Sentry
     Sentry.setContext('device', deviceInfo);
     Sentry.setTag('device_model', Constants.deviceName || 'unknown');
     Sentry.setTag('is_iphone16', deviceInfo.isIphone16);
-    
+
     if (deviceInfo.isIphone16) {
       console.log('🍎 iPhone 16 detected - enhanced crash monitoring enabled');
       Sentry.addBreadcrumb({
