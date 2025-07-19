@@ -8,19 +8,22 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "SENTRY_AUTH_TOKEN": "@sentry-auth-token"
+        "SENTRY_AUTH_TOKEN": "@sentry-auth-token",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "SENTRY_AUTH_TOKEN": "@sentry-auth-token"
+        "SENTRY_AUTH_TOKEN": "@sentry-auth-token",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "SENTRY_AUTH_TOKEN": "@sentry-auth-token"
+        "SENTRY_AUTH_TOKEN": "@sentry-auth-token",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     }
   },
