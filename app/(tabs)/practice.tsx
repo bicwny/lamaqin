@@ -186,23 +186,13 @@ export default function PracticeScreen() {
       return;
     }
 
-    if (project.practices.type === 'time') {
-      // For meditation practices, navigate to meditation detail overview
-      router.push({
-        pathname: '/meditation-detail/[practiceId]',
-        params: {
-          practiceId: projectId,
-        },
-      });
-    } else {
-      // For count-based practices, navigate to practice detail
-      router.push({
-        pathname: '/practice-detail/[practiceId]',
-        params: {
-          practiceId: projectId,
-        },
-      });
-    }
+    // Direct all practice types to the unified practice-detail page
+    router.push({
+      pathname: '/practice-detail/[practiceId]',
+      params: {
+        practiceId: projectId,
+      },
+    });
   };
 
   if (loading) {
