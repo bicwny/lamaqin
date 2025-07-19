@@ -17,7 +17,7 @@ localPort = 8083
 externalPort = 3001
 
 [workflows]
-runButton = "Expo Doctor Check"
+runButton = "Dev Server"
 
 [[workflows.workflow]]
 name = "Dev Server"
