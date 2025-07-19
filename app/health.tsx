@@ -1,6 +1,7 @@
 
+import React from 'react';
 import { HealthDashboard } from '@/components/HealthDashboard';
-import { PageTemplate } from '@/components/PageTemplate';
+import PageTemplate from '@/components/PageTemplate';
 
 export default function HealthScreen() {
   return (
