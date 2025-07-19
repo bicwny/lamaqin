@@ -1,9 +1,9 @@
 import { Stack } from 'expo-router';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '@/lib/toast';
+import { toastConfig } from '../lib/toast';
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
