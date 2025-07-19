@@ -35,6 +35,18 @@ export function iPhone16CrashTest() {
           // Simulate async operation crash
           Promise.reject(new Error('iPhone 16 Async Operation Crash'));
           break;
+
+        case 'webview':
+          // Simulate WebView specific crash (common on iPhone 16)
+          throw new Error('iPhone 16 WebView Crash - Navigation Stack Overflow');
+
+        case 'gesture':
+          // Simulate gesture handling crash
+          throw new Error('iPhone 16 Gesture Handling Crash - Touch Event Processing');
+
+        case 'animation':
+          // Simulate animation performance crash
+          throw new Error('iPhone 16 Animation Crash - Rendering Pipeline Overload');
           
         default:
           throw new Error('iPhone 16 General Crash Test');
@@ -107,6 +119,27 @@ export function iPhone16CrashTest() {
         >
           <Text style={styles.buttonText}>异步测试</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.button, styles.webviewButton]} 
+          onPress={() => runCrashTest('webview')}
+        >
+          <Text style={styles.buttonText}>WebView测试</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.button, styles.gestureButton]} 
+          onPress={() => runCrashTest('gesture')}
+        >
+          <Text style={styles.buttonText}>手势测试</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.button, styles.animationButton]} 
+          onPress={() => runCrashTest('animation')}
+        >
+          <Text style={styles.buttonText}>动画测试</Text>
+        </TouchableOpacity>
       </View>
       
       <View style={styles.resultsContainer}>
@@ -165,6 +198,15 @@ const styles = StyleSheet.create({
   },
   asyncButton: {
     backgroundColor: '#96ceb4',
+  },
+  webviewButton: {
+    backgroundColor: '#ffa726',
+  },
+  gestureButton: {
+    backgroundColor: '#ab47bc',
+  },
+  animationButton: {
+    backgroundColor: '#ef5350',
   },
   buttonText: {
     color: 'white',
