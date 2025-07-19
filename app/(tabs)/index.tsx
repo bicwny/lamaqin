@@ -925,20 +925,6 @@ export default function HomeScreen() {
             to open developer tools.
           </ThemedText>
         </ThemedView>
-
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Sentry Test</ThemedText>
-          <ThemedText style={styles.testDescription}>
-            Test crash reporting for iPhone 16 debugging:
-          </ThemedText>
-          <Button 
-            title='Try!' 
-            onPress={() => { 
-              console.log('🧪 Testing Sentry crash reporting...');
-              Sentry.captureException(new Error('First error'));
-            }}
-          />
-        </ThemedView>
     </PageTemplate>
   );
 }
@@ -983,7 +969,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 20,
-    marginHorizontal: 16,
+    marginHorizontal: 16,```python
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
