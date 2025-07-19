@@ -10,6 +10,5 @@ config.resolver.platforms = ['ios', 'android', 'web'];
 // Ignore Replit development tools that may cause module resolution issues
 config.resolver.blacklistRE = /__replco/;
 
-// Apply NativeWind first, then Sentry
-const configWithNativeWind = withNativeWind(config, { input: './global.css' });
-module.exports = withSentryConfig(configWithNativeWind);
+// Apply NativeWind and export
+module.exports = withNativeWind(config, { input: './global.css' });
