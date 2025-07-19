@@ -13,7 +13,15 @@ export function iPhone16CrashTest() {
     Constants.deviceName?.includes('iPhone17')
   );
 
+  // Safety check - disable crash tests in production
+  const shouldShowTests = __DEV__ && isIPhone16;
+
   const runCrashTest = (testType: string) => {
+    if (!__DEV__) {
+      console.log('🚫 Crash tests disabled in production');
+      return;
+    }
+    
     const timestamp = new Date().toLocaleTimeString();
     
     try {
@@ -72,16 +80,8 @@ export function iPhone16CrashTest() {
     }
   };
 
-  if (!isIPhone16) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>iPhone 16 测试</Text>
-        <Text style={styles.subtitle}>
-          当前设备: {Constants.deviceName || 'Unknown'}
-        </Text>
-        <Text style={styles.info}>此测试仅在 iPhone 16 上可用</Text>
-      </View>
-    );
+  if (!shouldShowTests) {
+    return null;
   }
 
   return (

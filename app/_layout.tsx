@@ -8,92 +8,82 @@ import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 import { CrashBoundary } from '@/components/CrashBoundary';
 
-// Initialize Sentry
-Sentry.init({
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || 'YOUR_SENTRY_DSN_HERE',
-  debug: __DEV__,
-  enableAutoSessionTracking: true,
-  sessionTrackingIntervalMillis: 30000,
-  enableNdkScopeSync: true,
-  enableAutoPerformanceTracing: true,
-});
+// Initialize Sentry with proper error handling
+const sentryDsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
+if (sentryDsn && sentryDsn !== 'YOUR_SENTRY_DSN_HERE') {
+  try {
+    Sentry.init({
+      dsn: sentryDsn,
+      debug: __DEV__,
+      enableAutoSessionTracking: true,
+      sessionTrackingIntervalMillis: 30000,
+      enableNdkScopeSync: Platform.OS === 'android',
+      enableAutoPerformanceTracing: true,
+    });
+  } catch (error) {
+    console.warn('Sentry initialization failed:', error);
+  }
+} else {
+  console.warn('Sentry DSN not configured');
+}
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    // Enhanced device debugging for iPhone 16
+    // Basic device debugging
     const deviceInfo = {
       platform: Platform.OS,
       version: Platform.Version,
       model: Constants.deviceName,
       screen: Dimensions.get('screen'),
       window: Dimensions.get('window'),
-      isIphone16: Platform.OS === 'ios' && (
-        Constants.deviceName?.includes('iPhone16') || 
-        Constants.deviceName?.includes('iPhone 16') ||
-        Constants.deviceName?.includes('iPhone17')
-      ),
       expo: {
         sdkVersion: Constants.expoVersion,
-        deviceId: Constants.deviceId,
         sessionId: Constants.sessionId,
       }
     };
 
     console.log('🔍 Device Debug Info:', JSON.stringify(deviceInfo, null, 2));
 
-    // Add device context to Sentry
-    Sentry.setContext('device', deviceInfo);
-    Sentry.setTag('device_model', Constants.deviceName || 'unknown');
-    Sentry.setTag('is_iphone16', deviceInfo.isIphone16);
-
-    if (deviceInfo.isIphone16) {
-      console.log('🍎 iPhone 16 detected - enhanced crash monitoring enabled');
-      Sentry.addBreadcrumb({
-        message: 'iPhone 16 detected',
-        level: 'info',
-        data: deviceInfo
-      });
-      
-      // iPhone 16 specific monitoring
-      Sentry.setTag('device_category', 'iphone16');
-      Sentry.setLevel('debug');
-      
-      // Monitor memory warnings
-      if (Platform.OS === 'ios') {
-        const memoryWarningHandler = () => {
-          console.log('⚠️ iPhone 16 Memory Warning');
-          Sentry.addBreadcrumb({
-            message: 'Memory warning on iPhone 16',
-            level: 'warning',
-            category: 'memory'
-          });
-        };
-        
-        // Add memory monitoring if available
-        try {
-          require('react-native').AppState.addEventListener('memoryWarning', memoryWarningHandler);
-        } catch (e) {
-          console.log('Memory warning listener not available');
-        }
+    // Add device context to Sentry if available
+    if (sentryDsn) {
+      try {
+        Sentry.setContext('device', deviceInfo);
+        Sentry.setTag('device_model', Constants.deviceName || 'unknown');
+        Sentry.setTag('platform', Platform.OS);
+      } catch (error) {
+        console.warn('Failed to set Sentry context:', error);
       }
     }
 
-    // Global error handler
-    const originalHandler = ErrorUtils.getGlobalHandler();
-    ErrorUtils.setGlobalHandler((error, isFatal) => {
-      console.error('🚨 Global Error:', error);
-      Sentry.captureException(error, {
-        tags: {
-          isFatal: isFatal,
-          source: 'global_handler'
+    // Global error handler with safety checks
+    try {
+      const originalHandler = ErrorUtils.getGlobalHandler();
+      ErrorUtils.setGlobalHandler((error, isFatal) => {
+        console.error('🚨 Global Error:', error);
+        
+        // Only capture to Sentry if it's configured
+        if (sentryDsn) {
+          try {
+            Sentry.captureException(error, {
+              tags: {
+                isFatal: isFatal,
+                source: 'global_handler'
+              }
+            });
+          } catch (sentryError) {
+            console.warn('Failed to capture error to Sentry:', sentryError);
+          }
+        }
+        
+        if (originalHandler) {
+          originalHandler(error, isFatal);
         }
       });
-      if (originalHandler) {
-        originalHandler(error, isFatal);
-      }
-    });
+    } catch (error) {
+      console.warn('Failed to set global error handler:', error);
+    }
 
   }, []);
 
