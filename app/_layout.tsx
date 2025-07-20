@@ -16,10 +16,21 @@ function RootLayoutNav() {
     );
   }
 
+  // Authentication-based navigation
+  if (!user) {
+    // User not authenticated - show only auth routes
+    return (
+      <Stack>
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    );
+  }
+
+  // User authenticated - show main app routes
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="auth" options={{ headerShown: false }} />
       <Stack.Screen name="profile" options={{ headerShown: false }} />
       <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
       <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
