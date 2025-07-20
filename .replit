@@ -25,7 +25,7 @@ localPort = 46193
 externalPort = 3002
 
 [workflows]
-runButton = "EAS Publish Preview iOS"
+runButton = "Dev Server"
 
 [[workflows.workflow]]
 name = "Dev Server"
