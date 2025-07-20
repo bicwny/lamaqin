@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   View, 
@@ -25,6 +24,33 @@ export default function ProfileSetupScreen() {
   const [practiceYears, setPracticeYears] = useState('');
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleSkipProfile = async () => {
+    try {
+      console.log('⏭️ User chose to skip profile setup');
+      Alert.alert(
+        '确认跳过',
+        '您可以随时在个人页面完善资料',
+        [
+          {
+            text: '取消',
+            style: 'cancel'
+          },
+          {
+            text: '跳过',
+            onPress: () => {
+              console.log('✅ Redirecting to main app after skip');
+              router.replace('/(tabs)/index');
+            }
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Skip profile error:', error);
+      // Even if there's an error, still redirect
+      router.replace('/(tabs)/index');
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!user) {
