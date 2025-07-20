@@ -19,11 +19,8 @@ function RootLayoutNav() {
   // Show auth layout for unauthenticated users
   if (!user) {
     return (
-      <Stack initialRouteName="auth/unified">
-        <Stack.Screen name="auth/unified" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/register" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/email-verification" options={{ headerShown: false }} />
+      <Stack initialRouteName="auth">
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
       </Stack>
     );
   }
