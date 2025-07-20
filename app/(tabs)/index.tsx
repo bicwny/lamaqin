@@ -972,10 +972,187 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: '#fff',
     fontSize: 16,
-The code block marker `\`\`\`text` caused a syntax error, so it's removed.
-
-<replit_final_file>
-import React, { useState, useEffect } from 'react';
+    fontWeight: '600',
+  },
+  section: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
+  },
+  viewMoreText: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  studyCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  studyCardHeader: {
+    marginBottom: 8,
+  },
+  studyCardTitleContainer: {
+    flex: 1,
+  },
+  courseName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  continueStudyText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  progressText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: 12,
+  },
+  quickActionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  quickActionButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  listenButton: {
+    backgroundColor: '#E3F2FD',
+  },
+  readButton: {
+    backgroundColor: '#F3E5F5',
+  },
+  onlineButton: {
+    backgroundColor: '#E8F5E8',
+  },
+  quickActionButtonText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.textPrimary,
+  },
+  noStudyText: {
+    textAlign: 'center',
+    color: Colors.textSecondary,
+    fontSize: 16,
+    padding: 20,
+  },
+  practiceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  practiceCardColumn: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: '48%',
+    minHeight: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  practiceHeader: {
+    marginBottom: 8,
+  },
+  practiceNameColumn: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
+  },
+  countPercentageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  practiceCountColumn: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    flex: 1,
+  },
+  progressPercent: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  progressBarContainer: {
+    marginBottom: 12,
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+  },
+  progressBarFill: {
+    height: 4,
+    backgroundColor: Colors.primary,
+    borderRadius: 2,
+  },
+  practiceActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginTop: 'auto',
+  },
+  actionButtonSpacer: {
+    width: 12,
+  },
+  weeklyProgressColumn: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  todayDetailsColumn: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
+    marginBottom: 8,
+  },
+  practiceCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  noPracticeText: {
+    textAlign: 'center',
+    color: Colors.textSecondary,
+    fontSize: 16,
+  },
+});
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
