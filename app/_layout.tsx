@@ -16,6 +16,19 @@ function RootLayoutNav() {
     );
   }
 
+  // Show auth layout for unauthenticated users
+  if (!user) {
+    return (
+      <Stack initialRouteName="auth/unified">
+        <Stack.Screen name="auth/unified" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/register" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/email-verification" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
+
+  // Show main app layout for authenticated users
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
