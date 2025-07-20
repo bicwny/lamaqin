@@ -2,834 +2,209 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { toastService } from '@/lib/toast';
-import { useTimezone } from '@/hooks/useTimezone';
-import { getCurrentDateInTimezone } from '@/lib/timezone';
-
 import { Colors } from '@/constants/Colors';
 import PageTemplate from '@/components/PageTemplate';
 import { ConnectionTest } from '@/components/ConnectionTest';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import { RefreshControl } from 'react-native';
-import Avatar from '@/components/Avatar';
 
-interface NextLesson {
-  courseId: string;
-  courseName: string;
-  lessonNumber: number;
-  lessonTitle: string;
-  progress: string;
-  lessonId: string;
-  url?: string;
+interface StudyRecord {
+  id: string;
+  course_name: string;
+  progress_percentage: number;
+  total_lessons: number;
+  completed_lessons: number;
+  last_studied_at: string;
 }
 
-interface DailyPractice {
+interface PracticeProject {
   id: string;
-  name: string;
-  current: number;
-  target: number;
-  unit: string;
-  status: 'completed' | 'in_progress' | 'pending';
-  progressPercent: number;
-  type: 'count' | 'time';
-}
-
-interface WeeklyPractice {
-  id: string;
-  name: string;
-  weekSessions: number;
-  weekTarget: number;
-  todaySessions: number;
-  status: 'completed' | 'in_progress' | 'pending';
-  todayDetails?: string;
+  practice_name: string;
+  current_count: number;
+  target_count: number;
+  progress_percentage: number;
+  last_practiced_at: string;
 }
 
 export default function HomeScreen() {
-  const { user } = useAuth();
-  const [practiceProjects, setPracticeProjects] = useState<any[]>([]);
-  const [userCourses, setUserCourses] = useState<any[]>([]);
-  const [mindfulnessRecords, setMindfulnessRecords] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
-
-  // Defer data loading until component is focused or user interacts
-  useEffect(() => {
-    if (user?.id && !dataLoaded) {
-      // Add a small delay to allow the page to render first
-      const timer = setTimeout(() => {
-        setDataLoaded(true);
-        loadDashboardData();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [user?.id, dataLoaded]);
-
+  const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [refreshing, setRefreshing] = useState(false);
-  const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
-  const [courseLessons, setCourseLessons] = useState<Array<{
-    courseId: string;
-    courseName: string;
-    lessonNumber: number;
-    lessonTitle: string;
-    progress: string;
-    lessonId: string;
-    url?: string;
-    isCompleted?: boolean;
-  }>>([]);
-  const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
-  const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
-
-  // Track when user is returning from recording to avoid unnecessary refresh
-  const [lastRecordTime, setLastRecordTime] = useState<number>(0);
-
-  // Add timezone support for daily reset
-  const { timezoneInfo, handleDailyResetCheck } = useTimezone();
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user?.id) {
-        // Set up daily reset check for count-based practices
-        if (timezoneInfo) {
-          handleDailyResetCheck(() => {
-            console.log('🌅 Daily reset triggered for count-based practices - resetting displays');
-            // Reset daily practices display to show 0 counts
-            setDailyPractices(prev => prev.map(practice => ({
-              ...practice,
-              current: 0,
-              progressPercent: 0,
-              status: 'pending' as const
-            })));
-            // Reload data from database (should be empty for new day)
-            loadDashboardData();
-          });
-        }
-
-        const now = Date.now();
-        // Only refresh if it's been more than 2 seconds since last record
-        // This prevents refresh when user just recorded something and came back
-        if (now - lastRecordTime > 2000) {
-          loadDashboardData();
-        }
-      }
-    }, [user?.id, lastRecordTime, timezoneInfo])
-  );
-
-  const loadDashboardData = async () => {
-    if (!user?.id) return;
-
-    try {
-      setLoading(true);
-      await Promise.all([
-        loadCourseLessons(),
-        loadDailyPractices(),
-        loadWeeklyPractices(),
-        loadUserProfile()
-      ]);
-    } catch (error) {
-      console.error('❌ Error loading dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadDashboardData();
-    setRefreshing(false);
-  };
-
-  const loadCourseLessons = async () => {
-    try {
-      // Get user's active courses with progress
-      const { data: userCourses, error } = await supabase
-        .from('user_courses')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('progress_percentage', { ascending: false });
-
-      if (error) throw error;
-
-      if (!userCourses || userCourses.length === 0) {
-        setCourseLessons([]);
-        return;
-      }
-
-      const allCourseLessons = [];
-
-      for (const userCourse of userCourses) {
-        // Get study records to find the next incomplete lesson
-        const { data: studyRecords, error: studyError } = await supabase
-          .from('study_records')
-          .select(`
-            lesson_id,
-            study_type,
-            lesson:course_lessons(lesson_number, title, id)
-          `)
-          .eq('user_id', user.id)
-          .eq('course_id', userCourse.course_id);
-
-        if (studyError) throw studyError;
-
-        // Get all lessons for this course to find the next one
-        const { data: allLessons, error: lessonsError } = await supabase
-          .from('course_lessons')
-          .select('*')
-          .eq('course_id', userCourse.course_id)
-          .order('lesson_number');
-
-        if (lessonsError) throw lessonsError;
-
-        // Find completed lessons (both 听传承 and 看法本)
-        const lessonCompletionMap = new Map();
-        studyRecords?.forEach(record => {
-          if (!lessonCompletionMap.has(record.lesson_id)) {
-            lessonCompletionMap.set(record.lesson_id, { 
-              听传承: false, 
-              看法本: false,
-              lessonNumber: record.lesson?.lesson_number || 0,
-              title: record.lesson?.title || `第${record.lesson?.lesson_number || 0}课`
-            });
-          }
-
-          const lessonData = lessonCompletionMap.get(record.lesson_id);
-          if (record.study_type === '听传承') {
-            lessonData.听传承 = true;
-          } else if (record.study_type === '看法本') {
-            lessonData.看法本 = true;
-          }
-        });
-
-        // Check if all lessons are completed
-        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
-          lesson => lesson.听传承 && lesson.看法本
-        ).length;
-
-        const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
-
-        // If all lessons are completed and course is still active, update status and skip adding to display
-        if (isAllLessonsCompleted && userCourse.status === 'active') {
-          // Update course status to completed - this will hide the card immediately
-          await supabase
-            .from('user_courses')
-            .update({ 
-              status: 'completed',
-              completed_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user.id)
-            .eq('course_id', userCourse.course_id);
-
-          // Skip adding this course to the display since it's now completed
-          continue;
-        }
-
-        // Find the next incomplete lesson
-        let nextLessonNumber = 1;
-        let nextLessonId = '';
-        let nextLessonTitle = '';
-        let nextLessonUrl = '';
-        let listenCount = 0;
-        let readCount = 0;
-
-        for (let i = 1; i <= userCourse.course.total_lessons; i++) {
-          const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
-          if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
-            nextLessonNumber = i;
-            const nextLesson = allLessons?.find(l => l.lesson_number === i);
-            if (nextLesson) {
-              nextLessonId = nextLesson.id;
-              nextLessonTitle = nextLesson.title || `第${i}课`;
-              nextLessonUrl = nextLesson.url || '';
-
-              // Get study counts for this specific lesson
-              const lessonStudyRecords = studyRecords?.filter(record => 
-                record.lesson?.lesson_number === i
-              ) || [];
-
-              listenCount = lessonStudyRecords.filter(record => 
-                record.study_type === '听传承'
-              ).length;
-
-              readCount = lessonStudyRecords.filter(record => 
-                record.study_type === '看法本'
-              ).length;
-            } else {
-              // If no lesson found, use fallback title
-              nextLessonTitle = `第${i}课`;
-            }
-            break;
-          }
-        }
-
-        allCourseLessons.push({
-          courseId: userCourse.course_id,
-          courseName: userCourse.course.name,
-          lessonNumber: nextLessonNumber,
-          lessonTitle: nextLessonTitle,
-          lessonId: nextLessonId,
-          url: nextLessonUrl,
-          progress: `听传承: ${listenCount}次 | 看法本: ${readCount}次`,
-          isCompleted: false
-        });
-      }
-
-      setCourseLessons(allCourseLessons);
-
-    } catch (error) {
-      console.error('Error loading course lessons:', error);
-      setCourseLessons([]);
-    }
-  };
-
-  const loadDailyPractices = async () => {
-    try {
-      const { data: projects, error } = await supabase
-        .from('user_practice_projects')
-        .select(`
-          *,
-          practices(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .eq('target_period', 'daily')
-        .order('created_at', { ascending: true })
-        .limit(3);
-
-      if (error) throw error;
-
-      // Use timezone-aware date for count-based practices
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
-
-      const practicesData: DailyPractice[] = [];
-
-      for (const project of projects || []) {
-        if (project.practices.type === 'count') {
-          // Get today's records for count-based practices
-          const { data: todayRecords, error: recordsError } = await supabase
-            .from('daily_records')
-            .select('count')
-            .eq('user_id', user.id)
-            .eq('practice_project_id', project.id)
-            .eq('record_date', today);
-
-          if (recordsError) throw recordsError;
-
-          const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
-          const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
-
-          let status: 'completed' | 'in_progress' | 'pending' = 'pending';
-          if (todayCount >= project.daily_target) status = 'completed';
-          else if (todayCount > 0) status = 'in_progress';
-
-          practicesData.push({
-            id: project.id,
-            name: project.practices.name,
-            current: todayCount,
-            target: project.daily_target,
-            unit: project.practices.unit,
-            status,
-            progressPercent,
-            type: 'count'
-          });
-        }
-      }
-
-      setDailyPractices(practicesData);
-    } catch (error) {
-      console.error('❌ Error loading daily practices:', error);
-      setDailyPractices([]);
-    }
-  };
-
-  const loadWeeklyPractices = async () => {
-    try {
-      const { data: projects, error } = await supabase
-        .from('user_practice_projects')
-        .select(`
-          *,
-          practices(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .eq('target_period', 'weekly')
-        .limit(3);
-
-      if (error) throw error;
-
-      // Use timezone-aware date for weekly practices
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
-
-      // Use Monday as week start for consistency with getCurrentWeekStart()
-      // Calculate week start based on timezone-aware today
-      const todayDate = timezoneInfo 
-        ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
-        : new Date();
-
-      const dayOfWeek = todayDate.getDay();
-      const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-      const monday = new Date(todayDate.setDate(diff));
-      const weekStart = monday.toISOString().split('T')[0];
-
-      const practicesData: WeeklyPractice[] = [];
-
-      for (const project of projects || []) {
-        if (project.practices.type === 'time') {
-          // Get this week's meditation records
-          const { data: weekRecords, error: weekError } = await supabase
-            .from('meditation_records')
-            .select('duration_minutes, record_date')
-            .eq('user_id', user.id)
-            .eq('practice_id', project.practice_id)
-            .gte('record_date', weekStart)
-            .lte('record_date', today);
-
-          if (weekError) throw weekError;
-
-          const weekSessions = weekRecords?.length || 0;
-          const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
-          const todaySessions = todayRecords.length;
-
-          let status: 'completed' | 'in_progress' | 'pending' = 'pending';
-          if (weekSessions >= project.daily_target) status = 'completed';
-          else if (weekSessions > 0) status = 'in_progress';
-
-          const todayDetails = todayRecords.length > 0 
-            ? todayRecords.map((record, index) => `第${index + 1}座${record.duration_minutes}分钟`).join('；')
-            : undefined;
-
-          practicesData.push({
-            id: project.id,
-            name: project.practices.name,
-            weekSessions,
-            weekTarget: project.daily_target,
-            todaySessions,
-            status,
-            todayDetails,
-            practiceId: project.practice_id,
-            type: 'time'
-          });
-        }
-      }
-
-      setWeeklyPractices(practicesData);
-    } catch (error) {
-      console.error('❌ Error loading weekly practices:', error);
-      setWeeklyPractices([]);
-    }
-  };
-
-  const loadUserProfile = async () => {
-    try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('dharma_name')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('❌ Error fetching user dharma name:', error);
-      } else if (userData?.dharma_name) {
-        setUserDharmaName(userData.dharma_name);
-      }
-    } catch (error) {
-      console.error('❌ Error loading user profile:', error);
-    }
-  };
-
-  const navigateToProfile = () => {
-    router.push('/profile');
-  };
-
-  const navigateToStudy = () => {
-    router.push('/(tabs)/study');
-  };
-
-  const recordStudy = async (courseId: string, lessonNumber: number, studyType: '听传承' | '看法本') => {
-    if (!user) return;
-
-    try {
-      // Optimistic update: immediately update the progress text
-      setCourseLessons(prev => prev.map(lesson => {
-        if (lesson.courseId === courseId && lesson.lessonNumber === lessonNumber) {
-          const currentProgress = lesson.progress;
-          const [listenPart, readPart] = currentProgress.split(' | ');
-          const listenCount = parseInt(listenPart.match(/\d+/)?.[0] || '0');
-          const readCount = parseInt(readPart.match(/\d+/)?.[0] || '0');
-
-          const newListenCount = studyType === '听传承' ? listenCount + 1 : listenCount;
-          const newReadCount = studyType === '看法本' ? readCount + 1 : readCount;
-
-          return {
-            ...lesson,
-            progress: `听传承: ${newListenCount}次 | 看法本: ${newReadCount}次`
-          };
-        }
-        return lesson;
-      }));
-
-      // Show success toast immediately
-      toastService.success({
-        title: '学习记录已保存',
-        message: `${studyType}完成 - 继续加油！`
-      });
-
-      const today = new Date().toISOString().split('T')[0];
-
-      // Find the lesson
-      const { data: lessons, error: lessonError } = await supabase
-        .from('course_lessons')
-        .select('id')
-        .eq('course_id', courseId)
-        .eq('lesson_number', lessonNumber)
-        .limit(1);
-
-      if (lessonError || !lessons || lessons.length === 0) {
-        toastService.error({
-          title: '课程信息有误',
-          message: '无法找到对应的课程内容'
-        });
-        // Revert optimistic update
-        loadCourseLessons();
-        return;
-      }
-
-      const studyRecord = {
-        user_id: user.id,
-        course_id: courseId,
-        lesson_id: lessons[0].id,
-        study_date: today,
-        study_type: studyType,
-        study_count_for_lesson: 1
-      };
-
-      const { error } = await supabase
-        .from('study_records')
-        .insert(studyRecord);
-
-      if (error) throw error;
-
-      // Background refresh to ensure data consistency
-      setTimeout(() => {
-        loadCourseLessons();
-      }, 1000);
-
-    } catch (error) {
-      console.error('Error recording study:', error);
-      toastService.error({
-        title: '保存失败',
-        message: '网络异常，请稍后重试'
-      });
-
-      // Revert optimistic update on error
-      loadCourseLessons();
-    }
-  };
-
-  const navigateToPractice = () => {
-    router.push('/(tabs)/practice');
-  };
-
-
-
-  // Handle tapping the whole practice card to view details
-  const handlePracticeCardTap = (practice: any) => {
-    // All practice types now use the unified practice-detail page
-    router.push({
-      pathname: '/practice-detail/[practiceId]',
-      params: {
-        practiceId: practice.id,
-      },
-    });
-  };
-
-  // Handle quick complete button (check mark)
-  const handleQuickComplete = async (e: any, practice: any) => {
-    e.stopPropagation(); // Prevent card tap
-
-    if (practice.status === 'completed') {
-      // Already completed, just show message
-      toastService.info({
-        title: '今日目标已达成',
-        message: '继续保持！明日再接再厉'
-      });
-      return;
-    }
-
-    // Calculate remaining amount to complete daily target
-    const remaining = practice.target - practice.current;
-
-    // Optimistic update: immediately update UI
-    updatePracticeOptimistically(practice.id, remaining, practice.type);
-
-    // Show success toast immediately
-    toastService.success({
-      title: '已完成今日目标',
-      message: `${practice.name} +${remaining.toLocaleString()} ${practice.unit}`
-    });
-
-    // Record in background
-    try {
-      await recordQuickCompleteBackground(practice, remaining);
-    } catch (error) {
-      // Revert optimistic update on error
-      console.error('❌ Error recording practice:', error);
-      toastService.error({
-        title: '记录失败',
-        message: '请检查网络连接后重试'
-      });
-
-      // Refresh data to revert optimistic changes
+  const [studyData, setStudyData] = useState<StudyRecord[]>([]);
+  const [practiceData, setPracticeData] = useState<PracticeProject[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    if (user) {
       loadDashboardData();
     }
-  };
+  }, [user]);
 
-  // Handle add record button (plus)
-  const handleAddRecord = (e: any, practice: any) => {
-    e.stopPropagation(); // Prevent card tap
-
-    // Track when user is going to record
-    setLastRecordTime(Date.now());
-
-    // All practice types now use the unified practice-detail page
-        router.push({
-          pathname: '/practice-detail/[practiceId]',
-          params: {
-            practiceId: practice.id,
-          },
-        });
-  };
-
-  // Optimistic update helper function
-  const updatePracticeOptimistically = (practiceId: string, amount: number, practiceType: 'count' | 'time') => {
-    if (practiceType === 'time') {
-      // Update weekly practices
-      setWeeklyPractices(prev => prev.map(practice => {
-        if (practice.id === practiceId) {
-          const newWeekSessions = practice.weekSessions + 1;
-          const newTodaySessions = practice.todaySessions + 1;
-
-          return {
-            ...practice,
-            weekSessions: newWeekSessions,
-            todaySessions: newTodaySessions,
-            status: newWeekSessions >= practice.weekTarget ? 'completed' : 'in_progress',
-            todayDetails: practice.todayDetails 
-              ? `${practice.todayDetails}；第${newTodaySessions}座${amount}分钟`
-              : `第${newTodaySessions}座${amount}分钟`
-          };
-        }
-        return practice;
-      }));
-    } else {
-      // Update daily practices
-      setDailyPractices(prev => prev.map(practice => {
-        if (practice.id === practiceId) {
-          const newCurrent = practice.current + amount;
-          const newProgressPercent = Math.min((newCurrent / practice.target) * 100, 100);
-
-          return {
-            ...practice,
-            current: newCurrent,
-            progressPercent: newProgressPercent,
-            status: newCurrent >= practice.target ? 'completed' : 'in_progress'
-          };
-        }
-        return practice;
-      }));
+  const loadDashboardData = async () => {
+    try {
+      setLoadingData(true);
+      // Mock data for now - replace with actual API calls
+      setStudyData([]);
+      setPracticeData([]);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoadingData(false);
     }
   };
 
-  // Background recording function (no UI updates)
-  const recordQuickCompleteBackground = async (practice: any, amount: number) => {
-    if (!user) return;
+  const handleLoginPress = () => {
+    router.push('/auth/unified');
+  };
 
-    // Use timezone-aware date for recording
-    const recordDate = timezoneInfo 
-      ? getCurrentDateInTimezone(timezoneInfo.timezone)
-      : new Date().toISOString().split('T')[0];
-
-    if (practice.type === 'time') {
-      // For time-based practices, create a meditation record with target duration
-      const { error } = await supabase
-        .from('meditation_records')
-        .insert({
-          user_id: user.id,
-          practice_id: practice.practiceId,
-          record_date: recordDate,
-          duration_minutes: amount, // Use remaining amount as duration
-          session_number: 1,
-        });
-
-      if (error) throw error;
-    } else {
-      // For count-based practices, create a daily record
-      const { error: recordError } = await supabase
-        .from('daily_records')
-        .insert({
-          user_id: user.id,
-          practice_project_id: practice.id,
-          record_date: recordDate,
-          count: amount,
-          notes: '快速完成今日目标'
-        });
-
-      if (recordError) throw recordError;
-
-      // Update project's current count
-      const { error: updateError } = await supabase
-        .from('user_practice_projects')
-        .update({ 
-          current_count: practice.current + amount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', practice.id)
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
+  const handleQuickAction = (action: string, itemId?: string) => {
+    switch (action) {
+      case 'listen':
+        // Handle listen action
+        break;
+      case 'read':
+        // Handle read action
+        break;
+      case 'online':
+        // Handle online action
+        break;
+      case 'practice':
+        if (itemId) {
+          router.push(`/practice-detail/${itemId}`);
+        }
+        break;
     }
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 6) return '夜深了，早点休息';
-    if (hour < 12) return '早上好，开始今日修行';
-    if (hour < 18) return '下午好，精进不懈';
-    return '晚上好，回顾今日收获';
+  const handleViewMore = (section: string) => {
+    switch (section) {
+      case 'study':
+        router.push('/(tabs)/study');
+        break;
+      case 'practice':
+        router.push('/(tabs)/practice');
+        break;
+    }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <PageTemplate
-        title="修行主页"
-        subtitle={getGreeting()}
-        rightAction={{
-          component: <Avatar dharmaName={userDharmaName} size={32} />,
-          onPress: navigateToProfile
-        }}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
+      <PageTemplate title="佛学修行" scrollable={false}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>加载中...</Text>
+          <Text style={styles.loadingText}>正在加载...</Text>
+        </View>
+      </PageTemplate>
+    );
+  }
+
+  if (!user) {
+    return (
+      <PageTemplate title="佛学修行" scrollable={false}>
+        <View style={styles.container}>
+          <View style={styles.welcomeSection}>
+            <Text style={styles.welcomeTitle}>欢迎来到佛学修行平台</Text>
+            <Text style={styles.welcomeSubtitle}>
+              记录您的修行历程，跟踪学习进度
+            </Text>
+
+            <TouchableOpacity 
+              style={styles.loginButton}
+              onPress={handleLoginPress}
+            >
+              <Text style={styles.loginButtonText}>开始修行之旅</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ConnectionTest />
         </View>
       </PageTemplate>
     );
   }
 
   return (
-    <PageTemplate
-      title="修行主页"
-      subtitle={`${getGreeting()} • ${userDharmaName}居士`}
-      rightAction={{
-        component: <Avatar dharmaName={userDharmaName} size={32} />,
-        onPress: navigateToProfile
-      }}
-      scrollable={false}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
-        <ScrollView 
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
+    <PageTemplate title="修行首页" scrollable={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Study Progress Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>学习进度</Text>
+            <TouchableOpacity onPress={() => handleViewMore('study')}>
+              <Text style={styles.viewMoreText}>查看更多</Text>
+            </TouchableOpacity>
+          </View>
 
-
-          {/* Study Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日学习</Text>
-              <TouchableOpacity onPress={navigateToStudy}>
-                <Text style={styles.viewMoreText}>查看更多</Text>
-              </TouchableOpacity>
-            </View>
-
-            {courseLessons.map((nextLesson, index) => (
-              <View 
-                key={index} 
-                style={styles.studyCard}
-              >
+          {loadingData ? (
+            <ActivityIndicator size="small" color={Colors.primary} />
+          ) : studyData.length > 0 ? (
+            studyData.slice(0, 2).map((study) => (
+              <View key={study.id} style={styles.studyCard}>
                 <View style={styles.studyCardHeader}>
                   <View style={styles.studyCardTitleContainer}>
-                    <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
-                      <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
+                    <Text style={styles.courseName}>{study.course_name}</Text>
+                    <Text style={styles.continueStudyText}>继续学习</Text>
                   </View>
                 </View>
-                <Text style={styles.progressText}>{nextLesson.progress}</Text>
+
+                <Text style={styles.progressText}>
+                  进度: {study.completed_lessons}/{study.total_lessons} 课 ({study.progress_percentage}%)
+                </Text>
+
                 <View style={styles.quickActionButtons}>
                   <TouchableOpacity 
                     style={[styles.quickActionButton, styles.listenButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
+                    onPress={() => handleQuickAction('listen', study.id)}
                   >
-                    <Text style={styles.quickActionButtonText}>听传承</Text>
+                    <Text style={styles.quickActionButtonText}>听课</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={[styles.quickActionButton, styles.readButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
+                    onPress={() => handleQuickAction('read', study.id)}
                   >
-                    <Text style={styles.quickActionButtonText}>看法本</Text>
+                    <Text style={styles.quickActionButtonText}>阅读</Text>
                   </TouchableOpacity>
-                  {nextLesson.url ? (
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.onlineButton]}
-                      onPress={() => Linking.openURL(nextLesson.url || '')}
-                    >
-                      <Text style={styles.quickActionButtonText}>在线课程</Text>
-                    </TouchableOpacity>
-                  ) : null}
+                  <TouchableOpacity 
+                    style={[styles.quickActionButton, styles.onlineButton]}
+                    onPress={() => handleQuickAction('online', study.id)}
+                  >
+                    <Text style={styles.quickActionButtonText}>在线</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-            ))}
+            ))
+          ) : (
+            <Text style={styles.noStudyText}>暂无学习记录</Text>
+          )}
+        </View>
+
+        {/* Practice Progress Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>修行进度</Text>
+            <TouchableOpacity onPress={() => handleViewMore('practice')}>
+              <Text style={styles.viewMoreText}>查看更多</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Practice Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日修行</Text>
-              <TouchableOpacity onPress={navigateToPractice}>
-                <Text style={styles.viewMoreText}>查看更多</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Practice Cards in Two Columns */}
+          {loadingData ? (
+            <ActivityIndicator size="small" color={Colors.primary} />
+          ) : practiceData.length > 0 ? (
             <View style={styles.practiceGrid}>
-              {/* Daily Practices */}
-              {dailyPractices.map((practice) => (
-                <TouchableOpacity 
-                  key={practice.id} 
+              {practiceData.slice(0, 4).map((practice) => (
+                <TouchableOpacity
+                  key={practice.id}
                   style={styles.practiceCardColumn}
-                  onPress={() => handlePracticeCardTap(practice)}
-                  activeOpacity={0.7}
+                  onPress={() => handleQuickAction('practice', practice.id)}
                 >
                   <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
-                      {practice.name}
-                    </Text>
+                    <Text style={styles.practiceNameColumn}>{practice.practice_name}</Text>
                   </View>
 
                   <View style={styles.countPercentageRow}>
                     <Text style={styles.practiceCountColumn}>
-                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
+                      {practice.current_count}/{practice.target_count}
                     </Text>
                     <Text style={styles.progressPercent}>
-                      {Math.round(practice.progressPercent)}%
+                      {practice.progress_percentage}%
                     </Text>
                   </View>
 
@@ -838,92 +213,24 @@ export default function HomeScreen() {
                       <View 
                         style={[
                           styles.progressBarFill, 
-                          { width: `${Math.min(practice.progressPercent, 100)}%` }
+                          { width: `${practice.progress_percentage}%` }
                         ]} 
                       />
                     </View>
                   </View>
 
-                  {/* Action Buttons */}
-                  <View style={styles.practiceActions}>
-                    <TouchableOpacity
-                      onPress={(e) => handleQuickComplete(e, practice)}
-                    >
-                      <Ionicons 
-                        name="checkmark-circle-outline" 
-                        size={24} 
-                        color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
-                      />
-                    </TouchableOpacity>
-
-                    <View style={styles.actionButtonSpacer} />
-
-                    <TouchableOpacity
-                      onPress={(e) => handleAddRecord(e, practice)}
-                    >
-                      <Ionicons 
-                        name="add-circle-outline" 
-                        size={24} 
-                        color={Colors.primary} 
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-              ))}
-
-              {/* Weekly Practices */}
-              {weeklyPractices.map((practice) => (
-                <TouchableOpacity 
-                  key={practice.id} 
-                  style={styles.practiceCardColumn}
-                  onPress={() => handlePracticeCardTap(practice)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
-                      {practice.name}
-                    </Text>
-                  </View>
-                  <Text style={styles.weeklyProgressColumn}>
-                    本周 {practice.weekSessions}/{practice.weekTarget}座
-                    {practice.status === 'completed' && ' 已完成'}
-                  </Text>
-                  {practice.todaySessions > 0 && practice.todayDetails && (
-                    <Text style={styles.todayDetailsColumn} numberOfLines={2}>
-                      今日：{practice.todayDetails}
-                    </Text>
-                  )}
-
-                  {/* Action Button for Weekly Practices */}
-                  <View style={styles.practiceActions}>
-                    <View style={styles.actionButtonSpacer} />
-                    <TouchableOpacity
-                      onPress={(e) => handleAddRecord(e, practice)}
-                    >
-                      <Ionicons 
-                        name="add-circle-outline" 
-                        size={24} 
-                        color={Colors.primary} 
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <Text style={styles.weeklyProgressColumn}>本周进度良好</Text>
+                  <Text style={styles.todayDetailsColumn}>今日已完成</Text>
                 </TouchableOpacity>
               ))}
             </View>
-
-            {courseLessons.length === 0 && (
-              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
-                <Text style={styles.noStudyText}>暂无进行中的课程，点击查看课程库</Text>
-              </TouchableOpacity>
-            )}
-
-            {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
-              <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
-                <Text style={styles.noPracticeText}>暂无修行项目，点击添加</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </ScrollView>
+          ) : (
+            <View style={styles.practiceCard}>
+              <Text style={styles.noPracticeText}>暂无修行项目</Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
     </PageTemplate>
   );
 }
@@ -937,37 +244,42 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.background,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
     color: Colors.textSecondary,
-    fontWeight: '500',
   },
-  offlineContainer: {
+  welcomeSection: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 32,
   },
-  offlineTitle: {
+  welcomeTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: Colors.textPrimary,
-    marginBottom: 8,
+    textAlign: 'center',
+    marginBottom: 12,
   },
-  offlineSubtitle: {
+  welcomeSubtitle: {
     fontSize: 16,
     color: Colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
+    lineHeight: 24,
   },
   loginButton: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   loginButtonText: {
     color: '#fff',
@@ -1151,981 +463,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: Colors.textSecondary,
     fontSize: 16,
-  },
-});
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { toastService } from '@/lib/toast';
-import { useTimezone } from '@/hooks/useTimezone';
-import { getCurrentDateInTimezone } from '@/lib/timezone';
-
-import { Colors } from '@/constants/Colors';
-import PageTemplate from '@/components/PageTemplate';
-import { ConnectionTest } from '@/components/ConnectionTest';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import { RefreshControl } from 'react-native';
-import Avatar from '@/components/Avatar';
-
-interface NextLesson {
-  courseId: string;
-  courseName: string;
-  lessonNumber: number;
-  lessonTitle: string;
-  progress: string;
-  lessonId: string;
-  url?: string;
-}
-
-interface DailyPractice {
-  id: string;
-  name: string;
-  current: number;
-  target: number;
-  unit: string;
-  status: 'completed' | 'in_progress' | 'pending';
-  progressPercent: number;
-  type: 'count' | 'time';
-}
-
-interface WeeklyPractice {
-  id: string;
-  name: string;
-  weekSessions: number;
-  weekTarget: number;
-  todaySessions: number;
-  status: 'completed' | 'in_progress' | 'pending';
-  todayDetails?: string;
-}
-
-export default function HomeScreen() {
-  const { user } = useAuth();
-  const [practiceProjects, setPracticeProjects] = useState<any[]>([]);
-  const [userCourses, setUserCourses] = useState<any[]>([]);
-  const [mindfulnessRecords, setMindfulnessRecords] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
-
-  // Defer data loading until component is focused or user interacts
-  useEffect(() => {
-    if (user?.id && !dataLoaded) {
-      // Add a small delay to allow the page to render first
-      const timer = setTimeout(() => {
-        setDataLoaded(true);
-        loadDashboardData();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [user?.id, dataLoaded]);
-
-  const router = useRouter();
-  const [refreshing, setRefreshing] = useState(false);
-  const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
-  const [courseLessons, setCourseLessons] = useState<Array<{
-    courseId: string;
-    courseName: string;
-    lessonNumber: number;
-    lessonTitle: string;
-    progress: string;
-    lessonId: string;
-    url?: string;
-    isCompleted?: boolean;
-  }>>([]);
-  const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
-  const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
-
-  // Track when user is returning from recording to avoid unnecessary refresh
-  const [lastRecordTime, setLastRecordTime] = useState<number>(0);
-
-  // Add timezone support for daily reset
-  const { timezoneInfo, handleDailyResetCheck } = useTimezone();
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (user?.id) {
-        // Set up daily reset check for count-based practices
-        if (timezoneInfo) {
-          handleDailyResetCheck(() => {
-            console.log('🌅 Daily reset triggered for count-based practices - resetting displays');
-            // Reset daily practices display to show 0 counts
-            setDailyPractices(prev => prev.map(practice => ({
-              ...practice,
-              current: 0,
-              progressPercent: 0,
-              status: 'pending' as const
-            })));
-            // Reload data from database (should be empty for new day)
-            loadDashboardData();
-          });
-        }
-
-        const now = Date.now();
-        // Only refresh if it's been more than 2 seconds since last record
-        // This prevents refresh when user just recorded something and came back
-        if (now - lastRecordTime > 2000) {
-          loadDashboardData();
-        }
-      }
-    }, [user?.id, lastRecordTime, timezoneInfo])
-  );
-
-  const loadDashboardData = async () => {
-    if (!user?.id) return;
-
-    try {
-      setLoading(true);
-      await Promise.all([
-        loadCourseLessons(),
-        loadDailyPractices(),
-        loadWeeklyPractices(),
-        loadUserProfile()
-      ]);
-    } catch (error) {
-      console.error('❌ Error loading dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadDashboardData();
-    setRefreshing(false);
-  };
-
-  const loadCourseLessons = async () => {
-    try {
-      // Get user's active courses with progress
-      const { data: userCourses, error } = await supabase
-        .from('user_courses')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('progress_percentage', { ascending: false });
-
-      if (error) throw error;
-
-      if (!userCourses || userCourses.length === 0) {
-        setCourseLessons([]);
-        return;
-      }
-
-      const allCourseLessons = [];
-
-      for (const userCourse of userCourses) {
-        // Get study records to find the next incomplete lesson
-        const { data: studyRecords, error: studyError } = await supabase
-          .from('study_records')
-          .select(`
-            lesson_id,
-            study_type,
-            lesson:course_lessons(lesson_number, title, id)
-          `)
-          .eq('user_id', user.id)
-          .eq('course_id', userCourse.course_id);
-
-        if (studyError) throw studyError;
-
-        // Get all lessons for this course to find the next one
-        const { data: allLessons, error: lessonsError } = await supabase
-          .from('course_lessons')
-          .select('*')
-          .eq('course_id', userCourse.course_id)
-          .order('lesson_number');
-
-        if (lessonsError) throw lessonsError;
-
-        // Find completed lessons (both 听传承 and 看法本)
-        const lessonCompletionMap = new Map();
-        studyRecords?.forEach(record => {
-          if (!lessonCompletionMap.has(record.lesson_id)) {
-            lessonCompletionMap.set(record.lesson_id, { 
-              听传承: false, 
-              看法本: false,
-              lessonNumber: record.lesson?.lesson_number || 0,
-              title: record.lesson?.title || `第${record.lesson?.lesson_number || 0}课`
-            });
-          }
-
-          const lessonData = lessonCompletionMap.get(record.lesson_id);
-          if (record.study_type === '听传承') {
-            lessonData.听传承 = true;
-          } else if (record.study_type === '看法本') {
-            lessonData.看法本 = true;
-          }
-        });
-
-        // Check if all lessons are completed
-        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
-          lesson => lesson.听传承 && lesson.看法本
-        ).length;
-
-        const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
-
-        // If all lessons are completed and course is still active, update status and skip adding to display
-        if (isAllLessonsCompleted && userCourse.status === 'active') {
-          // Update course status to completed - this will hide the card immediately
-          await supabase
-            .from('user_courses')
-            .update({ 
-              status: 'completed',
-              completed_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user.id)
-            .eq('course_id', userCourse.course_id);
-
-          // Skip adding this course to the display since it's now completed
-          continue;
-        }
-
-        // Find the next incomplete lesson
-        let nextLessonNumber = 1;
-        let nextLessonId = '';
-        let nextLessonTitle = '';
-        let nextLessonUrl = '';
-        let listenCount = 0;
-        let readCount = 0;
-
-        for (let i = 1; i <= userCourse.course.total_lessons; i++) {
-          const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
-          if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
-            nextLessonNumber = i;
-            const nextLesson = allLessons?.find(l => l.lesson_number === i);
-            if (nextLesson) {
-              nextLessonId = nextLesson.id;
-              nextLessonTitle = nextLesson.title || `第${i}课`;
-              nextLessonUrl = nextLesson.url || '';
-
-              // Get study counts for this specific lesson
-              const lessonStudyRecords = studyRecords?.filter(record => 
-                record.lesson?.lesson_number === i
-              ) || [];
-
-              listenCount = lessonStudyRecords.filter(record => 
-                record.study_type === '听传承'
-              ).length;
-
-              readCount = lessonStudyRecords.filter(record => 
-                record.study_type === '看法本'
-              ).length;
-            } else {
-              // If no lesson found, use fallback title
-              nextLessonTitle = `第${i}课`;
-            }
-            break;
-          }
-        }
-
-        allCourseLessons.push({
-          courseId: userCourse.course_id,
-          courseName: userCourse.course.name,
-          lessonNumber: nextLessonNumber,
-          lessonTitle: nextLessonTitle,
-          lessonId: nextLessonId,
-          url: nextLessonUrl,
-          progress: `听传承: ${listenCount}次 | 看法本: ${readCount}次`,
-          isCompleted: false
-        });
-      }
-
-      setCourseLessons(allCourseLessons);
-
-    } catch (error) {
-      console.error('Error loading course lessons:', error);
-      setCourseLessons([]);
-    }
-  };
-
-  const loadDailyPractices = async () => {
-    try {
-      const { data: projects, error } = await supabase
-        .from('user_practice_projects')
-        .select(`
-          *,
-          practices(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .eq('target_period', 'daily')
-        .order('created_at', { ascending: true })
-        .limit(3);
-
-      if (error) throw error;
-
-      // Use timezone-aware date for count-based practices
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
-
-      const practicesData: DailyPractice[] = [];
-
-      for (const project of projects || []) {
-        if (project.practices.type === 'count') {
-          // Get today's records for count-based practices
-          const { data: todayRecords, error: recordsError } = await supabase
-            .from('daily_records')
-            .select('count')
-            .eq('user_id', user.id)
-            .eq('practice_project_id', project.id)
-            .eq('record_date', today);
-
-          if (recordsError) throw recordsError;
-
-          const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
-          const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
-
-          let status: 'completed' | 'in_progress' | 'pending' = 'pending';
-          if (todayCount >= project.daily_target) status = 'completed';
-          else if (todayCount > 0) status = 'in_progress';
-
-          practicesData.push({
-            id: project.id,
-            name: project.practices.name,
-            current: todayCount,
-            target: project.daily_target,
-            unit: project.practices.unit,
-            status,
-            progressPercent,
-            type: 'count'
-          });
-        }
-      }
-
-      setDailyPractices(practicesData);
-    } catch (error) {
-      console.error('❌ Error loading daily practices:', error);
-      setDailyPractices([]);
-    }
-  };
-
-  const loadWeeklyPractices = async () => {
-    try {
-      const { data: projects, error } = await supabase
-        .from('user_practice_projects')
-        .select(`
-          *,
-          practices(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .eq('target_period', 'weekly')
-        .limit(3);
-
-      if (error) throw error;
-
-      // Use timezone-aware date for weekly practices
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
-
-      // Use Monday as week start for consistency with getCurrentWeekStart()
-      // Calculate week start based on timezone-aware today
-      const todayDate = timezoneInfo 
-        ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
-        : new Date();
-
-      const dayOfWeek = todayDate.getDay();
-      const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-      const monday = new Date(todayDate.setDate(diff));
-      const weekStart = monday.toISOString().split('T')[0];
-
-      const practicesData: WeeklyPractice[] = [];
-
-      for (const project of projects || []) {
-        if (project.practices.type === 'time') {
-          // Get this week's meditation records
-          const { data: weekRecords, error: weekError } = await supabase
-            .from('meditation_records')
-            .select('duration_minutes, record_date')
-            .eq('user_id', user.id)
-            .eq('practice_id', project.practice_id)
-            .gte('record_date', weekStart)
-            .lte('record_date', today);
-
-          if (weekError) throw weekError;
-
-          const weekSessions = weekRecords?.length || 0;
-          const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
-          const todaySessions = todayRecords.length;
-
-          let status: 'completed' | 'in_progress' | 'pending' = 'pending';
-          if (weekSessions >= project.daily_target) status = 'completed';
-          else if (weekSessions > 0) status = 'in_progress';
-
-          const todayDetails = todayRecords.length > 0 
-            ? todayRecords.map((record, index) => `第${index + 1}座${record.duration_minutes}分钟`).join('；')
-            : undefined;
-
-          practicesData.push({
-            id: project.id,
-            name: project.practices.name,
-            weekSessions,
-            weekTarget: project.daily_target,
-            todaySessions,
-            status,
-            todayDetails,
-            practiceId: project.practice_id,
-            type: 'time'
-          });
-        }
-      }
-
-      setWeeklyPractices(practicesData);
-    } catch (error) {
-      console.error('❌ Error loading weekly practices:', error);
-      setWeeklyPractices([]);
-    }
-  };
-
-  const loadUserProfile = async () => {
-    try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('dharma_name')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('❌ Error fetching user dharma name:', error);
-      } else if (userData?.dharma_name) {
-        setUserDharmaName(userData.dharma_name);
-      }
-    } catch (error) {
-      console.error('❌ Error loading user profile:', error);
-    }
-  };
-
-  const navigateToProfile = () => {
-    router.push('/profile');
-  };
-
-  const navigateToStudy = () => {
-    router.push('/(tabs)/study');
-  };
-
-  const recordStudy = async (courseId: string, lessonNumber: number, studyType: '听传承' | '看法本') => {
-    if (!user) return;
-
-    try {
-      // Optimistic update: immediately update the progress text
-      setCourseLessons(prev => prev.map(lesson => {
-        if (lesson.courseId === courseId && lesson.lessonNumber === lessonNumber) {
-          const currentProgress = lesson.progress;
-          const [listenPart, readPart] = currentProgress.split(' | ');
-          const listenCount = parseInt(listenPart.match(/\d+/)?.[0] || '0');
-          const readCount = parseInt(readPart.match(/\d+/)?.[0] || '0');
-
-          const newListenCount = studyType === '听传承' ? listenCount + 1 : listenCount;
-          const newReadCount = studyType === '看法本' ? readCount + 1 : readCount;
-
-          return {
-            ...lesson,
-            progress: `听传承: ${newListenCount}次 | 看法本: ${newReadCount}次`
-          };
-        }
-        return lesson;
-      }));
-
-      // Show success toast immediately
-      toastService.success({
-        title: '学习记录已保存',
-        message: `${studyType}完成 - 继续加油！`
-      });
-
-      const today = new Date().toISOString().split('T')[0];
-
-      // Find the lesson
-      const { data: lessons, error: lessonError } = await supabase
-        .from('course_lessons')
-        .select('id')
-        .eq('course_id', courseId)
-        .eq('lesson_number', lessonNumber)
-        .limit(1);
-
-      if (lessonError || !lessons || lessons.length === 0) {
-        toastService.error({
-          title: '课程信息有误',
-          message: '无法找到对应的课程内容'
-        });
-        // Revert optimistic update
-        loadCourseLessons();
-        return;
-      }
-
-      const studyRecord = {
-        user_id: user.id,
-        course_id: courseId,
-        lesson_id: lessons[0].id,
-        study_date: today,
-        study_type: studyType,
-        study_count_for_lesson: 1
-      };
-
-      const { error } = await supabase
-        .from('study_records')
-        .insert(studyRecord);
-
-      if (error) throw error;
-
-      // Background refresh to ensure data consistency
-      setTimeout(() => {
-        loadCourseLessons();
-      }, 1000);
-
-    } catch (error) {
-      console.error('Error recording study:', error);
-      toastService.error({
-        title: '保存失败',
-        message: '网络异常，请稍后重试'
-      });
-
-      // Revert optimistic update on error
-      loadCourseLessons();
-    }
-  };
-
-  const navigateToPractice = () => {
-    router.push('/(tabs)/practice');
-  };
-
-
-
-  // Handle tapping the whole practice card to view details
-  const handlePracticeCardTap = (practice: any) => {
-    // All practice types now use the unified practice-detail page
-    router.push({
-      pathname: '/practice-detail/[practiceId]',
-      params: {
-        practiceId: practice.id,
-      },
-    });
-  };
-
-  // Handle quick complete button (check mark)
-  const handleQuickComplete = async (e: any, practice: any) => {
-    e.stopPropagation(); // Prevent card tap
-
-    if (practice.status === 'completed') {
-      // Already completed, just show message
-      toastService.info({
-        title: '今日目标已达成',
-        message: '继续保持！明日再接再厉'
-      });
-      return;
-    }
-
-    // Calculate remaining amount to complete daily target
-    const remaining = practice.target - practice.current;
-
-    // Optimistic update: immediately update UI
-    updatePracticeOptimistically(practice.id, remaining, practice.type);
-
-    // Show success toast immediately
-    toastService.success({
-      title: '已完成今日目标',
-      message: `${practice.name} +${remaining.toLocaleString()} ${practice.unit}`
-    });
-
-    // Record in background
-    try {
-      await recordQuickCompleteBackground(practice, remaining);
-    } catch (error) {
-      // Revert optimistic update on error
-      console.error('❌ Error recording practice:', error);
-      toastService.error({
-        title: '记录失败',
-        message: '请检查网络连接后重试'
-      });
-
-      // Refresh data to revert optimistic changes
-      loadDashboardData();
-    }
-  };
-
-  // Handle add record button (plus)
-  const handleAddRecord = (e: any, practice: any) => {
-    e.stopPropagation(); // Prevent card tap
-
-    // Track when user is going to record
-    setLastRecordTime(Date.now());
-
-    // All practice types now use the unified practice-detail page
-        router.push({
-          pathname: '/practice-detail/[practiceId]',
-          params: {
-            practiceId: practice.id,
-          },
-        });
-  };
-
-  // Optimistic update helper function
-  const updatePracticeOptimistically = (practiceId: string, amount: number, practiceType: 'count' | 'time') => {
-    if (practiceType === 'time') {
-      // Update weekly practices
-      setWeeklyPractices(prev => prev.map(practice => {
-        if (practice.id === practiceId) {
-          const newWeekSessions = practice.weekSessions + 1;
-          const newTodaySessions = practice.todaySessions + 1;
-
-          return {
-            ...practice,
-            weekSessions: newWeekSessions,
-            todaySessions: newTodaySessions,
-            status: newWeekSessions >= practice.weekTarget ? 'completed' : 'in_progress',
-            todayDetails: practice.todayDetails 
-              ? `${practice.todayDetails}；第${newTodaySessions}座${amount}分钟`
-              : `第${newTodaySessions}座${amount}分钟`
-          };
-        }
-        return practice;
-      }));
-    } else {
-      // Update daily practices
-      setDailyPractices(prev => prev.map(practice => {
-        if (practice.id === practiceId) {
-          const newCurrent = practice.current + amount;
-          const newProgressPercent = Math.min((newCurrent / practice.target) * 100, 100);
-
-          return {
-            ...practice,
-            current: newCurrent,
-            progressPercent: newProgressPercent,
-            status: newCurrent >= practice.target ? 'completed' : 'in_progress'
-          };
-        }
-        return practice;
-      }));
-    }
-  };
-
-  // Background recording function (no UI updates)
-  const recordQuickCompleteBackground = async (practice: any, amount: number) => {
-    if (!user) return;
-
-    // Use timezone-aware date for recording
-    const recordDate = timezoneInfo 
-      ? getCurrentDateInTimezone(timezoneInfo.timezone)
-      : new Date().toISOString().split('T')[0];
-
-    if (practice.type === 'time') {
-      // For time-based practices, create a meditation record with target duration
-      const { error } = await supabase
-        .from('meditation_records')
-        .insert({
-          user_id: user.id,
-          practice_id: practice.practiceId,
-          record_date: recordDate,
-          duration_minutes: amount, // Use remaining amount as duration
-          session_number: 1,
-        });
-
-      if (error) throw error;
-    } else {
-      // For count-based practices, create a daily record
-      const { error: recordError } = await supabase
-        .from('daily_records')
-        .insert({
-          user_id: user.id,
-          practice_project_id: practice.id,
-          record_date: recordDate,
-          count: amount,
-          notes: '快速完成今日目标'
-        });
-
-      if (recordError) throw recordError;
-
-      // Update project's current count
-      const { error: updateError } = await supabase
-        .from('user_practice_projects')
-        .update({ 
-          current_count: practice.current + amount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', practice.id)
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
-    }
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 6) return '夜深了，早点休息';
-    if (hour < 12) return '早上好，开始今日修行';
-    if (hour < 18) return '下午好，精进不懈';
-    return '晚上好，回顾今日收获';
-  };
-
-  if (loading) {
-    return (
-      <PageTemplate
-        title="修行主页"
-        subtitle={getGreeting()}
-        rightAction={{
-          component: <Avatar dharmaName={userDharmaName} size={32} />,
-          onPress: navigateToProfile
-        }}
-        scrollable={false}
-        backgroundColor={Colors.background}
-      >
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>加载中...</Text>
-        </View>
-      </PageTemplate>
-    );
-  }
-
-  return (
-    <PageTemplate
-      title="修行主页"
-      subtitle={`${getGreeting()} • ${userDharmaName}居士`}
-      rightAction={{
-        component: <Avatar dharmaName={userDharmaName} size={32} />,
-        onPress: navigateToProfile
-      }}
-      scrollable={false}
-      backgroundColor={Colors.background}
-      padding={0}
-    >
-        <ScrollView 
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-
-
-          {/* Study Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日学习</Text>
-              <TouchableOpacity onPress={navigateToStudy}>
-                <Text style={styles.viewMoreText}>查看更多</Text>
-              </TouchableOpacity>
-            </View>
-
-            {courseLessons.map((nextLesson, index) => (
-              <View 
-                key={index} 
-                style={styles.studyCard}
-              >
-                <View style={styles.studyCardHeader}>
-                  <View style={styles.studyCardTitleContainer}>
-                    <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
-                      <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
-                  </View>
-                </View>
-                <Text style={styles.progressText}>{nextLesson.progress}</Text>
-                <View style={styles.quickActionButtons}>
-                  <TouchableOpacity 
-                    style={[styles.quickActionButton, styles.listenButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                  >
-                    <Text style={styles.quickActionButtonText}>听传承</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.quickActionButton, styles.readButton]}
-                    onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                  >
-                    <Text style={styles.quickActionButtonText}>看法本</Text>
-                  </TouchableOpacity>
-                  {nextLesson.url ? (
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.onlineButton]}
-                      onPress={() => Linking.openURL(nextLesson.url || '')}
-                    >
-                      <Text style={styles.quickActionButtonText}>在线课程</Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Practice Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日修行</Text>
-              <TouchableOpacity onPress={navigateToPractice}>
-                <Text style={styles.viewMoreText}>查看更多</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Practice Cards in Two Columns */}
-            <View style={styles.practiceGrid}>
-              {/* Daily Practices */}
-              {dailyPractices.map((practice) => (
-                <TouchableOpacity 
-                  key={practice.id} 
-                  style={styles.practiceCardColumn}
-                  onPress={() => handlePracticeCardTap(practice)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
-                      {practice.name}
-                    </Text>
-                  </View>
-
-                  <View style={styles.countPercentageRow}>
-                    <Text style={styles.practiceCountColumn}>
-                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
-                    </Text>
-                    <Text style={styles.progressPercent}>
-                      {Math.round(practice.progressPercent)}%
-                    </Text>
-                  </View>
-
-                  <View style={styles.progressBarContainer}>
-                    <View style={styles.progressBarBg}>
-                      <View 
-                        style={[
-                          styles.progressBarFill, 
-                          { width: `${Math.min(practice.progressPercent, 100)}%` }
-                        ]} 
-                      />
-                    </View>
-                  </View>
-
-                  {/* Action Buttons */}
-                  <View style={styles.practiceActions}>
-                    <TouchableOpacity
-                      onPress={(e) => handleQuickComplete(e, practice)}
-                    >
-                      <Ionicons 
-                        name="checkmark-circle-outline" 
-                        size={24} 
-                        color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
-                      />
-                    </TouchableOpacity>
-
-                    <View style={styles.actionButtonSpacer} />
-
-                    <TouchableOpacity
-                      onPress={(e) => handleAddRecord(e, practice)}
-                    >
-                      <Ionicons 
-                        name="add-circle-outline" 
-                        size={24} 
-                        color={Colors.primary} 
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-              ))}
-
-              {/* Weekly Practices */}
-              {weeklyPractices.map((practice) => (
-                <TouchableOpacity 
-                  key={practice.id} 
-                  style={styles.practiceCardColumn}
-                  onPress={() => handlePracticeCardTap(practice)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
-                      {practice.name}
-                    </Text>
-                  </View>
-                  <Text style={styles.weeklyProgressColumn}>
-                    本周 {practice.weekSessions}/{practice.weekTarget}座
-                    {practice.status === 'completed' && ' 已完成'}
-                  </Text>
-                  {practice.todaySessions > 0 && practice.todayDetails && (
-                    <Text style={styles.todayDetailsColumn} numberOfLines={2}>
-                      今日：{practice.todayDetails}
-                    </Text>
-                  )}
-
-                  {/* Action Button for Weekly Practices */}
-                  <View style={styles.practiceActions}>
-                    <View style={styles.actionButtonSpacer} />
-                    <TouchableOpacity
-                      onPress={(e) => handleAddRecord(e, practice)}
-                    >
-                      <Ionicons 
-                        name="add-circle-outline" 
-                        size={24} 
-                        color={Colors.primary} 
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {courseLessons.length === 0 && (
-              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
-                <Text style={styles.noStudyText}>暂无进行中的课程，点击查看课程库</Text>
-              </TouchableOpacity>
-            )}
-
-            {dailyPractices.length === 0 && weeklyPractices.length === 0 && (
-              <TouchableOpacity style={styles.practiceCard} onPress={navigateToPractice}>
-                <Text style={styles.noPracticeText}>暂无修行项目，点击添加</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </ScrollView>
-    </PageTemplate>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  offlineContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  offlineTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.textPrimary,
-    marginBottom: 8,
-  },
-  offlineSubtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  loginButton: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
