@@ -693,6 +693,15 @@ export default function HomeScreen() {
     return '晚上好，回顾今日收获';
   };
 
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    } else {
+      // User is null, stop loading immediately
+      setLoading(false);
+    }
+  }, [user]);
+
   if (loading) {
     return (
       <PageTemplate
