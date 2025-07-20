@@ -58,9 +58,6 @@ export default function PracticeScreen() {
   useEffect(() => {
     if (user) {
       loadPracticeData();
-    } else {
-      // User is null, stop loading immediately
-      setLoading(false);
     }
   }, [user]);
 
@@ -71,10 +68,7 @@ export default function PracticeScreen() {
   );
 
   const loadPracticeData = async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
     try {
       console.log('🔄 Loading practice data for user:', user.id);
