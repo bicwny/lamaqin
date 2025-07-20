@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { toastService } from '@/lib/toast';
 
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
@@ -54,7 +55,7 @@ export default function ProfileSetupScreen() {
 
   const handleSaveProfile = async () => {
     if (!user) {
-      Alert.alert('错误', '用户信息未找到');
+      toastService.error('用户信息未找到');
       return;
     }
 
@@ -91,23 +92,31 @@ export default function ProfileSetupScreen() {
 
       if (dbError) {
         console.error('Database update error:', dbError);
-        Alert.alert('保存失败', '数据库更新失败，请稍后重试');
+        toastService.error({
+          title: '保存失败',
+          message: '数据库更新失败，请稍后重试'
+        });
         return;
       }
 
-      // For profile setup, we still navigate since it's initial setup
-      Alert.alert('保存成功', '个人资料已更新', [
-        {
-          text: '确定',
-          onPress: () => {
-            // Navigate to tabs - AuthContext will handle proper routing
-            router.replace('/(tabs)');
-          }
-        }
-      ]);
+      console.log('✅ Profile saved successfully');
+      
+      // Show success toast
+      toastService.success({
+        title: '保存成功',
+        message: '个人资料已更新'
+      });
+
+      // Navigate to main app after a short delay to show the toast
+      setTimeout(() => {
+        router.replace('/(tabs)/index');
+      }, 1500);
     } catch (error) {
       console.error('Profile save error:', error);
-      Alert.alert('保存失败', '网络错误，请稍后重试');
+      toastService.error({
+        title: '保存失败',
+        message: '网络错误，请稍后重试'
+      });
     } finally {
       setLoading(false);
     }
