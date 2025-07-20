@@ -48,43 +48,6 @@ function RootLayoutNav() {
   );
 }
 
-  return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="auth" options={{ headerShown: false }} />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
-      <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
-      <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
-      <Stack.Screen name="add-practice" options={{ headerShown: false }} />
-      <Stack.Screen name="practice-config" options={{ headerShown: false }} />
-      <Stack.Screen name="practice-history" options={{ headerShown: false }} />
-      <Stack.Screen name="meditation-history" options={{ headerShown: false }} />
-      <Stack.Screen name="lesson-viewer" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="modals/custom-record" 
-        options={{ presentation: 'modal', headerShown: false }} 
-      />
-      <Stack.Screen 
-        name="modals/meditation-record" 
-        options={{ presentation: 'modal', headerShown: false }} 
-      />
-      <Stack.Screen 
-        name="practice-detail/[practiceId]" 
-        options={{ headerShown: false }} 
-      />
-      <Stack.Screen 
-        name="meditation-detail/[recordId]" 
-        options={{ headerShown: false }} 
-      />
-      <Stack.Screen 
-        name="course-detail/[courseId]" 
-        options={{ headerShown: false }} 
-      />
-      <Stack.Screen name="+not-found" />
-    </Stack>
-  );
-}
-
 export default function RootLayout() {
   return (
     <AuthProvider>
