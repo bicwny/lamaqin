@@ -48,7 +48,102 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="profile" 
+          options={{ 
+            title: '个人资料',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="edit-profile" 
+          options={{ 
+            title: '编辑资料',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="profile-setup" 
+          options={{ 
+            title: '完善资料',
+            headerShown: false
+          }} 
+        />
+        <Stack.Screen 
+          name="add-practice" 
+          options={{ 
+            title: '添加修行项目',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="practice-config" 
+          options={{ 
+            title: '项目配置',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="course-detail" 
+          options={{ 
+            title: '课程详情',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="lesson-viewer" 
+          options={{ 
+            title: '课程内容',
+            headerShown: false
+          }} 
+        />
+        <Stack.Screen 
+          name="practice-detail" 
+          options={{ 
+            title: '修行项目详情',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="practice-history" 
+          options={{ 
+            title: '修行记录',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="meditation-detail" 
+          options={{ 
+            title: '禅修详情',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="meditation-record-detail" 
+          options={{ 
+            title: '禅修记录详情',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="meditation-history" 
+          options={{ 
+            title: '禅修记录',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="modals" 
+          options={{ 
+            presentation: 'modal',
+            headerShown: false
+          }} 
+        />
+      </Stack>
       <Toast config={toastConfig} />
     </AuthProvider>
   );
