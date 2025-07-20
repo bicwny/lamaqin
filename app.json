@@ -9,19 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.bicwny.expoonreplit",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.bicwny.expoonreplit"
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
@@ -29,12 +24,6 @@
       "hostname": "0.0.0.0",
       "port": 8081
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "plugins": [
       "expo-router",
       [
@@ -57,6 +46,7 @@
         "projectId": "943c08b8-8051-4c2d-9c99-ece545b667be"
       }
     },
-    "owner": "bicwny"
+    "owner": "bicwny",
+    "assetBundlePatterns": ["**/*"]
   }
 }
