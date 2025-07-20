@@ -26,47 +26,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [stuckStateDetected, setStuckStateDetected] = useState(false);
-
-  // Auto-recovery mechanism for stuck auth states
-  useEffect(() => {
-    let stuckStateTimer: NodeJS.Timeout;
-    let noSessionCount = 0;
-
-    const resetTimer = () => {
-      if (stuckStateTimer) clearTimeout(stuckStateTimer);
-      
-      stuckStateTimer = setTimeout(() => {
-        // If we've been loading for more than 10 seconds with no user, auto-recover
-        if (loading && !user && !stuckStateDetected) {
-          console.log('🚨 AUTO-RECOVERY: Detected stuck auth state after 10s timeout');
-          console.log('🔄 AUTO-RECOVERY: Triggering automatic force logout...');
-          setStuckStateDetected(true);
-          forceLogoutAll().catch(err => {
-            console.error('❌ AUTO-RECOVERY: Force logout failed:', err);
-          });
-        }
-      }, 10000); // 10 second timeout
-    };
-
-    // Start the timer
-    resetTimer();
-
-    // Reset timer when auth state changes
-    const checkStateChange = () => {
-      if (!loading || user) {
-        if (stuckStateTimer) clearTimeout(stuckStateTimer);
-      } else {
-        resetTimer();
-      }
-    };
-
-    checkStateChange();
-
-    return () => {
-      if (stuckStateTimer) clearTimeout(stuckStateTimer);
-    };
-  }, [loading, user, stuckStateDetected]);
 
   useEffect(() => {
     // Check for existing session
@@ -95,10 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Handle token refresh or initial session
         if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
           console.log('🔄 Session event:', event);
-          
-          // Reset stuck state detection on successful session
           if (session?.user && session.user.email_confirmed_at) {
-            setStuckStateDetected(false);
             console.log('✅ Session maintained for:', session.user.email);
 
             // Store session data
@@ -124,26 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           } else if (!session) {
             console.log('⚠️ No session in refresh/initial event - checking stored session');
-            
-            // Track consecutive no-session events
-            const currentCount = parseInt(sessionStorage.getItem('no_session_count') || '0') + 1;
-            sessionStorage.setItem('no_session_count', currentCount.toString());
-            
-            if (currentCount >= 3 && !stuckStateDetected) {
-              console.log('🚨 AUTO-RECOVERY: 3+ consecutive no-session events detected');
-              console.log('🔄 AUTO-RECOVERY: Triggering automatic cleanup...');
-              setStuckStateDetected(true);
-              sessionStorage.removeItem('no_session_count');
-              
-              // Trigger automatic force logout after a brief delay
-              setTimeout(() => {
-                forceLogoutAll().catch(err => {
-                  console.error('❌ AUTO-RECOVERY: Cleanup failed:', err);
-                });
-              }, 1000);
-              return;
-            }
-            
             // Before clearing user, check if we have a stored session
             try {
               const storedUserData = await AsyncStorage.getItem('@user_session');
@@ -151,7 +87,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const userData = JSON.parse(storedUserData);
                 console.log('🔄 Restoring user from stored data:', userData.email);
                 setUser(userData);
-                sessionStorage.removeItem('no_session_count'); // Reset counter on successful restore
               } else {
                 console.log('❌ No stored session available, clearing user');
                 setUser(null);
@@ -169,12 +104,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_IN') {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
-            
-            // Clear stuck state detection and session counters
-            setStuckStateDetected(false);
-            if (typeof sessionStorage !== 'undefined') {
-              sessionStorage.removeItem('no_session_count');
-            }
 
             // Set user immediately
             setUser({
@@ -621,12 +550,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setLoading(true);
       setUser(null);
-      setStuckStateDetected(false);
-      
-      // Clear session failure counters
-      if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.removeItem('no_session_count');
-      }
 
       // Clear ALL storage aggressively
       try {
