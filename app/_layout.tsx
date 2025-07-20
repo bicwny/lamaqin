@@ -88,7 +88,7 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="course-detail" 
+          name="course-detail/[courseId]" 
           options={{ 
             title: '课程详情',
             presentation: 'modal'
@@ -102,7 +102,7 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="practice-detail" 
+          name="practice-detail/[practiceId]" 
           options={{ 
             title: '修行项目详情',
             presentation: 'modal'
@@ -116,14 +116,21 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="meditation-detail" 
+          name="meditation-detail/[practiceId]" 
           options={{ 
             title: '禅修详情',
             presentation: 'modal'
           }} 
         />
         <Stack.Screen 
-          name="meditation-record-detail" 
+          name="meditation-detail/[recordId]" 
+          options={{ 
+            title: '禅修详情',
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="meditation-record-detail/[recordId]" 
           options={{ 
             title: '禅修记录详情',
             presentation: 'modal'
@@ -137,7 +144,14 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="modals" 
+          name="modals/custom-record" 
+          options={{ 
+            presentation: 'modal',
+            headerShown: false
+          }} 
+        />
+        <Stack.Screen 
+          name="modals/meditation-record" 
           options={{ 
             presentation: 'modal',
             headerShown: false

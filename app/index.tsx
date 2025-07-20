@@ -8,15 +8,25 @@ export default function Index() {
   const { user, isInitialized } = useAuth();
 
   useEffect(() => {
-    if (!isInitialized) return;
+    // Add timeout to prevent hanging during deployment health checks
+    const redirectTimeout = setTimeout(() => {
+      if (!isInitialized) {
+        // If not initialized after timeout, redirect to auth as fallback
+        router.replace('/auth/unified');
+        return;
+      }
 
-    if (user) {
-      // User is authenticated, redirect to main tabs
-      router.replace('/(tabs)');
-    } else {
-      // User is not authenticated, redirect to auth
-      router.replace('/auth/unified');
-    }
+      if (user) {
+        // User is authenticated, redirect to main tabs
+        router.replace('/(tabs)');
+      } else {
+        // User is not authenticated, redirect to auth
+        router.replace('/auth/unified');
+      }
+    }, 100); // Quick timeout for deployment health checks
+
+    // Clear timeout if component unmounts
+    return () => clearTimeout(redirectTimeout);
   }, [user, isInitialized]);
 
   // Show loading state while determining where to redirect
