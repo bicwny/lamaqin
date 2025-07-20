@@ -16,16 +16,6 @@ function RootLayoutNav() {
     );
   }
 
-  // Show auth layout for unauthenticated users
-  if (!user) {
-    return (
-      <Stack initialRouteName="auth">
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-      </Stack>
-    );
-  }
-
-  // Show main app layout for authenticated users
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

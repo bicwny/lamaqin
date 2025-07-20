@@ -6,7 +6,6 @@ export default function AuthLayout() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName="unified"
     >
       <Stack.Screen name="unified" />
       <Stack.Screen name="login" />
