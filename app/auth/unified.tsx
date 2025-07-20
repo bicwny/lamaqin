@@ -223,7 +223,7 @@ export default function UnifiedAuthScreen() {
 
   const handleSendOTP = async () => {
     const trimmedEmail = email.trim();
-    
+
     // Check if email is empty or just whitespace
     if (!trimmedEmail) {
       showError(ErrorType.EMAIL_EMPTY);
@@ -368,34 +368,34 @@ export default function UnifiedAuthScreen() {
                 updated_at: new Date().toISOString()
               });
 
-            if (insertError) {
-              console.error('Error creating user:', insertError);
-              // Continue anyway, AuthContext will handle this
+              if (insertError) {
+                console.error('Error creating user:', insertError);
+                // Continue anyway, AuthContext will handle this
+              }
+            } catch (insertErr) {
+              console.error('Database insert failed:', insertErr);
+              // Continue anyway, user can still use the app
             }
-          } catch (insertErr) {
-            console.error('Database insert failed:', insertErr);
-            // Continue anyway, user can still use the app
-          }
 
-          // New user - redirect to profile setup
-          router.replace('/profile-setup');
-        } else {
-          // Existing user - check if profile is complete
-          const isProfileComplete = existingUser.dharma_name && 
-                                  existingUser.class_name && 
-                                  existingUser.practice_years && 
-                                  existingUser.location;
-
-          if (!isProfileComplete) {
-            // Profile incomplete - redirect to profile setup
-            console.log('🔄 Existing user with incomplete profile, redirecting to setup');
+            // New user - redirect to profile setup
             router.replace('/profile-setup');
           } else {
-            // Existing user with complete profile - go to main app
-            console.log('✅ Existing user with complete profile, redirecting to tabs');
-            router.replace('/(tabs)');
+            // Existing user - check if profile is complete
+            const isProfileComplete = existingUser.dharma_name && 
+                                    existingUser.class_name && 
+                                    existingUser.practice_years && 
+                                    existingUser.location;
+
+            if (!isProfileComplete) {
+              // Profile incomplete - redirect to profile setup
+              console.log('🔄 Existing user with incomplete profile, redirecting to setup');
+              router.replace('/profile-setup');
+            } else {
+              // Existing user with complete profile - go to main app
+              console.log('✅ Existing user with complete profile, redirecting to tabs');
+              router.replace('/(tabs)/index');
+            }
           }
-        }
       }
     } catch (error) {
       Alert.alert('验证失败', '网络错误，请稍后重试');
