@@ -6,11 +6,8 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '../lib/toast';
 
 function RootLayoutNav() {
-  const { user, loading } = useAuth();
-
-  // Don't block the entire app loading - let screens handle their own states
-  // This allows the health check endpoint to respond immediately
-
+  // Remove all blocking logic from root layout
+  // Each screen will handle its own authentication state
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

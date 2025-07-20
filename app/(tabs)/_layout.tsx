@@ -15,12 +15,18 @@ export default function TabLayout() {
 
   console.log('🏠 TabLayout rendering at:', new Date().toISOString());
 
-  // Show tabs immediately without waiting for full auth check
-  // Let individual screens handle their own loading states
+  // Don't block - show loading state only if explicitly needed
+  // Let screens handle their own authentication states
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+      <View style={{ 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        backgroundColor: '#fff' 
+      }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={{ marginTop: 8, color: '#666' }}>加载中...</Text>
       </View>
     );
   }

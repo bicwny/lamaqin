@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Check for existing session
@@ -136,7 +136,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuthState = async () => {
     try {
       console.log('🔍 Checking auth state...');
-      setLoading(true);
+      // Don't set loading immediately - this prevents blocking
+      // setLoading(true);
 
       // First try to get session from storage directly
       let storedSession = null;
