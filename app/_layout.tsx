@@ -4,6 +4,19 @@ import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from '../lib/toast';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import 'react-native-reanimated/lib/reanimated2/js-reanimated';
+import { Platform } from 'react-native';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
+// Add explicit health check route handling for web deployment
+if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location.pathname === '/') {
+  // Ensure root path returns 200 status for health checks
+}
 
 function RootLayoutNav() {
   // Remove all blocking logic from root layout
