@@ -1,6 +1,6 @@
 import { Tabs, Redirect } from "expo-router";
 import React from "react";
-import { Platform, View, ActivityIndicator } from "react-native";
+import { Platform, View, ActivityIndicator, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { HapticTab } from "@/components/HapticTab";
