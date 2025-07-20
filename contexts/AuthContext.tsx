@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔍 Checking auth state...');
       setLoading(true);
 
-      // First try to get session from storage directly
+      // Quick check for stored session first
       let storedSession = null;
       try {
         // Use conditional storage access for web compatibility
@@ -147,13 +147,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (storedData) {
             console.log('📦 Found session data in storage');
             storedSession = JSON.parse(storedData);
+          } else {
+            console.log('📦 No stored session found - likely first time user');
+            // For first-time users, set loading to false quickly
+            setLoading(false);
+            return;
           }
         }
       } catch (storageError) {
         console.log('⚠️ Error reading from storage:', storageError);
+        // If we can't read storage and no session exists, stop loading
+        setLoading(false);
+        return;
       }
 
-      // Then get session from Supabase
+      // If we have stored session, verify with Supabase
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {

@@ -16,6 +16,38 @@ function RootLayoutNav() {
     );
   }
 
+  // If user is not authenticated, show auth stack
+  if (!user) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="auth" />
+      </Stack>
+    );
+  }
+
+  // If user is authenticated, show main app
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="profile" />
+      <Stack.Screen name="profile-setup" />
+      <Stack.Screen name="edit-profile" />
+      <Stack.Screen name="add-practice" />
+      <Stack.Screen name="practice-config" />
+      <Stack.Screen name="practice-history" />
+      <Stack.Screen name="meditation-history" />
+      <Stack.Screen name="course-detail/[courseId]" />
+      <Stack.Screen name="practice-detail/[practiceId]" />
+      <Stack.Screen name="meditation-detail/[practiceId]" />
+      <Stack.Screen name="meditation-detail/[recordId]" />
+      <Stack.Screen name="meditation-record-detail/[recordId]" />
+      <Stack.Screen name="lesson-viewer" />
+      <Stack.Screen name="modals/custom-record" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="modals/meditation-record" options={{ presentation: 'modal' }} />
+    </Stack>
+  );
+}
+
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
