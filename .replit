@@ -25,7 +25,7 @@ localPort = 46193
 externalPort = 3002
 
 [workflows]
-runButton = "Dev Server"
+runButton = "EAS Init"
 
 [[workflows.workflow]]
 name = "Dev Server"
