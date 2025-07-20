@@ -1,15 +1,11 @@
-import { Stack, Redirect } from 'expo-router';
-import { useEffect } from 'react';
+import { Stack } from 'expo-router';
 
 export default function AuthLayout() {
-  console.log('🔐 AuthLayout rendering');
-  
   return (
     <Stack
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName="unified"
     >
       <Stack.Screen name="unified" />
       <Stack.Screen name="login" />
