@@ -1,4 +1,4 @@
-import { Stack, Redirect } from 'expo-router';
+import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
@@ -14,11 +14,6 @@ function RootLayoutNav() {
         <ActivityIndicator size="large" />
       </View>
     );
-  }
-
-  // Redirect unauthenticated users to login
-  if (!user) {
-    return <Redirect href="/auth/unified" />;
   }
 
   return (
