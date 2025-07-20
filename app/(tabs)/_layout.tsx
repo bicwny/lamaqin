@@ -1,6 +1,6 @@
-import { Tabs, Redirect } from "expo-router";
+import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, View, ActivityIndicator, Text } from "react-native";
+import { Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { HapticTab } from "@/components/HapticTab";
@@ -8,33 +8,11 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useAuth } from "@/contexts/AuthContext";
 
 export default function TabLayout() {
-  const { user, loading } = useAuth();
+  const colorScheme = useColorScheme();
 
-  console.log('🏠 TabLayout rendering at:', new Date().toISOString());
-
-  // Don't block - show loading state only if explicitly needed
-  // Let screens handle their own authentication states
-  if (loading) {
-    return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: '#fff' 
-      }}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={{ marginTop: 8, color: '#666' }}>加载中...</Text>
-      </View>
-    );
-  }
-
-  // Redirect to auth if not authenticated
-  if (!user) {
-    return <Redirect href="/auth/unified" />;
-  }
+  console.log("🏠 TabLayout rendering at:", new Date().toISOString());
 
   return (
     <Tabs

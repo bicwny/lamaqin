@@ -54,7 +54,6 @@ export default function PracticeScreen() {
   const [presetProjectNames, setPresetProjectNames] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
 
   useEffect(() => {
     if (user) {
@@ -142,20 +141,6 @@ export default function PracticeScreen() {
         isCompleted: project.current_count >= project.target_count,
       };
     }
-  };
-
-  const getActiveProjects = () => {
-    return projects.filter(project => {
-      const progress = calculateProgress(project);
-      return project.status === 'active' && !progress.isCompleted;
-    });
-  };
-
-  const getCompletedProjects = () => {
-    return projects.filter(project => {
-      const progress = calculateProgress(project);
-      return project.status === 'completed' || progress.isCompleted;
-    });
   };
 
   const handleAddPractice = () => {
@@ -266,10 +251,6 @@ export default function PracticeScreen() {
     );
   }
 
-  const activeProjects = getActiveProjects();
-  const completedProjects = getCompletedProjects();
-  const currentProjects = activeTab === 'active' ? activeProjects : completedProjects;
-
   return (
       <PageTemplate
         title="修行记录" 
@@ -281,50 +262,17 @@ export default function PracticeScreen() {
         backgroundColor={Colors.background}
         padding={0}
       >
-        {/* Tab Navigation */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'active' && styles.activeTab]}
-            onPress={() => setActiveTab('active')}
-          >
-            <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
-              进行中 ({activeProjects.length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'completed' && styles.activeTab]}
-            onPress={() => setActiveTab('completed')}
-          >
-            <Text style={[styles.tabText, activeTab === 'completed' && styles.activeTabText]}>
-              已完成 ({completedProjects.length})
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         <ScrollView 
         style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {currentProjects.length === 0 ? (
-          <View style={styles.emptyTabState}>
-            <Text style={styles.emptyTabTitle}>
-              {activeTab === 'active' ? '暂无进行中的修行项目' : '暂无已完成的修行项目'}
-            </Text>
-            <Text style={styles.emptyTabDescription}>
-              {activeTab === 'active' 
-                ? '添加新的修行项目开始你的精神成长之旅' 
-                : '完成的修行项目将在这里显示'}
-            </Text>
-          </View>
-        ) : (
-          <>
-            <Text style={styles.sectionTitle}>
-              {activeTab === 'active' ? '进行中的修行项目：' : '已完成的修行项目：'}
-            </Text>
 
-            {currentProjects.map((project) => {
+
+        <Text style={styles.sectionTitle}>我的修行项目：</Text>
+
+        {projects.map((project) => {
           const progress = calculateProgress(project);
           const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
@@ -401,8 +349,6 @@ export default function PracticeScreen() {
             </View>
           );
         })}
-          </>
-        )}
       </ScrollView>
     </PageTemplate>
   );
@@ -560,57 +506,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F2F2F7',
-    marginHorizontal: 16,
-    marginVertical: 12,
-    borderRadius: 12,
-    padding: 4,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  activeTab: {
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  activeTabText: {
-    color: Colors.primary,
-  },
-  emptyTabState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    minHeight: 300,
-  },
-  emptyTabTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  emptyTabDescription: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
   },
   loadingContainer: {
     flex: 1,

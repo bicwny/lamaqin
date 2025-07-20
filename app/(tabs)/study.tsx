@@ -87,7 +87,6 @@ interface CourseLesson {
 }
 
 type ViewMode = 'home' | 'manage' | 'courseDetail';
-type TabMode = 'active' | 'completed';
 
 export default function StudyScreen() {
   const { user } = useAuth();
@@ -101,7 +100,6 @@ export default function StudyScreen() {
   const [selectedCourse, setSelectedCourse] = useState<UserCourse | null>(null);
   const [joiningCourse, setJoiningCourse] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [activeTab, setActiveTab] = useState<TabMode>('active');
 
   useEffect(() => {
     loadStudyData();
@@ -434,11 +432,6 @@ export default function StudyScreen() {
 
   // Home View
   if (viewMode === 'home') {
-    const activeCourses = userCourses.filter(uc => uc.status === 'active' || (uc.status === 'paused' && uc.progress_percentage < 100));
-    const completedCourses = userCourses.filter(uc => uc.status === 'completed' || uc.progress_percentage >= 100);
-    
-    const displayCourses = activeTab === 'active' ? activeCourses : completedCourses;
-
     if (userCourses.length === 0) {
       return (
         <PageTemplate
@@ -464,7 +457,7 @@ export default function StudyScreen() {
                 onPress={() => setViewMode('manage')}
               >
                 <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-                <Text style={styles.browseButtonText}>管理</Text>
+                <Text style={styles.browseButtonText}>管理课程</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -477,128 +470,80 @@ export default function StudyScreen() {
         title="闻思学习"
         subtitle="系统学习佛法课程"
         rightAction={{
-          text: "管理",
+          text: "管理课程",
           onPress: () => setViewMode('manage')
         }}
         scrollable={false}
         backgroundColor={Colors.background}
         padding={0}
       >
-        {/* Tab Navigation */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tabButton, activeTab === 'active' && styles.activeTabButton]}
-            onPress={() => setActiveTab('active')}
-          >
-            <Text style={[styles.tabButtonText, activeTab === 'active' && styles.activeTabButtonText]}>
-              学习中 ({activeCourses.length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabButton, activeTab === 'completed' && styles.activeTabButton]}
-            onPress={() => setActiveTab('completed')}
-          >
-            <Text style={[styles.tabButtonText, activeTab === 'completed' && styles.activeTabButtonText]}>
-              已完成 ({completedCourses.length})
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         <ScrollView style={styles.scrollView}>
           <View style={styles.section}>
-            {displayCourses.length === 0 ? (
-              <View style={styles.emptyTabState}>
-                <Ionicons 
-                  name={activeTab === 'active' ? "book-outline" : "checkmark-done-circle-outline"} 
-                  size={60} 
-                  color="#9CA3AF" 
-                />
-                <Text style={styles.emptyTabTitle}>
-                  {activeTab === 'active' ? '暂无学习中的课程' : '暂无已完成的课程'}
-                </Text>
-                <Text style={styles.emptyTabDescription}>
-                  {activeTab === 'active' 
-                    ? '加入新课程开始学习吧' 
-                    : '完成课程后会显示在这里'
-                  }
-                </Text>
-              </View>
-            ) : (
-              displayCourses.map(userCourse => {
-                const courseProgress = getCourseProgress(userCourse.course_id);
-                const currentLesson = courseProgress?.currentLesson || 1;
-                const progressPercentage = userCourse.progress_percentage || 0;
-                const isCompleted = progressPercentage >= 100;
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>我的课程</Text>
+            </View>
 
-                return (
+            {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
+              const courseProgress = getCourseProgress(userCourse.course_id);
+              const currentLesson = courseProgress?.currentLesson || 1;
+              const progressPercentage = userCourse.progress_percentage || 0;
+
+              return (
+                <TouchableOpacity 
+                  key={userCourse.id} 
+                  style={styles.courseCard}
+                  onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+                >
+                  <View style={styles.courseHeader}>
+                    <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                    <Text style={styles.courseInfo}>
+                      {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+                    </Text>
+                  </View>
+
+                  <View style={styles.progressContainer}>
+                    <View style={styles.progressTextRow}>
+                      <Text style={styles.progressText}>
+                        完成进度：{progressPercentage.toFixed(1)}%
+                      </Text>
+                      <Text style={styles.currentLessonText}>
+                        上次完成：第{currentLesson}课
+                      </Text>
+                    </View>
+
+                    <View style={styles.progressBarContainer}>
+                      <View style={styles.progressBarBg}>
+                        <View 
+                          style={[
+                            styles.progressBarFill, 
+                            { width: `${Math.min(progressPercentage, 100)}%` }
+                          ]} 
+                        />
+                      </View>
+                    </View>
+                  </View>
+
                   <TouchableOpacity 
-                    key={userCourse.id} 
-                    style={styles.courseCard}
-                    onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+                    style={styles.continueButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      router.push(`/course-detail/${userCourse.course_id}`);
+                    }}
                   >
-                    <View style={styles.courseHeader}>
-                      <View style={styles.courseHeaderContent}>
-                        <Text style={styles.courseName}>{userCourse.course.name}</Text>
-                        {isCompleted && (
-                          <Ionicons name="checkmark-done-circle" size={24} color="#28a745" />
-                        )}
-                      </View>
-                      <Text style={styles.courseInfo}>
-                        {userCourse.course.teacher} • {userCourse.course.total_lessons}课
-                      </Text>
-                    </View>
-
-                    <View style={styles.progressContainer}>
-                      <View style={styles.progressTextRow}>
-                        <Text style={styles.progressText}>
-                          完成进度：{progressPercentage.toFixed(1)}%
-                        </Text>
-                        {!isCompleted && (
-                          <Text style={styles.currentLessonText}>
-                            上次完成：第{currentLesson}课
-                          </Text>
-                        )}
-                      </View>
-
-                      <View style={styles.progressBarContainer}>
-                        <View style={styles.progressBarBg}>
-                          <View 
-                            style={[
-                              styles.progressBarFill, 
-                              { 
-                                width: `${Math.min(progressPercentage, 100)}%`,
-                                backgroundColor: isCompleted ? '#28a745' : Colors.primary
-                              }
-                            ]} 
-                          />
-                        </View>
-                      </View>
-                    </View>
-
-                    <TouchableOpacity 
-                      style={[
-                        styles.continueButton,
-                        isCompleted && styles.completedButton
-                      ]}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        router.push(`/course-detail/${userCourse.course_id}`);
-                      }}
-                    >
-                      <Text style={styles.continueButtonText}>
-                        {isCompleted ? '查看详情' : '继续学习'}
-                      </Text>
-                    </TouchableOpacity>
+                    <Text style={styles.continueButtonText}>继续学习</Text>
                   </TouchableOpacity>
-                );
-              })
-            )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {/* Course Summary Footer */}
           <View style={styles.courseSummary}>
             <Text style={styles.courseSummaryText}>
-              共{userCourses.length}门课程 • {activeCourses.length}门学习中 • {completedCourses.length}门已完成
+              {userCourses.length}门课程已加入
+              {userCourses.filter(uc => uc.status === 'paused').length > 0 && 
+                `，${userCourses.filter(uc => uc.status === 'paused').length}门课程已暂停`
+              }
             </Text>
           </View>
         </ScrollView>
@@ -1143,62 +1088,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     flex: 1,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F2F2F7',
-    marginHorizontal: 16,
-    marginVertical: 12,
-    borderRadius: 12,
-    padding: 4,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  activeTabButton: {
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  tabButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  activeTabButtonText: {
-    color: Colors.primary,
-  },
-  emptyTabState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 32,
-  },
-  emptyTabTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyTabDescription: {
-    fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
-  },
-  courseHeaderContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  completedButton: {
-    backgroundColor: '#28a745',
   },
 });

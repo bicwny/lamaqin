@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -15,7 +14,6 @@ import { router, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 
 interface Practice {
   id: string;
@@ -28,26 +26,12 @@ interface Practice {
 export default function AddPracticeScreen() {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
-  const [filteredPractices, setFilteredPractices] = useState<Practice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState('');
+  
 
   useEffect(() => {
     loadPractices();
   }, []);
-
-  useEffect(() => {
-    // Filter practices based on search text
-    if (searchText.trim() === '') {
-      setFilteredPractices(practices);
-    } else {
-      const filtered = practices.filter(practice =>
-        practice.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        practice.description?.toLowerCase().includes(searchText.toLowerCase())
-      );
-      setFilteredPractices(filtered);
-    }
-  }, [searchText, practices]);
 
   const loadPractices = async () => {
     try {
@@ -64,7 +48,6 @@ export default function AddPracticeScreen() {
       console.log('📋 Available practices:', allPractices?.length || 0);
       console.log('🔍 Available practice names:', allPractices?.map(p => p.name) || []);
       setPractices(allPractices || []);
-      setFilteredPractices(allPractices || []);
     } catch (error) {
       console.error('Error loading practices:', error);
       Alert.alert('错误', '加载修行项目失败');
@@ -86,20 +69,41 @@ export default function AddPracticeScreen() {
     });
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
+  const renderPracticeSelector = () => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>选择修行项目</Text>
+      <ScrollView style={styles.practiceList} showsVerticalScrollIndicator={false}>
+        {practices.map((practice) => (
+          <TouchableOpacity
+            key={practice.id}
+            style={[
+              styles.practiceCard,
+            ]}
+            onPress={() => handlePracticeSelect(practice)}
+          >
+            <Text style={[
+              styles.practiceName,
+            ]}>
+              {practice.name}
+            </Text>
+            <Text style={styles.practiceType}>
+              {practice.type === 'count' ? '计数类' : '计时类'} • {practice.unit}
+            </Text>
+            {practice.description && (
+              <Text style={styles.practiceDescription}>{practice.description}</Text>
+            )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
+  
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-            <Text style={styles.cancelButtonText}>取消</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>选择项目名称</Text>
-          <View style={styles.placeholder} />
-        </View>
+        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载修行项目中...</Text>
@@ -111,13 +115,7 @@ export default function AddPracticeScreen() {
   if (practices.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-            <Text style={styles.cancelButtonText}>取消</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>选择项目名称</Text>
-          <View style={styles.placeholder} />
-        </View>
+        <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>🔄 加载中...</Text>
           <Text style={styles.emptyDescription}>
@@ -136,58 +134,10 @@ export default function AddPracticeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-      
-      {/* Custom Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-          <Text style={styles.cancelButtonText}>取消</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>选择项目名称</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <Stack.Screen options={{ title: '添加修法', headerShown: true }} />
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="搜索预设名称或输入自定义名称..."
-            placeholderTextColor="#999"
-            value={searchText}
-            onChangeText={setSearchText}
-            clearButtonMode="while-editing"
-          />
-        </View>
-      </View>
-
-      {/* Practice List */}
-      <ScrollView style={styles.practiceList} showsVerticalScrollIndicator={false}>
-        {filteredPractices.map((practice) => (
-          <TouchableOpacity
-            key={practice.id}
-            style={styles.practiceItem}
-            onPress={() => handlePracticeSelect(practice)}
-          >
-            <View style={styles.practiceInfo}>
-              <Text style={styles.practiceName}>
-                {practice.name}
-              </Text>
-              <Text style={styles.practiceSubtitle}>
-                {practice.type === 'count' ? '计数类修行' : '计时类修行'}
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#C7C7CC" />
-          </TouchableOpacity>
-        ))}
-        
-        {filteredPractices.length === 0 && searchText.trim() !== '' && (
-          <View style={styles.noResultsContainer}>
-            <Text style={styles.noResultsText}>未找到匹配的修行项目</Text>
-            <Text style={styles.noResultsSubtext}>请尝试其他关键词</Text>
-          </View>
-        )}
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {renderPracticeSelector()}
       </ScrollView>
     </SafeAreaView>
   );
@@ -196,81 +146,11 @@ export default function AddPracticeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#f8f9fa',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'white',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C7C7CC',
-  },
-  cancelButton: {
-    padding: 8,
-  },
-  cancelButtonText: {
-    fontSize: 17,
-    color: Colors.primary,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#000',
-  },
-  placeholder: {
-    width: 50, // Same width as cancel button to center the title
-  },
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'white',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C7C7CC',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F2F7',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
+  content: {
     flex: 1,
-    fontSize: 16,
-    color: '#000',
-  },
-  practiceList: {
-    flex: 1,
-  },
-  practiceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#C7C7CC',
-  },
-  practiceInfo: {
-    flex: 1,
-  },
-  practiceName: {
-    fontSize: 17,
-    fontWeight: '400',
-    color: '#000',
-    marginBottom: 2,
-  },
-  practiceSubtitle: {
-    fontSize: 14,
-    color: '#8E8E93',
+    padding: 16,
   },
   loadingContainer: {
     flex: 1,
@@ -312,19 +192,124 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  noResultsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 60,
+  section: {
+    marginBottom: 24,
   },
-  noResultsText: {
-    fontSize: 17,
-    color: '#8E8E93',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  practiceList: {
+    flex: 1,
+  },
+  practiceCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  practiceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  practiceType: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  practiceDescription: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  configForm: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
     marginBottom: 8,
   },
-  noResultsSubtext: {
-    fontSize: 14,
-    color: '#C7C7CC',
+  input: {
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  periodSelector: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  periodButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    backgroundColor: 'white',
+    alignItems: 'center',
+  },
+  selectedPeriodButton: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  periodButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  selectedPeriodButtonText: {
+    color: 'white',
+  },
+  footer: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+    backgroundColor: 'white',
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
   },
 });
