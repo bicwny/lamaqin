@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "expo-on-replit",
+    "name": "Lamaqin",
     "slug": "expo-on-replit",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.bicwny.expoonreplit"
     },
     "web": {
       "bundler": "metro",
@@ -47,6 +48,8 @@
       }
     },
     "owner": "bicwny",
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }
