@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Lamaqin",
-    "slug": "expo-on-replit",
+    "slug": "lamaqin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bicwny.lamaqin"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.bicwny.expoonreplit"
+      "package": "com.bicwny.lamaqin"
     },
     "web": {
       "bundler": "metro",
