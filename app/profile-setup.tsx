@@ -197,7 +197,7 @@ export default function ProfileSetupScreen() {
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>👤 法名（可选）</Text>
+            <Text style={styles.inputLabel}>👤 法名</Text>
             <TextInput
               style={styles.input}
               placeholder="如：多吉、白玛等"
@@ -208,7 +208,7 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🏷️ 俗名（可选）</Text>
+            <Text style={styles.inputLabel}>🏷️ 俗名（必填）</Text>
             <TextInput
               style={styles.input}
               placeholder="您的姓名"
@@ -219,7 +219,7 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📚 当前学修班级（可选）</Text>
+            <Text style={styles.inputLabel}>📚 当前学修班级</Text>
             <TextInput
               style={styles.input}
               placeholder="如：加行班、净土班等"
@@ -232,7 +232,7 @@ export default function ProfileSetupScreen() {
 
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
+            <Text style={styles.inputLabel}>📍 所在地区</Text>
             <TextInput
               style={styles.input}
               placeholder="如：北京、上海等"
