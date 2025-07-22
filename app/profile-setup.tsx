@@ -22,7 +22,7 @@ export default function ProfileSetupScreen() {
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [currentClass, setCurrentClass] = useState('');
-  const [practiceYears, setPracticeYears] = useState('');
+  
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -67,7 +67,6 @@ export default function ProfileSetupScreen() {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
           class_name: currentClass.trim() || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         }
       });
@@ -85,7 +84,6 @@ export default function ProfileSetupScreen() {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
           class_name: currentClass.trim() || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
           updated_at: new Date().toISOString()
         });
@@ -184,16 +182,7 @@ export default function ProfileSetupScreen() {
             />
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>⏰ 修行年限（可选）</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="修行多少年了"
-              value={practiceYears}
-              onChangeText={setPracticeYears}
-              keyboardType="numeric"
-            />
-          </View>
+          
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>

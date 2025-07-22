@@ -25,7 +25,7 @@ export default function EditProfileScreen() {
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [currentClass, setCurrentClass] = useState('');
-  const [practiceYears, setPracticeYears] = useState('');
+  
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -40,7 +40,7 @@ export default function EditProfileScreen() {
     try {
       const { data: userData, error } = await supabase
         .from('users')
-        .select('dharma_name, lay_name, location, practice_years, class_name')
+        .select('dharma_name, lay_name, location, class_name')
         .eq('id', user.id)
         .single();
 
@@ -50,7 +50,6 @@ export default function EditProfileScreen() {
         setDharmaName(userData.dharma_name || '');
         setLayName(userData.lay_name || '');
         setLocation(userData.location || '');
-        setPracticeYears(userData.practice_years ? userData.practice_years.toString() : '');
         setCurrentClass(userData.class_name || '');
       }
     } catch (error) {
@@ -75,7 +74,6 @@ export default function EditProfileScreen() {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
           class_name: currentClass.trim() || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         })
         .eq('id', user.id);
@@ -95,7 +93,6 @@ export default function EditProfileScreen() {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
           class_name: currentClass.trim() || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         }
       });
@@ -193,17 +190,7 @@ export default function EditProfileScreen() {
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>修行年限</ThemedText>
-              <TextInput
-                style={styles.input}
-                value={practiceYears}
-                onChangeText={setPracticeYears}
-                placeholder="请输入修行年数"
-                placeholderTextColor="#999"
-                keyboardType="numeric"
-              />
-            </View>
+            
 
             <View style={styles.inputGroup}>
               <ThemedText style={styles.label}>常住地</ThemedText>
