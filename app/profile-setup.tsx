@@ -140,7 +140,7 @@ export default function ProfileSetupScreen() {
 
       // Navigate to main app after a short delay to show the toast
       setTimeout(() => {
-        router.replace('/(tabs)/index');
+        router.replace('/(tabs)');
       }, 1500);
     } catch (error) {
       console.error('Profile save error:', error);
