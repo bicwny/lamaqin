@@ -79,5 +79,5 @@ export default function Index() {
 
   // Authenticated with complete profile - go to main app
   console.log('✅ Index: Profile complete, redirecting to tabs home');
-  return <Redirect href="/(tabs)/index" />;
+  return <Redirect href="/(tabs)" />;
 }
