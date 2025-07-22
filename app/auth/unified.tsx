@@ -256,7 +256,7 @@ export default function UnifiedAuthScreen() {
 
     try {
       // Always use signInWithOtp with shouldCreateUser: true
-      // This ensures consistent Magic Link template for all users
+      //      // This ensures consistent Magic Link template for all users
       const { error } = await supabase.auth.signInWithOtp({
         email: cleanEmail,
         options: {
@@ -383,7 +383,7 @@ export default function UnifiedAuthScreen() {
             // Existing user - check if profile is complete
             const isProfileComplete = existingUser.dharma_name && 
                                     existingUser.class_name && 
-                                    existingUser.practice_years && 
+                                    existingUser.practice_years !== null && 
                                     existingUser.location;
 
             if (!isProfileComplete) {
