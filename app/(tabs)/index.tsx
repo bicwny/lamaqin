@@ -52,6 +52,8 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+
+  console.log("🏠 HomeScreen rendering, user:", user?.email, "loading:", loading);
   const [refreshing, setRefreshing] = useState(false);
   const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
   const [courseLessons, setCourseLessons] = useState<Array<{

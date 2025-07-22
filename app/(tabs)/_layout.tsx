@@ -13,6 +13,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   console.log("🏠 TabLayout rendering at:", new Date().toISOString());
+  console.log("🏠 TabLayout colorScheme:", colorScheme);
 
   return (
     <Tabs
@@ -55,13 +56,11 @@ export default function TabLayout() {
           marginTop: 2,
         },
       }}
-      initialRouteName="index"
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "当日",
-          href: "/(tabs)/index",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
