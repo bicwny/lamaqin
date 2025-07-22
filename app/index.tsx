@@ -65,9 +65,9 @@ export default function Index() {
     );
   }
 
-  // Not authenticated - go to auth
+  // Not authenticated - go to unified auth screen
   if (!user) {
-    console.log('🔐 Index: Redirecting to auth/unified');
+    console.log('🔐 Index: No user found, redirecting to unified auth');
     return <Redirect href="/auth/unified" />;
   }
 
