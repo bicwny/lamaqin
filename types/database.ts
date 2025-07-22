@@ -65,6 +65,7 @@ export interface UserPracticeProject {
   target_count: number;
   start_date?: string;
   target_end_date?: string;
+  completed_date?: string;
   current_count: number;
   daily_target: number;
   status: 'not_started' | 'active' | 'completed';
