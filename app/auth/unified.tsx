@@ -381,24 +381,11 @@ export default function UnifiedAuthScreen() {
             router.replace('/profile-setup');
           } else {
             // Existing user - check if profile is complete
-            const isProfileComplete = existingUser.dharma_name && 
-                                    existingUser.location;
+            
 
-            console.log('🔍 Profile completeness check:', {
-              dharma_name: existingUser.dharma_name,
-              location: existingUser.location,
-              isComplete: isProfileComplete
-            });
-
-            if (!isProfileComplete) {
-              // Profile incomplete - redirect to profile setup
-              console.log('🔄 Existing user with incomplete profile, redirecting to setup');
-              router.replace('/profile-setup');
-            } else {
-              // Existing user with complete profile - go to main app
-              console.log('✅ Existing user with complete profile, redirecting to tabs');
-              router.replace('/(tabs)/index');
-            }
+            // Let root index handle all routing logic after authentication
+        console.log('✅ User authenticated, redirecting to root index for routing');
+        router.replace('/');
           }
       }
     } catch (error) {
