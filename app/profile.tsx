@@ -131,7 +131,8 @@ export default function ProfileScreen() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.replace('/auth/login');
+      // Let the root index handle routing after logout
+      router.replace('/');
     } catch (error) {
       console.error('Sign out error:', error);
     }
