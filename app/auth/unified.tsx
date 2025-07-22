@@ -384,6 +384,12 @@ export default function UnifiedAuthScreen() {
             const isProfileComplete = existingUser.dharma_name && 
                                     existingUser.location;
 
+            console.log('🔍 Profile completeness check:', {
+              dharma_name: existingUser.dharma_name,
+              location: existingUser.location,
+              isComplete: isProfileComplete
+            });
+
             if (!isProfileComplete) {
               // Profile incomplete - redirect to profile setup
               console.log('🔄 Existing user with incomplete profile, redirecting to setup');

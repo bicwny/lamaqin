@@ -1,30 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  Alert, 
+  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView
 } from 'react-native';
 import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
-import { useAuth } from '@/contexts/AuthContext';
 import { toastService } from '@/lib/toast';
 
 export default function ProfileSetupScreen() {
-  const { user } = useAuth();
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [currentClass, setCurrentClass] = useState('');
-  
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    loadUserData();
+  }, [user?.id]);
+
+  const loadUserData = async () => {
+    if (!user?.id) {
+      setInitialLoading(false);
+      return;
+    }
+
+    try {
+      console.log('🔍 Loading existing user data for profile setup:', user.email);
+
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('dharma_name, lay_name, class_name, location')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('❌ Error loading user data:', error);
+      } else if (userData) {
+        console.log('✅ Loaded existing user data:', userData);
+        // Pre-populate form fields with existing data
+        setDharmaName(userData.dharma_name || '');
+        setLayName(userData.lay_name || '');
+        setCurrentClass(userData.class_name || '');
+        setLocation(userData.location || '');
+      } else {
+        console.log('ℹ️ No existing user data found');
+      }
+    } catch (error) {
+      console.error('❌ Error loading user data:', error);
+    } finally {
+      setInitialLoading(false);
+    }
+  };
 
   const handleSkipProfile = async () => {
     try {
@@ -98,7 +136,7 @@ export default function ProfileSetupScreen() {
       }
 
       console.log('✅ Profile saved successfully');
-      
+
       // Show success toast
       toastService.success({
         title: '保存成功',
@@ -133,6 +171,15 @@ export default function ProfileSetupScreen() {
       ]
     );
   };
+
+  if (initialLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+        <Text style={styles.loadingText}>正在加载...</Text>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView 
@@ -182,7 +229,7 @@ export default function ProfileSetupScreen() {
             />
           </View>
 
-          
+
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
@@ -328,5 +375,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textSecondary,
   },
 });
