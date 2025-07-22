@@ -214,6 +214,11 @@ export default function CourseDetailScreen() {
           <Text style={styles.courseInfoText}>
             讲解：{userCourse.course.teacher} • 完成：{Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课（{(userCourse.progress_percentage || 0).toFixed(1)}%）
           </Text>
+          {userCourse.completed_date && (
+            <Text style={styles.completionDateText}>
+              完成日期：{new Date(userCourse.completed_date).toLocaleDateString('zh-CN')}
+            </Text>
+          )}
         </View>
 
         <Text style={styles.sectionTitle}>课程内容：</Text>
@@ -340,6 +345,12 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontWeight: '500',
     marginBottom: 4,
+  },
+  completionDateText: {
+    fontSize: 14,
+    color: '#28a745',
+    fontWeight: '600',
+    marginTop: 4,
   },
   lessonItem: {
     backgroundColor: 'white',
