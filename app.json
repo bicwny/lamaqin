@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bicwny.lamaqin",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -21,7 +22,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.bicwny.lamaqin"
+      "package": "com.bicwny.lamaqin",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
