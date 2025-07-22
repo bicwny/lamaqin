@@ -33,10 +33,17 @@ config.watchFolders = [
   path.resolve(__dirname, 'utils'),
 ];
 
-// Serializer configuration to handle undefined paths
+// Enhanced serializer configuration to handle undefined paths
 config.serializer = {
   ...config.serializer,
   getModulesRunBeforeMainModule: () => [],
+  // Filter out any undefined or invalid module paths
+  processModuleFilter: (module) => {
+    if (!module || !module.path || typeof module.path !== 'string') {
+      return false;
+    }
+    return true;
+  },
 };
 
 module.exports = withNativeWind(config, { input: './global.css' });
