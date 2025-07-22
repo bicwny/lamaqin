@@ -97,6 +97,26 @@ export default function ProfileSetupScreen() {
       return;
     }
 
+    // Validate required fields
+    const trimmedLayName = layName.trim();
+    const trimmedLocation = location.trim();
+
+    if (!trimmedLayName) {
+      toastService.error({
+        title: '请填写俗名',
+        message: '俗名是必填项，请输入您的姓名'
+      });
+      return;
+    }
+
+    if (!trimmedLocation) {
+      toastService.error({
+        title: '请填写所在地区',
+        message: '所在地区是必填项，请输入您的地区'
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // Update user metadata in Supabase Auth
@@ -208,10 +228,10 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🏷️ 俗名（必填）</Text>
+            <Text style={[styles.inputLabel, styles.requiredLabel]}>🏷️ 俗名（必填）</Text>
             <TextInput
-              style={styles.input}
-              placeholder="您的姓名"
+              style={[styles.input, styles.requiredInput]}
+              placeholder="您的姓名 *"
               value={layName}
               onChangeText={setLayName}
               autoCapitalize="words"
@@ -232,10 +252,10 @@ export default function ProfileSetupScreen() {
 
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📍 所在地区</Text>
+            <Text style={[styles.inputLabel, styles.requiredLabel]}>📍 所在地区（必填）</Text>
             <TextInput
-              style={styles.input}
-              placeholder="如：北京、上海等"
+              style={[styles.input, styles.requiredInput]}
+              placeholder="如：北京、上海等 *"
               value={location}
               onChangeText={setLocation}
               autoCapitalize="words"
@@ -265,7 +285,8 @@ export default function ProfileSetupScreen() {
           <View style={styles.noteSection}>
             <Text style={styles.noteTitle}>💡 温馨提示</Text>
             <Text style={styles.noteText}>
-              • 所有信息都是可选的{'\n'}
+              • 俗名和所在地区为必填项{'\n'}
+              • 法名和学修班级为可选项{'\n'}
               • 您可以随时在个人资料页面修改{'\n'}
               • 我们会保护您的隐私信息
             </Text>
@@ -385,5 +406,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: Colors.textSecondary,
+  },
+  requiredLabel: {
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  requiredInput: {
+    borderColor: Colors.primary,
+    borderWidth: 1.5,
   },
 });

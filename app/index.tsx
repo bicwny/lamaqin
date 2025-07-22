@@ -28,7 +28,7 @@ export default function Index() {
 
       const { data: userData, error } = await supabase
         .from('users')
-        .select('dharma_name, location')
+        .select('dharma_name, lay_name, location')
         .eq('id', user.id)
         .single();
 
@@ -39,11 +39,14 @@ export default function Index() {
         return;
       }
 
-      const isComplete = Boolean(userData?.dharma_name && userData?.location);
+      // Profile is complete only if both lay_name and location are provided
+      const isComplete = Boolean(userData?.lay_name && userData?.location);
       console.log('✅ Profile completeness check:', {
         dharma_name: userData?.dharma_name,
+        lay_name: userData?.lay_name,
         location: userData?.location,
-        isComplete
+        isComplete: isComplete,
+        requiredFields: 'lay_name + location'
       });
 
       setProfileComplete(isComplete);
