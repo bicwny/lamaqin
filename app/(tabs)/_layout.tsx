@@ -10,7 +10,6 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
-  console.log('📱 TabLayout: Rendering tabs layout');
   const colorScheme = useColorScheme();
 
   console.log("🏠 TabLayout rendering at:", new Date().toISOString());
