@@ -21,6 +21,6 @@ export default function Index() {
     return <Redirect href="/auth/unified" />;
   }
 
-  console.log('✅ Index: Redirecting to home tab');
-  return <Redirect href="/(tabs)/index" />;
+  console.log('✅ Index: Redirecting to tabs');
+  return <Redirect href="/(tabs)" />;
 }
