@@ -105,3 +105,24 @@ args = "npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "EXPO_PACKAGER_PROXY_URL=https://$REPLIT_DEV_DOMAIN REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN npx expo start --clear --reset-cache"
+
+[[workflows.workflow]]
+name = "Dev Server Physical Device"
+author = 43042942
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "rm -rf .expo"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "rm -rf node_modules/.cache"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "rm -rf /tmp/metro-*"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "EXPO_PACKAGER_PROXY_URL=https://$REPLIT_DEV_DOMAIN REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN npx expo start --clear --reset-cache --tunnel"

@@ -29,6 +29,11 @@
       "hostname": "0.0.0.0",
       "port": 8081
     },
+    "packagerOpts": {
+      "config": "metro.config.js",
+      "https": false,
+      "port": 8081
+    },
     "plugins": [
       "expo-router",
       [
