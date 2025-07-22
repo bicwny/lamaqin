@@ -1,0 +1,319 @@
+
+# Study System Logic Documentation
+# React Native Expo App - 修行追踪 (Practice Tracking)
+
+## Overview
+The study system is a comprehensive course management and progress tracking module that allows users to enroll in Buddhist study courses, track their learning progress through individual lessons, and maintain detailed study records.
+
+## Core Components Architecture
+
+### 1. Database Schema
+
+#### Courses Table
+- `id` (UUID): Unique course identifier
+- `name` (string): Course title/name
+- `total_lessons` (integer): Total number of lessons in the course
+- `teacher` (string): Instructor name
+- `description` (string): Course description
+- `created_at` (timestamp): Course creation date
+- `updated_at` (timestamp): Last modification date
+
+#### Course Lessons Table
+- `id` (UUID): Unique lesson identifier
+- `course_id` (UUID): Foreign key to courses table
+- `lesson_number` (integer): Sequential lesson number within course
+- `title` (string): Lesson title
+- `url` (string, optional): Online lesson URL
+- `created_at` (timestamp): Lesson creation date
+
+#### User Courses Table (Enrollment)
+- `id` (UUID): Unique enrollment identifier
+- `user_id` (UUID): Foreign key to auth.users
+- `course_id` (UUID): Foreign key to courses table
+- `status` (enum): 'active', 'completed', 'paused'
+- `joined_date` (timestamp): Enrollment date
+- `completed_date` (timestamp, optional): Course completion date
+- `progress_percentage` (float): Calculated completion percentage
+- `created_at` (timestamp): Record creation date
+- `updated_at` (timestamp): Last modification date
+
+#### Study Records Table
+- `id` (UUID): Unique study record identifier
+- `user_id` (UUID): Foreign key to auth.users
+- `course_id` (UUID): Foreign key to courses table
+- `lesson_id` (UUID): Foreign key to course_lessons table
+- `lesson_number` (integer): Lesson number for quick reference
+- `study_date` (date): Date of study session
+- `study_type` (enum): '听传承' (Listen to Teaching) or '看法本' (Read Text)
+- `study_count_for_lesson` (integer): Number of times studied (usually 1)
+- `created_at` (timestamp): Record creation date
+
+### 2. Study System Components
+
+#### StudyService (lib/database.ts)
+Central service managing all study-related database operations:
+
+**Course Management:**
+- `getCourses()`: Fetch all available courses
+- `getCourseLessons(courseId)`: Get all lessons for a specific course
+- `getUserCourses(userId)`: Get user's enrolled courses with progress
+
+**Enrollment Management:**
+- `joinCourse(userId, courseId)`: Enroll user in a course
+- `updateCourseStatus(userId, courseId, status)`: Update enrollment status
+
+**Study Recording:**
+- `recordStudy(studyData)`: Record individual study session
+- `getLessonStudySummary(userId, courseId, lessonId)`: Get study counts per lesson
+- `getUserStudyProgress(userId)`: Get comprehensive study records
+
+**Progress Calculation:**
+- `calculateProgress(userId, courseId)`: Calculate and update course completion percentage
+
+#### Study Screen Components
+- **Main Study Screen** (`app/(tabs)/study.tsx`): Primary interface with multiple view modes
+- **Course Detail Screen** (`app/course-detail/[courseId].tsx`): Individual course management
+- **Lesson Viewer** (`app/lesson-viewer.tsx`): Online lesson content display
+
+## User Flow & Logic
+
+### 1. Course Discovery & Enrollment
+
+#### Available Courses Display
+1. System loads all available courses from database
+2. Filters out courses user is already enrolled in
+3. Displays course information (name, teacher, lesson count, description)
+4. Provides "Join Course" button for unenrolled courses
+
+#### Course Enrollment Process
+1. User clicks "Join Course" button
+2. System checks if user is already enrolled (prevent duplicates)
+3. Creates new record in `user_courses` table with status 'active'
+4. Initializes progress tracking at 0%
+5. Redirects user to course study interface
+6. Shows success toast notification
+
+### 2. Study Interface & Navigation
+
+#### Home View Modes
+- **Learning Tab**: Shows active courses with progress indicators
+- **Completed Tab**: Shows finished courses with completion dates
+- **Empty State**: Guides new users to course enrollment
+
+#### Course Management View
+- **My Courses Section**: Lists enrolled courses with status management
+- **Available Courses Section**: Shows courses available for enrollment
+- **Status Controls**: Pause/Resume/Continue learning buttons
+
+### 3. Lesson Study System
+
+#### Two-Type Study Tracking
+The system tracks two distinct types of study activities:
+
+**听传承 (Listen to Teaching):**
+- Records when user listens to audio/video teaching
+- Tracked per lesson, can be repeated multiple times
+- Required for lesson completion
+
+**看法本 (Read Text):**
+- Records when user reads the course text/materials
+- Tracked per lesson, can be repeated multiple times
+- Required for lesson completion
+
+#### Study Recording Process
+1. User navigates to course detail page
+2. Selects specific lesson
+3. Chooses study type (听传承 or 看法本)
+4. System records study session with:
+   - Current date as study_date
+   - User ID and course/lesson identifiers
+   - Study type and count (usually 1)
+5. Updates lesson progress display in real-time
+6. Triggers overall course progress recalculation
+
+#### Lesson Completion Logic
+A lesson is considered "completed" when:
+- User has at least 1 record of 听传承 (Listen to Teaching)
+- AND user has at least 1 record of 看法本 (Read Text)
+- Visual indicator (✅) appears next to completed lessons
+
+### 4. Progress Calculation System
+
+#### Lesson-Level Progress
+```
+For each lesson:
+- Count 听传承 records: listenCount
+- Count 看法本 records: readCount  
+- Lesson completed if: listenCount > 0 AND readCount > 0
+```
+
+#### Course-Level Progress
+```
+totalLessons = course.total_lessons
+completedLessons = count of lessons with both study types
+progressPercentage = (completedLessons / totalLessons) * 100
+```
+
+#### Real-Time Progress Updates
+1. Every study record triggers `calculateProgress()`
+2. System queries all study records for the course
+3. Groups records by lesson_id
+4. Counts completion status per lesson
+5. Updates `progress_percentage` in `user_courses` table
+6. Refreshes UI displays automatically
+
+### 5. Course Status Management
+
+#### Status Types & Behaviors
+**Active Status:**
+- Default status for newly enrolled courses
+- Appears in "Learning" tab
+- Full study functionality available
+- Progress tracking active
+
+**Paused Status:**
+- User-initiated temporary suspension
+- Removes from active learning list
+- Maintains all progress data
+- Can be resumed to active status
+
+**Completed Status:**
+- Automatically set when progress reaches 100%
+- Can also be manually set
+- Appears in "Completed" tab
+- Records completion_date
+- Allows re-study functionality
+
+### 6. Data Synchronization & Consistency
+
+#### Multi-Device Sync
+- All study data stored in Supabase cloud database
+- Real-time updates across all user devices
+- Progress calculations performed server-side
+- Automatic conflict resolution (latest update wins)
+
+#### Data Integrity Measures
+- Foreign key constraints ensure referential integrity
+- Duplicate enrollment prevention
+- Study record validation (valid lesson numbers, dates)
+- Progress percentage bounds checking (0-100%)
+
+## Advanced Features
+
+### 1. Study Statistics & Analytics
+
+#### Personal Progress Tracking
+- Daily/weekly/monthly study session counts
+- Course completion rates and timelines
+- Individual lesson repetition tracking
+- Study type preference analysis
+
+#### Dashboard Integration
+- Next lesson recommendations
+- Study streak tracking
+- Quick action buttons for frequent courses
+- Progress summary cards
+
+### 2. Content Integration
+
+#### Online Lesson Viewing
+- Embedded web view for online course content
+- External link support for course materials
+- Fallback handling for missing URLs
+- Browser redirect option for complex content
+
+#### Offline Capability Planning
+- Local storage for course metadata
+- Progress sync when connection restored
+- Offline study record queuing
+- Cache management for lesson content
+
+### 3. Performance Optimizations
+
+#### Efficient Data Loading
+- Lazy loading of lesson content
+- Pagination for large course lists
+- Incremental progress updates
+- Optimized database queries with joins
+
+#### Caching Strategy
+- Course data cached in memory
+- Progress calculations cached per session
+- Lesson metadata pre-loaded
+- User enrollment status cached
+
+### 4. Error Handling & Recovery
+
+#### Network Failure Management
+- Graceful degradation for offline scenarios
+- Retry logic for failed study recordings
+- Local storage fallback for critical data
+- User-friendly error messages
+
+#### Data Validation
+- Client-side validation before submission
+- Server-side data integrity checks
+- Duplicate study record prevention
+- Invalid date/time handling
+
+## Implementation Details
+
+### 1. State Management
+```typescript
+// Course enrollment state
+const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
+const [allCourses, setAllCourses] = useState<Course[]>([]);
+
+// Study progress state
+const [progress, setProgress] = useState<StudyProgress[]>([]);
+const [courseLessons, setCourseLessons] = useState<Record<string, CourseLesson[]>>({});
+
+// UI state management
+const [refreshTrigger, setRefreshTrigger] = useState(0);
+const [viewMode, setViewMode] = useState<ViewMode>('home');
+```
+
+### 2. Data Flow Architecture
+```
+User Action → UI Component → StudyService → Supabase Database
+    ↓                                                ↓
+Toast Notification ← State Update ← Response ← Database Update
+    ↓                                                ↓
+UI Refresh ← Progress Recalc ← Trigger ← Success Confirmation
+```
+
+### 3. Real-Time Updates
+- `refreshTrigger` state variable forces component re-renders
+- Progress calculations update database immediately
+- UI displays latest data through reactive state management
+- Toast notifications provide immediate user feedback
+
+## Future Enhancements
+
+### 1. Advanced Analytics
+- Detailed study pattern analysis
+- Comparative progress tracking
+- Personalized study recommendations
+- Achievement and milestone systems
+
+### 2. Social Features
+- Study group functionality
+- Progress sharing capabilities
+- Community discussions per lesson
+- Peer learning encouragement
+
+### 3. Content Expansion
+- Multiple media type support (video, audio, PDF)
+- Interactive lesson elements
+- Quiz and assessment integration
+- Note-taking and bookmarking
+
+### 4. Accessibility Improvements
+- Screen reader optimization
+- Keyboard navigation support
+- High contrast mode
+- Multi-language support
+
+---
+
+This study system provides a comprehensive framework for Buddhist course learning with detailed progress tracking, flexible study modes, and robust data management. The architecture supports scalability while maintaining simplicity for end users.
