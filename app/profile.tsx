@@ -267,6 +267,11 @@ export default function ProfileScreen() {
               <Text style={[styles.actionButtonText, styles.signOutText]}>退出登录</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Support Contact */}
+          <View style={styles.supportSection}>
+            <Text style={styles.supportText}>如有任何问题，请联系 app@bicwny.com</Text>
+          </View>
         </ScrollView>
       </ThemedView>
     </SafeAreaView>
@@ -427,5 +432,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: '600',
+  },
+  supportSection: {
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  supportText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: 'center',
   },
 });
