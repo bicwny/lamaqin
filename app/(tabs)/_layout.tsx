@@ -61,6 +61,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "当日",
+          href: "/(tabs)/index",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               size={28}
