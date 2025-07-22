@@ -1,0 +1,246 @@
+
+# Authentication Logic & User Flow Documentation
+# React Native Expo App - 修行追踪 (Practice Tracking)
+
+## Overview
+This document outlines the complete authentication system logic, user flows, and profile setup process for the meditation/practice tracking application.
+
+## Core Authentication Components
+
+### 1. Authentication Context (AuthContext)
+- Manages global authentication state
+- Handles session persistence across app restarts
+- Provides authentication methods to entire app
+- Manages user data synchronization with database
+- Handles logout and session cleanup
+
+### 2. Authentication Screens
+- Unified Auth Screen (primary entry point)
+- Login Screen (legacy, redirects to unified)
+- Register Screen (legacy, redirects to unified)
+- Profile Setup Screen (mandatory for new users)
+
+## User Flow States
+
+### A. UNAUTHENTICATED USER
+1. App loads → Root Index checks authentication
+2. No valid session found → Redirect to Unified Auth Screen
+3. User sees email input with app branding
+4. Two paths: New user or Existing user (system auto-detects)
+
+### B. EMAIL VERIFICATION FLOW
+1. User enters email address
+2. System validates email format
+3. Supabase sends OTP code via email
+4. User receives email with 6-digit verification code
+5. User enters OTP code in app
+6. System verifies code with Supabase
+
+### C. NEW USER PATH
+1. Email not found in system
+2. OTP verification succeeds
+3. User account created automatically
+4. Redirect to Profile Setup (mandatory)
+5. Must complete required fields before accessing app
+
+### D. EXISTING USER PATH
+1. Email exists in system
+2. OTP verification succeeds
+3. Check profile completeness
+4. If complete → Redirect to main app
+5. If incomplete → Redirect to Profile Setup
+
+## Profile Setup Logic
+
+### Required Fields Validation
+- **Lay Name (俗名)**: Mandatory field
+- **Location (所在地区)**: Mandatory field
+- **Dharma Name (法名)**: Optional field
+- **Current Class (当前学修班级)**: Optional field
+
+### Profile Completeness Check
+```
+isProfileComplete = (lay_name !== null && lay_name !== '') && 
+                   (location !== null && location !== '')
+```
+
+### Profile Setup Flow
+1. Pre-populate fields if user has existing partial data
+2. Display form with required field indicators
+3. Validate required fields on save attempt
+4. Show error messages for missing required fields
+5. Save to both Supabase Auth metadata AND users table
+6. Show success message upon completion
+7. Redirect to main app (tabs navigation)
+
+## Session Management Logic
+
+### Session Persistence Strategy
+1. **Primary Storage**: AsyncStorage for React Native
+2. **Backup Storage**: Web localStorage/sessionStorage for web platform
+3. **Database Sync**: User record in Supabase users table
+4. **Auth Metadata**: Supabase Auth user metadata
+
+### Session Validation Process
+1. App startup → Check stored session tokens
+2. Validate with Supabase auth.getSession()
+3. Verify email_confirmed_at exists
+4. Check database user record exists
+5. Validate profile completeness
+6. Route user based on validation results
+
+### Session Cleanup (Logout)
+1. Clear AsyncStorage completely
+2. Clear web storage (localStorage/sessionStorage)
+3. Call Supabase signOut with global scope
+4. Clear user state in React context
+5. Force page reload on web platform
+6. Redirect to authentication screen
+
+## Routing Logic
+
+### Root Index Decision Tree
+```
+if (loading) → Show loading spinner
+if (!user) → Redirect to /auth/unified
+if (user && !profileComplete) → Redirect to /profile-setup
+if (user && profileComplete) → Redirect to /(tabs)
+```
+
+### Authentication Guard
+- All protected routes check authentication status
+- Unauthenticated users redirected to unified auth
+- Incomplete profiles redirected to profile setup
+
+## Error Handling
+
+### Network Errors
+- Display user-friendly error messages
+- Implement retry logic for failed requests
+- Graceful degradation for offline scenarios
+
+### Authentication Errors
+- Invalid email format → Client-side validation
+- OTP expired/invalid → Clear OTP, show error message
+- Rate limiting → Show cooldown timer
+- Network timeout → Retry option
+
+### Database Errors
+- User creation failure → Continue with auth, sync later
+- Profile save failure → Show error, allow retry
+- Session sync failure → Continue, mark for retry
+
+## Security Considerations
+
+### Data Validation
+- Email format validation on client and server
+- OTP code format validation (6 digits)
+- Required field validation before database save
+- SQL injection prevention through parameterized queries
+
+### Session Security
+- Automatic token refresh through Supabase
+- Secure storage of authentication tokens
+- Global logout capability
+- Session timeout handling
+
+## Database Integration
+
+### User Table Structure
+```
+users table:
+- id (UUID, primary key, matches auth.users.id)
+- email (string, unique)
+- dharma_name (string, nullable)
+- lay_name (string, required for completeness)
+- class_name (string, nullable)
+- location (string, required for completeness)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+### Data Synchronization
+1. Authentication success → Ensure user exists in database
+2. Profile update → Update both auth metadata and users table
+3. Session validation → Verify database record exists
+4. Logout → No database changes needed
+
+## Edge Cases & Fallback Logic
+
+### Partial Data Scenarios
+- User exists in auth but not in database → Create database record
+- User exists in database but incomplete profile → Force profile setup
+- Auth metadata out of sync with database → Database takes precedence
+
+### Network Failure Recovery
+- Store failed operations for retry
+- Cache user data locally
+- Sync when connection restored
+- Show offline indicators
+
+### Multiple Device Sessions
+- Global logout affects all devices
+- Session conflicts resolved by latest login
+- Profile changes sync across devices
+
+## Performance Optimizations
+
+### Lazy Loading
+- Authentication screens loaded only when needed
+- Profile data fetched on demand
+- Heavy components loaded after authentication
+
+### Caching Strategy
+- User profile cached in memory
+- Authentication status cached locally
+- Database queries optimized with indexes
+
+## User Experience Enhancements
+
+### Loading States
+- Skeleton screens during data loading
+- Progress indicators for long operations
+- Smooth transitions between states
+
+### Error Recovery
+- Clear error messages in user's language
+- Retry buttons for failed operations
+- Contextual help and guidance
+
+### Accessibility
+- Screen reader support
+- Keyboard navigation
+- High contrast mode support
+
+## Testing Scenarios
+
+### Authentication Flow Tests
+1. New user registration → Profile setup → Main app
+2. Existing user login → Direct to main app
+3. Incomplete profile → Forced profile setup
+4. Invalid OTP → Error handling
+5. Network failure → Retry logic
+
+### Session Management Tests
+1. App restart with valid session → Auto-login
+2. Session expiry → Re-authentication required
+3. Logout → Complete session cleanup
+4. Multiple device logout → Global session termination
+
+## Future Enhancements
+
+### Planned Features
+- Social login options (Google, Apple)
+- Biometric authentication
+- Two-factor authentication
+- Account recovery options
+
+### Scalability Considerations
+- Rate limiting implementation
+- Load balancing for high traffic
+- Database optimization for large user base
+- CDN integration for global performance
+
+---
+
+This document serves as the blueprint for the authentication system implementation and should be updated as features evolve or requirements change.
