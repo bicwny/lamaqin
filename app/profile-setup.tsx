@@ -64,32 +64,7 @@ export default function ProfileSetupScreen() {
     }
   };
 
-  const handleSkipProfile = async () => {
-    try {
-      console.log('⏭️ User chose to skip profile setup');
-      Alert.alert(
-        '确认跳过',
-        '您可以随时在个人页面完善资料',
-        [
-          {
-            text: '取消',
-            style: 'cancel'
-          },
-          {
-            text: '跳过',
-            onPress: () => {
-              console.log('✅ Redirecting to main app after skip');
-              router.replace('/(tabs)/index');
-            }
-          }
-        ]
-      );
-    } catch (error) {
-      console.error('Skip profile error:', error);
-      // Even if there's an error, still redirect
-      router.replace('/(tabs)/index');
-    }
-  };
+  
 
   const handleSaveProfile = async () => {
     if (!user) {
@@ -178,19 +153,7 @@ export default function ProfileSetupScreen() {
     }
   };
 
-  const handleSkip = () => {
-    Alert.alert(
-      '跳过设置',
-      '您可以稍后在个人资料页面完善信息',
-      [
-        { text: '继续设置', style: 'cancel' },
-        { 
-          text: '跳过', 
-          onPress: () => router.replace('/(tabs)') 
-        }
-      ]
-    );
-  };
+  
 
   if (initialLoading) {
     return (
@@ -274,13 +237,7 @@ export default function ProfileSetupScreen() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.skipButton} 
-            onPress={handleSkip}
-            disabled={loading}
-          >
-            <Text style={styles.skipButtonText}>暂时跳过</Text>
-          </TouchableOpacity>
+          
 
           <View style={styles.noteSection}>
             <Text style={styles.noteTitle}>💡 温馨提示</Text>
@@ -368,16 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  skipButton: {
-    alignItems: 'center',
-    marginTop: 15,
-    paddingVertical: 10,
-  },
-  skipButtonText: {
-    color: Colors.textSecondary,
-    fontSize: 16,
-    textDecorationLine: 'underline',
-  },
+  
   noteSection: {
     marginTop: 30,
     padding: 20,
