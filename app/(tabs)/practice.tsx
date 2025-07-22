@@ -48,12 +48,15 @@ interface MeditationRecord {
   created_at: string;
 }
 
+type PracticeTab = 'active' | 'complete';
+
 export default function PracticeScreen() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<PracticeProject[]>([]);
   const [presetProjectNames, setPresetProjectNames] = useState<{[key: string]: string}>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<PracticeTab>('active');
 
   useEffect(() => {
     if (user) {
@@ -251,6 +254,18 @@ export default function PracticeScreen() {
     );
   }
 
+  const activeProjects = projects.filter(project => {
+    const progress = calculateProgress(project);
+    return project.status === 'active' && !progress.isCompleted;
+  });
+
+  const completedProjects = projects.filter(project => {
+    const progress = calculateProgress(project);
+    return project.status === 'completed' || progress.isCompleted;
+  });
+
+  const currentProjects = activeTab === 'active' ? activeProjects : completedProjects;
+
   return (
       <PageTemplate
         title="修行记录" 
@@ -262,93 +277,125 @@ export default function PracticeScreen() {
         backgroundColor={Colors.background}
         padding={0}
       >
+        {/* Tab Bar */}
+        <View style={styles.tabBar}>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'active' && styles.activeTab]}
+            onPress={() => setActiveTab('active')}
+          >
+            <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
+              进行中 ({activeProjects.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'complete' && styles.activeTab]}
+            onPress={() => setActiveTab('complete')}
+          >
+            <Text style={[styles.tabText, activeTab === 'complete' && styles.activeTabText]}>
+              已完成 ({completedProjects.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <ScrollView 
         style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {currentProjects.length === 0 ? (
+          <View style={styles.emptyTabState}>
+            <Text style={styles.emptyTabText}>
+              {activeTab === 'active' ? '暂无进行中的修行项目' : '暂无已完成的修行项目'}
+            </Text>
+          </View>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>
+              {activeTab === 'active' ? '进行中的修行项目：' : '已完成的修行项目：'}
+            </Text>
 
+            {currentProjects.map((project) => {
+              const progress = calculateProgress(project);
+              const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
 
-        <Text style={styles.sectionTitle}>我的修行项目：</Text>
+              // Unified display logic based on target_end_date
+              const practiceDisplayType = project.target_end_date ? '固定时长' : '持续进行';
+              const totalWeeks = project.target_end_date 
+                ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
+                : null;
 
-        {projects.map((project) => {
-          const progress = calculateProgress(project);
-          const isTimeBasedWeekly = project.practices.type === 'time' && project.target_period === 'weekly';
+              return (
+                <View key={project.id} style={styles.practiceCard}>
 
-          // Unified display logic based on target_end_date
-          const practiceDisplayType = project.target_end_date ? '固定时长' : '持续进行';
-          const totalWeeks = project.target_end_date 
-            ? Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (7 * 24 * 60 * 60 * 1000))
-            : null;
-
-          return (
-            <View key={project.id} style={styles.practiceCard}>
-
-              {/* Practice Name and Project Name Row */}
-              <View style={styles.practiceNameRow}>
-                <Text style={styles.practiceName}>
-                  {project.practices.name}
-                  {project.practices.type === 'time' && ` (${practiceDisplayType})`}
-                  {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
-                </Text>
-
-                {/* Project Name Display */}
-                {(project.project_name || project.preset_project_id) && (
-                  <View style={styles.projectNamePill}>
-                    <Text style={styles.projectNameText}>
-                      {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
+                  {/* Practice Name and Project Name Row */}
+                  <View style={styles.practiceNameRow}>
+                    <Text style={styles.practiceName}>
+                      {project.practices.name}
+                      {project.practices.type === 'time' && ` (${practiceDisplayType})`}
+                      {project.practices.type === 'time' && totalWeeks && ` - ${totalWeeks}周`}
                     </Text>
-                  </View>
-                )}
-              </View>
 
-              <View style={styles.progressContainer}>
-                {project.practices.type === 'count' ? (
-                  <View>
-                    <Text style={styles.practiceInfo}>
-                      {progress.current.toLocaleString()}/{progress.target.toLocaleString()}{project.practices.unit} • 每日：{project.daily_target.toLocaleString()}{project.practices.unit}
-                    </Text>
-                  </View>
-                ) : (
-                  <View>
-                    {project.target_period === 'weekly' ? (
-                      <Text style={styles.practiceInfo}>
-                        本周目标：{project.daily_target}座 (每周{project.daily_target}座)
-                      </Text>
-                    ) : (
-                      <Text style={styles.practiceInfo}>
-                        总进度：{progress.current}/{progress.target}天
-                      </Text>
+                    {/* Project Name Display */}
+                    {(project.project_name || project.preset_project_id) && (
+                      <View style={styles.projectNamePill}>
+                        <Text style={styles.projectNameText}>
+                          {project.project_name || presetProjectNames[project.preset_project_id] || '预设项目'}
+                        </Text>
+                      </View>
                     )}
-
-                    <WeeklyProgressDisplay
-                      project={project}
-                      user={user}
-                    />
                   </View>
-                )}
-              </View>
 
-              <View style={styles.buttonRow}>
-                <TouchableOpacity
-                  style={styles.secondaryButton}
-                  onPress={() => handleViewDetails(project.id, project.practices.name)}
-                >
-                  <Text style={styles.secondaryButtonText}>查看详情</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.primaryButton}
-                  onPress={() => handleCustomRecord(project.id, project.practices.name)}
-                >
-                  <Text style={styles.buttonText}>
-                    {project.practices.type === 'time' ? '记录观修' : '记录'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          );
-        })}
+                  <View style={styles.progressContainer}>
+                    {project.practices.type === 'count' ? (
+                      <View>
+                        <Text style={styles.practiceInfo}>
+                          {progress.current.toLocaleString()}/{progress.target.toLocaleString()}{project.practices.unit} • 每日：{project.daily_target.toLocaleString()}{project.practices.unit}
+                        </Text>
+                      </View>
+                    ) : (
+                      <View>
+                        {project.target_period === 'weekly' ? (
+                          <Text style={styles.practiceInfo}>
+                            本周目标：{project.daily_target}座 (每周{project.daily_target}座)
+                          </Text>
+                        ) : (
+                          <Text style={styles.practiceInfo}>
+                            总进度：{progress.current}/{progress.target}天
+                          </Text>
+                        )}
+
+                        <WeeklyProgressDisplay
+                          project={project}
+                          user={user}
+                        />
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.buttonRow}>
+                    <TouchableOpacity
+                      style={styles.secondaryButton}
+                      onPress={() => handleViewDetails(project.id, project.practices.name)}
+                    >
+                      <Text style={styles.secondaryButtonText}>查看详情</Text>
+                    </TouchableOpacity>
+                    {activeTab === 'active' && (
+                      <TouchableOpacity
+                        style={styles.primaryButton}
+                        onPress={() => handleCustomRecord(project.id, project.practices.name)}
+                      >
+                        <Text style={styles.buttonText}>
+                          {project.practices.type === 'time' ? '记录观修' : '记录'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              );
+            })}
+          </>
+        )}
       </ScrollView>
     </PageTemplate>
   );
@@ -705,5 +752,44 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.2,
     marginLeft: 8,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#F8F9FA',
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  activeTab: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  activeTabText: {
+    color: Colors.primary,
+  },
+  emptyTabState: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyTabText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
   },
 });
