@@ -1,0 +1,461 @@
+
+# Mindfulness System Logic & Functionality Documentation
+# React Native Expo App - 修行追踪 (Practice Tracking)
+
+## Overview
+The mindfulness system (心性观察) is designed to help users observe and track their mental states throughout the day, distinguishing between wholesome (善心) and unwholesome (恶心) thoughts and emotions. This system promotes self-awareness and mindful observation of one's inner mental processes.
+
+## Core Concepts
+
+### 1. Mental State Categories
+- **善心 (Good Mind/Wholesome States)**: Positive, beneficial mental states
+  - Compassion, loving-kindness, patience, generosity
+  - Mindful awareness, clarity, peace
+  - Gratitude, joy, contentment
+  - Wisdom, understanding, acceptance
+
+- **恶心 (Bad Mind/Unwholesome States)**: Negative, harmful mental states
+  - Anger, hatred, resentment, jealousy
+  - Greed, attachment, craving
+  - Ignorance, delusion, confusion
+  - Pride, arrogance, fear, worry
+
+### 2. Recording Philosophy
+- **Non-judgmental observation**: Users observe mental states without harsh self-criticism
+- **Immediate recording**: Capture mental states as they arise for accuracy
+- **Pattern recognition**: Build awareness of mental habits over time
+- **Progress tracking**: Monitor improvement in mental cultivation
+
+## System Architecture
+
+### Database Schema
+```sql
+-- Mindfulness Records Table
+CREATE TABLE mindfulness_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    record_date DATE NOT NULL,           -- Date in user's timezone
+    record_time TIME NOT NULL,           -- Time stored in UTC
+    mind_type TEXT CHECK (mind_type IN ('good', 'bad')) NOT NULL,
+    description TEXT,                    -- Optional user description
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Data Flow
+1. **User Input** → Mental state selection + optional description
+2. **Timezone Processing** → Convert to appropriate timezone for storage
+3. **Database Storage** → Store with proper date/time handling
+4. **Statistics Generation** → Real-time calculation of daily stats
+5. **Display** → Show formatted data with timezone awareness
+
+## Functional Components
+
+### A. Recording Interface
+1. **Description Input Field**
+   - Optional text area for context
+   - Placeholder: "描述当前的心境或想法（可选）"
+   - Multiline support (3 lines)
+   - Preserved until successful recording
+
+2. **Action Buttons**
+   - **善心 Button**: Green (#10B981), records positive mental state
+   - **恶心 Button**: Red (#EF4444), records negative mental state
+   - Both buttons trigger immediate database recording
+
+3. **User Experience Flow**
+   ```
+   User observes mental state → 
+   (Optional) Adds description → 
+   Selects 善心 or 恶心 → 
+   System records with timestamp → 
+   Description field clears → 
+   Statistics update immediately
+   ```
+
+### B. Statistics Dashboard
+1. **Today's Statistics Card**
+   - **Good Count**: Number of 善心 records today
+   - **Bad Count**: Number of 恶心 records today
+   - **Good Percentage**: (Good / Total) × 100
+   - **Visual Progress Bar**: Green fill representing good percentage
+
+2. **Real-time Calculations**
+   ```javascript
+   const getTodayStats = () => {
+     const good = todayRecords.filter(r => r.mind_type === 'good').length;
+     const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
+     const total = good + bad;
+     const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
+     return { good, bad, total, goodPercent };
+   };
+   ```
+
+3. **Progress Visualization**
+   - Horizontal progress bar
+   - Green fill proportional to good percentage
+   - Light red background (indicating areas for improvement)
+
+### C. Timezone Management
+1. **Daily Reset Logic**
+   - Resets at midnight in user's local timezone
+   - Automatic detection of timezone changes
+   - Handles daylight saving time transitions
+
+2. **Time Storage Strategy**
+   - **record_date**: Stored in user's timezone (YYYY-MM-DD)
+   - **record_time**: Stored in UTC (HH:MM:SS)
+   - **Display**: Converted back to user's local time
+
+3. **Timezone Display**
+   - Shows current timezone name
+   - Indicates daily reset time: "每日午夜12点重置"
+
+## Data Processing Logic
+
+### A. Recording Process
+1. **Input Validation**
+   - Ensure user is authenticated
+   - Verify timezone information is available
+   - Validate mind_type is either 'good' or 'bad'
+
+2. **Timestamp Generation**
+   ```javascript
+   const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+   const now = new Date();
+   const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+   ```
+
+3. **Database Insert**
+   ```javascript
+   await mindfulnessService.recordMindfulness({
+     user_id: user.id,
+     record_date: today,        // Local date
+     record_time: utcTime,      // UTC time
+     mind_type: mindType,       // 'good' or 'bad'
+     description: description.trim() || undefined
+   });
+   ```
+
+4. **Success Handling**
+   - Show success toast notification
+   - Clear description field
+   - Refresh today's records
+   - Update statistics immediately
+
+### B. Data Retrieval
+1. **Today's Records Query**
+   ```javascript
+   const records = await mindfulnessService.getTodayRecords(user.id, today);
+   ```
+
+2. **Date Validation**
+   - Ensure proper date format (YYYY-MM-DD)
+   - Handle timezone conversion errors gracefully
+   - Fall back to empty array on invalid dates
+
+3. **Time Display Conversion**
+   ```javascript
+   const formatTime = (timeString) => {
+     const utcDate = new Date(`1970-01-01T${timeString}Z`);
+     return utcDate.toLocaleTimeString('en-US', {
+       timeZone: timezoneInfo?.timezone || 'UTC',
+       hour12: false,
+       hour: '2-digit',
+       minute: '2-digit'
+     });
+   };
+   ```
+
+## User Interface Logic
+
+### A. Loading States
+1. **Initial Load**
+   ```javascript
+   if (loading || !timezoneInfo) {
+     return <LoadingSpinner message="加载中..." />;
+   }
+   ```
+
+2. **Data Refresh**
+   - Show loading during database operations
+   - Maintain UI responsiveness
+   - Handle network errors gracefully
+
+### B. Daily Reset Handling
+1. **Automatic Reset Detection**
+   ```javascript
+   useEffect(() => {
+     if (user && timezoneInfo) {
+       handleDailyResetCheck(() => {
+         console.log('Daily reset triggered for mindfulness');
+         setTodayRecords([]); // Clear display
+         loadTodayRecords(); // Reload from database
+       });
+     }
+   }, [user, timezoneInfo]);
+   ```
+
+2. **Reset Actions**
+   - Clear current day's display data
+   - Reload fresh data from database
+   - Reset statistics to 0/0
+   - Maintain user's timezone settings
+
+### C. Error Handling
+1. **Network Errors**
+   - Show user-friendly error messages
+   - Provide retry mechanisms
+   - Graceful degradation when offline
+
+2. **Data Validation Errors**
+   - Invalid timezone data → Show loading state
+   - Database connection issues → Show error toast
+   - Authentication errors → Redirect to login
+
+## User Experience Features
+
+### A. Mindful Recording Process
+1. **Observation Prompts**
+   - Encourage present-moment awareness
+   - Non-judgmental mental state observation
+   - Optional context description
+
+2. **Immediate Feedback**
+   - Instant recording confirmation
+   - Updated statistics display
+   - Visual progress indication
+
+3. **Habit Formation**
+   - Easy, quick recording process
+   - Visual progress tracking
+   - Daily reset creates fresh start
+
+### B. Progress Awareness
+1. **Daily Statistics**
+   - Clear numerical display
+   - Percentage-based progress
+   - Visual progress bar
+
+2. **Trend Recognition**
+   - Daily pattern awareness
+   - Mental state distribution
+   - Progress over time (future enhancement)
+
+## Database Service Layer
+
+### A. MindfulnessService Methods
+```javascript
+export const mindfulnessService = {
+  // Get today's records for a specific user and date
+  async getTodayRecords(userId: string, date: string): Promise<MindfulnessRecord[]>
+  
+  // Record a new mindfulness entry
+  async recordMindfulness(record: Omit<MindfulnessRecord, 'id' | 'created_at'>): Promise<MindfulnessRecord>
+  
+  // Get weekly summary (future enhancement)
+  async getWeeklySummary(userId: string, weekStart: string): Promise<WeeklySummary>
+  
+  // Get monthly trends (future enhancement)
+  async getMonthlyTrends(userId: string, month: string): Promise<MonthlyTrends>
+};
+```
+
+### B. Data Types
+```typescript
+interface MindfulnessRecord {
+  id: string;
+  user_id: string;
+  record_date: string;    // YYYY-MM-DD in user timezone
+  record_time: string;    // HH:MM:SS in UTC
+  mind_type: 'good' | 'bad';
+  description?: string;
+  created_at: string;
+}
+
+interface DailyStats {
+  good: number;
+  bad: number;
+  total: number;
+  goodPercent: number;
+}
+```
+
+## Integration with Other Systems
+
+### A. Authentication Integration
+- Requires authenticated user
+- User ID for data isolation
+- Session validation before recording
+
+### B. Timezone Integration
+- Uses shared timezone management system
+- Consistent date/time handling across app
+- Daily reset synchronization
+
+### C. Toast Notification Integration
+- Success/error message display
+- Consistent UI feedback patterns
+- User-friendly error communication
+
+## Performance Considerations
+
+### A. Database Optimization
+1. **Indexing Strategy**
+   - Index on (user_id, record_date) for daily queries
+   - Index on record_date for admin queries
+   - Composite index for efficient filtering
+
+2. **Query Optimization**
+   - Limit queries to single day by default
+   - Use date range queries for weekly/monthly views
+   - Implement pagination for large datasets
+
+### B. Memory Management
+1. **State Management**
+   - Only load current day's data by default
+   - Clear old data on daily reset
+   - Efficient state updates
+
+2. **UI Performance**
+   - Lazy loading for historical data
+   - Debounced input handling
+   - Optimized re-rendering
+
+## Security & Privacy
+
+### A. Data Protection
+1. **Row Level Security (RLS)**
+   - Users can only access their own records
+   - Database-level access control
+   - Secure multi-tenant architecture
+
+2. **Input Sanitization**
+   - Validate all user inputs
+   - Prevent SQL injection attacks
+   - Safe string handling
+
+### B. Privacy Considerations
+1. **Data Minimization**
+   - Only collect necessary information
+   - Optional description field
+   - User controls data retention
+
+2. **Local Storage Security**
+   - Secure session management
+   - Encrypted local storage where applicable
+   - Automatic session cleanup
+
+## Future Enhancements
+
+### A. Advanced Analytics
+1. **Weekly Trends**
+   - 7-day rolling averages
+   - Week-over-week comparisons
+   - Trend visualization
+
+2. **Monthly Reports**
+   - Monthly summaries
+   - Progress over time
+   - Pattern identification
+
+3. **Insights & Recommendations**
+   - AI-powered pattern recognition
+   - Personalized improvement suggestions
+   - Mindfulness practice recommendations
+
+### B. Social Features
+1. **Community Sharing** (Optional)
+   - Anonymous progress sharing
+   - Community encouragement
+   - Group challenges
+
+2. **Teacher/Mentor Dashboard**
+   - Progress monitoring for students
+   - Guidance and feedback system
+   - Privacy-respecting oversight
+
+### C. Integration Features
+1. **Meditation Timer Integration**
+   - Automatic post-meditation recording
+   - Session quality assessment
+   - Practice correlation analysis
+
+2. **Study Integration**
+   - Connect mindfulness with study progress
+   - Dharma learning impact tracking
+   - Holistic spiritual development
+
+### D. Notification System
+1. **Mindful Reminders**
+   - Gentle daily check-in reminders
+   - Customizable notification times
+   - Mindfulness prompt messages
+
+2. **Progress Celebrations**
+   - Milestone achievements
+   - Positive reinforcement
+   - Encouragement notifications
+
+## Technical Implementation Notes
+
+### A. Component Architecture
+```
+MindfulnessScreen (Main Container)
+├── PageTemplate (Layout wrapper)
+├── TimezoneDisplay (Timezone info)
+├── StatsCard (Statistics display)
+│   ├── StatsRow (Numerical stats)
+│   └── ProgressBar (Visual progress)
+├── RecordCard (Recording interface)
+│   ├── DescriptionInput (Optional text)
+│   └── ButtonRow (Action buttons)
+└── LoadingContainer (Loading state)
+```
+
+### B. State Management
+```javascript
+// Component State
+const [todayRecords, setTodayRecords] = useState<MindfulnessRecord[]>([]);
+const [description, setDescription] = useState('');
+const [loading, setLoading] = useState(true);
+
+// Derived State
+const stats = getTodayStats(); // Calculated from todayRecords
+
+// External State
+const { user } = useAuth(); // Authentication context
+const { timezoneInfo, handleDailyResetCheck } = useTimezone(); // Timezone hook
+```
+
+### C. Effect Management
+```javascript
+useEffect(() => {
+  loadTodayRecords(); // Initial data load
+  
+  // Daily reset handler
+  if (user && timezoneInfo) {
+    handleDailyResetCheck(() => {
+      setTodayRecords([]);
+      loadTodayRecords();
+    });
+  }
+}, [user, timezoneInfo]);
+```
+
+## Conclusion
+
+The mindfulness system provides a simple yet powerful tool for mental state awareness and cultivation. By combining immediate recording capabilities with meaningful statistics and timezone-aware daily resets, it supports users in developing greater self-awareness and mental clarity.
+
+The system's design emphasizes:
+- **Simplicity**: Easy, quick recording process
+- **Accuracy**: Proper timezone and timestamp handling
+- **Privacy**: Secure, user-controlled data
+- **Growth**: Clear progress visualization
+- **Mindfulness**: Non-judgmental observation and tracking
+
+This foundation supports both individual practice development and potential integration with broader spiritual and meditation tracking systems.
+
+---
+
+This document serves as the technical and functional specification for the mindfulness tracking system and should be updated as features evolve or new requirements emerge.
