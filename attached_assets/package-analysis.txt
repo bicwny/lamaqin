@@ -1,0 +1,152 @@
+
+# PACKAGE ANALYSIS - Buddhist Practice App
+
+## ESSENTIAL PACKAGES (Keep)
+
+### Core React Native & Expo
+- expo: ^53.0.20 ✅ Core framework
+- react: 19.0.0 ✅ Core library
+- react-native: 0.79.5 ✅ Core platform
+- expo-router: ~5.1.4 ✅ Navigation system
+- expo-constants: ~17.1.6 ✅ App constants
+- expo-status-bar: ~2.2.3 ✅ Status bar control
+
+### Navigation
+- @react-navigation/native: ^7.1.6 ✅ Navigation core
+- @react-navigation/bottom-tabs: ^7.3.10 ✅ Tab navigation
+- @react-navigation/elements: ^2.3.8 ✅ Navigation components
+- react-native-screens: ~4.11.1 ✅ Native screen optimization
+- react-native-safe-area-context: ^5.4.0 ✅ Safe area handling
+
+### UI & Interaction
+- react-native-gesture-handler: ~2.24.0 ✅ Gesture handling
+- react-native-reanimated: ~3.17.4 ✅ Animations
+- @expo/vector-icons: ^14.1.0 ✅ Icon library
+- expo-haptics: ~14.1.4 ✅ Haptic feedback
+- expo-blur: ~14.1.5 ✅ Blur effects
+
+### Storage & Database
+- @supabase/supabase-js: ^2.50.2 ✅ Database client
+- @react-native-async-storage/async-storage: 2.1.2 ✅ Local storage
+
+### Development & Build
+- expo-dev-client: ~5.2.4 ✅ Development client
+- expo-splash-screen: ~0.30.10 ✅ Splash screen
+- expo-font: ~13.3.1 ✅ Font loading
+
+### Date/Time & Forms
+- @react-native-community/datetimepicker: 8.4.1 ✅ Date picker
+- @react-native-picker/picker: ^2.11.1 ✅ Picker component
+- react-native-modal-datetime-picker: ^18.0.0 ✅ Modal date picker
+
+### Utilities
+- expo-linking: ~7.1.7 ✅ Deep linking
+- expo-notifications: ^0.31.3 ✅ Push notifications
+- react-native-toast-message: ^2.3.3 ✅ Toast notifications
+- react-native-url-polyfill: ^2.0.0 ✅ URL polyfill for React Native
+
+### Styling
+- nativewind: ^4.1.23 ✅ Tailwind for React Native
+- tailwindcss: ^3.4.17 ✅ CSS framework
+
+## POTENTIALLY REDUNDANT PACKAGES
+
+### 🟡 Questionable/Redundant
+- react-native-elements: ^3.4.3 
+  ⚠️ REDUNDANT - Old UI library, replaced by newer solutions
+  ⚠️ You're using custom components and NativeWind instead
+
+- react-native-vector-icons: ^10.2.0
+  ⚠️ POTENTIALLY REDUNDANT - @expo/vector-icons already provides icons
+  ⚠️ May cause conflicts on iOS/Android
+
+- expo-symbols: ~0.4.5
+  ⚠️ POTENTIALLY REDUNDANT - Limited to iOS, may cause Android issues
+
+- expo-image: ~2.4.0
+  ⚠️ QUESTIONABLE - React Native Image component is sufficient for most cases
+
+- expo-system-ui: ~5.0.10
+  ⚠️ QUESTIONABLE - Limited usage, may not be essential
+
+- react-native-webview: ^13.13.5
+  ⚠️ KEEP IF NEEDED - Only if you're using WebView for course content
+
+### 🔧 Development Only
+- @babel/traverse: ^7.28.0
+  ⚠️ Should be in devDependencies, not production
+
+- babel-plugin-module-resolver: ^5.0.2
+  ⚠️ Should be in devDependencies
+
+### 🌐 Web-Specific
+- react-dom: 19.0.0
+  ⚠️ Only needed for web builds, causes bundle bloat for mobile
+- react-native-web: ~0.20.0
+  ⚠️ Only needed for web builds
+
+- @expo/ngrok: ^4.1.3
+  ⚠️ Development only, should be in devDependencies
+
+## COMPATIBILITY ISSUES
+
+### iOS Specific (May cause Android issues)
+- expo-symbols: ~0.4.5 ❌ iOS only, will fail on Android
+
+### Potential Conflicts
+- react-native-vector-icons vs @expo/vector-icons
+  ❌ Both provide similar functionality, may conflict
+
+### Version Mismatches
+- React 19.0.0 with React Native 0.79.5
+  ⚠️ Bleeding edge React version, may cause stability issues
+
+## RECOMMENDED ACTIONS
+
+### 1. Remove Redundant Packages
+```bash
+npm uninstall react-native-elements react-native-vector-icons expo-symbols @babel/traverse babel-plugin-module-resolver @expo/ngrok
+```
+
+### 2. Move Development Packages
+```bash
+npm uninstall @babel/traverse babel-plugin-module-resolver @expo/ngrok
+npm install -D @babel/traverse babel-plugin-module-resolver @expo/ngrok
+```
+
+### 3. Consider Removing (if not used)
+- expo-image (if using standard Image component)
+- expo-system-ui (if not actively used)
+- react-native-webview (if no WebView usage)
+
+### 4. Web-Only Packages (remove for mobile-only)
+If you're not supporting web:
+```bash
+npm uninstall react-dom react-native-web
+```
+
+## FINAL CLEAN PACKAGE.JSON RECOMMENDATIONS
+
+### Keep Essential (24 packages)
+1. expo, react, react-native
+2. expo-router, navigation packages
+3. @supabase/supabase-js
+4. @react-native-async-storage/async-storage
+5. UI essentials: reanimated, gesture-handler, safe-area-context
+6. @expo/vector-icons (single icon solution)
+7. Date/time pickers
+8. nativewind + tailwindcss
+9. expo-notifications, expo-linking, expo-haptics
+10. react-native-toast-message
+
+### Remove (8-10 packages)
+1. react-native-elements
+2. react-native-vector-icons  
+3. expo-symbols
+4. @babel/traverse (move to dev)
+5. babel-plugin-module-resolver (move to dev)
+6. @expo/ngrok (move to dev)
+7. expo-image (if unused)
+8. expo-system-ui (if unused)
+
+This will reduce your bundle size by ~15-20% and eliminate iOS/Android compatibility issues.
