@@ -11,7 +11,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bicwny.lamaqin",
-      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -22,18 +21,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.bicwny.lamaqin",
-      "versionCode": 1
+      "package": "com.bicwny.lamaqin"
     },
     "web": {
       "bundler": "metro",
       "fontDisplay": "swap",
       "hostname": "0.0.0.0",
-      "port": 8081
-    },
-    "packagerOpts": {
-      "config": "metro.config.js",
-      "https": false,
       "port": 8081
     },
     "plugins": [
