@@ -1,0 +1,764 @@
+
+# STUDY SYSTEM LOGIC - Buddhist Practice App
+
+## OVERVIEW
+The study system is designed for systematic Buddhist learning through structured courses and lessons. It supports multiple study methods and tracks progress through completion of both listening (听传承) and reading (看法本) components for each lesson.
+
+## 1. CORE STUDY ARCHITECTURE
+
+### 1.1 Database Structure
+```
+study_system:
+├── courses (课程基础表)
+├── course_lessons (课程章节表)
+├── user_courses (用户课程注册表)
+└── study_records (学习记录表)
+```
+
+### 1.2 Entity Relationships
+```sql
+courses:
+- id (UUID, primary key)
+- name (课程名称: "《入菩萨行论》", "《前行广释》")
+- total_lessons (总课数)
+- teacher (授课老师)
+- description (课程描述)
+- created_at
+
+course_lessons:
+- id (UUID, primary key)
+- course_id (关联课程)
+- lesson_number (课序号: 1, 2, 3...)
+- title (课程标题: "第1课：菩提心的重要性")
+- url (在线链接, nullable)
+- created_at
+
+user_courses:
+- id (UUID, primary key)
+- user_id (关联用户)
+- course_id (关联课程)
+- status ('active' | 'completed' | 'paused')
+- joined_date (加入日期)
+- completed_date (完成日期, nullable)
+- progress_percentage (完成百分比: 0.00-100.00)
+- created_at, updated_at
+
+study_records:
+- id (UUID, primary key)
+- user_id (关联用户)
+- course_id (关联课程)
+- lesson_id (关联课程)
+- study_date (学习日期)
+- study_type ('听传承' | '看法本')
+- study_count_for_lesson (该课学习次数)
+- created_at
+```
+
+## 2. STUDY SYSTEM WORKFLOW
+
+### 2.1 Course Discovery & Enrollment
+
+#### Available Courses Display
+```typescript
+const loadAvailableCourses = async () => {
+  // Get all courses from database
+  const allCourses = await studyService.getCourses();
+  
+  // Get user's enrolled courses
+  const userCourses = await studyService.getUserCourses(userId);
+  
+  // Filter out already enrolled courses
+  const availableCourses = allCourses.filter(course => 
+    !userCourses.some(uc => uc.course_id === course.id)
+  );
+  
+  return availableCourses;
+};
+```
+
+#### Course Enrollment Process
+```typescript
+const joinCourse = async (courseId: string) => {
+  // Check for existing enrollment
+  const existingEnrollment = await checkExistingEnrollment(userId, courseId);
+  
+  if (existingEnrollment) {
+    throw new Error('已加入该课程');
+  }
+  
+  // Create user_courses record
+  const userCourse = await studyService.joinCourse(userId, courseId);
+  
+  // Initialize progress tracking
+  const initialProgress = {
+    status: 'active',
+    progress_percentage: 0.00,
+    joined_date: today
+  };
+  
+  return userCourse;
+};
+```
+
+### 2.2 Course Status Management
+
+#### Course Status Types
+```typescript
+type CourseStatus = 'active' | 'completed' | 'paused';
+
+const manageCourseStatus = {
+  pause: async (userId: string, courseId: string) => {
+    await studyService.updateCourseStatus(userId, courseId, 'paused');
+    // Course appears in "暂停" section
+  },
+  
+  resume: async (userId: string, courseId: string) => {
+    await studyService.updateCourseStatus(userId, courseId, 'active');
+    // Course returns to active learning
+  },
+  
+  complete: async (userId: string, courseId: string) => {
+    await studyService.updateCourseStatus(userId, courseId, 'completed');
+    // Automatically set when progress reaches 100%
+  }
+};
+```
+
+### 2.3 Lesson Structure & Navigation
+
+#### Lesson Loading Logic
+```typescript
+const loadCourseLessons = async (courseId: string) => {
+  const lessons = await studyService.getCourseLessons(courseId);
+  
+  // Sort lessons by lesson_number
+  const sortedLessons = lessons.sort((a, b) => 
+    a.lesson_number - b.lesson_number
+  );
+  
+  return sortedLessons;
+};
+```
+
+#### Next Lesson Determination
+```typescript
+const getNextLesson = async (userId: string, courseId: string) => {
+  const studyRecords = await studyService.getUserStudyRecords(userId, courseId);
+  
+  // Group records by lesson
+  const lessonCompletionMap = new Map();
+  
+  studyRecords.forEach(record => {
+    if (!lessonCompletionMap.has(record.lesson_id)) {
+      lessonCompletionMap.set(record.lesson_id, {
+        听传承: false,
+        看法本: false,
+        lessonNumber: record.lesson.lesson_number
+      });
+    }
+    
+    const completion = lessonCompletionMap.get(record.lesson_id);
+    completion[record.study_type] = true;
+  });
+  
+  // Find first incomplete lesson
+  const allLessons = await studyService.getCourseLessons(courseId);
+  
+  for (const lesson of allLessons) {
+    const completion = lessonCompletionMap.get(lesson.id);
+    
+    if (!completion || !completion.听传承 || !completion.看法本) {
+      return lesson;
+    }
+  }
+  
+  // All lessons completed
+  return null;
+};
+```
+
+## 3. STUDY RECORDING SYSTEM
+
+### 3.1 Study Types & Methods
+
+#### Dual Study Method Requirement
+```typescript
+interface StudyType {
+  听传承: "Listen to Teaching" // Audio/live instruction
+  看法本: "Read Text"         // Written materials study
+}
+
+// Each lesson requires BOTH methods for completion
+const isLessonComplete = (lesson: any) => {
+  return lesson.听传承 && lesson.看法本;
+};
+```
+
+#### Study Recording Flow
+```typescript
+const recordStudy = async (
+  courseId: string,
+  lessonNumber: number,
+  studyType: '听传承' | '看法本'
+) => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Find lesson by number
+  const lesson = await studyService.getLessonByCourseAndNumber(
+    courseId, 
+    lessonNumber
+  );
+  
+  // Record study session
+  await studyService.recordStudy({
+    user_id: userId,
+    course_id: courseId,
+    lesson_id: lesson.id,
+    study_date: today,
+    study_type: studyType,
+    study_count_for_lesson: 1
+  });
+  
+  // Auto-calculate and update progress
+  await studyService.calculateProgress(userId, courseId);
+  
+  return { success: true };
+};
+```
+
+### 3.2 Progress Calculation Logic
+
+#### Lesson Completion Tracking
+```typescript
+const calculateCourseProgress = async (userId: string, courseId: string) => {
+  // Get course metadata
+  const course = await studyService.getCourse(courseId);
+  
+  // Get all study records for this course
+  const studyRecords = await studyService.getUserStudyRecords(userId, courseId);
+  
+  if (!studyRecords || studyRecords.length === 0) {
+    return 0;
+  }
+  
+  // Group by lesson and check completion
+  const lessonCompletionMap = new Map();
+  
+  studyRecords.forEach(record => {
+    if (!lessonCompletionMap.has(record.lesson_id)) {
+      lessonCompletionMap.set(record.lesson_id, {
+        听传承: false,
+        看法本: false,
+        lessonNumber: record.lesson?.lesson_number || 0
+      });
+    }
+    
+    const lessonData = lessonCompletionMap.get(record.lesson_id);
+    if (record.study_type === '听传承') {
+      lessonData.听传承 = true;
+    } else if (record.study_type === '看法本') {
+      lessonData.看法本 = true;
+    }
+  });
+  
+  // Count fully completed lessons (both 听传承 AND 看法本)
+  const completedLessons = Array.from(lessonCompletionMap.values()).filter(
+    lesson => lesson.听传承 && lesson.看法本
+  );
+  
+  // Calculate percentage
+  const progressPercentage = (completedLessons.length / course.total_lessons) * 100;
+  
+  // Update user_courses table
+  await supabase
+    .from('user_courses')
+    .update({
+      progress_percentage: progressPercentage,
+      status: progressPercentage >= 100 ? 'completed' : 'active',
+      completed_date: progressPercentage >= 100 ? new Date().toISOString().split('T')[0] : null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('user_id', userId)
+    .eq('course_id', courseId);
+  
+  return progressPercentage;
+};
+```
+
+### 3.3 Real-time Progress Display
+
+#### Lesson Progress Component
+```typescript
+const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }) => {
+  const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0 });
+  
+  useEffect(() => {
+    loadLessonCounts();
+  }, [userId, courseId, lessonId, refreshTrigger]);
+  
+  const loadLessonCounts = async () => {
+    const summary = await studyService.getLessonStudySummary(userId, courseId, lessonId);
+    setCounts({
+      听传承: summary.听传承,
+      看法本: summary.看法本
+    });
+  };
+  
+  const isCompleted = counts.听传承 > 0 && counts.看法本 > 0;
+  
+  return (
+    <View>
+      <Text>听传承: {counts.听传承}次 | 看法本: {counts.看法本}次</Text>
+      {isCompleted && <Text>✅</Text>}
+    </View>
+  );
+};
+```
+
+## 4. DAILY STUDY INTEGRATION
+
+### 4.1 Daily Dashboard Display
+
+#### Active Course Cards
+```typescript
+const generateDailyStudyCards = async (userId: string) => {
+  const activeCourses = await studyService.getUserCourses(userId, 'active');
+  
+  const studyCards = [];
+  
+  for (const userCourse of activeCourses) {
+    const nextLesson = await getNextLesson(userId, userCourse.course_id);
+    
+    if (nextLesson) {
+      studyCards.push({
+        courseId: userCourse.course_id,
+        courseName: userCourse.course.name,
+        lessonNumber: nextLesson.lesson_number,
+        lessonTitle: nextLesson.title,
+        progress: `完成进度：${userCourse.progress_percentage.toFixed(1)}%`,
+        teacher: userCourse.course.teacher
+      });
+    }
+  }
+  
+  return studyCards;
+};
+```
+
+#### Quick Study Actions
+```typescript
+const quickStudyActions = {
+  听传承: (courseId: string, lessonNumber: number) => {
+    recordStudy(courseId, lessonNumber, '听传承');
+    toastService.success({
+      title: '学习记录已保存',
+      message: '听传承完成 - 继续加油！'
+    });
+  },
+  
+  看法本: (courseId: string, lessonNumber: number) => {
+    recordStudy(courseId, lessonNumber, '看法本');
+    toastService.success({
+      title: '学习记录已保存',
+      message: '看法本完成 - 继续加油！'
+    });
+  },
+  
+  在线课程: async (lessonUrl?: string) => {
+    if (lessonUrl) {
+      await Linking.openURL(lessonUrl);
+    } else {
+      toastService.info({
+        title: '暂无在线链接',
+        message: '该课程资源正在准备中'
+      });
+    }
+  }
+};
+```
+
+## 5. STUDY INTERFACE DESIGN
+
+### 5.1 Tab-based Organization
+
+#### Study Tabs Structure
+```typescript
+type StudyTab = 'active' | 'complete';
+
+const StudyTabContent = {
+  active: {
+    title: '学习中',
+    filter: (courses: UserCourse[]) => courses.filter(uc => uc.status === 'active'),
+    actions: ['继续学习', '暂停']
+  },
+  
+  complete: {
+    title: '已完成',
+    filter: (courses: UserCourse[]) => courses.filter(uc => 
+      uc.status === 'completed' || uc.progress_percentage >= 100
+    ),
+    actions: ['重新学习']
+  }
+};
+```
+
+### 5.2 Course Detail Interface
+
+#### Course Information Display
+```typescript
+const CourseDetailCard = ({ userCourse }) => {
+  return (
+    <View style={styles.courseInfoCard}>
+      <Text style={styles.courseInfoTitle}>课程信息</Text>
+      
+      <View style={styles.courseInfoRow}>
+        <Text style={styles.label}>授课老师：</Text>
+        <Text style={styles.value}>{userCourse.course.teacher}</Text>
+      </View>
+      
+      <View style={styles.courseInfoRow}>
+        <Text style={styles.label}>总课数：</Text>
+        <Text style={styles.value}>{userCourse.course.total_lessons}课</Text>
+      </View>
+      
+      <View style={styles.courseInfoRow}>
+        <Text style={styles.label}>完成进度：</Text>
+        <Text style={styles.value}>
+          {userCourse.progress_percentage.toFixed(1)}% 
+          ({Math.round(userCourse.progress_percentage * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课)
+        </Text>
+      </View>
+      
+      {userCourse.completed_date && (
+        <View style={styles.courseInfoRow}>
+          <Text style={styles.label}>完成日期：</Text>
+          <Text style={styles.value}>
+            {new Date(userCourse.completed_date).toLocaleDateString('zh-CN')}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+```
+
+#### Lesson List Interface
+```typescript
+const LessonListItem = ({ lesson, userId, courseId, refreshTrigger }) => {
+  return (
+    <View style={styles.lessonItem}>
+      <View style={styles.lessonHeader}>
+        <Text style={styles.lessonTitle}>{lesson.title}</Text>
+        <LessonProgressDisplay
+          userId={userId}
+          courseId={courseId}
+          lessonId={lesson.id}
+          refreshTrigger={refreshTrigger}
+        />
+      </View>
+      
+      <View style={styles.recordButtons}>
+        <TouchableOpacity
+          style={[styles.recordButton, styles.listenButton]}
+          onPress={() => recordStudy(courseId, lesson.lesson_number, '听传承')}
+        >
+          <Text style={styles.recordButtonText}>听传承</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.recordButton, styles.readButton]}
+          onPress={() => recordStudy(courseId, lesson.lesson_number, '看法本')}
+        >
+          <Text style={styles.recordButtonText}>看法本</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.recordButton, styles.viewButton]}
+          onPress={() => handleOnlineCourse(lesson.url)}
+        >
+          <Text style={styles.recordButtonText}>在线课程</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+```
+
+## 6. NAVIGATION & ROUTING
+
+### 6.1 Study Flow Navigation
+```typescript
+const StudyNavigationFlow = {
+  // From index page
+  indexToStudy: () => {
+    router.push('/(tabs)/study');
+  },
+  
+  // From index to specific course
+  indexToCourseDetail: (courseId: string) => {
+    router.push({
+      pathname: '/(tabs)/study',
+      params: { courseId, viewMode: 'courseDetail' }
+    });
+  },
+  
+  // Direct course navigation
+  studyToCourseDetail: (courseId: string) => {
+    router.push(`/course-detail/${courseId}`);
+  },
+  
+  // Course management
+  studyToManagement: () => {
+    setViewMode('manage');
+  }
+};
+```
+
+### 6.2 View Mode Management
+```typescript
+type ViewMode = 'home' | 'manage' | 'courseDetail';
+
+const ViewModeController = {
+  home: {
+    title: '闻思学习',
+    subtitle: '系统学习佛法课程',
+    content: () => <StudyHomeView />,
+    actions: { rightAction: 'manageCourses' }
+  },
+  
+  manage: {
+    title: '课程管理',
+    subtitle: '管理您的学习课程',
+    content: () => <CourseManagementView />,
+    actions: { backButton: true }
+  },
+  
+  courseDetail: {
+    title: (course) => course.name,
+    subtitle: '课程详情与学习记录',
+    content: (course) => <CourseDetailView course={course} />,
+    actions: { backButton: true }
+  }
+};
+```
+
+## 7. DATA PERSISTENCE & SYNC
+
+### 7.1 Real-time Updates
+```typescript
+const StudyDataSync = {
+  // Record study with immediate UI update
+  recordStudyWithSync: async (studyData) => {
+    // Optimistic update
+    updateLocalState(studyData);
+    
+    try {
+      // Persist to database
+      await studyService.recordStudy(studyData);
+      
+      // Refresh progress calculations
+      await studyService.calculateProgress(userId, courseId);
+      
+      // Trigger UI refresh
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      // Rollback optimistic update
+      revertLocalState(studyData);
+      throw error;
+    }
+  },
+  
+  // Batch progress recalculation
+  batchRecalculateProgress: async (userId: string) => {
+    const userCourses = await studyService.getUserCourses(userId);
+    
+    for (const userCourse of userCourses) {
+      await studyService.calculateProgress(userId, userCourse.course_id);
+    }
+    
+    // Reload updated data
+    const updatedCourses = await studyService.getUserCourses(userId);
+    setUserCourses(updatedCourses);
+  }
+};
+```
+
+### 7.2 Progress Integrity
+```typescript
+const ProgressIntegrityCheck = {
+  // Verify progress calculation accuracy
+  verifyProgress: async (userId: string, courseId: string) => {
+    const course = await studyService.getCourse(courseId);
+    const studyRecords = await studyService.getUserStudyRecords(userId, courseId);
+    
+    // Manual calculation
+    const manualProgress = calculateProgressManually(studyRecords, course.total_lessons);
+    
+    // Database stored progress
+    const userCourse = await studyService.getUserCourse(userId, courseId);
+    const storedProgress = userCourse.progress_percentage;
+    
+    // Check for discrepancy
+    if (Math.abs(manualProgress - storedProgress) > 0.01) {
+      console.warn('Progress discrepancy detected', {
+        manual: manualProgress,
+        stored: storedProgress,
+        difference: Math.abs(manualProgress - storedProgress)
+      });
+      
+      // Auto-correct if needed
+      await studyService.calculateProgress(userId, courseId);
+    }
+    
+    return { manual: manualProgress, stored: storedProgress };
+  }
+};
+```
+
+## 8. STUDY ANALYTICS & REPORTING
+
+### 8.1 Learning Statistics
+```typescript
+const StudyAnalytics = {
+  generateStudyStats: async (userId: string) => {
+    const userCourses = await studyService.getUserCourses(userId);
+    const allStudyRecords = await studyService.getAllUserStudyRecords(userId);
+    
+    return {
+      totalCourses: userCourses.length,
+      activeCourses: userCourses.filter(uc => uc.status === 'active').length,
+      completedCourses: userCourses.filter(uc => uc.status === 'completed').length,
+      pausedCourses: userCourses.filter(uc => uc.status === 'paused').length,
+      totalStudySessions: allStudyRecords.length,
+      averageProgress: userCourses.reduce((sum, uc) => sum + uc.progress_percentage, 0) / userCourses.length,
+      recentActivity: getRecentStudyActivity(allStudyRecords, 7), // Last 7 days
+      studyStreak: calculateStudyStreak(allStudyRecords)
+    };
+  },
+  
+  generateCourseReport: async (userId: string, courseId: string) => {
+    const studyRecords = await studyService.getUserStudyRecords(userId, courseId);
+    const userCourse = await studyService.getUserCourse(userId, courseId);
+    
+    const lessonBreakdown = groupStudyRecordsByLesson(studyRecords);
+    
+    return {
+      course: userCourse.course,
+      progress: userCourse.progress_percentage,
+      joinedDate: userCourse.joined_date,
+      completedDate: userCourse.completed_date,
+      totalStudySessions: studyRecords.length,
+      lessonBreakdown,
+      studyMethodDistribution: {
+        听传承: studyRecords.filter(r => r.study_type === '听传承').length,
+        看法本: studyRecords.filter(r => r.study_type === '看法本').length
+      }
+    };
+  }
+};
+```
+
+## 9. ERROR HANDLING & DATA VALIDATION
+
+### 9.1 Study Recording Validation
+```typescript
+const StudyValidation = {
+  validateStudyRecord: (recordData: any) => {
+    const errors = [];
+    
+    if (!recordData.user_id) errors.push('用户ID必填');
+    if (!recordData.course_id) errors.push('课程ID必填');
+    if (!recordData.lesson_id) errors.push('课程ID必填');
+    if (!recordData.study_date) errors.push('学习日期必填');
+    if (!['听传承', '看法本'].includes(recordData.study_type)) {
+      errors.push('学习类型必须是"听传承"或"看法本"');
+    }
+    
+    if (errors.length > 0) {
+      throw new Error(`学习记录验证失败: ${errors.join(', ')}`);
+    }
+    
+    return true;
+  },
+  
+  validateCourseEnrollment: async (userId: string, courseId: string) => {
+    // Check if course exists
+    const course = await studyService.getCourse(courseId);
+    if (!course) {
+      throw new Error('课程不存在');
+    }
+    
+    // Check if user already enrolled
+    const existingEnrollment = await studyService.getUserCourse(userId, courseId);
+    if (existingEnrollment) {
+      throw new Error('已加入该课程');
+    }
+    
+    return true;
+  }
+};
+```
+
+### 9.2 Data Consistency Checks
+```typescript
+const DataConsistencyCheck = {
+  // Ensure study records have valid lesson references
+  validateStudyRecordsIntegrity: async () => {
+    const orphanedRecords = await supabase
+      .from('study_records')
+      .select('*')
+      .is('lesson.id', null); // Records with invalid lesson_id
+    
+    if (orphanedRecords.data && orphanedRecords.data.length > 0) {
+      console.warn('Found orphaned study records:', orphanedRecords.data);
+      // Handle cleanup or report
+    }
+  },
+  
+  // Ensure progress percentages are accurate
+  auditProgressCalculations: async () => {
+    const allUserCourses = await supabase
+      .from('user_courses')
+      .select('*');
+    
+    for (const userCourse of allUserCourses.data || []) {
+      const calculatedProgress = await studyService.calculateProgress(
+        userCourse.user_id, 
+        userCourse.course_id
+      );
+      
+      if (Math.abs(calculatedProgress - userCourse.progress_percentage) > 1) {
+        console.warn('Progress calculation mismatch:', {
+          userCourse: userCourse.id,
+          stored: userCourse.progress_percentage,
+          calculated: calculatedProgress
+        });
+      }
+    }
+  }
+};
+```
+
+## 10. FUTURE ENHANCEMENTS
+
+### 10.1 Advanced Features
+1. **Study Scheduling**: Set study goals and schedules
+2. **Note Taking**: Add personal notes to lessons
+3. **Bookmarks**: Mark important lesson sections
+4. **Discussion Forums**: Community discussions per course
+5. **Certificate System**: Generate completion certificates
+6. **Study Groups**: Collaborative learning features
+7. **Voice Recognition**: Voice-activated study recording
+8. **Offline Access**: Download courses for offline study
+
+### 10.2 Performance Optimizations
+1. **Lazy Loading**: Progressive lesson loading
+2. **Caching Strategy**: Intelligent data caching
+3. **Batch Operations**: Optimize database operations
+4. **Search Functionality**: Full-text search across courses
+5. **Recommendation Engine**: Suggest relevant courses
+6. **Analytics Dashboard**: Detailed study analytics
+
+---
+
+This comprehensive study system creates a robust framework for systematic Buddhist education, tracking dual-method completion requirements while maintaining accurate progress calculations and providing intuitive user interfaces for learners at all levels.
