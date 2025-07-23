@@ -1,0 +1,688 @@
+
+# Practice System Logic & Implementation Guide
+# React Native Expo App - 修行追踪 (Practice Tracking)
+
+## Overview
+This document outlines the complete practice tracking system architecture, covering all types of practice activities including count-based practices, time-based practices, meditation, study courses, and mindfulness tracking.
+
+## Core Practice Architecture
+
+### 1. Practice Types Classification
+The system supports multiple practice tracking methods:
+
+#### A. COUNT-BASED PRACTICES (计数类)
+- **Unit**: 次 (times/repetitions)
+- **Examples**: 佛号念诵, 礼拜, 大礼拜, 供灯, 供花
+- **Tracking Method**: Increment counters for each completion
+- **Progress Calculation**: current_count / target_count * 100%
+
+#### B. TIME-BASED PRACTICES (计时类)
+- **Unit**: 分钟 (minutes) or 座 (sessions)
+- **Examples**: 观修, 禅修, 念佛
+- **Tracking Method**: Duration recording with start/stop functionality
+- **Progress Calculation**: total_minutes / target_minutes * 100%
+
+#### C. MEDITATION PRACTICES (观修记录)
+- **Unit**: 座 (meditation sessions)
+- **Special Features**: 
+  - 92 specific meditation topics (前行实修法)
+  - Reflection recording (观后感)
+  - Session numbering
+  - Method tracking
+- **Progress Calculation**: completed_sessions / 92 * 100%
+
+#### D. STUDY PRACTICES (闻思学习)
+- **Unit**: 课 (lessons)
+- **Structure**: Courses → Lessons → Study Records
+- **Study Types**: 听传承 (listening to teachings), 看法本 (reading texts)
+- **Progress Calculation**: completed_lessons / total_lessons * 100%
+
+#### E. MINDFULNESS TRACKING (觉察记录)
+- **Unit**: 次 (instances)
+- **Categories**: Good mind states vs Bad mind states
+- **Tracking Method**: Real-time logging with timestamps
+- **Analytics**: Daily/weekly trends, percentage calculations
+
+## Database Schema & Relationships
+
+### Core Tables Structure
+
+#### Users Table
+```sql
+users:
+- id (UUID, primary key)
+- dharma_name (法名)
+- lay_name (俗名, required)
+- email (unique)
+- location (所在地区, required)
+- class_name (学修班级)
+- practice_years (修行年数)
+- created_at, updated_at
+```
+
+#### Practices Table (修行项目基础表)
+```sql
+practices:
+- id (UUID, primary key)
+- name (修行名称: "大礼拜", "佛号念诵", "前行观修")
+- type ("count" | "time")
+- unit ("次" | "分钟" | "座")
+- description (详细说明)
+- created_at
+```
+
+#### User Practice Projects (用户修行项目)
+```sql
+user_practice_projects:
+- id (UUID, primary key)
+- user_id (关联用户)
+- practice_id (关联修行项目)
+- theme_id (关联主题, nullable)
+- target_count (目标数量)
+- current_count (当前完成数量)
+- daily_target (每日目标)
+- start_date (开始日期)
+- target_end_date (目标完成日期)
+- status ("not_started" | "active" | "completed")
+- goal_type ("fixed_duration" | "ongoing")
+- target_period ("daily" | "weekly")
+```
+
+#### Daily Records (日常修行记录)
+```sql
+daily_records:
+- id (UUID, primary key)
+- user_id
+- practice_project_id
+- record_date (记录日期)
+- record_time (记录时间, UTC)
+- count (数量)
+- notes (备注)
+- created_at
+```
+
+#### Meditation Records (观修专用记录)
+```sql
+meditation_records:
+- id (UUID, primary key)
+- user_id
+- practice_id
+- record_date
+- record_time (UTC)
+- duration_minutes (观修时长)
+- session_number (第几座)
+- method (观修方法)
+- reflection (观后感)
+- reflection_created_at
+- created_at
+```
+
+#### Meditation Topics (92个观修主题)
+```sql
+meditation_topics:
+- id (UUID, primary key)
+- practice_id (关联前行观修)
+- topic_number (1-92)
+- title ("思维闲暇之本体", "思维差别之圆满"...)
+- description (详细说明)
+- created_at
+```
+
+## Practice Flow Logic
+
+### 1. Adding New Practice Projects
+
+#### Step 1: Practice Selection
+```typescript
+// From add-practice.tsx
+const handlePracticeSelect = (practice: Practice) => {
+  router.push({
+    pathname: '/practice-config',
+    params: {
+      practiceId: practice.id,
+      practiceName: practice.name,
+      practiceType: practice.type,
+      practiceUnit: practice.unit,
+    },
+  });
+};
+```
+
+#### Step 2: Project Configuration
+```typescript
+// From practice-config.tsx
+const createPracticeProject = async () => {
+  await practiceService.createUserPracticeProject(
+    user.id,
+    practiceId,
+    targetCount,
+    dailyTarget,
+    startDate,
+    targetEndDate,
+    targetPeriod,
+    themeId,
+    goalType
+  );
+};
+```
+
+#### Step 3: Project Activation
+- Status set to 'active'
+- Appears in user's practice dashboard
+- Ready for daily recording
+
+### 2. Daily Practice Recording
+
+#### Count-Based Recording Flow
+```typescript
+// Increment counter for count-based practices
+const recordCountPractice = async (projectId: string, amount: number) => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  await dailyRecordService.recordPractice(
+    userId,
+    projectId,
+    amount,
+    today
+  );
+  
+  // Auto-update project progress
+  await updateProjectProgress(projectId);
+};
+```
+
+#### Time-Based Recording Flow
+```typescript
+// Record duration for time-based practices
+const recordTimePractice = async (
+  projectId: string, 
+  durationMinutes: number
+) => {
+  const today = new Date().toISOString().split('T')[0];
+  const utcTime = new Date().toISOString().split('T')[1].split('.')[0];
+  
+  await dailyRecordService.recordPractice({
+    user_id: userId,
+    practice_project_id: projectId,
+    record_date: today,
+    record_time: utcTime,
+    count: durationMinutes
+  });
+};
+```
+
+### 3. Meditation Practice Special Logic
+
+#### Session Recording with Topics
+```typescript
+const recordMeditationSession = async (data: {
+  practiceId: string;
+  durationMinutes: number;
+  sessionNumber?: number;
+  topicId?: string;
+  reflection?: string;
+}) => {
+  // Record to meditation_records table
+  await meditationService.recordMeditationWithReflection({
+    user_id: userId,
+    practice_id: data.practiceId,
+    record_date: today,
+    duration_minutes: data.durationMinutes,
+    session_number: data.sessionNumber,
+    reflection: data.reflection
+  });
+  
+  // Update topic progress if applicable
+  if (data.topicId) {
+    await updateTopicProgress(userId, data.topicId);
+  }
+};
+```
+
+#### 92 Topics Progress Tracking
+```typescript
+const calculateMeditationProgress = async (userId: string) => {
+  const records = await meditationService.getMeditationRecords(userId);
+  
+  return {
+    completedSessions: records.length,
+    totalSessions: 92,
+    currentTopic: getCurrentTopic(records),
+    progressPercentage: (records.length / 92) * 100
+  };
+};
+```
+
+#### Reflection System
+```typescript
+const updateMeditationReflection = async (
+  recordId: string,
+  reflection: string
+) => {
+  await meditationService.updateMeditationReflection(
+    recordId,
+    reflection,
+    userId
+  );
+  
+  // Trigger UI refresh
+  loadMeditationRecords();
+};
+```
+
+## Study System Integration
+
+### Course Structure
+```typescript
+interface Course {
+  id: string;
+  name: string;
+  total_lessons: number;
+  teacher?: string;
+  description?: string;
+}
+
+interface CourseLesson {
+  id: string;
+  course_id: string;
+  lesson_number: number;
+  title: string;
+  url?: string;
+}
+```
+
+### Study Recording Logic
+```typescript
+const recordStudySession = async (
+  courseId: string,
+  lessonNumber: number,
+  studyType: '听传承' | '看法本'
+) => {
+  await studyService.recordStudy({
+    user_id: userId,
+    course_id: courseId,
+    lesson_number: lessonNumber,
+    study_date: today,
+    study_type: studyType,
+    study_count_for_lesson: 1
+  });
+  
+  // Auto-calculate course progress
+  await studyService.calculateProgress(userId, courseId);
+};
+```
+
+### Progress Calculation
+```typescript
+const calculateCourseProgress = async (userId: string, courseId: string) => {
+  // Get total lessons
+  const course = await getCourse(courseId);
+  
+  // Get completed lessons (both 听传承 and 看法本)
+  const studyRecords = await getStudyRecords(userId, courseId);
+  
+  // Group by lesson and check completion
+  const completedLessons = groupByLesson(studyRecords)
+    .filter(lesson => lesson.听传承 && lesson.看法本);
+  
+  const progress = (completedLessons.length / course.total_lessons) * 100;
+  
+  // Update user_courses table
+  await updateCourseProgress(userId, courseId, progress);
+  
+  return progress;
+};
+```
+
+## Mindfulness System Logic
+
+### Real-time Mind State Tracking
+```typescript
+const recordMindfulness = async (
+  mindType: 'good' | 'bad',
+  description?: string
+) => {
+  const now = new Date();
+  const utcTime = now.toISOString().split('T')[1].split('.')[0];
+  
+  await mindfulnessService.recordMindfulness({
+    user_id: userId,
+    record_date: now.toISOString().split('T')[0],
+    record_time: utcTime,
+    mind_type: mindType,
+    description: description
+  });
+  
+  // Update daily stats
+  await updateDailyMindfulnessStats();
+};
+```
+
+### Analytics & Trends
+```typescript
+const generateMindfulnessStats = async (userId: string, period: string) => {
+  const records = await mindfulnessService.getWeeklyStats(
+    userId,
+    startDate,
+    endDate
+  );
+  
+  const goodCount = records.filter(r => r.mind_type === 'good').length;
+  const badCount = records.filter(r => r.mind_type === 'bad').length;
+  const total = goodCount + badCount;
+  
+  return {
+    goodPercentage: total > 0 ? (goodCount / total) * 100 : 0,
+    badPercentage: total > 0 ? (badCount / total) * 100 : 0,
+    trend: calculateTrend(records),
+    totalRecords: total
+  };
+};
+```
+
+## Theme-Based Practice Groups
+
+### Theme System
+```sql
+themes:
+- id (UUID, primary key)
+- name ("前行班", "金刚萨埵法会", "地藏法会")
+- description
+- type ("foundation" | "puja" | "meditation" | "practice")
+- created_at
+
+theme_practices:
+- id (UUID, primary key)
+- theme_id
+- practice_id
+- target_count (该主题下的目标数量)
+- is_required (是否必修)
+- created_at
+```
+
+### Joining Themes
+```typescript
+const joinTheme = async (userId: string, themeId: string) => {
+  // Get all practices in the theme
+  const themePractices = await practiceService.getThemePractices(themeId);
+  
+  const createdProjects = [];
+  
+  for (const themePractice of themePractices) {
+    // Create user practice project for each practice in theme
+    const newProject = await practiceService.createUserPracticeProject(
+      userId,
+      themePractice.practice_id,
+      themePractice.target_count,
+      Math.ceil(themePractice.target_count / 365), // Daily target
+      undefined, // start_date
+      undefined, // target_end_date
+      'daily',
+      themeId
+    );
+    
+    createdProjects.push(newProject);
+  }
+  
+  return createdProjects;
+};
+```
+
+## Progress Tracking & Analytics
+
+### Dashboard Statistics
+```typescript
+const generateDashboardStats = async (userId: string) => {
+  // Practice progress
+  const activeProjects = await practiceService.getUserPracticeProjects(userId);
+  const practiceProgress = activeProjects.map(project => ({
+    name: project.practices?.name,
+    current: project.current_count,
+    target: project.target_count,
+    percentage: (project.current_count / project.target_count) * 100
+  }));
+  
+  // Meditation progress
+  const meditationProgress = await meditationService.getMeditationProgress(userId);
+  
+  // Study progress
+  const studyProgress = await studyService.getUserCourses(userId);
+  
+  // Mindfulness stats
+  const mindfulnessStats = await mindfulnessService.getTodayRecords(userId, today);
+  
+  return {
+    practiceProgress,
+    meditationProgress,
+    studyProgress,
+    mindfulnessStats,
+    totalActiveProjects: activeProjects.length
+  };
+};
+```
+
+### Weekly/Monthly Reports
+```typescript
+const generatePeriodicReport = async (
+  userId: string,
+  startDate: string,
+  endDate: string
+) => {
+  // Aggregate data from all practice types
+  const dailyRecords = await getDailyRecords(userId, startDate, endDate);
+  const meditationRecords = await getMeditationRecords(userId, startDate, endDate);
+  const studyRecords = await getStudyRecords(userId, startDate, endDate);
+  const mindfulnessRecords = await getMindfulnessRecords(userId, startDate, endDate);
+  
+  return {
+    summary: {
+      totalPracticeHours: calculateTotalHours(dailyRecords, meditationRecords),
+      completedSessions: meditationRecords.length,
+      studyLessons: studyRecords.length,
+      mindfulnessEntries: mindfulnessRecords.length
+    },
+    trends: calculateTrends(allRecords),
+    achievements: checkAchievements(userId, allRecords)
+  };
+};
+```
+
+## Data Synchronization & Storage
+
+### UTC Time Handling
+```typescript
+// All time-based records stored in UTC
+const recordWithUTCTime = (localTime: Date) => {
+  const utcTime = localTime.toISOString().split('T')[1].split('.')[0];
+  
+  return {
+    record_date: localTime.toISOString().split('T')[0],
+    record_time: utcTime, // HH:MM:SS in UTC
+    created_at: localTime.toISOString()
+  };
+};
+
+// Convert to local time for display
+const displayLocalTime = (utcTime: string, userTimezone: string) => {
+  const today = new Date().toISOString().split('T')[0];
+  const fullUTCDateTime = `${today}T${utcTime}.000Z`;
+  const localTime = new Date(fullUTCDateTime).toLocaleTimeString();
+  return localTime;
+};
+```
+
+### Offline Support Strategy
+```typescript
+// Cache practices for offline use
+const cacheUserPractices = async (userId: string) => {
+  const practices = await practiceService.getUserPracticeProjects(userId);
+  await AsyncStorage.setItem(
+    `practices_${userId}`,
+    JSON.stringify(practices)
+  );
+};
+
+// Sync when online
+const syncOfflineRecords = async () => {
+  const pendingRecords = await AsyncStorage.getItem('pending_records');
+  
+  if (pendingRecords) {
+    const records = JSON.parse(pendingRecords);
+    
+    for (const record of records) {
+      try {
+        await uploadRecord(record);
+        // Remove from pending after successful upload
+      } catch (error) {
+        // Keep in pending for next sync attempt
+      }
+    }
+  }
+};
+```
+
+## User Experience Features
+
+### Smart Defaults & Suggestions
+```typescript
+const generateSmartSuggestions = async (userId: string) => {
+  const userHistory = await getUserPracticeHistory(userId);
+  
+  // Suggest daily targets based on historical data
+  const averageDailyPractice = calculateAverageDaily(userHistory);
+  
+  // Suggest practice times based on completion patterns
+  const optimalTimes = findOptimalPracticeTimes(userHistory);
+  
+  // Suggest next meditation topic based on progress
+  const nextTopic = suggestNextMeditationTopic(userId);
+  
+  return {
+    dailyTargets: averageDailyPractice,
+    optimalTimes,
+    nextTopic,
+    streakInfo: calculateStreaks(userHistory)
+  };
+};
+```
+
+### Achievement System
+```typescript
+const checkAchievements = async (userId: string) => {
+  const allRecords = await getAllUserRecords(userId);
+  
+  const achievements = [];
+  
+  // Practice milestone achievements
+  if (getTotalPracticeCount(allRecords) >= 10000) {
+    achievements.push('万次修行里程碑');
+  }
+  
+  // Meditation consistency achievements
+  if (getMeditationStreak(allRecords) >= 21) {
+    achievements.push('禅修21天习惯养成');
+  }
+  
+  // Study completion achievements
+  const completedCourses = getCompletedCourses(userId);
+  if (completedCourses.length >= 1) {
+    achievements.push('学修课程完成者');
+  }
+  
+  return achievements;
+};
+```
+
+## Error Handling & Data Integrity
+
+### Transaction Management
+```typescript
+const recordPracticeTransaction = async (recordData: any) => {
+  const { data, error } = await supabase.rpc('record_practice_transaction', {
+    record_data: recordData
+  });
+  
+  if (error) {
+    // Rollback any partial changes
+    await rollbackPracticeRecord(recordData.id);
+    throw error;
+  }
+  
+  return data;
+};
+```
+
+### Data Validation
+```typescript
+const validatePracticeRecord = (record: any) => {
+  const errors = [];
+  
+  if (!record.user_id) errors.push('用户ID必填');
+  if (!record.practice_project_id) errors.push('修行项目ID必填');
+  if (!record.record_date) errors.push('记录日期必填');
+  if (record.count <= 0) errors.push('记录数量必须大于0');
+  
+  if (errors.length > 0) {
+    throw new Error(`数据验证失败: ${errors.join(', ')}`);
+  }
+  
+  return true;
+};
+```
+
+## Performance Optimization
+
+### Caching Strategy
+```typescript
+// Cache frequently accessed data
+const practiceCache = new Map<string, any>();
+
+const getCachedUserPractices = async (userId: string) => {
+  const cacheKey = `practices_${userId}`;
+  
+  if (practiceCache.has(cacheKey)) {
+    return practiceCache.get(cacheKey);
+  }
+  
+  const practices = await practiceService.getUserPracticeProjects(userId);
+  practiceCache.set(cacheKey, practices);
+  
+  // Auto-expire cache after 5 minutes
+  setTimeout(() => practiceCache.delete(cacheKey), 5 * 60 * 1000);
+  
+  return practices;
+};
+```
+
+### Batch Operations
+```typescript
+const batchUpdateProgress = async (projectIds: string[]) => {
+  const updates = projectIds.map(id => 
+    practiceService.updatePracticeProject(id, { updated_at: new Date() })
+  );
+  
+  await Promise.all(updates);
+};
+```
+
+## Future Enhancements
+
+### Planned Features
+1. **Social Features**: Practice groups, shared challenges
+2. **Advanced Analytics**: Machine learning insights, pattern recognition
+3. **Integration**: Calendar sync, reminder notifications
+4. **Gamification**: Levels, badges, leaderboards
+5. **Export Features**: PDF reports, data export
+6. **Multi-language**: Support for multiple languages
+7. **Wearable Integration**: Apple Watch, Android Wear support
+
+### Scalability Considerations
+1. **Database Optimization**: Indexing, query optimization
+2. **Real-time Updates**: WebSocket integration for live updates
+3. **Content Delivery**: CDN for static assets
+4. **Background Sync**: Efficient offline/online synchronization
+5. **Push Notifications**: Timely reminders and motivational messages
+
+---
+
+This document serves as the comprehensive guide for understanding and maintaining the practice tracking system. It should be updated as new features are implemented or requirements change.
