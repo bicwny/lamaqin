@@ -1,0 +1,597 @@
+
+# AUTHENTICATION SYSTEM LOGIC - Buddhist Practice App
+
+## OVERVIEW
+This document outlines the complete authentication system architecture for the React Native Expo app "修行追踪" (Practice Tracking). The system uses Supabase as the backend authentication provider with email-based OTP (One-Time Password) verification for secure, passwordless authentication.
+
+## 1. AUTHENTICATION ARCHITECTURE
+
+### 1.1 Technology Stack
+```
+Frontend: React Native + Expo Router
+Backend: Supabase (PostgreSQL + Auth)
+Authentication Method: Email OTP (One-Time Password)
+State Management: React Context API
+Storage: AsyncStorage (React Native) / localStorage (Web)
+Session Management: Supabase Auth with automatic token refresh
+```
+
+### 1.2 Core Components
+```
+📁 Authentication System
+├── 🔐 Supabase Auth Service (lib/supabase.ts)
+├── 🎯 AuthContext (contexts/AuthContext.tsx)
+├── 📱 Auth Screens (app/auth/)
+│   ├── unified.tsx (Smart unified flow)
+│   ├── login.tsx (Login flow)
+│   ├── register.tsx (Registration flow)
+│   └── email-verification.tsx (Email verification)
+├── 🛡️ Route Protection (_layout.tsx)
+└── 💾 Session Persistence (AsyncStorage/localStorage)
+```
+
+## 2. AUTHENTICATION FLOW LOGIC
+
+### 2.1 User Registration Flow
+```
+Registration Process:
+1. User enters email + optional dharma_name
+2. System calls supabase.auth.signInWithOtp() with shouldCreateUser: true
+3. Supabase sends OTP to user's email
+4. User enters OTP from email
+5. System calls supabase.auth.verifyOtp()
+6. On success: Create user record in database
+7. Store session and redirect to main app
+
+Technical Implementation:
+┌─────────────────────────────────────────────────────────────┐
+│ handleRegister() in register.tsx                            │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Input Validation                                         │
+│    - Check email format                                     │
+│    - Check required fields                                  │
+│                                                             │
+│ 2. Send OTP (if not sent)                                   │
+│    supabase.auth.signInWithOtp({                           │
+│      email: email.trim(),                                   │
+│      options: {                                             │
+│        shouldCreateUser: true,                              │
+│        data: { dharma_name: dharmaName.trim() || null }     │
+│      }                                                      │
+│    })                                                       │
+│                                                             │
+│ 3. Verify OTP (if sent)                                     │
+│    supabase.auth.verifyOtp({                               │
+│      email: email.trim(),                                   │
+│      token: otp,                                            │
+│      type: 'email'                                          │
+│    })                                                       │
+│                                                             │
+│ 4. Update user metadata if dharma_name provided            │
+│ 5. Redirect to /(tabs)/index                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.2 User Login Flow
+```
+Login Process:
+1. User enters email address
+2. System calls supabase.auth.signInWithOtp() with shouldCreateUser: false
+3. Supabase sends OTP to registered email
+4. User enters OTP from email
+5. System calls supabase.auth.verifyOtp()
+6. On success: Load user data and redirect to main app
+
+Technical Implementation:
+┌─────────────────────────────────────────────────────────────┐
+│ handleLogin() in login.tsx                                  │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Input Validation                                         │
+│    - Check email format                                     │
+│    - Verify email exists in system                         │
+│                                                             │
+│ 2. Send OTP (if not sent)                                   │
+│    supabase.auth.signInWithOtp({                           │
+│      email: email.trim(),                                   │
+│      options: { shouldCreateUser: false }                   │
+│    })                                                       │
+│                                                             │
+│ 3. Verify OTP (if sent)                                     │
+│    supabase.auth.verifyOtp({                               │
+│      email: email.trim(),                                   │
+│      token: otp,                                            │
+│      type: 'email'                                          │
+│    })                                                       │
+│                                                             │
+│ 4. Redirect to /(tabs)/index                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Unified Authentication Flow (Advanced)
+```
+Unified Flow Features:
+- Smart error detection and recovery
+- Adaptive UI based on user state
+- Rate limiting protection
+- Enhanced error messaging
+- Automatic retry mechanisms
+
+Error Detection Logic:
+┌─────────────────────────────────────────────────────────────┐
+│ detectErrorType() in unified.tsx                            │
+├─────────────────────────────────────────────────────────────┤
+│ Network Errors:                                             │
+│ - 'network', 'fetch', 'timeout', 'connection' in message   │
+│                                                             │
+│ Email Errors:                                               │
+│ - Empty email validation                                    │
+│ - Invalid email format                                      │
+│ - Email delivery failures                                   │
+│                                                             │
+│ OTP Errors:                                                 │
+│ - Invalid OTP format                                        │
+│ - Expired OTP codes                                         │
+│ - Incorrect OTP entries                                     │
+│                                                             │
+│ Rate Limiting:                                              │
+│ - Too many requests detection                               │
+│ - Automatic backoff strategies                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 3. SESSION MANAGEMENT
+
+### 3.1 AuthContext Implementation
+```
+AuthContext Responsibilities:
+1. Maintain global authentication state
+2. Handle session persistence across app restarts
+3. Manage automatic token refresh
+4. Provide authentication methods to components
+5. Handle logout and cleanup
+
+State Structure:
+interface AuthContextType {
+  user: User | null;              // Current authenticated user
+  loading: boolean;               // Loading state for auth operations
+  signInWithOTP: (email: string) => Promise<{ error?: string }>;
+  verifyOTP: (email: string, token: string) => Promise<{ error?: string }>;
+  signUpWithOTP: (email: string, dharmaName?: string) => Promise<{ error?: string }>;
+  signOut: () => Promise<void>;
+  forceLogoutAll: () => Promise<void>;
+  clearAllCache: () => Promise<void>;
+}
+
+User Object Structure:
+interface User {
+  id: string;                     // Supabase user ID
+  email: string;                  // User's email address
+  dharma_name?: string;           // Optional Buddhist dharma name
+}
+```
+
+### 3.2 Session Persistence Logic
+```
+Multi-Platform Storage Strategy:
+┌─────────────────────────────────────────────────────────────┐
+│ createCustomStorage() in lib/supabase.ts                   │
+├─────────────────────────────────────────────────────────────┤
+│ Web Platform (Platform.OS === 'web'):                      │
+│ ├── Primary: window.localStorage                           │
+│ ├── Fallback: In-memory storage                            │
+│ └── SSR Safe: Server-side rendering compatibility          │
+│                                                             │
+│ React Native Platform:                                      │
+│ ├── Primary: AsyncStorage                                  │
+│ ├── Secure: Expo SecureStore (when available)             │
+│ └── Persistent: Survives app restarts                      │
+│                                                             │
+│ Storage Keys:                                               │
+│ ├── 'sb-repl-auth-token' (Supabase session)               │
+│ ├── '@user_session' (User data cache)                     │
+│ └── '@auth_token' (Legacy support)                        │
+└─────────────────────────────────────────────────────────────┘
+
+Session Restoration Flow:
+1. App starts → checkAuthState()
+2. Try to get session from Supabase
+3. If valid session exists → setUser() and continue
+4. If no session → check AsyncStorage for cached data
+5. If cached data valid → restore user state
+6. If no valid data → redirect to auth screens
+```
+
+### 3.3 Automatic Token Refresh
+```
+Supabase Auth Configuration:
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: createCustomStorage(),     // Custom storage adapter
+    autoRefreshToken: true,             // Auto-refresh expired tokens
+    persistSession: true,               // Persist sessions
+    detectSessionInUrl: Platform.OS === 'web', // Web URL detection
+    flowType: 'pkce',                   // PKCE flow for security
+    storageKey: 'sb-repl-auth-token',   // Custom storage key
+    debug: false,                       // Production setting
+  },
+});
+
+Token Refresh Events:
+- TOKEN_REFRESHED: Successful token refresh
+- INITIAL_SESSION: App startup session check
+- SIGNED_IN: New authentication
+- SIGNED_OUT: User logout
+```
+
+## 4. ROUTE PROTECTION
+
+### 4.1 App Layout Protection
+```
+Root Layout Structure:
+app/_layout.tsx
+├── AuthProvider wraps entire app
+├── Check authentication state
+├── Show loading screen during auth check
+├── Redirect to auth screens if not authenticated
+└── Allow access to main app if authenticated
+
+Protected Route Logic:
+┌─────────────────────────────────────────────────────────────┐
+│ RootLayout in app/_layout.tsx                               │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Initialize AuthProvider context                          │
+│ 2. Check loading state                                      │
+│    if (loading) return <LoadingScreen />                    │
+│                                                             │
+│ 3. Check authentication state                               │
+│    if (!user) return <Redirect href="/auth/unified" />     │
+│                                                             │
+│ 4. Allow access to protected routes                        │
+│    return <Stack /> // Main app navigation                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 4.2 Tab Navigation Protection
+```
+Tab Layout Protection:
+app/(tabs)/_layout.tsx
+├── Assumes user is already authenticated
+├── No additional auth checks needed
+├── Direct access to all tab screens
+└── Logout handled through profile screen
+
+Tab Structure:
+- index: Main dashboard (今日修行)
+- study: Study courses (闻思)
+- mindfulness: Mindfulness tracking (心性)
+- practice: Practice activities (修行)
+- stats: Statistics and dedication (回向)
+```
+
+## 5. DATABASE INTEGRATION
+
+### 5.1 User Creation Logic
+```
+Database User Creation:
+┌─────────────────────────────────────────────────────────────┐
+│ ensureUserInDatabase() in AuthContext                      │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Health Check                                             │
+│    - Test database connectivity                             │
+│    - Verify table access permissions                       │
+│                                                             │
+│ 2. User Existence Check                                     │
+│    SELECT id, email FROM users WHERE id = user.id          │
+│                                                             │
+│ 3. Create User if Not Exists                               │
+│    INSERT INTO users (                                      │
+│      id,                    // Supabase Auth user ID       │
+│      email,                 // User's email address        │
+│      dharma_name,           // Optional dharma name         │
+│      created_at             // Timestamp                    │
+│    )                                                        │
+│                                                             │
+│ 4. Error Handling                                           │
+│    - Duplicate key errors (user created by another process)│
+│    - Network connectivity issues                           │
+│    - Database permission problems                          │
+│    - Timeout handling (10 second limit)                   │
+└─────────────────────────────────────────────────────────────┘
+
+Database Schema:
+CREATE TABLE users (
+  id UUID PRIMARY KEY,              -- Matches Supabase auth.users.id
+  email VARCHAR NOT NULL UNIQUE,    -- User's email address
+  dharma_name VARCHAR,              -- Optional Buddhist name
+  lay_name VARCHAR,                 -- Real name (required in profile)
+  location VARCHAR,                 -- User's location
+  class_name VARCHAR,               -- Buddhist class/group
+  practice_years INTEGER,           -- Years of practice
+  timezone_id VARCHAR,              -- User's timezone
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 5.2 Profile Setup Flow
+```
+Profile Completion Logic:
+1. User authenticates successfully
+2. Check if profile is complete (lay_name, location)
+3. If incomplete → redirect to /profile-setup
+4. User fills required profile information
+5. Update users table with complete profile
+6. Redirect to main app dashboard
+
+Required Profile Fields:
+- lay_name (俗名): Real name - REQUIRED
+- location (所在地区): User's location - REQUIRED
+- dharma_name (法名): Buddhist name - OPTIONAL
+- class_name (学修班级): Study group - OPTIONAL
+- practice_years (修行年数): Years of practice - OPTIONAL
+```
+
+## 6. SECURITY FEATURES
+
+### 6.1 OTP Security
+```
+OTP Security Measures:
+1. Time-based expiration (typically 5-10 minutes)
+2. Single-use tokens (cannot be reused)
+3. Rate limiting on OTP requests
+4. Email delivery verification
+5. Secure token generation by Supabase
+
+Rate Limiting Logic:
+- Maximum 3 OTP requests per 5 minutes per email
+- Automatic backoff for repeated failures
+- Countdown timer prevents spam requests
+- Error tracking for security monitoring
+```
+
+### 6.2 Session Security
+```
+Session Security Features:
+1. PKCE Flow (Proof Key for Code Exchange)
+2. Automatic token refresh
+3. Secure storage (encrypted on device)
+4. Session invalidation on logout
+5. Global logout capability
+
+Storage Security:
+- React Native: AsyncStorage (sandboxed per app)
+  └── Enhanced: Expo SecureStore when available
+- Web: localStorage (origin-isolated)
+  └── Additional: sessionStorage for temporary data
+```
+
+### 6.3 Error Handling & Security
+```
+Security Error Handling:
+┌─────────────────────────────────────────────────────────────┐
+│ Security-Focused Error Types                                │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Invalid Credentials                                      │
+│    - Wrong email format                                     │
+│    - Non-existent email                                     │
+│    - Invalid OTP codes                                      │
+│                                                             │
+│ 2. Rate Limiting                                            │
+│    - Too many login attempts                                │
+│    - OTP request flooding                                   │
+│    - Account lockout protection                             │
+│                                                             │
+│ 3. Session Security                                         │
+│    - Expired sessions                                       │
+│    - Invalid tokens                                         │
+│    - Concurrent session limits                              │
+│                                                             │
+│ 4. Network Security                                         │
+│    - Man-in-the-middle protection                          │
+│    - Certificate validation                                 │
+│    - Secure HTTPS enforcement                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 7. LOGOUT & CLEANUP
+
+### 7.1 Standard Logout Flow
+```
+signOut() Implementation:
+┌─────────────────────────────────────────────────────────────┐
+│ Standard Logout Process                                     │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Clear Storage                                            │
+│    - AsyncStorage.removeItem('@auth_token')                │
+│    - AsyncStorage.removeItem('@user_session')              │
+│    - localStorage.clear() (web only)                       │
+│                                                             │
+│ 2. Supabase Logout                                          │
+│    await supabase.auth.signOut({ scope: 'global' })        │
+│                                                             │
+│ 3. State Cleanup                                            │
+│    - setUser(null)                                          │
+│    - setLoading(false)                                      │
+│                                                             │
+│ 4. Navigation                                               │
+│    - Redirect to auth screens                               │
+│    - Clear navigation history                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 7.2 Force Logout (Emergency Cleanup)
+```
+forceLogoutAll() Implementation:
+┌─────────────────────────────────────────────────────────────┐
+│ Emergency Complete Cleanup                                  │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Aggressive Storage Clearing                             │
+│    - AsyncStorage.clear() (everything)                     │
+│    - localStorage.clear() (web)                            │
+│    - sessionStorage.clear() (web)                          │
+│    - IndexedDB cleanup (web)                               │
+│                                                             │
+│ 2. Multiple Logout Attempts                                │
+│    - Global scope logout                                    │
+│    - Local scope fallback                                   │
+│    - Force session termination                             │
+│                                                             │
+│ 3. App State Reset                                          │
+│    - Clear all context state                               │
+│    - Reset navigation stack                                 │
+│    - Force app reload (web)                                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 7.3 Cache Management
+```
+clearAllCache() Implementation:
+1. Comprehensive storage cleanup
+2. Supabase session termination
+3. Web-specific cleanup (IndexedDB, etc.)
+4. Expo SecureStore cleanup
+5. Force app reload for clean state
+
+Cache Locations Cleared:
+- React Native: AsyncStorage, SecureStore
+- Web: localStorage, sessionStorage, IndexedDB
+- Supabase: Auth tokens, session data
+- App State: All context and component state
+```
+
+## 8. ERROR HANDLING & DEBUGGING
+
+### 8.1 Authentication Error Types
+```
+Comprehensive Error Classification:
+┌─────────────────────────────────────────────────────────────┐
+│ ErrorType Enum                                              │
+├─────────────────────────────────────────────────────────────┤
+│ NETWORK: Connection issues, timeouts                        │
+│ EMAIL_EMPTY: Missing email address                          │
+│ EMAIL_INVALID: Email doesn't exist                          │
+│ EMAIL_FORMAT: Invalid email format                          │
+│ EMAIL_DELIVERY: Email sending failed                        │
+│ OTP_INVALID: Wrong OTP code                                 │
+│ OTP_EXPIRED: OTP timeout                                    │
+│ OTP_FORMAT: Invalid OTP format                              │
+│ RATE_LIMITED: Too many requests                             │
+│ SESSION_EXPIRED: Session timeout                            │
+│ DATABASE_ERROR: Database connectivity                       │
+│ UNKNOWN: Unclassified errors                                │
+└─────────────────────────────────────────────────────────────┘
+
+Error Recovery Strategies:
+- Network errors: Retry with exponential backoff
+- Email errors: User guidance and validation
+- OTP errors: Resend capability and clear instructions
+- Rate limiting: Countdown timers and user feedback
+- Session errors: Auto-refresh or re-authentication
+```
+
+### 8.2 Debug Tools
+```
+Debug Components Available:
+1. AuthStateDebugger: Real-time auth state monitoring
+2. ConnectionTest: Database connectivity testing
+3. UserCheck: User data verification
+4. DatabaseStatus: System health monitoring
+
+Production Logging:
+- Authentication events
+- Error occurrences
+- Session state changes
+- Performance metrics
+```
+
+## 9. PLATFORM-SPECIFIC CONSIDERATIONS
+
+### 9.1 React Native Specific
+```
+React Native Features:
+- AsyncStorage for session persistence
+- Expo SecureStore for sensitive data
+- Deep linking for email verification
+- Push notifications (future enhancement)
+- Biometric authentication (future enhancement)
+
+App State Handling:
+- Background/foreground session checks
+- App refresh on resume
+- Offline capability with sync
+```
+
+### 9.2 Web Specific
+```
+Web Platform Features:
+- localStorage/sessionStorage
+- URL-based session detection
+- Browser security model
+- Cross-tab session sharing
+- Automatic page refresh for cleanup
+
+Browser Compatibility:
+- Modern browser support
+- Progressive Web App ready
+- Responsive design
+- Cross-browser testing
+```
+
+## 10. FUTURE ENHANCEMENTS
+
+### 10.1 Planned Security Features
+```
+Future Authentication Enhancements:
+1. Multi-Factor Authentication (MFA)
+2. Biometric authentication (Face ID, Touch ID)
+3. Social login integration (Google, Apple)
+4. SMS OTP as backup option
+5. Device registration and trust
+6. Advanced session management
+7. OAuth2/OpenID Connect support
+```
+
+### 10.2 User Experience Improvements
+```
+Planned UX Enhancements:
+1. Remember device functionality
+2. Quick login with saved credentials
+3. Seamless account recovery
+4. Progressive profile completion
+5. Smart error recovery
+6. Offline authentication caching
+7. Advanced rate limiting with user feedback
+```
+
+## 11. DEPLOYMENT & ENVIRONMENT
+
+### 11.1 Environment Configuration
+```
+Environment Variables Required:
+- EXPO_PUBLIC_SUPABASE_URL: Supabase project URL
+- EXPO_PUBLIC_SUPABASE_ANON_KEY: Supabase anonymous key
+
+Supabase Configuration:
+- Database URL and credentials
+- Email service configuration (SMTP)
+- Rate limiting settings
+- CORS configuration for web
+- Row Level Security (RLS) policies
+```
+
+### 11.2 Production Considerations
+```
+Production Deployment Checklist:
+1. Environment variables securely configured
+2. Supabase rate limits properly set
+3. Email service tested and monitored
+4. Error tracking implemented
+5. Performance monitoring active
+6. Security audit completed
+7. Backup and recovery procedures in place
+8. User support documentation ready
+```
+
+---
+
+This authentication system provides a robust, secure, and user-friendly authentication experience for the Buddhist practice tracking app, with comprehensive error handling, multi-platform support, and future-ready architecture.
