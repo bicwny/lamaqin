@@ -686,3 +686,1661 @@ const batchUpdateProgress = async (projectIds: string[]) => {
 ---
 
 This document serves as the comprehensive guide for understanding and maintaining the practice tracking system. It should be updated as new features are implemented or requirements change.
+# PRACTICE SYSTEM LOGIC - Buddhist Practice App
+
+## OVERVIEW
+The practice system is designed for systematic Buddhist practice management, supporting both count-based practices (like mantra recitation) and time-based practices (like meditation sessions). It provides flexible project management with goal setting, progress tracking, and comprehensive record keeping.
+
+## 1. CORE PRACTICE ARCHITECTURE
+
+### 1.1 Database Structure
+```
+practice_system:
+├── practices (修行基础表)
+├── user_practice_projects (用户修行项目表)
+├── daily_records (计数类修行记录表)
+├── meditation_records (计时类修行记录表)
+├── preset_project_names (预设项目名称表)
+└── meditation_topics (观修主题表)
+```
+
+### 1.2 Entity Relationships
+```sql
+practices:
+- id (UUID, primary key)
+- name (修行名称: "百字明", "金刚萨埵心咒", "上师瑜伽")
+- type ('count' | 'time')
+- unit (单位: "遍", "分钟", "座")
+- description (修行描述)
+- created_at
+
+user_practice_projects:
+- id (UUID, primary key)
+- user_id (关联用户)
+- practice_id (关联修行)
+- target_count (目标数量)
+- current_count (当前完成数量)
+- daily_target (每日目标或每周目标)
+- target_period ('daily' | 'weekly')
+- start_date (开始日期)
+- target_end_date (目标结束日期, nullable)
+- status ('not_started' | 'active' | 'completed')
+- project_name (自定义项目名称, nullable)
+- preset_project_id (预设项目ID, nullable)
+- goal_type ('total' | 'daily' | 'fixed_duration' | 'topic_progress')
+- created_at, updated_at
+
+daily_records:
+- id (UUID, primary key)
+- user_id (关联用户)
+- practice_project_id (关联项目)
+- record_date (记录日期)
+- count (当日完成数量)
+- notes (备注, nullable)
+- created_at
+
+meditation_records:
+- id (UUID, primary key)
+- user_id (关联用户)
+- practice_id (关联修行)
+- record_date (记录日期)
+- duration_minutes (观修时长)
+- session_number (当日第几座, nullable)
+- reflection (观后感, nullable)
+- notes (备注, nullable)
+- created_at
+
+preset_project_names:
+- id (UUID, primary key)
+- name (预设名称: "21天加行", "百日共修")
+- category (分类, nullable)
+- display_order (显示顺序)
+
+meditation_topics:
+- id (UUID, primary key)
+- category (类别: "四加行", "五加行")
+- topic_name (主题名称)
+- week_number (周数)
+- description (描述)
+- display_order (显示顺序)
+```
+
+## 2. PRACTICE TYPES & CLASSIFICATION
+
+### 2.1 Count-Based Practices (计数类)
+```typescript
+interface CountBasedPractice {
+  type: 'count';
+  unit: '遍' | '次' | '个';
+  examples: [
+    '百字明', '金刚萨埵心咒', '阿弥陀佛圣号',
+    '大礼拜', '转经轮', '供灯'
+  ];
+  tracking: {
+    totalTarget: number;    // 总目标数量
+    dailyTarget: number;    // 每日目标数量
+    currentCount: number;   // 当前完成数量
+    progressPercent: number; // 完成百分比
+  };
+}
+```
+
+#### Count-Based Practice Workflow
+```typescript
+const recordCountPractice = async (
+  projectId: string,
+  count: number,
+  notes?: string
+) => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Create daily record
+  const dailyRecord = await supabase
+    .from('daily_records')
+    .insert({
+      user_id: userId,
+      practice_project_id: projectId,
+      record_date: today,
+      count: count,
+      notes: notes || null
+    });
+  
+  // Update project current count
+  const { data: project } = await supabase
+    .from('user_practice_projects')
+    .select('current_count, target_count')
+    .eq('id', projectId)
+    .single();
+  
+  const newCurrentCount = project.current_count + count;
+  const isCompleted = newCurrentCount >= project.target_count;
+  
+  await supabase
+    .from('user_practice_projects')
+    .update({
+      current_count: newCurrentCount,
+      status: isCompleted ? 'completed' : 'active',
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', projectId);
+  
+  return { success: true, isCompleted };
+};
+```
+
+### 2.2 Time-Based Practices (计时类)
+```typescript
+interface TimeBasedPractice {
+  type: 'time';
+  unit: '分钟' | '座';
+  examples: [
+    '上师瑜伽', '寂止观修', '慈悲观修',
+    '菩提心观修', '空性观修'
+  ];
+  tracking: {
+    sessionTarget: number;     // 目标座数 (每日或每周)
+    currentSessions: number;   // 当前完成座数
+    totalMinutes: number;      // 总观修时长
+    averageDuration: number;   // 平均每座时长
+  };
+}
+```
+
+#### Time-Based Practice Workflow
+```typescript
+const recordMeditationSession = async (
+  practiceId: string,
+  durationMinutes: number,
+  reflection?: string,
+  notes?: string
+) => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Get today's session count for session numbering
+  const { data: todayRecords } = await supabase
+    .from('meditation_records')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('practice_id', practiceId)
+    .eq('record_date', today);
+  
+  const sessionNumber = (todayRecords?.length || 0) + 1;
+  
+  // Create meditation record
+  const meditationRecord = await supabase
+    .from('meditation_records')
+    .insert({
+      user_id: userId,
+      practice_id: practiceId,
+      record_date: today,
+      duration_minutes: durationMinutes,
+      session_number: sessionNumber,
+      reflection: reflection || null,
+      notes: notes || null
+    });
+  
+  // Update project progress
+  await updateMeditationProgress(practiceId);
+  
+  return { success: true, sessionNumber };
+};
+
+const updateMeditationProgress = async (practiceId: string) => {
+  // Get project info
+  const { data: project } = await supabase
+    .from('user_practice_projects')
+    .select('*')
+    .eq('practice_id', practiceId)
+    .eq('user_id', userId)
+    .single();
+  
+  if (!project) return;
+  
+  if (project.target_period === 'weekly') {
+    // Calculate weekly progress
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    
+    const { data: weeklyRecords } = await supabase
+      .from('meditation_records')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('practice_id', practiceId)
+      .gte('record_date', startOfWeek.toISOString().split('T')[0]);
+    
+    const weeklyCount = weeklyRecords?.length || 0;
+    const isWeeklyComplete = weeklyCount >= project.daily_target;
+    
+    // Update project weekly progress (stored in current_count)
+    const newCurrentCount = project.current_count + (isWeeklyComplete ? 1 : 0);
+    
+    await supabase
+      .from('user_practice_projects')
+      .update({
+        current_count: newCurrentCount,
+        status: newCurrentCount >= project.target_count ? 'completed' : 'active'
+      })
+      .eq('id', project.id);
+  } else {
+    // Daily progress tracking
+    const today = new Date().toISOString().split('T')[0];
+    
+    const { data: todayRecords } = await supabase
+      .from('meditation_records')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('practice_id', practiceId)
+      .eq('record_date', today);
+    
+    const todayCount = todayRecords?.length || 0;
+    // Update logic based on daily completion
+  }
+};
+```
+
+## 3. PROJECT MANAGEMENT SYSTEM
+
+### 3.1 Project Creation Workflow
+
+#### Practice Selection
+```typescript
+const loadAvailablePractices = async () => {
+  // Get all practices - multiple projects allowed for same practice
+  const { data: practices, error } = await supabase
+    .from('practices')
+    .select('*')
+    .order('name');
+  
+  return practices || [];
+};
+
+const navigateToPracticeConfig = (practice: Practice) => {
+  router.push({
+    pathname: '/practice-config',
+    params: {
+      practiceId: practice.id,
+      practiceName: practice.name,
+      practiceType: practice.type,
+      practiceUnit: practice.unit,
+    },
+  });
+};
+```
+
+#### Project Configuration
+```typescript
+interface ProjectConfiguration {
+  // Basic Info
+  practiceId: string;
+  projectName?: string;        // Custom project name
+  presetProjectId?: string;    // Or preset project selection
+  
+  // Goal Setting
+  goalType: 'total' | 'daily' | 'fixed_duration' | 'topic_progress';
+  
+  // For Count-Based Practices
+  configMode: 'total' | 'daily';
+  totalTarget?: number;        // Total count goal
+  dailyTarget?: number;        // Daily count goal
+  
+  // For Time-Based Practices
+  targetPeriod: 'daily' | 'weekly';
+  sessionsTarget: number;      // Sessions per period
+  
+  // Time Planning
+  startDate: Date;
+  durationMode: '30天' | '60天' | '100天' | '1年' | '自定义' | '持续进行';
+  customEndDate?: Date;
+}
+
+const createPracticeProject = async (config: ProjectConfiguration) => {
+  let finalTargetCount: number;
+  let finalDailyTarget: number;
+  let endDate: Date | null = null;
+  
+  if (config.practiceType === 'count') {
+    const days = calculateDurationDays(config);
+    endDate = new Date(config.startDate.getTime() + days * 24 * 60 * 60 * 1000);
+    
+    if (config.configMode === 'total') {
+      finalTargetCount = config.totalTarget!;
+      finalDailyTarget = Math.ceil(finalTargetCount / days);
+    } else {
+      finalDailyTarget = config.dailyTarget!;
+      finalTargetCount = finalDailyTarget * days;
+    }
+  } else {
+    // Time-based practices
+    finalDailyTarget = config.sessionsTarget;
+    
+    if (config.durationMode === '持续进行') {
+      endDate = null;
+      finalTargetCount = 0; // Indicates ongoing
+    } else {
+      const days = calculateDurationDays(config);
+      endDate = new Date(config.startDate.getTime() + days * 24 * 60 * 60 * 1000);
+      finalTargetCount = config.targetPeriod === 'weekly' 
+        ? finalDailyTarget * Math.ceil(days / 7)
+        : finalDailyTarget * days;
+    }
+  }
+  
+  const projectData = {
+    user_id: userId,
+    practice_id: config.practiceId,
+    target_count: finalTargetCount,
+    daily_target: finalDailyTarget,
+    target_period: config.targetPeriod || 'daily',
+    start_date: config.startDate.toISOString().split('T')[0],
+    target_end_date: endDate ? endDate.toISOString().split('T')[0] : null,
+    status: 'active',
+    current_count: 0,
+    goal_type: config.goalType,
+    preset_project_id: config.presetProjectId || null,
+    project_name: config.presetProjectId ? null : config.projectName || null,
+  };
+  
+  const { data, error } = await supabase
+    .from('user_practice_projects')
+    .insert([projectData])
+    .select();
+  
+  return { data, error };
+};
+```
+
+### 3.2 Project Status Management
+
+#### Status Types & Transitions
+```typescript
+type ProjectStatus = 'not_started' | 'active' | 'completed';
+
+const ProjectStatusManager = {
+  // Auto-completion when target reached
+  checkAutoCompletion: async (projectId: string) => {
+    const { data: project } = await supabase
+      .from('user_practice_projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
+    
+    if (!project) return;
+    
+    const isCompleted = project.target_count > 0 && 
+                       project.current_count >= project.target_count;
+    
+    if (isCompleted && project.status !== 'completed') {
+      await supabase
+        .from('user_practice_projects')
+        .update({
+          status: 'completed',
+          completed_date: new Date().toISOString().split('T')[0],
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId);
+    }
+  },
+  
+  // Manual status updates
+  updateStatus: async (projectId: string, newStatus: ProjectStatus) => {
+    const updateData: any = {
+      status: newStatus,
+      updated_at: new Date().toISOString()
+    };
+    
+    if (newStatus === 'completed') {
+      updateData.completed_date = new Date().toISOString().split('T')[0];
+    } else {
+      updateData.completed_date = null;
+    }
+    
+    await supabase
+      .from('user_practice_projects')
+      .update(updateData)
+      .eq('id', projectId);
+  }
+};
+```
+
+### 3.3 Project Naming System
+
+#### Preset Project Names
+```typescript
+const PresetProjectNameService = {
+  getPresetProjectNames: async () => {
+    const { data, error } = await supabase
+      .from('preset_project_names')
+      .select('*')
+      .order('display_order', { ascending: true });
+    
+    return data || [];
+  },
+  
+  // Common preset examples
+  commonPresets: [
+    { name: '21天加行', category: '短期共修' },
+    { name: '百日共修', category: '中期共修' },
+    { name: '四加行第一轮', category: '前行修法' },
+    { name: '金刚萨埵除障', category: '净化修法' },
+    { name: '上师瑜伽加持', category: '上师相应法' },
+    { name: '发心菩提心', category: '菩提心修法' }
+  ]
+};
+
+const ProjectNamingModal = ({ onSelectName }) => {
+  const [searchText, setSearchText] = useState('');
+  const [presets, setPresets] = useState([]);
+  
+  const selectPreset = (preset) => {
+    onSelectName({
+      projectName: preset.name,
+      presetProjectId: preset.id,
+      isPreset: true
+    });
+  };
+  
+  const selectCustomName = () => {
+    if (searchText.trim()) {
+      onSelectName({
+        projectName: searchText.trim(),
+        presetProjectId: null,
+        isPreset: false
+      });
+    }
+  };
+  
+  return (
+    <Modal>
+      <TextInput
+        placeholder="搜索预设名称或输入自定义名称..."
+        value={searchText}
+        onChangeText={setSearchText}
+      />
+      
+      {presets.filter(p => 
+        p.name.toLowerCase().includes(searchText.toLowerCase())
+      ).map(preset => (
+        <TouchableOpacity key={preset.id} onPress={() => selectPreset(preset)}>
+          <Text>{preset.name}</Text>
+          {preset.category && <Text>{preset.category}</Text>}
+        </TouchableOpacity>
+      ))}
+      
+      {searchText.trim() && (
+        <TouchableOpacity onPress={selectCustomName}>
+          <Text>使用自定义名称: "{searchText}"</Text>
+        </TouchableOpacity>
+      )}
+    </Modal>
+  );
+};
+```
+
+## 4. PROGRESS TRACKING SYSTEM
+
+### 4.1 Real-time Progress Calculation
+
+#### Count-Based Progress
+```typescript
+const calculateCountProgress = (project: UserPracticeProject) => {
+  const current = project.current_count || 0;
+  const target = project.target_count || 1;
+  
+  return {
+    current,
+    target,
+    percentage: Math.min((current / target) * 100, 100),
+    remaining: Math.max(target - current, 0),
+    isCompleted: current >= target,
+    dailySuggestion: project.daily_target || 0
+  };
+};
+
+const PracticeProgressDisplay = ({ project }) => {
+  const progress = calculateCountProgress(project);
+  
+  return (
+    <View style={styles.progressContainer}>
+      <Text style={styles.progressText}>
+        {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {project.practices.unit}
+      </Text>
+      
+      <View style={styles.progressBarContainer}>
+        <View style={styles.progressBar}>
+          <View 
+            style={[
+              styles.progressFill, 
+              { width: `${Math.min(progress.percentage, 100)}%` }
+            ]} 
+          />
+        </View>
+        <Text style={styles.progressPercentage}>
+          {progress.percentage.toFixed(1)}%
+        </Text>
+      </View>
+      
+      <Text style={styles.dailyTarget}>
+        每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
+      </Text>
+      
+      {progress.isCompleted && (
+        <View style={styles.completedBadge}>
+          <Text style={styles.completedText}>✅ 已完成</Text>
+        </View>
+      )}
+    </View>
+  );
+};
+```
+
+#### Time-Based Progress
+```typescript
+const calculateTimeProgress = async (project: UserPracticeProject) => {
+  if (project.target_period === 'weekly') {
+    // Weekly meditation progress
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    
+    const { data: weeklyRecords } = await supabase
+      .from('meditation_records')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('practice_id', project.practice_id)
+      .gte('record_date', startOfWeek.toISOString().split('T')[0]);
+    
+    const weeklyCount = weeklyRecords?.length || 0;
+    const weeklyTarget = project.daily_target;
+    
+    return {
+      current: weeklyCount,
+      target: weeklyTarget,
+      percentage: Math.min((weeklyCount / weeklyTarget) * 100, 100),
+      isCompleted: weeklyCount >= weeklyTarget,
+      period: 'weekly',
+      totalMinutes: weeklyRecords?.reduce((sum, r) => sum + r.duration_minutes, 0) || 0
+    };
+  } else {
+    // Daily meditation progress
+    const today = new Date().toISOString().split('T')[0];
+    
+    const { data: todayRecords } = await supabase
+      .from('meditation_records')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('practice_id', project.practice_id)
+      .eq('record_date', today);
+    
+    const todayCount = todayRecords?.length || 0;
+    const dailyTarget = project.daily_target;
+    
+    return {
+      current: todayCount,
+      target: dailyTarget,
+      percentage: Math.min((todayCount / dailyTarget) * 100, 100),
+      isCompleted: todayCount >= dailyTarget,
+      period: 'daily',
+      totalMinutes: todayRecords?.reduce((sum, r) => sum + r.duration_minutes, 0) || 0,
+      sessions: todayRecords || []
+    };
+  }
+};
+
+const MeditationProgressDisplay = ({ project, refreshTrigger }) => {
+  const [progress, setProgress] = useState(null);
+  
+  useEffect(() => {
+    calculateTimeProgress(project).then(setProgress);
+  }, [project, refreshTrigger]);
+  
+  if (!progress) return <Text>加载中...</Text>;
+  
+  const sessionDetails = progress.sessions?.map((session, index) =>
+    `第${index + 1}座${session.duration_minutes}分钟`
+  ).join('；');
+  
+  return (
+    <View style={styles.progressContainer}>
+      <Text style={styles.progressText}>
+        {progress.period === 'weekly' ? '本周' : '今日'}进度：
+        {progress.current}/{progress.target}座
+        {progress.isCompleted ? ' ✅' : ''}
+      </Text>
+      
+      {sessionDetails && (
+        <Text style={styles.sessionDetails}>
+          {progress.period === 'weekly' ? '本周' : '今日'}：{sessionDetails}
+        </Text>
+      )}
+      
+      <Text style={styles.totalTime}>
+        总时长：{progress.totalMinutes} 分钟
+      </Text>
+    </View>
+  );
+};
+```
+
+### 4.2 Historical Progress Tracking
+
+#### Daily Record History
+```typescript
+const PracticeHistoryService = {
+  getDailyRecords: async (projectId: string, limit = 10) => {
+    const { data, error } = await supabase
+      .from('daily_records')
+      .select('*')
+      .eq('practice_project_id', projectId)
+      .eq('user_id', userId)
+      .order('record_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    return data || [];
+  },
+  
+  getMeditationRecords: async (practiceId: string, limit = 10) => {
+    const { data, error } = await supabase
+      .from('meditation_records')
+      .select('*')
+      .eq('practice_id', practiceId)
+      .eq('user_id', userId)
+      .order('record_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    return data || [];
+  },
+  
+  getProgressStatistics: async (projectId: string) => {
+    const records = await this.getDailyRecords(projectId, 100);
+    
+    if (records.length === 0) return null;
+    
+    const totalCount = records.reduce((sum, r) => sum + r.count, 0);
+    const averageDaily = totalCount / records.length;
+    const activeDays = records.length;
+    const streak = calculateCurrentStreak(records);
+    
+    return {
+      totalCount,
+      averageDaily: Math.round(averageDaily),
+      activeDays,
+      streak,
+      firstRecord: records[records.length - 1].record_date,
+      lastRecord: records[0].record_date
+    };
+  }
+};
+
+const calculateCurrentStreak = (records: DailyRecord[]) => {
+  if (records.length === 0) return 0;
+  
+  // Sort by date descending
+  const sortedRecords = records.sort((a, b) => 
+    new Date(b.record_date).getTime() - new Date(a.record_date).getTime()
+  );
+  
+  let streak = 0;
+  let currentDate = new Date();
+  
+  for (const record of sortedRecords) {
+    const recordDate = new Date(record.record_date);
+    const daysDiff = Math.floor(
+      (currentDate.getTime() - recordDate.getTime()) / (24 * 60 * 60 * 1000)
+    );
+    
+    if (daysDiff === streak) {
+      streak++;
+      currentDate = recordDate;
+    } else {
+      break;
+    }
+  }
+  
+  return streak;
+};
+```
+
+## 5. USER INTERFACE DESIGN
+
+### 5.1 Practice Tab Organization
+
+#### Tab Structure
+```typescript
+type PracticeTab = 'active' | 'complete';
+
+const PracticeTabContent = {
+  active: {
+    title: '修行中',
+    filter: (projects: UserPracticeProject[]) => 
+      projects.filter(p => p.status === 'active'),
+    actions: ['记录修行', '查看详情', '编辑项目']
+  },
+  
+  complete: {
+    title: '已完成',
+    filter: (projects: UserPracticeProject[]) => 
+      projects.filter(p => p.status === 'completed'),
+    actions: ['查看详情', '重新开始']
+  }
+};
+
+const PracticeTabRenderer = ({ activeTab, projects }) => {
+  const filteredProjects = PracticeTabContent[activeTab].filter(projects);
+  
+  return (
+    <ScrollView>
+      {filteredProjects.map(project => (
+        <PracticeCard key={project.id} project={project} />
+      ))}
+    </ScrollView>
+  );
+};
+```
+
+#### Practice Card Display
+```typescript
+const PracticeCard = ({ project }) => {
+  const [progress, setProgress] = useState(null);
+  const [presetName, setPresetName] = useState('');
+
+  useEffect(() => {
+    loadProgress();
+    loadPresetName();
+  }, [project]);
+
+  const getDisplayProjectName = () => {
+    return project.project_name || presetName || '预设项目';
+  };
+
+  return (
+    <View style={styles.practiceCard}>
+      {/* Header */}
+      <View style={styles.practiceHeader}>
+        <Text style={styles.practiceType}>
+          {project.practices.type === 'count' ? '计数类' : '计时类'}
+          {project.practices.type === 'time' && project.target_period === 'weekly' && ' (周)'}
+        </Text>
+        {progress?.isCompleted && (
+          <View style={styles.completedBadge}>
+            <Text style={styles.completedText}>✅ 已完成</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Practice Name & Project */}
+      <View style={styles.practiceNameRow}>
+        <Text style={styles.practiceName}>
+          {project.practices.name}
+        </Text>
+        {(project.project_name || project.preset_project_id) && (
+          <View style={styles.projectNamePill}>
+            <Text style={styles.projectNameText}>
+              {getDisplayProjectName()}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Progress Display */}
+      <View style={styles.progressContainer}>
+        {project.practices.type === 'count' ? (
+          <CountProgressDisplay project={project} />
+        ) : (
+          <TimeProgressDisplay project={project} />
+        )}
+      </View>
+
+      {/* Action Buttons */}
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => navigateToDetail(project.id)}
+        >
+          <Text style={styles.secondaryButtonText}>查看详情</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => handleRecord(project)}
+        >
+          <Text style={styles.primaryButtonText}>
+            {project.practices.type === 'time' ? '记录观修' : '记录修行'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+```
+
+### 5.2 Recording Interfaces
+
+#### Count-Based Recording Modal
+```typescript
+const CustomRecordModal = ({ projectId, practiceName, practiceType }) => {
+  const [count, setCount] = useState('');
+  const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!count || parseInt(count) <= 0) {
+      Alert.alert('错误', '请输入有效的数量');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Create daily record
+      const { error: recordError } = await supabase
+        .from('daily_records')
+        .insert({
+          user_id: userId,
+          practice_project_id: projectId,
+          record_date: today,
+          count: parseInt(count),
+          notes: notes.trim() || null
+        });
+
+      if (recordError) throw recordError;
+
+      // Update project progress
+      const { data: project, error: projectError } = await supabase
+        .from('user_practice_projects')
+        .select('current_count, target_count')
+        .eq('id', projectId)
+        .single();
+
+      if (projectError) throw projectError;
+
+      const newCurrentCount = project.current_count + parseInt(count);
+      const isCompleted = newCurrentCount >= project.target_count;
+
+      await supabase
+        .from('user_practice_projects')
+        .update({
+          current_count: newCurrentCount,
+          status: isCompleted ? 'completed' : 'active',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId);
+
+      Alert.alert('成功', `${practiceName}记录已保存`, [
+        { text: '确定', onPress: () => router.back() }
+      ]);
+
+    } catch (error) {
+      console.error('Record save error:', error);
+      Alert.alert('错误', '保存失败，请重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal>
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>{practiceName}</Text>
+        
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>数量</Text>
+          <TextInput
+            style={styles.input}
+            value={count}
+            onChangeText={setCount}
+            placeholder="请输入完成数量"
+            keyboardType="numeric"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>备注 (可选)</Text>
+          <TextInput
+            style={[styles.input, styles.notesInput]}
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="记录心得体会..."
+            multiline
+            numberOfLines={3}
+          />
+        </View>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.cancelButtonText}>取消</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.saveButton, loading && styles.disabledButton]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>保存</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+```
+
+#### Time-Based Recording Modal
+```typescript
+const MeditationRecordModal = ({ projectId, practiceId, practiceName }) => {
+  const [duration, setDuration] = useState('');
+  const [reflection, setReflection] = useState('');
+  const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    const durationMinutes = parseInt(duration);
+    if (!duration || durationMinutes <= 0) {
+      Alert.alert('错误', '请输入有效的时长');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Get today's session count
+      const { data: todayRecords } = await supabase
+        .from('meditation_records')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('practice_id', practiceId)
+        .eq('record_date', today);
+
+      const sessionNumber = (todayRecords?.length || 0) + 1;
+
+      // Create meditation record
+      const { error: recordError } = await supabase
+        .from('meditation_records')
+        .insert({
+          user_id: userId,
+          practice_id: practiceId,
+          record_date: today,
+          duration_minutes: durationMinutes,
+          session_number: sessionNumber,
+          reflection: reflection.trim() || null,
+          notes: notes.trim() || null
+        });
+
+      if (recordError) throw recordError;
+
+      // Update project progress
+      await updateMeditationProgress(practiceId);
+
+      Alert.alert('成功', `第${sessionNumber}座观修记录已保存`, [
+        { text: '确定', onPress: () => router.back() }
+      ]);
+
+    } catch (error) {
+      console.error('Meditation record save error:', error);
+      Alert.alert('错误', '保存失败，请重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal>
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>{practiceName}</Text>
+        
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>观修时长 (分钟)</Text>
+          <TextInput
+            style={styles.input}
+            value={duration}
+            onChangeText={setDuration}
+            placeholder="例如: 30"
+            keyboardType="numeric"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>观后感 (可选)</Text>
+          <TextInput
+            style={[styles.input, styles.reflectionInput]}
+            value={reflection}
+            onChangeText={setReflection}
+            placeholder="记录观修中的感悟和体验..."
+            multiline
+            numberOfLines={4}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>备注 (可选)</Text>
+          <TextInput
+            style={[styles.input, styles.notesInput]}
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="其他说明..."
+            multiline
+            numberOfLines={2}
+          />
+        </View>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.cancelButtonText}>取消</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.saveButton, loading && styles.disabledButton]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>保存记录</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+```
+
+## 6. DAILY INTEGRATION SYSTEM
+
+### 6.1 Daily Dashboard Display
+
+#### Practice Cards for Index
+```typescript
+const generateDailyPracticeCards = async (userId: string) => {
+  // Get active projects
+  const { data: activeProjects } = await supabase
+    .from('user_practice_projects')
+    .select(`
+      *,
+      practices (
+        id,
+        name,
+        type,
+        unit,
+        description
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false });
+
+  if (!activeProjects) return [];
+
+  const practiceCards = [];
+
+  for (const project of activeProjects) {
+    if (project.practices.type === 'count') {
+      // Count-based practice card
+      const progress = calculateCountProgress(project);
+      const displayName = await getDisplayProjectName(project);
+
+      practiceCards.push({
+        type: 'count',
+        id: project.id,
+        name: project.practices.name,
+        projectName: displayName,
+        unit: project.practices.unit,
+        current: progress.current,
+        target: progress.target,
+        progressPercent: progress.percentage,
+        dailyTarget: project.daily_target,
+        status: progress.isCompleted ? 'completed' : 'active'
+      });
+    } else {
+      // Time-based practice card
+      const progress = await calculateTimeProgress(project);
+      const displayName = await getDisplayProjectName(project);
+
+      practiceCards.push({
+        type: 'time',
+        id: project.id,
+        name: project.practices.name,
+        projectName: displayName,
+        unit: project.practices.unit,
+        weekSessions: progress.current,
+        weekTarget: progress.target,
+        todaySessions: progress.period === 'daily' ? progress.current : 0,
+        todayDetails: progress.sessions?.map((s, i) => 
+          `第${i+1}座${s.duration_minutes}分钟`
+        ).join('；'),
+        status: progress.isCompleted ? 'completed' : 'active',
+        period: progress.period
+      });
+    }
+  }
+
+  return practiceCards;
+};
+
+const PracticeDashboardCard = ({ practice, onRecord, onNavigate }) => {
+  return (
+    <TouchableOpacity
+      style={styles.practiceCard}
+      onPress={() => onNavigate(practice.id)}
+    >
+      {practice.type === 'count' ? (
+        <CountPracticeDashboard practice={practice} onRecord={onRecord} />
+      ) : (
+        <TimePracticeDashboard practice={practice} onRecord={onRecord} />
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const CountPracticeDashboard = ({ practice, onRecord }) => (
+  <View>
+    <View style={styles.practiceNameRow}>
+      <Text style={styles.practiceName}>{practice.name}</Text>
+      {practice.projectName && (
+        <View style={styles.projectNamePill}>
+          <Text style={styles.projectNameText}>{practice.projectName}</Text>
+        </View>
+      )}
+    </View>
+
+    <View style={styles.countPercentageRow}>
+      <Text style={styles.practiceCount}>
+        {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
+      </Text>
+      <Text style={styles.progressPercent}>
+        {Math.round(practice.progressPercent)}%
+      </Text>
+    </View>
+
+    <View style={styles.progressBarContainer}>
+      <View style={styles.progressBar}>
+        <View 
+          style={[
+            styles.progressFill, 
+            { width: `${Math.min(practice.progressPercent, 100)}%` }
+          ]} 
+        />
+      </View>
+    </View>
+
+    <View style={styles.practiceActions}>
+      <TouchableOpacity onPress={() => onRecord(practice)}>
+        <Ionicons 
+          name="checkmark-circle-outline" 
+          size={24} 
+          color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
+        />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => onRecord(practice)}>
+        <Ionicons 
+          name="add-circle-outline" 
+          size={24} 
+          color={Colors.primary} 
+        />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
+const TimePracticeDashboard = ({ practice, onRecord }) => (
+  <View>
+    <View style={styles.practiceNameRow}>
+      <Text style={styles.practiceName}>{practice.name}</Text>
+      {practice.projectName && (
+        <View style={styles.projectNamePill}>
+          <Text style={styles.projectNameText}>{practice.projectName}</Text>
+        </View>
+      )}
+    </View>
+
+    <Text style={styles.weeklyProgress}>
+      本周 {practice.weekSessions}/{practice.weekTarget}座
+      {practice.status === 'completed' && ' 已完成'}
+    </Text>
+
+    {practice.todaySessions > 0 && practice.todayDetails && (
+      <Text style={styles.todayDetails}>
+        今日：{practice.todayDetails}
+      </Text>
+    )}
+
+    <View style={styles.practiceActions}>
+      <TouchableOpacity onPress={() => onRecord(practice)}>
+        <Ionicons 
+          name="add-circle-outline" 
+          size={24} 
+          color={Colors.primary} 
+        />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+```
+
+### 6.2 Quick Record Actions
+
+#### Quick Record Handler
+```typescript
+const QuickRecordHandler = {
+  handleQuickComplete: async (practice: any) => {
+    if (practice.type === 'count') {
+      // Quick complete with daily target amount
+      const quickAmount = practice.dailyTarget || 100;
+      
+      Alert.alert(
+        '快速记录',
+        `记录 ${quickAmount} ${practice.unit}？`,
+        [
+          { text: '取消', style: 'cancel' },
+          { 
+            text: '确定', 
+            onPress: async () => {
+              await recordCountPractice(practice.id, quickAmount);
+              toastService.success({
+                title: '记录成功',
+                message: `${practice.name} +${quickAmount} ${practice.unit}`
+              });
+            }
+          }
+        ]
+      );
+    } else {
+      // Navigate to meditation record for time-based
+      router.push({
+        pathname: '/modals/meditation-record',
+        params: {
+          projectId: practice.id,
+          practiceId: practice.practiceId,
+          practiceName: practice.name,
+        },
+      });
+    }
+  },
+
+  handleAddRecord: async (practice: any) => {
+    if (practice.type === 'count') {
+      router.push({
+        pathname: '/modals/custom-record',
+        params: {
+          projectId: practice.id,
+          practiceName: practice.name,
+          practiceType: 'count',
+        },
+      });
+    } else {
+      router.push({
+        pathname: '/modals/meditation-record',
+        params: {
+          projectId: practice.id,
+          practiceId: practice.practiceId,
+          practiceName: practice.name,
+        },
+      });
+    }
+  }
+};
+```
+
+## 7. DATA ANALYTICS & INSIGHTS
+
+### 7.1 Practice Statistics
+
+#### Overall Practice Analytics
+```typescript
+const PracticeAnalytics = {
+  generateOverallStats: async (userId: string) => {
+    const { data: projects } = await supabase
+      .from('user_practice_projects')
+      .select(`
+        *,
+        practices (id, name, type, unit)
+      `)
+      .eq('user_id', userId);
+
+    const { data: dailyRecords } = await supabase
+      .from('daily_records')
+      .select('*')
+      .eq('user_id', userId);
+
+    const { data: meditationRecords } = await supabase
+      .from('meditation_records')
+      .select('*')
+      .eq('user_id', userId);
+
+    return {
+      totalProjects: projects?.length || 0,
+      activeProjects: projects?.filter(p => p.status === 'active').length || 0,
+      completedProjects: projects?.filter(p => p.status === 'completed').length || 0,
+      
+      countBasedProjects: projects?.filter(p => p.practices.type === 'count').length || 0,
+      timeBasedProjects: projects?.filter(p => p.practices.type === 'time').length || 0,
+      
+      totalRecordingSessions: (dailyRecords?.length || 0) + (meditationRecords?.length || 0),
+      totalMeditationMinutes: meditationRecords?.reduce((sum, r) => sum + r.duration_minutes, 0) || 0,
+      totalMantras: dailyRecords?.reduce((sum, r) => sum + r.count, 0) || 0,
+      
+      averageMeditationDuration: meditationRecords?.length ? 
+        Math.round((meditationRecords?.reduce((sum, r) => sum + r.duration_minutes, 0) || 0) / meditationRecords.length) : 0,
+      
+      practiceStreak: await calculatePracticeStreak(userId),
+      mostActivePractice: await getMostActivePractice(userId)
+    };
+  },
+
+  generateProjectReport: async (projectId: string) => {
+    const { data: project } = await supabase
+      .from('user_practice_projects')
+      .select(`
+        *,
+        practices (id, name, type, unit)
+      `)
+      .eq('id', projectId)
+      .single();
+
+    if (!project) return null;
+
+    if (project.practices.type === 'count') {
+      const { data: records } = await supabase
+        .from('daily_records')
+        .select('*')
+        .eq('practice_project_id', projectId)
+        .order('record_date', { ascending: true });
+
+      const totalDays = records?.length || 0;
+      const totalCount = records?.reduce((sum, r) => sum + r.count, 0) || 0;
+      const averageDaily = totalDays > 0 ? Math.round(totalCount / totalDays) : 0;
+      
+      return {
+        project,
+        totalDays,
+        totalCount,
+        averageDaily,
+        progress: Math.min((project.current_count / project.target_count) * 100, 100),
+        streak: calculateRecordStreak(records || []),
+        dailyBreakdown: records?.map(r => ({
+          date: r.record_date,
+          count: r.count,
+          notes: r.notes
+        })) || []
+      };
+    } else {
+      const { data: records } = await supabase
+        .from('meditation_records')
+        .select('*')
+        .eq('practice_id', project.practice_id)
+        .eq('user_id', project.user_id)
+        .order('record_date', { ascending: true });
+
+      const totalSessions = records?.length || 0;
+      const totalMinutes = records?.reduce((sum, r) => sum + r.duration_minutes, 0) || 0;
+      const averageDuration = totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0;
+      
+      return {
+        project,
+        totalSessions,
+        totalMinutes,
+        averageDuration,
+        sessionBreakdown: records?.map(r => ({
+          date: r.record_date,
+          duration: r.duration_minutes,
+          sessionNumber: r.session_number,
+          reflection: r.reflection,
+          notes: r.notes
+        })) || []
+      };
+    }
+  }
+};
+```
+
+### 7.2 Progress Insights
+
+#### Smart Recommendations
+```typescript
+const PracticeInsights = {
+  generateDailyRecommendations: async (userId: string) => {
+    const projects = await getActivePracticeProjects(userId);
+    const recommendations = [];
+
+    for (const project of projects) {
+      if (project.practices.type === 'count') {
+        const progress = calculateCountProgress(project);
+        const daysRemaining = calculateDaysRemaining(project);
+        
+        if (daysRemaining > 0) {
+          const requiredDaily = Math.ceil(progress.remaining / daysRemaining);
+          
+          if (requiredDaily > project.daily_target * 1.2) {
+            recommendations.push({
+              type: 'warning',
+              project: project.practices.name,
+              message: `需要加快进度，建议每日 ${requiredDaily} ${project.practices.unit}`,
+              action: 'increase_pace'
+            });
+          } else if (progress.percentage > 90) {
+            recommendations.push({
+              type: 'success',
+              project: project.practices.name,
+              message: '即将完成！继续保持',
+              action: 'maintain_pace'
+            });
+          }
+        }
+      } else {
+        const weeklyProgress = await calculateTimeProgress(project);
+        
+        if (weeklyProgress.current === 0 && new Date().getDay() > 3) {
+          recommendations.push({
+            type: 'reminder',
+            project: project.practices.name,
+            message: '本周还未开始观修，建议安排时间',
+            action: 'start_meditation'
+          });
+        } else if (weeklyProgress.isCompleted) {
+          recommendations.push({
+            type: 'celebration',
+            project: project.practices.name,
+            message: '本周目标已完成！可以适当增加座数',
+            action: 'bonus_session'
+          });
+        }
+      }
+    }
+
+    return recommendations;
+  },
+
+  generateMotivationalMessage: (project: any, progress: any) => {
+    const messages = {
+      starting: [
+        '🌱 万事开头难，您已经迈出了重要的第一步！',
+        '🙏 发心修行，功德无量！',
+        '✨ 每一次修行都是心灵的净化'
+      ],
+      progress: [
+        `💪 已完成 ${progress.percentage.toFixed(1)}%，继续加油！`,
+        '🔥 保持这个节奏，目标就在前方！',
+        '🌟 每日坚持，必有收获！'
+      ],
+      nearCompletion: [
+        '🎯 即将圆满！最后冲刺！',
+        '🏆 胜利在望，坚持到底！',
+        '✅ 马上就要完成了，真棒！'
+      ],
+      completed: [
+        '🎉 恭喜圆满完成！功德回向众生！',
+        '🙏 修行圆满，随喜功德！',
+        '🌈 完成目标，心生欢喜！'
+      ]
+    };
+
+    if (progress.percentage === 0) {
+      return messages.starting[Math.floor(Math.random() * messages.starting.length)];
+    } else if (progress.percentage < 80) {
+      return messages.progress[Math.floor(Math.random() * messages.progress.length)];
+    } else if (progress.percentage < 100) {
+      return messages.nearCompletion[Math.floor(Math.random() * messages.nearCompletion.length)];
+    } else {
+      return messages.completed[Math.floor(Math.random() * messages.completed.length)];
+    }
+  }
+};
+```
+
+## 8. ERROR HANDLING & DATA VALIDATION
+
+### 8.1 Input Validation
+```typescript
+const PracticeValidation = {
+  validateProjectData: (projectData: any) => {
+    const errors = [];
+    
+    if (!projectData.user_id) errors.push('用户ID必填');
+    if (!projectData.practice_id) errors.push('修行ID必填');
+    if (!projectData.start_date) errors.push('开始日期必填');
+    
+    if (projectData.target_count <= 0) errors.push('目标数量必须大于0');
+    if (projectData.daily_target <= 0) errors.push('每日目标必须大于0');
+    
+    if (projectData.target_end_date) {
+      const startDate = new Date(projectData.start_date);
+      const endDate = new Date(projectData.target_end_date);
+      if (endDate <= startDate) {
+        errors.push('结束日期必须晚于开始日期');
+      }
+    }
+    
+    if (errors.length > 0) {
+      throw new Error(`项目数据验证失败: ${errors.join(', ')}`);
+    }
+    
+    return true;
+  },
+
+  validateRecordData: (recordData: any, practiceType: string) => {
+    const errors = [];
+    
+    if (!recordData.user_id) errors.push('用户ID必填');
+    if (!recordData.record_date) errors.push('记录日期必填');
+    
+    if (practiceType === 'count') {
+      if (!recordData.practice_project_id) errors.push('项目ID必填');
+      if (!recordData.count || recordData.count <= 0) errors.push('数量必须大于0');
+    } else {
+      if (!recordData.practice_id) errors.push('修行ID必填');
+      if (!recordData.duration_minutes || recordData.duration_minutes <= 0) {
+        errors.push('时长必须大于0分钟');
+      }
+    }
+    
+    if (errors.length > 0) {
+      throw new Error(`记录数据验证失败: ${errors.join(', ')}`);
+    }
+    
+    return true;
+  }
+};
+```
+
+### 8.2 Data Consistency Checks
+```typescript
+const DataConsistencyCheck = {
+  auditProjectProgress: async () => {
+    const { data: projects } = await supabase
+      .from('user_practice_projects')
+      .select('*');
+    
+    for (const project of projects || []) {
+      if (project.practices?.type === 'count') {
+        const { data: records } = await supabase
+          .from('daily_records')
+          .select('count')
+          .eq('practice_project_id', project.id);
+        
+        const calculatedCount = records?.reduce((sum, r) => sum + r.count, 0) || 0;
+        
+        if (calculatedCount !== project.current_count) {
+          console.warn('Count mismatch for project:', {
+            projectId: project.id,
+            stored: project.current_count,
+            calculated: calculatedCount
+          });
+          
+          // Auto-fix if needed
+          await supabase
+            .from('user_practice_projects')
+            .update({ current_count: calculatedCount })
+            .eq('id', project.id);
+        }
+      }
+    }
+  },
+
+  cleanOrphanedRecords: async () => {
+    // Check for daily records without valid projects
+    const { data: orphanedDaily } = await supabase
+      .from('daily_records')
+      .select('id, practice_project_id')
+      .is('user_practice_projects.id', null);
+    
+    if (orphanedDaily && orphanedDaily.length > 0) {
+      console.warn('Found orphaned daily records:', orphanedDaily.length);
+    }
+    
+    // Check for meditation records without valid practices
+    const { data: orphanedMeditation } = await supabase
+      .from('meditation_records')
+      .select('id, practice_id')
+      .is('practices.id', null);
+    
+    if (orphanedMeditation && orphanedMeditation.length > 0) {
+      console.warn('Found orphaned meditation records:', orphanedMeditation.length);
+    }
+  }
+};
+```
+
+## 9. FUTURE ENHANCEMENTS
+
+### 9.1 Advanced Features
+1. **Community Sharing**: Share milestones and achievements
+2. **Group Practice**: Join community practice projects
+3. **Practice Calendar**: Visual calendar with practice schedule
+4. **Habit Tracking**: Integration with daily routine tracking
+5. **Achievement System**: Badges and milestones
+6. **Practice Reminders**: Smart notification system
+7. **Voice Recording**: Audio notes for reflections
+8. **Export Data**: Export practice history for backup
+
+### 9.2 AI-Powered Insights
+1. **Pattern Recognition**: Identify practice patterns and trends
+2. **Personalized Recommendations**: AI-suggested practice schedules
+3. **Progress Prediction**: Forecast completion dates
+4. **Motivation Messages**: Context-aware encouragement
+5. **Practice Optimization**: Suggest optimal practice times
+6. **Goal Adjustment**: Smart goal recommendation based on progress
+
+### 9.3 Integration Possibilities
+1. **Meditation Timers**: Built-in timer with bells
+2. **Mantra Counters**: Physical counter integration
+3. **Health Apps**: Integration with health tracking
+4. **Calendar Sync**: Sync with external calendars
+5. **Social Features**: Share with dharma friends
+6. **Teacher Connection**: Connect with practice teachers
+
+---
+
+This comprehensive practice system provides a robust foundation for Buddhist practice management, supporting both traditional count-based practices and contemplative meditation practices while maintaining accurate progress tracking and providing meaningful insights for practitioners at all levels.
