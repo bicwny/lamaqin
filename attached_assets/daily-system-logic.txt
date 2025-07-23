@@ -1,0 +1,832 @@
+
+# DAILY SYSTEM LOGIC - Buddhist Practice App
+
+## OVERVIEW
+The daily system serves as the central hub for the Buddhist practice app, providing users with a unified dashboard that aggregates all daily activities - study, practice, and mindfulness tracking. It implements timezone-aware daily resets and provides quick actions for maintaining consistent spiritual practice.
+
+## 1. DAILY SYSTEM ARCHITECTURE
+
+### 1.1 Core Components
+```
+daily_system:
+├── main_dashboard (app/(tabs)/index.tsx)
+├── timezone_management (hooks/useTimezone.ts + lib/timezone.ts)
+├── daily_reset_logic (automated daily counter resets)
+├── quick_actions (immediate practice recording)
+└── aggregated_displays (study + practice + mindfulness)
+```
+
+### 1.2 Daily Data Sources
+```typescript
+interface DailyDataSources {
+  study: {
+    source: 'user_courses + study_records',
+    displays: 'active_courses_with_next_lessons',
+    quick_actions: ['听传承', '看法本', '在线课程']
+  },
+  practice: {
+    count_based: {
+      source: 'user_practice_projects + daily_records',
+      period: 'daily',
+      reset_trigger: 'timezone_aware_midnight'
+    },
+    time_based: {
+      source: 'user_practice_projects + meditation_records',
+      period: 'weekly',
+      aggregation: 'current_week_sessions'
+    }
+  },
+  mindfulness: {
+    source: 'mindfulness_records',
+    displays: 'good_bad_heart_counts',
+    period: 'daily'
+  }
+}
+```
+
+## 2. TIMEZONE-AWARE DAILY RESET SYSTEM
+
+### 2.1 Timezone Detection & Management
+```typescript
+// From hooks/useTimezone.ts
+const TimezoneSystem = {
+  initialization: async () => {
+    // Detect user's local timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const offset = new Date().getTimezoneOffset();
+    
+    return {
+      timezone,
+      offset,
+      displayName: `${timezone} (GMT${offset >= 0 ? '-' : '+'}${Math.abs(offset/60)})`
+    };
+  },
+  
+  getCurrentDateInTimezone: (timezone: string) => {
+    // Return YYYY-MM-DD format in user's timezone
+    const now = new Date();
+    const localTime = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+    return localTime.toISOString().split('T')[0];
+  },
+  
+  dailyResetCheck: (timezoneInfo, lastResetDate, onReset) => {
+    const currentDate = getCurrentDateInTimezone(timezoneInfo.timezone);
+    
+    if (lastResetDate && currentDate !== lastResetDate) {
+      console.log('🌅 New day detected! Resetting daily counters...');
+      onReset(); // Trigger UI reset
+      AsyncStorage.setItem('lastResetDate', currentDate);
+    }
+  }
+};
+```
+
+### 2.2 Daily Reset Implementation
+```typescript
+// Integrated into main dashboard (app/(tabs)/index.tsx)
+const DailyResetLogic = {
+  trigger: 'useFocusEffect + useEffect',
+  
+  resetActions: [
+    'reset_daily_practice_display_counts',
+    'reload_data_from_database',
+    'update_last_reset_date',
+    'log_reset_event'
+  ],
+  
+  implementation: () => {
+    // When new day detected:
+    setDailyPractices(prev => prev.map(practice => ({
+      ...practice,
+      current: 0,           // Reset displayed count
+      progressPercent: 0,   // Reset progress bar
+      status: 'pending'     // Reset status
+    })));
+    
+    // Refresh from database (should show 0 for new day)
+    loadDashboardData();
+  }
+};
+```
+
+## 3. STUDY INTEGRATION IN DAILY DASHBOARD
+
+### 3.1 Active Course Display Logic
+```typescript
+const StudyDashboardIntegration = {
+  loadCourseLessons: async () => {
+    // Get user's active courses only
+    const { data: userCourses } = await supabase
+      .from('user_courses')
+      .select('*, course:courses(*)')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .order('progress_percentage', { ascending: false });
+    
+    const courseCards = [];
+    
+    for (const userCourse of userCourses) {
+      // Find next incomplete lesson
+      const nextLesson = await findNextIncompleteLesson(userCourse);
+      
+      if (nextLesson) {
+        courseCards.push({
+          courseId: userCourse.course_id,
+          courseName: userCourse.course.name,
+          lessonNumber: nextLesson.lesson_number,
+          lessonTitle: nextLesson.title,
+          progress: `听传承: ${listenCount}次 | 看法本: ${readCount}次`,
+          teacher: userCourse.course.teacher
+        });
+      }
+    }
+    
+    return courseCards;
+  },
+  
+  findNextIncompleteLesson: async (userCourse) => {
+    // Complex logic to determine next lesson needing completion
+    // A lesson is complete only when BOTH 听传承 AND 看法本 are recorded
+    
+    const studyRecords = await getStudyRecords(userCourse.course_id);
+    const allLessons = await getCourseLessons(userCourse.course_id);
+    
+    // Group records by lesson and check completion
+    const lessonCompletionMap = buildCompletionMap(studyRecords);
+    
+    // Find first lesson that doesn't have both study types
+    for (let i = 1; i <= userCourse.course.total_lessons; i++) {
+      const lessonData = lessonCompletionMap.get(i);
+      if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
+        return allLessons.find(l => l.lesson_number === i);
+      }
+    }
+    
+    return null; // All lessons completed
+  }
+};
+```
+
+### 3.2 Quick Study Actions
+```typescript
+const StudyQuickActions = {
+  recordStudy: async (courseId, lessonNumber, studyType) => {
+    // Optimistic UI update
+    updateStudyCardProgress(courseId, lessonNumber, studyType);
+    
+    // Show immediate feedback
+    toastService.success({
+      title: '学习记录已保存',
+      message: `${studyType}完成 - 继续加油！`
+    });
+    
+    // Background database update
+    try {
+      const studyRecord = {
+        user_id: user.id,
+        course_id: courseId,
+        lesson_id: await getLessonId(courseId, lessonNumber),
+        study_date: new Date().toISOString().split('T')[0],
+        study_type: studyType,
+        study_count_for_lesson: 1
+      };
+      
+      await supabase.from('study_records').insert(studyRecord);
+      
+      // Auto-calculate progress
+      await studyService.calculateProgress(user.id, courseId);
+      
+      // Background refresh for data consistency
+      setTimeout(() => loadCourseLessons(), 1000);
+      
+    } catch (error) {
+      // Revert optimistic update on error
+      loadCourseLessons();
+      toastService.error({
+        title: '保存失败',
+        message: '网络异常，请稍后重试'
+      });
+    }
+  }
+};
+```
+
+## 4. PRACTICE INTEGRATION IN DAILY DASHBOARD
+
+### 4.1 Dual Practice Type System
+```typescript
+interface DailyPracticeTypes {
+  count_based: {
+    period: 'daily',
+    reset_schedule: 'timezone_aware_midnight',
+    examples: ['大礼拜', '金刚萨埵百字明', '皈依发心'],
+    display_format: 'current/target unit',
+    progress_calculation: '(current / target) * 100',
+    completion_criteria: 'current >= target'
+  },
+  
+  time_based: {
+    period: 'weekly',
+    reset_schedule: 'monday_start_week',
+    examples: ['大圆满前行观修', '菩提心修法'],
+    display_format: 'week_sessions/week_target + today_details',
+    progress_calculation: 'sessions_completed_this_week',
+    completion_criteria: 'week_sessions >= week_target'
+  }
+}
+```
+
+### 4.2 Practice Loading Logic
+```typescript
+const PracticeDashboardIntegration = {
+  loadDailyPractices: async () => {
+    // Load count-based practices with daily targets
+    const { data: projects } = await supabase
+      .from('user_practice_projects')
+      .select('*, practices(*)')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .eq('target_period', 'daily')
+      .limit(3);
+    
+    const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+    const practicesData = [];
+    
+    for (const project of projects) {
+      if (project.practices.type === 'count') {
+        // Get today's count using timezone-aware date
+        const { data: todayRecords } = await supabase
+          .from('daily_records')
+          .select('count')
+          .eq('user_id', user.id)
+          .eq('practice_project_id', project.id)
+          .eq('record_date', today);
+        
+        const todayCount = todayRecords?.reduce((sum, r) => sum + r.count, 0) || 0;
+        const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
+        
+        let status = 'pending';
+        if (todayCount >= project.daily_target) status = 'completed';
+        else if (todayCount > 0) status = 'in_progress';
+        
+        practicesData.push({
+          id: project.id,
+          name: project.practices.name,
+          current: todayCount,
+          target: project.daily_target,
+          unit: project.practices.unit,
+          status,
+          progressPercent,
+          type: 'count'
+        });
+      }
+    }
+    
+    setDailyPractices(practicesData);
+  },
+  
+  loadWeeklyPractices: async () => {
+    // Load time-based practices with weekly targets
+    const { data: projects } = await supabase
+      .from('user_practice_projects')
+      .select('*, practices(*)')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .eq('target_period', 'weekly');
+    
+    const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+    const weekStart = getWeekStart(today); // Monday-based week
+    
+    const practicesData = [];
+    
+    for (const project of projects) {
+      if (project.practices.type === 'time') {
+        // Get this week's meditation sessions
+        const { data: weekRecords } = await supabase
+          .from('meditation_records')
+          .select('duration_minutes, record_date')
+          .eq('user_id', user.id)
+          .eq('practice_id', project.practice_id)
+          .gte('record_date', weekStart)
+          .lte('record_date', today);
+        
+        const weekSessions = weekRecords?.length || 0;
+        const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
+        const todaySessions = todayRecords.length;
+        
+        let status = 'pending';
+        if (weekSessions >= project.daily_target) status = 'completed';
+        else if (weekSessions > 0) status = 'in_progress';
+        
+        const todayDetails = todayRecords.length > 0 
+          ? todayRecords.map((r, i) => `第${i + 1}座${r.duration_minutes}分钟`).join('；')
+          : undefined;
+        
+        practicesData.push({
+          id: project.id,
+          name: project.practices.name,
+          weekSessions,
+          weekTarget: project.daily_target,
+          todaySessions,
+          status,
+          todayDetails,
+          practiceId: project.practice_id,
+          type: 'time'
+        });
+      }
+    }
+    
+    setWeeklyPractices(practicesData);
+  }
+};
+```
+
+### 4.3 Quick Action System
+```typescript
+const PracticeQuickActions = {
+  // Quick complete button (✓) - completes daily target immediately
+  handleQuickComplete: async (practice) => {
+    if (practice.status === 'completed') {
+      toastService.info({ 
+        title: '今日目标已达成', 
+        message: '继续保持！明日再接再厉' 
+      });
+      return;
+    }
+    
+    const remaining = practice.target - practice.current;
+    
+    // Optimistic UI update
+    updatePracticeOptimistically(practice.id, remaining, practice.type);
+    
+    // Immediate success feedback
+    toastService.success({
+      title: '已完成今日目标',
+      message: `${practice.name} +${remaining.toLocaleString()} ${practice.unit}`
+    });
+    
+    // Background recording
+    await recordQuickCompleteBackground(practice, remaining);
+  },
+  
+  // Add record button (+) - navigates to detailed recording
+  handleAddRecord: (practice) => {
+    setLastRecordTime(Date.now()); // Prevent unnecessary refresh
+    
+    router.push({
+      pathname: '/practice-detail/[practiceId]',
+      params: { practiceId: practice.id }
+    });
+  },
+  
+  // Optimistic update for immediate UI feedback
+  updatePracticeOptimistically: (practiceId, amount, practiceType) => {
+    if (practiceType === 'time') {
+      // Update weekly practices
+      setWeeklyPractices(prev => prev.map(practice => {
+        if (practice.id === practiceId) {
+          const newWeekSessions = practice.weekSessions + 1;
+          const newTodaySessions = practice.todaySessions + 1;
+          
+          return {
+            ...practice,
+            weekSessions: newWeekSessions,
+            todaySessions: newTodaySessions,
+            status: newWeekSessions >= practice.weekTarget ? 'completed' : 'in_progress',
+            todayDetails: practice.todayDetails 
+              ? `${practice.todayDetails}；第${newTodaySessions}座${amount}分钟`
+              : `第${newTodaySessions}座${amount}分钟`
+          };
+        }
+        return practice;
+      }));
+    } else {
+      // Update daily practices
+      setDailyPractices(prev => prev.map(practice => {
+        if (practice.id === practiceId) {
+          const newCurrent = practice.current + amount;
+          const newProgressPercent = Math.min((newCurrent / practice.target) * 100, 100);
+          
+          return {
+            ...practice,
+            current: newCurrent,
+            progressPercent: newProgressPercent,
+            status: newCurrent >= practice.target ? 'completed' : 'in_progress'
+          };
+        }
+        return practice;
+      }));
+    }
+  }
+};
+```
+
+## 5. MINDFULNESS INTEGRATION (FUTURE ENHANCEMENT)
+
+### 5.1 Mindfulness Dashboard Display
+```typescript
+const MindfulnessDashboardIntegration = {
+  loadTodayMindfulness: async () => {
+    const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+    
+    const { data: todayRecords } = await supabase
+      .from('mindfulness_records')
+      .select('mind_type')
+      .eq('user_id', user.id)
+      .eq('record_date', today);
+    
+    const goodCount = todayRecords?.filter(r => r.mind_type === 'good').length || 0;
+    const badCount = todayRecords?.filter(r => r.mind_type === 'bad').length || 0;
+    const total = goodCount + badCount;
+    
+    const mindfulnessRatio = total > 0 ? (goodCount / total * 100).toFixed(1) : '0';
+    
+    return {
+      goodCount,
+      badCount,
+      total,
+      mindfulnessRatio: `${mindfulnessRatio}%`,
+      status: total > 0 ? 'active' : 'pending'
+    };
+  },
+  
+  displayComponent: () => {
+    return (
+      <View style={styles.mindfulnessCard}>
+        <Text style={styles.cardTitle}>正念觉察</Text>
+        <Text style={styles.mindfulnessStats}>
+          善心: {mindfulness.goodCount}次 | 恶心: {mindfulness.badCount}次
+        </Text>
+        <Text style={styles.mindfulnessRatio}>
+          正念比例: {mindfulness.mindfulnessRatio}
+        </Text>
+        <TouchableOpacity 
+          style={styles.quickMindfulnessButton}
+          onPress={() => router.push('/(tabs)/mindfulness')}
+        >
+          <Text style={styles.buttonText}>记录觉察</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+};
+```
+
+## 6. DAILY DASHBOARD UI ARCHITECTURE
+
+### 6.1 Layout Structure
+```typescript
+const DailyDashboardLayout = {
+  structure: [
+    'page_header_with_greeting',
+    'user_avatar_profile_access',
+    'study_section_with_active_courses',
+    'practice_section_two_column_grid',
+    'mindfulness_section_summary_card', // Future
+    'quick_navigation_footer'
+  ],
+  
+  responsive_design: {
+    study_cards: 'full_width_vertical_stack',
+    practice_cards: 'two_column_grid_48_percent_width',
+    scroll_behavior: 'refresh_control_enabled',
+    loading_states: 'activity_indicator_with_text'
+  }
+};
+```
+
+### 6.2 Card-Based Interface
+```typescript
+const CardInterfaceSystem = {
+  study_card: {
+    components: [
+      'course_name_and_teacher',
+      'next_lesson_info',
+      'progress_text_display',
+      'quick_action_buttons_row'
+    ],
+    quick_actions: ['听传承', '看法本', '在线课程'],
+    styling: 'white_background_shadow_rounded'
+  },
+  
+  practice_card_count: {
+    components: [
+      'practice_name_truncated',
+      'count_and_percentage_row',
+      'progress_bar_visual',
+      'action_buttons_checkmark_plus'
+    ],
+    interactions: ['tap_for_detail', 'quick_complete', 'add_record'],
+    styling: 'two_column_responsive_grid'
+  },
+  
+  practice_card_time: {
+    components: [
+      'practice_name_truncated',
+      'week_progress_text',
+      'today_session_details',
+      'add_record_button_only'
+    ],
+    interactions: ['tap_for_detail', 'add_session'],
+    styling: 'consistent_with_count_cards'
+  }
+};
+```
+
+## 7. DATA REFRESH & SYNCHRONIZATION
+
+### 7.1 Smart Refresh Strategy
+```typescript
+const DataRefreshStrategy = {
+  focus_based_refresh: {
+    trigger: 'useFocusEffect',
+    condition: 'time_since_last_record > 2_seconds',
+    purpose: 'avoid_refresh_when_returning_from_recording'
+  },
+  
+  pull_to_refresh: {
+    trigger: 'user_gesture',
+    action: 'reload_all_dashboard_data',
+    feedback: 'visual_refresh_indicator'
+  },
+  
+  background_refresh: {
+    trigger: 'after_recording_actions',
+    delay: '1_second',
+    purpose: 'ensure_data_consistency'
+  },
+  
+  optimistic_updates: {
+    immediate: 'update_ui_before_database',
+    rollback: 'revert_on_error',
+    consistency_check: 'background_verification'
+  }
+};
+```
+
+### 7.2 Error Handling & Fallbacks
+```typescript
+const ErrorHandlingSystem = {
+  network_errors: {
+    strategy: 'optimistic_update_with_rollback',
+    user_feedback: 'toast_error_message',
+    recovery: 'automatic_retry_or_manual_refresh'
+  },
+  
+  data_inconsistency: {
+    detection: 'compare_optimistic_vs_database',
+    resolution: 'background_data_reload',
+    prevention: 'atomic_operations_where_possible'
+  },
+  
+  timezone_errors: {
+    fallback: 'use_utc_if_timezone_detection_fails',
+    logging: 'console_warn_with_details',
+    user_impact: 'minimal_functionality_preserved'
+  }
+};
+```
+
+## 8. PERFORMANCE OPTIMIZATION
+
+### 8.1 Data Loading Optimization
+```typescript
+const PerformanceOptimizations = {
+  parallel_loading: {
+    implementation: 'Promise.all_for_concurrent_requests',
+    benefits: 'faster_initial_load_time',
+    sections: ['courses', 'practices', 'profile', 'mindfulness']
+  },
+  
+  selective_refresh: {
+    strategy: 'only_refresh_changed_sections',
+    triggers: ['specific_user_actions', 'focus_events'],
+    optimization: 'avoid_full_dashboard_reload'
+  },
+  
+  caching_strategy: {
+    timezone_info: 'persist_in_async_storage',
+    user_profile: 'memory_cache_with_ttl',
+    practice_definitions: 'session_cache'
+  }
+};
+```
+
+### 8.2 UI Responsiveness
+```typescript
+const UIResponsivenessStrategy = {
+  immediate_feedback: {
+    all_user_actions: 'show_loading_or_success_state',
+    button_presses: 'visual_feedback_before_processing',
+    navigation: 'optimistic_routing'
+  },
+  
+  lazy_loading: {
+    non_critical_data: 'load_after_primary_content',
+    images_and_media: 'progressive_loading',
+    secondary_features: 'on_demand_initialization'
+  },
+  
+  smooth_animations: {
+    progress_bars: 'animated_progress_updates',
+    card_interactions: 'smooth_press_animations',
+    navigation_transitions: 'native_navigation_animations'
+  }
+};
+```
+
+## 9. DAILY WORKFLOW INTEGRATION
+
+### 9.1 Morning Dashboard Flow
+```typescript
+const MorningWorkflow = {
+  greeting_system: {
+    time_based_greeting: getGreeting(),
+    personalization: `${greeting} • ${dharmaName}居士`,
+    timezone_awareness: 'respect_user_local_time'
+  },
+  
+  daily_goal_presentation: {
+    study: 'show_next_lessons_for_active_courses',
+    practice: 'display_daily_targets_with_progress',
+    mindfulness: 'encourage_awareness_recording'
+  },
+  
+  quick_start_actions: {
+    study: 'one_click_lesson_recording',
+    practice: 'quick_complete_or_add_session',
+    navigation: 'direct_access_to_detailed_screens'
+  }
+};
+```
+
+### 9.2 Evening Review Flow
+```typescript
+const EveningWorkflow = {
+  progress_summary: {
+    study: 'lessons_completed_today',
+    practice: 'targets_achieved_vs_set',
+    mindfulness: 'awareness_moments_captured'
+  },
+  
+  encouragement_system: {
+    completed_goals: 'positive_reinforcement_messages',
+    partial_progress: 'gentle_encouragement_to_continue',
+    missed_days: 'compassionate_reset_messaging'
+  },
+  
+  preparation_for_tomorrow: {
+    auto_reset: 'midnight_counter_reset',
+    goal_continuity: 'preserve_long_term_practice_context',
+    motivation: 'daily_wisdom_or_inspiration'
+  }
+};
+```
+
+## 10. ANALYTICS & INSIGHTS INTEGRATION
+
+### 10.1 Daily Analytics Collection
+```typescript
+const DailyAnalytics = {
+  usage_metrics: {
+    dashboard_visits: 'track_daily_engagement',
+    action_completion_rates: 'study_practice_completion_ratios',
+    feature_usage: 'most_used_quick_actions'
+  },
+  
+  practice_consistency: {
+    streak_tracking: 'consecutive_days_with_practice',
+    goal_achievement: 'daily_target_completion_rates',
+    practice_distribution: 'study_vs_practice_vs_mindfulness_balance'
+  },
+  
+  personalization_data: {
+    preferred_practice_times: 'when_user_most_active',
+    practice_preferences: 'which_practices_completed_most',
+    learning_patterns: 'study_completion_timing_and_frequency'
+  }
+};
+```
+
+### 10.2 Dashboard Customization (Future)
+```typescript
+const CustomizationFeatures = {
+  layout_preferences: {
+    card_order: 'user_defined_priority_sections',
+    visibility_settings: 'hide_completed_or_irrelevant_items',
+    compact_vs_detailed: 'information_density_preferences'
+  },
+  
+  goal_customization: {
+    dynamic_targets: 'adjust_daily_goals_based_on_performance',
+    seasonal_adjustments: 'accommodate_practice_intensives',
+    personal_milestones: 'custom_achievement_celebrations'
+  },
+  
+  notification_integration: {
+    daily_reminders: 'practice_time_notifications',
+    achievement_alerts: 'goal_completion_celebrations',
+    gentle_nudges: 'missed_practice_gentle_reminders'
+  }
+};
+```
+
+## 11. TECHNICAL IMPLEMENTATION DETAILS
+
+### 11.1 State Management Architecture
+```typescript
+const StateManagement = {
+  local_state: {
+    dashboard_data: 'useState_for_display_components',
+    loading_states: 'individual_loading_flags',
+    user_interactions: 'optimistic_ui_updates'
+  },
+  
+  global_state: {
+    auth_context: 'user_authentication_and_profile',
+    timezone_context: 'timezone_aware_date_calculations',
+    navigation_state: 'react_navigation_integrated'
+  },
+  
+  persistence: {
+    async_storage: 'last_reset_date_and_preferences',
+    supabase_realtime: 'future_live_updates',
+    local_cache: 'performance_optimization_layer'
+  }
+};
+```
+
+### 11.2 Database Query Optimization
+```typescript
+const DatabaseOptimization = {
+  query_efficiency: {
+    selective_joins: 'only_fetch_needed_relations',
+    indexed_queries: 'proper_database_indexing',
+    batch_operations: 'minimize_round_trips'
+  },
+  
+  data_aggregation: {
+    server_side_calculations: 'progress_percentages_in_database',
+    view_optimizations: 'materialized_views_for_complex_aggregations',
+    caching_layer: 'redis_or_application_level_caching'
+  },
+  
+  real_time_updates: {
+    supabase_subscriptions: 'live_practice_updates',
+    optimistic_updates: 'immediate_ui_feedback',
+    conflict_resolution: 'last_write_wins_strategy'
+  }
+};
+```
+
+## 12. FUTURE ENHANCEMENTS
+
+### 12.1 Advanced Daily Features
+```typescript
+const FutureEnhancements = {
+  ai_insights: {
+    practice_recommendations: 'ml_based_practice_suggestions',
+    optimal_timing: 'personalized_practice_scheduling',
+    progress_predictions: 'achievement_timeline_forecasting'
+  },
+  
+  social_features: {
+    practice_sharing: 'optional_progress_sharing_with_sangha',
+    group_challenges: 'collective_practice_goals',
+    mentor_connection: 'guidance_and_accountability_partnerships'
+  },
+  
+  advanced_analytics: {
+    detailed_reports: 'weekly_monthly_practice_summaries',
+    trend_analysis: 'long_term_spiritual_development_tracking',
+    comparative_insights: 'progress_relative_to_similar_practitioners'
+  }
+};
+```
+
+### 12.2 Integration Opportunities
+```typescript
+const IntegrationOpportunities = {
+  calendar_integration: {
+    practice_scheduling: 'sync_with_device_calendar',
+    retreat_planning: 'intensive_practice_period_management',
+    reminder_system: 'intelligent_notification_scheduling'
+  },
+  
+  health_integration: {
+    mindfulness_tracking: 'correlation_with_meditation_apps',
+    wellness_metrics: 'holistic_wellbeing_dashboard',
+    activity_correlation: 'practice_impact_on_daily_life'
+  },
+  
+  content_integration: {
+    audio_dharma: 'integrated_teaching_playback',
+    text_resources: 'context_aware_scripture_references',
+    community_content: 'user_generated_practice_insights'
+  }
+};
+```
+
+---
+
+This comprehensive daily system creates a unified spiritual practice hub that respects users' timezone preferences, provides immediate feedback for sustained motivation, and integrates seamlessly with all aspects of Buddhist practice tracking while maintaining simplicity and ease of use.
