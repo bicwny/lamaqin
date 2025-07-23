@@ -1,0 +1,315 @@
+
+# DAILY SYSTEM LOGIC - Buddhist Practice App
+
+## OVERVIEW
+The "daily" system refers to all activities and tracking that occur on a daily basis in the Buddhist practice app. This includes daily study lessons, daily practice records, daily mindfulness tracking, and the main dashboard that aggregates all daily activities.
+
+## 1. DAILY DASHBOARD (INDEX PAGE)
+
+### 1.1 Main Dashboard Structure
+```
+📱 主页 
+   Greeting: "早上好/下午好/晚上好 • [用户法名]居士"
+   
+├── 今日学习 (Today's Study)
+│   ├── Active Course Cards
+│   ├── Quick Action Buttons (听传承/看法本/在线课程)
+│   └── Progress Display
+│
+├── 今日修行 (Today's Practice) 
+│   ├── Daily Count Practices
+│   ├── Weekly Time Practices (Today's Sessions)
+│   └── Quick Record Buttons
+│
+└── 今日正念 (Today's Mindfulness)
+    ├── Good/Bad Heart Tracking
+    ├── Daily Summary Stats
+    └── Quick Record Button
+```
+
+### 1.2 Data Loading Logic
+```
+Dashboard Loading Sequence:
+1. Load user authentication state & profile
+2. Load active study courses & next lessons
+3. Load daily practice projects & today's records
+4. Load weekly practice projects & today's sessions
+5. Load mindfulness records for today
+6. Calculate completion status for each activity
+7. Display aggregated daily view
+```
+
+## 2. DAILY STUDY SYSTEM
+
+### 2.1 Course & Lesson Management
+```
+Database Structure:
+├── courses (course metadata)
+├── course_lessons (individual lessons)
+├── user_courses (enrollment & progress)
+└── study_records (daily study tracking)
+```
+
+### 2.2 Daily Study Logic
+```
+Study Recording Flow:
+1. User selects course from active enrollments
+2. System shows next lesson or allows lesson selection
+3. User records study activity:
+   - 听传承 (Listen to Teaching) - audio/live instruction
+   - 看法本 (Read Text) - written materials
+   - 在线课程 (Online Course) - digital content
+4. System records to study_records table:
+   - user_id, course_id, lesson_id
+   - study_date (today)
+   - study_type (听传承/看法本)
+   - study_count_for_lesson (incremental)
+5. System recalculates course progress
+6. Updates user_courses.progress_percentage
+```
+
+### 2.3 Progress Calculation
+```
+Course Progress Logic:
+- Progress = (lessons with study_records / total_lessons) * 100
+- Lesson Completion = has both 听传承 AND 看法本 records
+- Daily Study Goal = Continue from last studied lesson
+- Auto-advance = Move to next lesson after completion
+```
+
+### 2.4 Daily Study Display
+```
+Index Page Study Card:
+┌─────────────────────────────┐
+│ 《入菩萨行论》               │
+│ 继续学习 · 第5课：护正知品    │
+│ 完成进度：2.5% (5/201课)      │
+│ [听传承] [看法本] [在线课程]   │
+└─────────────────────────────┘
+```
+
+## 3. DAILY PRACTICE SYSTEM
+
+### 3.1 Practice Types
+```
+Count-based Practices (daily target):
+- 磕头 (Prostrations): X times/day
+- 念咒 (Mantra Recitation): X times/day  
+- 供灯 (Butter Lamp Offering): X times/day
+
+Time-based Practices (session-based):
+- 前行观修 (Preliminary Meditation): X sessions/week
+- 正行观修 (Main Meditation): X sessions/week
+- 念佛 (Buddha Recitation): X sessions/week
+```
+
+### 3.2 Daily Practice Recording
+```
+Count Practice Flow:
+1. User sees daily target vs current count
+2. Taps "+" to record completion
+3. System prompts for count (default: daily_target remaining)
+4. Records to daily_records table:
+   - user_id, practice_project_id
+   - record_date (today)
+   - count (number completed)
+5. Updates project current_count
+6. Calculates completion status
+
+Time Practice Flow:
+1. User sees weekly target vs weekly sessions
+2. Taps "记录观修" to start session
+3. Modal opens with:
+   - Duration input (minutes)
+   - Method selection (前行观修/正行观修/etc)
+   - Optional notes
+4. Records to meditation_records table:
+   - user_id, practice_id
+   - record_date (today)  
+   - duration_minutes, method, notes
+5. Updates weekly session count
+```
+
+### 3.3 Daily Practice Status
+```
+Status Calculation:
+- 'pending': count = 0
+- 'in_progress': 0 < count < daily_target  
+- 'completed': count >= daily_target
+
+Progress Display:
+- Progress bar: (current_count / daily_target) * 100
+- Status icon: ⏸️ pending, 🔄 in_progress, ✅ completed
+```
+
+### 3.4 Daily Practice Display
+```
+Count Practice Card:
+┌─────────────────────────────┐
+│ 磕头                        │
+│ 今日 50/108 (46.3%)         │
+│ ████████░░░░░░░░░░           │
+│                        [+]  │
+└─────────────────────────────┘
+
+Time Practice Card:
+┌─────────────────────────────┐
+│ 前行观修                    │
+│ 本周 2/5座                  │
+│ 今日：已完成1座 (20分钟)     │
+│                   [记录观修] │
+└─────────────────────────────┘
+```
+
+## 4. DAILY MINDFULNESS SYSTEM
+
+### 4.1 Mindfulness Tracking
+```
+Heart State Recording:
+- Good Heart (善心): positive mental states
+- Bad Heart (恶心): negative mental states
+- Optional description for context
+```
+
+### 4.2 Daily Mindfulness Logic
+```
+Recording Flow:
+1. User taps mindfulness section or quick record
+2. Selects mind_type: 'good' or 'bad'
+3. Optional: adds description
+4. Records to mindfulness_records table:
+   - user_id, record_date (today)
+   - record_time (current time)
+   - mind_type, description
+5. NO toast notification (removed per request)
+6. Updates daily summary stats
+```
+
+### 4.3 Daily Mindfulness Display
+```
+Today's Mindfulness:
+┌─────────────────────────────┐
+│ 今日正念觉察                │
+│ 善心: 5次 | 恶心: 2次        │
+│ 正念比例: 71.4%             │
+│ [快速记录]                  │
+└─────────────────────────────┘
+```
+
+## 5. DAILY DATA FLOW
+
+### 5.1 Daily Reset Logic
+```
+New Day Processing:
+- All daily_records.record_date = today
+- All meditation_records.record_date = today  
+- All mindfulness_records.record_date = today
+- Daily targets reset (count practices start at 0)
+- Weekly practices continue accumulating
+- Course progress persists
+```
+
+### 5.2 Daily Aggregation
+```
+Dashboard Data Sources:
+1. Active Courses: user_courses WHERE status='active'
+2. Next Lessons: course_lessons with minimal study_records
+3. Daily Practices: user_practice_projects WHERE target_period='daily'
+4. Weekly Practices: user_practice_projects WHERE target_period='weekly'
+5. Today's Records: daily_records WHERE record_date=today
+6. Today's Sessions: meditation_records WHERE record_date=today
+7. Today's Mindfulness: mindfulness_records WHERE record_date=today
+```
+
+### 5.3 Daily Completion Logic
+```
+Overall Daily Progress:
+- Study: Has recorded any study activity today
+- Practice: All daily practices >= daily_target
+- Mindfulness: Has recorded mindfulness activity today
+- Total Daily Score: (completed_activities / total_activities) * 100
+```
+
+## 6. DAILY TIMEZONE HANDLING
+
+### 6.1 Timezone Awareness
+```
+Date Calculation:
+- User's timezone stored in users.timezone_id
+- All daily calculations use timezone-aware dates
+- getCurrentDateInTimezone() for consistent daily boundaries
+- UTC storage with timezone conversion for display
+```
+
+### 6.2 Daily Boundary Logic
+```
+Day Transition:
+- Midnight in user's timezone = new daily cycle
+- Previous day's incomplete practices remain in history
+- New day starts with fresh daily targets
+- Weekly practices span multiple daily cycles
+```
+
+## 7. DAILY PERSISTENCE & SYNC
+
+### 7.1 Data Persistence
+```
+Real-time Updates:
+- All daily records immediately saved to Supabase
+- Local state updated optimistically  
+- Error handling with retry logic
+- Offline capability with sync on reconnect
+```
+
+### 7.2 Daily History
+```
+Historical Data:
+- All daily_records preserved by date
+- All meditation_records preserved by date
+- All mindfulness_records preserved by date
+- Allows for daily/weekly/monthly progress analysis
+- Supports streak tracking and long-term trends
+```
+
+## 8. DAILY UI/UX PATTERNS
+
+### 8.1 Quick Actions
+```
+One-tap Recording:
+- [听传承] / [看法本] buttons for immediate study recording
+- [+] buttons for immediate count practice recording  
+- [记录观修] for immediate meditation session start
+- [快速记录] for immediate mindfulness recording
+```
+
+### 8.2 Progress Visualization
+```
+Daily Progress Indicators:
+- Progress bars for count practices (0-100%)
+- Session counters for time practices (X/Y座)
+- Completion checkmarks for achieved targets
+- Color coding: red (pending), yellow (progress), green (complete)
+```
+
+## 9. DAILY SYSTEM INTEGRATION
+
+### 9.1 Cross-Module Dependencies
+```
+Daily System Dependencies:
+- Authentication: user identification & timezone
+- Study System: course enrollment & lesson tracking
+- Practice System: project configuration & recording
+- Mindfulness System: awareness tracking
+- Profile System: dharma name & preferences
+```
+
+### 9.2 Daily Navigation Flow
+```
+Navigation Patterns:
+Index → Study Detail → Course Detail → Lesson Detail
+Index → Practice Detail → Meditation Recording → History
+Index → Mindfulness → Quick Record → Daily Summary
+Index → Profile → Settings → Timezone Configuration
+```
+
+This daily system creates a comprehensive Buddhist practice tracking environment where users can maintain consistent daily spiritual activities across study, practice, and mindfulness domains.
