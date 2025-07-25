@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 const fs = require('fs');
 const path = require('path');
 
@@ -58,7 +56,6 @@ if (problematicImports.length > 0) {
 
 // Check for circular dependencies
 console.log('\n🔄 Checking for potential circular dependencies...');
-// This is a basic check - you might want to use a more sophisticated tool
 const importMap = new Map();
 
 function buildImportMap(dir) {
