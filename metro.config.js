@@ -39,8 +39,15 @@ config.serializer = {
   getModulesRunBeforeMainModule: () => [],
   processModuleFilter: (module) => {
     // Filter out modules with undefined paths
-    if (!module.path || typeof module.path !== 'string') {
-      console.warn('Filtering out module with undefined path:', module);
+    if (!module || !module.path || typeof module.path !== 'string' || module.path.trim() === '') {
+      console.warn('Filtering out module with invalid path:', module);
+      return false;
+    }
+    // Additional check for valid file extensions
+    const validExtensions = ['.js', '.jsx', '.ts', '.tsx', '.json', '.png', '.jpg', '.jpeg', '.gif', '.svg'];
+    const hasValidExtension = validExtensions.some(ext => module.path.endsWith(ext));
+    if (!hasValidExtension && !module.path.includes('node_modules')) {
+      console.warn('Filtering out module with invalid extension:', module.path);
       return false;
     }
     return true;
