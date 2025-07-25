@@ -33,10 +33,32 @@ config.watchFolders = [
   path.resolve(__dirname, 'utils'),
 ];
 
-// Serializer configuration to handle undefined paths
+// Enhanced serializer configuration to handle undefined paths
 config.serializer = {
   ...config.serializer,
   getModulesRunBeforeMainModule: () => [],
+  processModuleFilter: (module) => {
+    // Filter out modules with undefined paths
+    if (!module.path || typeof module.path !== 'string') {
+      console.warn('Filtering out module with undefined path:', module);
+      return false;
+    }
+    return true;
+  },
+};
+
+// Add transformer configuration
+config.transformer = {
+  ...config.transformer,
+  babelTransformerPath: require.resolve('metro-react-native-babel-transformer'),
+  minifierPath: 'metro-minify-terser',
+  minifierConfig: {
+    // Handle undefined paths in minification
+    keep_fnames: true,
+    mangle: {
+      keep_fnames: true,
+    },
+  },
 };
 
 module.exports = withNativeWind(config, { input: './global.css' });
