@@ -50,7 +50,6 @@ config.serializer = {
 // Add transformer configuration
 config.transformer = {
   ...config.transformer,
-  babelTransformerPath: require.resolve('metro-react-native-babel-transformer'),
   minifierPath: 'metro-minify-terser',
   minifierConfig: {
     // Handle undefined paths in minification
