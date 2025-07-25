@@ -29,6 +29,8 @@ function RootLayoutNav() {
       />
       <Stack.Screen name="practice-detail/[practiceId]" />
       <Stack.Screen name="meditation-detail/[recordId]" />
+      <Stack.Screen name="meditation-detail/[practiceId]" />
+      <Stack.Screen name="meditation-record-detail/[recordId]" />
       <Stack.Screen name="course-detail/[courseId]" />
       <Stack.Screen name="+not-found" />
     </Stack>
