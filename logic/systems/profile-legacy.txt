@@ -1,0 +1,951 @@
+
+# PROFILE SYSTEM LOGIC - Buddhist Practice App
+
+## OVERVIEW
+The profile system manages user account information, personal details, and settings within the Buddhist practice app. It handles user registration, profile setup, editing capabilities, and authentication state management with a focus on Buddhist community features.
+
+## 1. CORE PROFILE ARCHITECTURE
+
+### 1.1 Database Structure
+```
+profile_system:
+├── users (用户基础表)
+└── auth.users (Supabase认证表)
+```
+
+### 1.2 Entity Relationships
+```sql
+users:
+- id (UUID, primary key, references auth.users)
+- email (用户邮箱, unique)
+- dharma_name (法名, nullable)
+- lay_name (俗名, required for completion)
+- class_name (当前班级, nullable)
+- location (所在地区, required for completion)
+- practice_years (修行年限, nullable)
+- bio (个人简介, nullable)
+- avatar_url (头像链接, nullable)
+- created_at (创建时间)
+- updated_at (更新时间)
+
+auth.users (Supabase Auth):
+- id (UUID, primary key)
+- email (邮箱)
+- email_confirmed_at (邮箱验证时间)
+- user_metadata (用户元数据)
+  └── dharma_name (法名存储)
+```
+
+## 2. PROFILE COMPLETION LOGIC
+
+### 2.1 Profile Completeness Requirements
+```typescript
+interface ProfileCompletionCriteria {
+  required_fields: ['lay_name', 'location'];
+  optional_fields: ['dharma_name', 'class_name', 'practice_years', 'bio'];
+}
+
+const isProfileComplete = (userData: UserData) => {
+  return Boolean(userData?.lay_name && userData?.location);
+};
+```
+
+### 2.2 Profile Validation Rules
+```typescript
+const ProfileValidation = {
+  lay_name: {
+    required: true,
+    minLength: 1,
+    maxLength: 50,
+    validation: (value: string) => {
+      if (!value.trim()) {
+        return { valid: false, message: '俗名是必填项，请输入您的姓名' };
+      }
+      return { valid: true };
+    }
+  },
+  
+  location: {
+    required: true,
+    minLength: 1,
+    maxLength: 100,
+    validation: (value: string) => {
+      if (!value.trim()) {
+        return { valid: false, message: '所在地区是必填项，请输入您的地区' };
+      }
+      return { valid: true };
+    }
+  },
+  
+  dharma_name: {
+    required: false,
+    maxLength: 50,
+    validation: (value: string) => {
+      return { valid: true }; // Optional field, always valid
+    }
+  },
+  
+  class_name: {
+    required: false,
+    maxLength: 100,
+    examples: ['23正科', '入行', '加行班', '净土班'],
+    validation: (value: string) => {
+      return { valid: true }; // Optional field, always valid
+    }
+  }
+};
+```
+
+## 3. PROFILE WORKFLOW SYSTEM
+
+### 3.1 User Registration & Setup Flow
+
+#### Step 1: Email Authentication
+```typescript
+const RegistrationFlow = {
+  emailVerification: async (email: string, dharmaName?: string) => {
+    // Send OTP code to email
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true,
+        data: {
+          dharma_name: dharmaName || null
+        }
+      }
+    });
+    
+    if (error) throw new Error(error.message);
+    
+    // Navigate to email verification screen
+    router.push({
+      pathname: '/auth/email-verification',
+      params: { email, dharmaName }
+    });
+  },
+  
+  verifyOTP: async (email: string, token: string) => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
+    
+    if (error) throw new Error(error.message);
+    
+    if (data.user) {
+      // Create user record in database
+      await ensureUserInDatabase(data.user);
+      
+      // Navigate to profile setup
+      router.replace('/profile-setup');
+    }
+  }
+};
+```
+
+#### Step 2: Profile Setup (Required)
+```typescript
+const ProfileSetupFlow = {
+  loadExistingData: async (userId: string) => {
+    // Check if user has existing profile data
+    const { data: userData } = await supabase
+      .from('users')
+      .select('dharma_name, lay_name, class_name, location')
+      .eq('id', userId)
+      .maybeSingle();
+    
+    // Pre-populate form with existing data
+    return userData || {};
+  },
+  
+  saveProfile: async (profileData: ProfileData) => {
+    // Validate required fields
+    if (!profileData.lay_name?.trim()) {
+      throw new Error('俗名是必填项，请输入您的姓名');
+    }
+    
+    if (!profileData.location?.trim()) {
+      throw new Error('所在地区是必填项，请输入您的地区');
+    }
+    
+    // Update both auth metadata and database
+    await Promise.all([
+      // Update Supabase Auth metadata
+      supabase.auth.updateUser({
+        data: {
+          dharma_name: profileData.dharma_name?.trim() || null,
+          lay_name: profileData.lay_name.trim(),
+          class_name: profileData.class_name?.trim() || null,
+          location: profileData.location.trim(),
+        }
+      }),
+      
+      // Update database record
+      supabase
+        .from('users')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          dharma_name: profileData.dharma_name?.trim() || null,
+          lay_name: profileData.lay_name.trim(),
+          class_name: profileData.class_name?.trim() || null,
+          location: profileData.location.trim(),
+          updated_at: new Date().toISOString()
+        })
+    ]);
+    
+    // Show success message and navigate to main app
+    toastService.success({
+      title: '保存成功',
+      message: '个人资料已更新'
+    });
+    
+    setTimeout(() => {
+      router.replace('/(tabs)');
+    }, 1500);
+  }
+};
+```
+
+### 3.2 Navigation Control Logic
+
+#### Route Protection & Redirection
+```typescript
+const RouteProtection = {
+  // Main index route logic
+  indexRoute: async () => {
+    const { user, loading } = useAuth();
+    const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
+    
+    if (loading) {
+      return <LoadingScreen />;
+    }
+    
+    // Not authenticated - redirect to unified auth
+    if (!user) {
+      console.log('🔐 No user found, redirecting to unified auth');
+      return <Redirect href="/auth/unified" />;
+    }
+    
+    // Check profile completeness
+    const userData = await checkProfileCompleteness(user.id);
+    const isComplete = Boolean(userData?.lay_name && userData?.location);
+    
+    // Authenticated but profile incomplete - redirect to setup
+    if (!isComplete) {
+      console.log('📝 Profile incomplete, redirecting to profile setup');
+      return <Redirect href="/profile-setup" />;
+    }
+    
+    // Authenticated with complete profile - redirect to main app
+    console.log('✅ Profile complete, redirecting to tabs home');
+    return <Redirect href="/(tabs)" />;
+  },
+  
+  profileSetupRoute: () => {
+    // Only accessible to authenticated users
+    const { user } = useAuth();
+    
+    if (!user) {
+      return <Redirect href="/auth/unified" />;
+    }
+    
+    // Show profile setup form
+    return <ProfileSetupScreen />;
+  }
+};
+```
+
+## 4. PROFILE DISPLAY & MANAGEMENT
+
+### 4.1 Profile Information Display
+
+#### Profile Header Component
+```typescript
+const ProfileHeader = ({ profile }) => {
+  return (
+    <View style={styles.profileHeader}>
+      <Avatar 
+        dharmaName={profile?.dharma_name} 
+        size={80} 
+      />
+      <View style={styles.profileInfo}>
+        <Text style={styles.dharmaName}>
+          {profile?.dharma_name || '未设置法名'}
+        </Text>
+        <Text style={styles.email}>
+          {profile?.email}
+        </Text>
+        {profile?.location && (
+          <Text style={styles.location}>
+            📍 {profile.location}
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+};
+```
+
+#### Profile Details Cards
+```typescript
+const ProfileDetailsCard = ({ profile }) => {
+  const detailItems = [
+    {
+      label: '当前班级',
+      value: profile?.class_name,
+      visible: !!profile?.class_name
+    },
+    {
+      label: '修行年限',
+      value: profile?.practice_years ? `${profile.practice_years} 年` : null,
+      visible: !!profile?.practice_years
+    },
+    {
+      label: '个人简介',
+      value: profile?.bio,
+      visible: !!profile?.bio
+    },
+    {
+      label: '加入时间',
+      value: new Date(profile?.created_at || '').toLocaleDateString('zh-CN'),
+      visible: true
+    }
+  ];
+  
+  return (
+    <View style={styles.profileDetails}>
+      {detailItems.filter(item => item.visible).map((item, index) => (
+        <View key={index} style={styles.detailItem}>
+          <Text style={styles.detailLabel}>{item.label}</Text>
+          <Text style={styles.detailValue}>{item.value}</Text>
+        </View>
+      ))}
+    </View>
+  );
+};
+```
+
+### 4.2 Avatar Generation System
+
+#### Dharma Name Avatar Logic
+```typescript
+const AvatarGenerator = {
+  generateFromDharmaName: (dharmaName?: string) => {
+    if (!dharmaName) {
+      return { text: '🙏', backgroundColor: '#FF6B6B' };
+    }
+    
+    // Extract first character for avatar display
+    const firstChar = dharmaName.charAt(0).toUpperCase();
+    
+    // Generate consistent color based on name
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
+    const colorIndex = dharmaName.charCodeAt(0) % colors.length;
+    
+    return {
+      text: firstChar,
+      backgroundColor: colors[colorIndex]
+    };
+  },
+  
+  Avatar: ({ dharmaName, size = 50 }) => {
+    const { text, backgroundColor } = AvatarGenerator.generateFromDharmaName(dharmaName);
+    
+    return (
+      <View style={[
+        styles.avatar,
+        { 
+          width: size, 
+          height: size, 
+          backgroundColor,
+          borderRadius: size / 2 
+        }
+      ]}>
+        <Text style={[styles.avatarText, { fontSize: size * 0.4 }]}>
+          {text}
+        </Text>
+      </View>
+    );
+  }
+};
+```
+
+## 5. PROFILE EDITING SYSTEM
+
+### 5.1 Edit Profile Flow
+
+#### Profile Data Loading
+```typescript
+const EditProfileFlow = {
+  loadUserProfile: async (userId: string) => {
+    try {
+      console.log('🔍 Loading profile for editing:', userId);
+      
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('dharma_name, lay_name, location, class_name, practice_years, bio')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('❌ Error fetching user data:', error);
+        throw new Error('加载用户资料失败');
+      }
+
+      // Pre-populate form fields
+      return {
+        dharmaName: userData.dharma_name || '',
+        layName: userData.lay_name || '',
+        location: userData.location || '',
+        currentClass: userData.class_name || '',
+        practiceYears: userData.practice_years || '',
+        bio: userData.bio || ''
+      };
+    } catch (error) {
+      console.error('❌ Error loading profile:', error);
+      throw error;
+    }
+  },
+  
+  saveProfileChanges: async (userId: string, profileData: any) => {
+    try {
+      // Validate data before saving
+      const validationResult = validateProfileData(profileData);
+      if (!validationResult.valid) {
+        throw new Error(validationResult.message);
+      }
+      
+      // Update database record
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({
+          dharma_name: profileData.dharmaName.trim() || null,
+          lay_name: profileData.layName.trim() || null,
+          class_name: profileData.currentClass.trim() || null,
+          location: profileData.location.trim() || null,
+          practice_years: profileData.practiceYears || null,
+          bio: profileData.bio.trim() || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (dbError) {
+        throw new Error('更新数据库时发生错误，请重试');
+      }
+
+      // Also update auth metadata for consistency
+      await supabase.auth.updateUser({
+        data: {
+          dharma_name: profileData.dharmaName.trim() || null,
+          lay_name: profileData.layName.trim() || null,
+          class_name: profileData.currentClass.trim() || null,
+          location: profileData.location.trim() || null,
+        }
+      });
+
+      toastService.success({
+        title: '保存成功',
+        message: '个人资料已更新'
+      });
+      
+      // Navigate back to profile
+      router.back();
+    } catch (error) {
+      console.error('❌ Save profile error:', error);
+      toastService.error({
+        title: '保存失败',
+        message: error.message || '请检查网络连接后重试'
+      });
+    }
+  }
+};
+```
+
+### 5.2 Form Validation & UI
+
+#### Real-time Validation
+```typescript
+const ProfileFormValidation = {
+  validateField: (fieldName: string, value: string) => {
+    const rules = ProfileValidation[fieldName];
+    if (!rules) return { valid: true };
+    
+    // Required field validation
+    if (rules.required && !value.trim()) {
+      return {
+        valid: false,
+        message: `${getFieldDisplayName(fieldName)}是必填项`
+      };
+    }
+    
+    // Length validation
+    if (rules.maxLength && value.length > rules.maxLength) {
+      return {
+        valid: false,
+        message: `${getFieldDisplayName(fieldName)}不能超过${rules.maxLength}个字符`
+      };
+    }
+    
+    // Custom validation
+    if (rules.validation) {
+      return rules.validation(value);
+    }
+    
+    return { valid: true };
+  },
+  
+  validateAllFields: (formData: any) => {
+    const errors = {};
+    
+    Object.keys(formData).forEach(fieldName => {
+      const validation = ProfileFormValidation.validateField(fieldName, formData[fieldName]);
+      if (!validation.valid) {
+        errors[fieldName] = validation.message;
+      }
+    });
+    
+    return {
+      valid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+};
+```
+
+## 6. DATA SYNCHRONIZATION & PERSISTENCE
+
+### 6.1 Database-Auth Sync Strategy
+
+#### Dual Storage Approach
+```typescript
+const DataSyncStrategy = {
+  // Store critical data in both places for reliability
+  dualStore: async (userId: string, userData: any) => {
+    const promises = [
+      // Primary storage: Database
+      supabase
+        .from('users')
+        .upsert({
+          id: userId,
+          ...userData,
+          updated_at: new Date().toISOString()
+        }),
+      
+      // Secondary storage: Auth metadata (for quick access)
+      supabase.auth.updateUser({
+        data: {
+          dharma_name: userData.dharma_name,
+          lay_name: userData.lay_name,
+          class_name: userData.class_name,
+          location: userData.location
+        }
+      })
+    ];
+    
+    // Execute both operations
+    const results = await Promise.allSettled(promises);
+    
+    // Check for errors
+    const dbResult = results[0];
+    const authResult = results[1];
+    
+    if (dbResult.status === 'rejected') {
+      console.error('Database update failed:', dbResult.reason);
+      throw new Error('数据库更新失败');
+    }
+    
+    if (authResult.status === 'rejected') {
+      console.warn('Auth metadata update failed:', authResult.reason);
+      // Don't fail the operation for auth metadata issues
+    }
+    
+    return { success: true };
+  },
+  
+  // Ensure user exists in database
+  ensureUserInDatabase: async (authUser: any) => {
+    try {
+      console.log('🔍 Ensuring user exists in database:', authUser.email);
+      
+      // Check if user exists
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', authUser.id)
+        .maybeSingle();
+      
+      if (!existingUser) {
+        console.log('🆕 Creating new user in database');
+        const { error } = await supabase
+          .from('users')
+          .insert({
+            id: authUser.id,
+            email: authUser.email,
+            dharma_name: authUser.user_metadata?.dharma_name || null,
+            created_at: new Date().toISOString()
+          });
+        
+        if (error && error.code !== '23505') { // Ignore duplicate key errors
+          throw error;
+        }
+      }
+      
+      console.log('✅ User exists in database');
+    } catch (error) {
+      console.error('❌ Error ensuring user in database:', error);
+      // Don't fail auth process for database sync issues
+    }
+  }
+};
+```
+
+### 6.2 Error Handling & Fallback
+
+#### Network Error Management
+```typescript
+const ProfileErrorHandling = {
+  handleProfileLoadError: async (userId: string, error: any) => {
+    console.error('❌ Profile loading error:', error);
+    
+    // Determine error type
+    let errorMessage = '网络连接异常，使用本地数据';
+    if (error.name === 'AbortError') {
+      errorMessage = '请求超时，使用本地数据';
+    } else if (error.message?.includes('Failed to fetch')) {
+      errorMessage = '网络连接失败，使用本地数据';
+    }
+    
+    // Try to get fallback data from auth context
+    const { user } = useAuth();
+    if (user) {
+      const fallbackProfile = {
+        id: user.id,
+        email: user.email,
+        dharma_name: user.dharma_name || '未设置法名',
+        lay_name: null,
+        location: null,
+        class_name: null,
+        practice_years: null,
+        bio: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      return {
+        profile: fallbackProfile,
+        error: errorMessage,
+        isOfflineData: true
+      };
+    }
+    
+    throw error;
+  },
+  
+  retryProfileLoad: async (userId: string, maxRetries: number = 3) => {
+    let lastError;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Profile load attempt ${attempt}/${maxRetries}`);
+        
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        
+        if (error) throw error;
+        
+        console.log('✅ Profile loaded successfully on retry');
+        return { profile: data, error: null };
+      } catch (error) {
+        lastError = error;
+        console.warn(`⚠️ Retry ${attempt} failed:`, error.message);
+        
+        if (attempt < maxRetries) {
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+      }
+    }
+    
+    // All retries failed
+    return ProfileErrorHandling.handleProfileLoadError(userId, lastError);
+  }
+};
+```
+
+## 7. AUTHENTICATION INTEGRATION
+
+### 7.1 Logout & Session Management
+
+#### Comprehensive Logout Process
+```typescript
+const ProfileAuthIntegration = {
+  handleLogout: async () => {
+    try {
+      console.log('🚪 Starting profile logout process');
+      
+      // Clear user state immediately
+      setUser(null);
+      setLoading(true);
+      
+      // Clear all storage locations
+      await Promise.all([
+        // AsyncStorage (React Native)
+        AsyncStorage.removeItem('@auth_token'),
+        AsyncStorage.removeItem('@user_session'),
+        AsyncStorage.removeItem('sb-repl-auth-token'),
+        
+        // Supabase session
+        supabase.auth.signOut({ scope: 'global' })
+      ]);
+      
+      // Clear web storage if available
+      if (typeof window !== 'undefined') {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+      }
+      
+      console.log('✅ Profile logout completed');
+      
+      // Navigate to root (let index handle routing)
+      router.replace('/');
+    } catch (error) {
+      console.error('❌ Profile logout error:', error);
+      // Force clear state even on error
+      setUser(null);
+      router.replace('/');
+    } finally {
+      setLoading(false);
+    }
+  },
+  
+  // Navigate after logout based on app state
+  postLogoutNavigation: () => {
+    // The root index.tsx will handle routing:
+    // No user -> /auth/unified
+    // User without complete profile -> /profile-setup
+    // User with complete profile -> /(tabs)
+    router.replace('/');
+  }
+};
+```
+
+### 7.2 Profile State in Auth Context
+
+#### Auth Context Profile Management
+```typescript
+const AuthContextProfileIntegration = {
+  userStateStructure: {
+    id: 'string', // UUID from Supabase
+    email: 'string', // User email
+    dharma_name: 'string?', // Optional dharma name from metadata
+    // Other profile fields loaded separately when needed
+  },
+  
+  profileCompletionCheck: async (userId: string) => {
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('lay_name, location')
+        .eq('id', userId)
+        .single();
+      
+      // Profile is complete only if both required fields exist
+      return Boolean(userData?.lay_name && userData?.location);
+    } catch (error) {
+      console.error('Profile completion check error:', error);
+      return false; // Default to incomplete on error
+    }
+  }
+};
+```
+
+## 8. USER INTERFACE COMPONENTS
+
+### 8.1 Profile Action Buttons
+
+#### Action Button Component
+```typescript
+const ProfileActionButton = ({ icon, label, onPress, isDestructive = false }) => {
+  return (
+    <TouchableOpacity 
+      style={[
+        styles.actionButton, 
+        isDestructive && styles.destructiveButton
+      ]} 
+      onPress={onPress}
+    >
+      <Ionicons 
+        name={icon} 
+        size={24} 
+        color={isDestructive ? '#FF3B30' : Colors.primary} 
+      />
+      <Text style={[
+        styles.actionButtonText,
+        isDestructive && styles.destructiveText
+      ]}>
+        {label}
+      </Text>
+      {!isDestructive && (
+        <Ionicons name="chevron-forward" size={20} color="#999" />
+      )}
+    </TouchableOpacity>
+  );
+};
+```
+
+#### Profile Actions List
+```typescript
+const ProfileActions = [
+  {
+    icon: 'person-outline',
+    label: '编辑个人资料',
+    action: () => router.push('/edit-profile'),
+    isDestructive: false
+  },
+  {
+    icon: 'log-out-outline',
+    label: '退出登录',
+    action: handleLogout,
+    isDestructive: true
+  }
+];
+```
+
+### 8.2 Form Input Components
+
+#### Themed Input Component
+```typescript
+const ThemedInput = ({ 
+  label, 
+  value, 
+  onChangeText, 
+  placeholder, 
+  required = false,
+  error = null,
+  ...props 
+}) => {
+  return (
+    <View style={styles.inputGroup}>
+      <Text style={[
+        styles.inputLabel,
+        required && styles.requiredLabel
+      ]}>
+        {label} {required && '*'}
+      </Text>
+      <TextInput
+        style={[
+          styles.input,
+          required && styles.requiredInput,
+          error && styles.errorInput
+        ]}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#999"
+        {...props}
+      />
+      {error && (
+        <Text style={styles.errorText}>{error}</Text>
+      )}
+    </View>
+  );
+};
+```
+
+## 9. ANALYTICS & MONITORING
+
+### 9.1 Profile Usage Analytics
+
+#### Profile Metrics Tracking
+```typescript
+const ProfileAnalytics = {
+  trackProfileCompletion: (userId: string, completionData: any) => {
+    console.log('📊 Profile completion tracked:', {
+      userId,
+      completedFields: Object.keys(completionData).filter(key => completionData[key]),
+      totalFields: Object.keys(completionData).length,
+      completionTimestamp: new Date().toISOString()
+    });
+  },
+  
+  trackProfileEdit: (userId: string, changedFields: string[]) => {
+    console.log('📊 Profile edit tracked:', {
+      userId,
+      changedFields,
+      editTimestamp: new Date().toISOString()
+    });
+  },
+  
+  generateProfileStats: async (userId: string) => {
+    const { data: userData } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (!userData) return null;
+    
+    const fieldsCompleted = [
+      userData.dharma_name,
+      userData.lay_name,
+      userData.location,
+      userData.class_name,
+      userData.practice_years,
+      userData.bio
+    ].filter(Boolean).length;
+    
+    return {
+      completionPercentage: (fieldsCompleted / 6) * 100,
+      memberSince: userData.created_at,
+      lastUpdated: userData.updated_at,
+      hasRequiredFields: Boolean(userData.lay_name && userData.location)
+    };
+  }
+};
+```
+
+## 10. SUPPORT & CONTACT INTEGRATION
+
+### 10.1 Support Contact Display
+
+#### Support Information Component
+```typescript
+const SupportSection = () => {
+  return (
+    <View style={styles.supportSection}>
+      <Text style={styles.supportText}>
+        如有任何问题，请联系 app@bicwny.com
+      </Text>
+    </View>
+  );
+};
+```
+
+## 11. FUTURE ENHANCEMENTS
+
+### 11.1 Advanced Profile Features
+1. **Profile Photos**: Upload and manage profile pictures
+2. **Social Features**: Connect with dharma friends
+3. **Practice History**: Display practice statistics in profile
+4. **Badges & Achievements**: Recognize practice milestones
+5. **Privacy Settings**: Control profile visibility
+6. **Backup & Sync**: Cloud backup of profile data
+7. **Multi-language**: Support for different languages
+8. **Accessibility**: Enhanced accessibility features
+
+### 11.2 Security Enhancements
+1. **Two-Factor Authentication**: Additional security layer
+2. **Session Management**: Better session control
+3. **Data Encryption**: Enhanced data protection
+4. **Audit Logs**: Track profile changes
+5. **GDPR Compliance**: Data protection compliance
+6. **Account Recovery**: Better account recovery options
+
+---
+
+This comprehensive profile system creates a robust foundation for user identity management within the Buddhist practice app, ensuring both simplicity for users and reliability for the application architecture.
