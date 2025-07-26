@@ -19,23 +19,34 @@ This is a React Native Expo app built for Buddhist practice tracking, including 
 - Click "Fork" button in top-right
 - The project will automatically clone with all dependencies
 
-### 2. Environment Setup
-Go to Replit's Secrets tool (🔒 icon in sidebar) and add:
+### 2. Database Access Setup
+This project uses an existing Supabase database that's already configured. You'll need to:
+
+**Option A - If you have access to the existing database:**
+- Ask the project maintainer for the Supabase credentials
+- Add them to Replit's Secrets tool (🔒 icon in sidebar):
 ```
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+EXPO_PUBLIC_SUPABASE_URL=existing_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=existing_supabase_anon_key
 ```
 
-### 3. Supabase Database Setup
+**Option B - Set up your own database copy:**
 - Create account at supabase.com
 - Create new project
 - Copy the URL and anon key to Replit Secrets
-- Run the SQL schema from `docs/database-schema.sql` in Supabase SQL editor
+- Run the complete SQL schema from `docs/database-schema.sql` in Supabase SQL editor
+- Use scripts in `/scripts/` folder to populate with sample data
 
-### 4. Start Development
+### 3. Start Development
 - Click the "Run" button (uses "Dev Server Clean" workflow)
 - Open the preview URL in mobile browser or Expo Go app
 - The app will show connection status on first load
+
+**Note**: The existing database already contains:
+- ✅ Complete practice types (念佛, 拜佛, 诵经, 禅修)
+- ✅ Study courses and lesson structure
+- ✅ User accounts and practice project templates
+- ✅ Sample data for testing all features
 
 ## PROJECT STRUCTURE
 
@@ -146,10 +157,13 @@ INSERT INTO courses (name, teacher, description, total_lessons) VALUES
 ('课程名', '导师名', '课程描述', 12);
 ```
 
-#### Database Testing:
-- Use scripts in `/scripts/` folder for common operations
-- `scripts/setup-test-data.js` - Creates sample data
-- `scripts/debug-user-projects.js` - Debug user practice setup
+#### Database Operations:
+- **Existing Database**: Already populated with practice types, courses, and sample users
+- Use scripts in `/scripts/` folder for maintenance operations:
+  - `scripts/setup-test-data.js` - Add additional sample data
+  - `scripts/debug-user-projects.js` - Debug user practice setup
+  - `scripts/populate-database.js` - Refresh database content
+- **New Users**: Will automatically get default practice options on first login
 
 ### Key Development Files:
 
@@ -183,9 +197,11 @@ INSERT INTO courses (name, teacher, description, total_lessons) VALUES
 ### Common Issues:
 
 #### Database Connection Failed:
-- Check Supabase URL and keys in Secrets
-- Verify RLS policies are disabled or properly configured
-- Run connection test: `components/ConnectionTest.tsx`
+- **First**: Ensure you have valid credentials in Replit Secrets
+- **Check**: Connection status indicator in the app (green = connected)
+- **Verify**: RLS policies are properly configured for the existing database
+- **Test**: Use `components/ConnectionTest.tsx` for detailed diagnostics
+- **Fallback**: App includes offline mode with mock data if database unavailable
 
 #### Expo Metro Issues:
 - Use "Dev Server Clean" workflow to clear caches
@@ -193,9 +209,11 @@ INSERT INTO courses (name, teacher, description, total_lessons) VALUES
 - Restart with `--clear --reset-cache` flags
 
 #### Authentication Problems:
-- Check user table structure matches `types/database.ts`
-- Verify Supabase auth email confirmation settings
-- Use `components/AuthStateDebugger.tsx` for debugging
+- **Existing Users**: May already have accounts in the database
+- **New Registration**: Creates new profiles automatically
+- **Debug Tools**: Use `components/AuthStateDebugger.tsx` for detailed auth state
+- **User Structure**: Check user table matches `types/database.ts`
+- **Email Settings**: Verify Supabase auth confirmation settings if issues persist
 
 #### Timezone Issues:
 - User timezone detection happens in `hooks/useTimezone.ts`
