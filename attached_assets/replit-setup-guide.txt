@@ -5,13 +5,72 @@
 This is a React Native Expo app built for Buddhist practice tracking, including study progress, meditation records, daily practice counting, and mindfulness awareness. The app uses Supabase as the backend database and is optimized for mobile-first experience.
 
 ## TECH STACK
-- **Frontend**: React Native with Expo Router
-- **Styling**: NativeWind (Tailwind CSS for React Native) 
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **State Management**: React Context + Local State
-- **Navigation**: Expo Router (file-based routing)
-- **Platform**: Cross-platform (iOS, Android, Web)
+
+### Core Framework
+- **Frontend**: React Native with Expo Router (v53) - Optimized for cross-platform Buddhist practice tracking
+- **Styling**: NativeWind (Tailwind CSS for React Native) - Consistent design system
+- **Database**: Supabase (PostgreSQL) - Real-time practice data with RLS security
+- **Authentication**: Supabase Auth - Secure user management
+- **State Management**: React Context + Local State - Simple, effective for app size
+- **Navigation**: Expo Router (file-based routing) - Clean, maintainable navigation structure
+- **Platform**: Cross-platform (iOS, Android, Web) - Maximum accessibility
+
+### Supporting Technologies
+- **TypeScript**: Full type safety for database operations and practice tracking
+- **React Native Elements**: UI component library for consistent interface
+- **Expo Notifications**: Practice reminders and mindfulness prompts
+- **Date/Time Handling**: React Native DateTime Picker for precise session timing
+- **Web Integration**: React Native WebView for course content display
+
+### Replit-Optimized Features
+- **Hot Reload**: Instant development feedback with Expo dev server
+- **Environment Variables**: Secure Supabase credentials via Replit Secrets
+- **Mobile Preview**: QR code access for real device testing
+- **Auto-deployment**: Seamless web deployment with Replit hosting
+
+### Recommended Enhancements
+- **Offline Support**: Consider adding AsyncStorage for offline practice tracking
+- **State Caching**: React Query could improve data fetching efficiency
+- **Performance**: Current setup is optimal for Buddhist practice app requirements
+- **Scalability**: Architecture supports growth from personal to community features
+
+## TECH STACK JUSTIFICATION
+
+### Why This Stack Works for Buddhist Practice Tracking
+
+**Expo + React Native**:
+- ✅ Cross-platform reach for diverse Buddhist communities
+- ✅ Native mobile performance for daily practice recording
+- ✅ Web compatibility for accessibility
+- ✅ Excellent Replit integration with hot reload
+
+**Supabase PostgreSQL**:
+- ✅ Real-time updates for community features
+- ✅ Row Level Security for private practice data
+- ✅ Complex queries for practice analytics
+- ✅ Reliable backup and scaling
+
+**NativeWind Styling**:
+- ✅ Consistent Buddhist-themed design system
+- ✅ Responsive layouts for different screen sizes
+- ✅ Easy maintenance with utility classes
+- ✅ Performance optimized for mobile
+
+**File-based Routing**:
+- ✅ Intuitive navigation structure
+- ✅ Easy to add new practice types or features
+- ✅ Clean separation of practice/study/mindfulness systems
+- ✅ SEO-friendly for web deployment
+
+### Alternative Considerations Evaluated
+
+**State Management**: React Context is sufficient for current complexity. Consider Zustand if community features expand significantly.
+
+**UI Framework**: React Native Elements provides good Buddhist app theming. Native Base was considered but adds unnecessary complexity.
+
+**Database**: Supabase chosen over Firebase for better PostgreSQL support for complex practice analytics and better Replit integration.
+
+**Deployment**: Replit Autoscale is ideal for variable usage patterns typical of meditation apps.
 
 ## QUICK START INSTRUCTIONS
 
@@ -135,10 +194,17 @@ study_records          # Lesson completion tracking
 ## DEVELOPMENT WORKFLOW
 
 ### Local Development:
-1. **Run the app**: Use "Run" button or `npx expo start`
-2. **Test on mobile**: Scan QR code with Expo Go app
-3. **Web testing**: Open the preview URL in browser
-4. **Database changes**: Update schema in Supabase, test with scripts
+1. **Run the app**: Use "Dev Server Clean" workflow (optimized for Replit)
+2. **Test on mobile**: Scan QR code with Expo Go app - essential for gesture testing
+3. **Web testing**: Preview URL works for desktop Buddhist course viewing
+4. **Database changes**: Update schema in Supabase, use TypeScript types for safety
+5. **Performance**: Use Expo dev tools for Buddhist practice session profiling
+
+### Tech Stack Optimization Tips:
+- **Hot Reload**: Expo's fast refresh works perfectly for rapid Buddhist UI development
+- **Type Safety**: Database types in `types/database.ts` prevent practice data errors
+- **Mobile-First**: Test practice recording gestures on real devices
+- **Web Fallback**: Ensure course content works in both mobile and web environments
 
 ### Common Development Tasks:
 
@@ -193,6 +259,25 @@ INSERT INTO courses (name, teacher, description, total_lessons) VALUES
 3. Download APK/IPA files for distribution
 
 ## TROUBLESHOOTING
+
+### Tech Stack Specific Issues:
+
+#### Expo Metro Bundler:
+- **Cache Issues**: Use "Dev Server Clean" workflow to clear Expo and Metro caches
+- **Module Resolution**: Check `babel.config.js` for path aliases
+- **Hot Reload**: Restart if practice component changes don't reflect
+- **Platform Differences**: Test practice recording on both iOS and Android
+
+#### NativeWind Styling:
+- **Tailwind Classes**: Ensure classes work across React Native platforms
+- **Buddhist Theme**: Check `constants/Colors.ts` for consistent theming
+- **Platform Styles**: Use platform-specific styles for meditation timers
+- **Performance**: Monitor style compilation in development
+
+#### TypeScript Integration:
+- **Database Types**: Keep `types/database.ts` synchronized with Supabase schema
+- **Practice Types**: Ensure count vs time practice types are properly typed
+- **Navigation**: Expo Router types should match practice flow navigation
 
 ### Common Issues:
 
