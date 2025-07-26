@@ -1,0 +1,272 @@
+
+# Buddhist Practice App - Complete Setup Guide for Replit
+
+## OVERVIEW
+This is a React Native Expo app built for Buddhist practice tracking, including study progress, meditation records, daily practice counting, and mindfulness awareness. The app uses Supabase as the backend database and is optimized for mobile-first experience.
+
+## TECH STACK
+- **Frontend**: React Native with Expo Router
+- **Styling**: NativeWind (Tailwind CSS for React Native) 
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **State Management**: React Context + Local State
+- **Navigation**: Expo Router (file-based routing)
+- **Platform**: Cross-platform (iOS, Android, Web)
+
+## QUICK START INSTRUCTIONS
+
+### 1. Fork this Repl
+- Click "Fork" button in top-right
+- The project will automatically clone with all dependencies
+
+### 2. Environment Setup
+Go to Replit's Secrets tool (🔒 icon in sidebar) and add:
+```
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 3. Supabase Database Setup
+- Create account at supabase.com
+- Create new project
+- Copy the URL and anon key to Replit Secrets
+- Run the SQL schema from `docs/database-schema.sql` in Supabase SQL editor
+
+### 4. Start Development
+- Click the "Run" button (uses "Dev Server Clean" workflow)
+- Open the preview URL in mobile browser or Expo Go app
+- The app will show connection status on first load
+
+## PROJECT STRUCTURE
+
+```
+├── app/                    # Expo Router pages (file-based routing)
+│   ├── (tabs)/            # Tab navigation screens
+│   │   ├── index.tsx      # Daily dashboard (main screen)
+│   │   ├── study.tsx      # Course study tracking
+│   │   ├── practice.tsx   # Practice project management
+│   │   ├── mindfulness.tsx # Mindfulness recording
+│   │   └── stats.tsx      # Analytics & progress
+│   ├── auth/              # Authentication screens
+│   ├── course-detail/     # Course lesson viewing
+│   ├── practice-detail/   # Practice recording screens
+│   └── modals/            # Modal screens
+├── components/            # Reusable UI components
+├── contexts/              # React Context providers
+├── hooks/                 # Custom React hooks
+├── lib/                   # Core services (Supabase, etc.)
+├── logic/                 # Documentation & system specs
+├── scripts/               # Database setup & utility scripts
+└── types/                 # TypeScript type definitions
+```
+
+## CORE FEATURES OVERVIEW
+
+### 1. Daily Dashboard (`app/(tabs)/index.tsx`)
+- **Purpose**: Central hub showing today's practice progress
+- **Features**: 
+  - Timezone-aware daily resets
+  - Quick action buttons for common practices
+  - Progress tracking for study, practice, mindfulness
+  - Motivational greetings and status updates
+
+### 2. Study System (`app/(tabs)/study.tsx`)
+- **Purpose**: Track Buddhist course progress
+- **Features**:
+  - Course enrollment and progress tracking
+  - Lesson-by-lesson completion (听传承 + 看法本)
+  - Integrated web viewer for online courses
+  - Teacher and course metadata
+
+### 3. Practice System (`app/(tabs)/practice.tsx`)
+- **Purpose**: Track meditation and recitation practices
+- **Features**:
+  - Two practice types: count-based (次) and time-based (分钟)
+  - Project-based practice management with targets
+  - Daily/weekly goal tracking
+  - Quick recording and detailed session logs
+
+### 4. Mindfulness System (`app/(tabs)/mindfulness.tsx`)
+- **Purpose**: Record moment-to-moment awareness
+- **Features**:
+  - Good/bad mind state recording with timestamps
+  - Daily awareness ratio tracking
+  - Quick recording with contextual notes
+
+### 5. Analytics (`app/(tabs)/stats.tsx`)
+- **Purpose**: Long-term progress visualization
+- **Features**:
+  - Practice streaks and consistency metrics
+  - Course completion rates
+  - Mindfulness awareness trends
+
+## DATABASE SCHEMA OVERVIEW
+
+### Core Tables:
+```sql
+users                    # User profiles with dharma names
+practices                # Practice definitions (念佛, 拜佛, etc.)
+user_practice_projects   # User's active practice goals
+daily_records           # Count-based practice records
+meditation_records      # Time-based meditation sessions
+mindfulness_records     # Awareness moment tracking
+courses                 # Available study courses
+user_courses           # User course enrollments
+study_records          # Lesson completion tracking
+```
+
+### Key Relationships:
+- Users have many practice projects
+- Practice projects generate daily/meditation records
+- Users enroll in courses and track lesson progress
+- All records are timezone-aware with proper date handling
+
+## DEVELOPMENT WORKFLOW
+
+### Local Development:
+1. **Run the app**: Use "Run" button or `npx expo start`
+2. **Test on mobile**: Scan QR code with Expo Go app
+3. **Web testing**: Open the preview URL in browser
+4. **Database changes**: Update schema in Supabase, test with scripts
+
+### Common Development Tasks:
+
+#### Adding New Practice Types:
+```sql
+-- In Supabase SQL editor
+INSERT INTO practices (name, type, unit, description) VALUES
+('新修法', 'count', '次', '描述新修法');
+```
+
+#### Adding New Courses:
+```sql
+-- Use scripts/add-qianxing-course.js as template
+-- Or manually in Supabase
+INSERT INTO courses (name, teacher, description, total_lessons) VALUES
+('课程名', '导师名', '课程描述', 12);
+```
+
+#### Database Testing:
+- Use scripts in `/scripts/` folder for common operations
+- `scripts/setup-test-data.js` - Creates sample data
+- `scripts/debug-user-projects.js` - Debug user practice setup
+
+### Key Development Files:
+
+#### Core Services:
+- `lib/supabase.ts` - Database client configuration
+- `contexts/AuthContext.tsx` - Authentication state management
+- `hooks/useTimezone.ts` - Timezone-aware date handling
+
+#### UI Components:
+- `components/PageTemplate.tsx` - Standard page layout
+- `components/CardContainer.tsx` - Consistent card styling
+- `lib/toast.tsx` - User feedback system
+
+## DEPLOYMENT
+
+### Replit Deployment:
+1. Click "Deploy" button in Replit
+2. Choose "Autoscale" deployment type
+3. Use these settings:
+   - **Build command**: `npx expo export --platform web`
+   - **Run command**: `npx serve dist -s -l 8081`
+   - **Port**: 8081
+
+### Mobile App Building:
+1. Install EAS CLI: `npm install -g @expo/eas-cli`
+2. Run workflow: "EAS Publish Preview Android" or "EAS Publish Preview iOS"
+3. Download APK/IPA files for distribution
+
+## TROUBLESHOOTING
+
+### Common Issues:
+
+#### Database Connection Failed:
+- Check Supabase URL and keys in Secrets
+- Verify RLS policies are disabled or properly configured
+- Run connection test: `components/ConnectionTest.tsx`
+
+#### Expo Metro Issues:
+- Use "Dev Server Clean" workflow to clear caches
+- Clear `.expo` and `node_modules/.cache` folders
+- Restart with `--clear --reset-cache` flags
+
+#### Authentication Problems:
+- Check user table structure matches `types/database.ts`
+- Verify Supabase auth email confirmation settings
+- Use `components/AuthStateDebugger.tsx` for debugging
+
+#### Timezone Issues:
+- User timezone detection happens in `hooks/useTimezone.ts`
+- Daily resets use timezone-aware date calculations
+- Check console logs for timezone detection results
+
+### Development Tips:
+
+#### Fast Development Cycle:
+1. Use optimistic UI updates for immediate feedback
+2. Background database sync prevents data loss
+3. Toast notifications provide user feedback
+4. Pull-to-refresh rebuilds data consistency
+
+#### Testing Strategies:
+1. Use mock data when database is unavailable
+2. Test with multiple users to verify RLS policies
+3. Test timezone edge cases (midnight resets)
+4. Verify offline/online state handling
+
+## CUSTOMIZATION GUIDE
+
+### Adding New Practice Types:
+1. Update `practices` table with new entry
+2. Add handling in practice selection components
+3. Update UI cards for new practice visualization
+
+### Adding New Study Features:
+1. Extend course schema if needed
+2. Update lesson tracking logic
+3. Add new study type recording options
+
+### UI/UX Modifications:
+1. Colors: Update `constants/Colors.ts`
+2. Layout: Modify `components/PageTemplate.tsx`
+3. Styling: Use NativeWind classes throughout
+
+### Business Logic Changes:
+1. Practice counting: `lib/practice-service.ts`
+2. Progress calculation: `lib/progress-service.ts`
+3. Timezone handling: `lib/timezone.ts`
+
+## SUPPORT RESOURCES
+
+### Documentation:
+- Expo Router: https://docs.expo.dev/router/
+- Supabase: https://supabase.com/docs
+- NativeWind: https://nativewind.dev/
+- React Native: https://reactnative.dev/
+
+### Project-Specific Docs:
+- `logic/systems/` - Detailed system specifications
+- `docs/SUPABASE_SETUP.md` - Database setup guide
+- `scripts/` - Utility scripts with examples
+
+### Community:
+- Expo Discord: https://chat.expo.dev
+- Supabase Discord: https://discord.supabase.com
+- React Native Community: https://reactnative.dev/community
+
+---
+
+## GETTING HELP
+
+If you encounter issues:
+1. Check the connection status in the app
+2. Review console logs for errors
+3. Use debug components in `/components/`
+4. Check database data directly in Supabase dashboard
+5. Reference system logic docs in `/logic/systems/`
+
+This app is designed for Buddhist practitioners to maintain consistent daily practice with modern technology while respecting traditional teachings and approaches.
+
+**Next Steps**: After setup, start by exploring the daily dashboard, create a practice project, and record your first session!
