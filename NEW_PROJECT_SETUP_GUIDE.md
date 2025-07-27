@@ -39,6 +39,68 @@ npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-as
 
 Note: Using Gluestack UI for comprehensive template components and modern design system.
 
+### Gluestack UI Guidelines
+
+#### Setup Gluestack Provider
+```typescript
+// app/_layout.tsx
+import { GluestackUIProvider } from '@gluestack-ui/themed';
+
+export default function RootLayout() {
+  return (
+    <GluestackUIProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* Your app content */}
+      </QueryClientProvider>
+    </GluestackUIProvider>
+  );
+}
+```
+
+#### Component Creation Rules
+**✅ DO:** Use Gluestack components instead of custom styles
+```typescript
+import { Box, Button, Text, VStack, HStack } from '@gluestack-ui/themed';
+
+export function PracticeCard() {
+  return (
+    <Box bg="$white" p="$4" borderRadius="$lg" shadow="$sm">
+      <VStack space="$3">
+        <Text fontSize="$lg" fontWeight="$bold">Practice Name</Text>
+        <HStack space="$2">
+          <Button action="primary" onPress={handleAction}>
+            <Button.Text>Record</Button.Text>
+          </Button>
+          <Button variant="outline" onPress={handleView}>
+            <Button.Text>View</Button.Text>
+          </Button>
+        </HStack>
+      </VStack>
+    </Box>
+  );
+}
+```
+
+**❌ AVOID:** Custom StyleSheet.create() usage
+```typescript
+// Don't do this
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 12,
+  }
+});
+```
+
+#### Component Mapping Guide
+- Replace `View` → `Box`
+- Replace `Text` → `Text` (with Gluestack tokens)
+- Replace `TouchableOpacity` → `Button` or `Pressable`
+- Replace custom cards → `Card` component
+- Replace custom inputs → `Input` component
+- Use `VStack`/`HStack` instead of flexbox containers
+
 #### Step 3: Configure Environment Variables
 In Replit Secrets, add:
 - `EXPO_PUBLIC_SUPABASE_URL`: Your Supabase project URL
