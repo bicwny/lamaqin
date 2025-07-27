@@ -840,6 +840,29 @@ Use your existing Supabase database with all tables and data. The schema include
 - `study_records` - Study progress
 - `mindfulness_records` - Mindfulness tracking
 
+#### Mindfulness Table SQL (if needed):
+```sql
+CREATE TABLE mindfulness_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    record_date DATE NOT NULL,
+    record_time TIME NOT NULL,
+    mind_type TEXT CHECK (mind_type IN ('good', 'bad')) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE mindfulness_records ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can only access their own records
+CREATE POLICY "Users can manage their own mindfulness records" ON mindfulness_records
+    FOR ALL USING (auth.uid() = user_id);
+
+-- Index for efficient queries
+CREATE INDEX idx_mindfulness_user_date ON mindfulness_records (user_id, record_date);
+```
+
 ### Phase 11: Additional Screens (Templates)
 
 #### Step 19: Practice Screen Template (app/(tabs)/practice.tsx)
@@ -1128,7 +1151,290 @@ export function LessonWebView({ url, title }: LessonWebViewProps) {
 }
 ```
 
-#### Step 22: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementation
+#### Step 22: Complete Mindfulness System (app/(tabs)/mindfulness.tsx)
+```typescript
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { useAuthStore } from '../../stores/authStore';
+import { supabase } from '../../lib/supabase';
+
+interface MindfulnessRecord {
+  id: string;
+  record_time: string;
+  mind_type: 'good' | 'bad';
+  description?: string;
+}
+
+export default function MindfulnessScreen() {
+  const { user } = useAuthStore();
+  const [todayRecords, setTodayRecords] = useState<MindfulnessRecord[]>([]);
+  const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTodayRecords();
+  }, [user]);
+
+  const loadTodayRecords = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data, error } = await supabase
+        .from('mindfulness_records')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('record_date', today)
+        .order('record_time');
+
+      if (error) throw error;
+      
+      console.log('💝 Loaded mindfulness records:', data?.length || 0);
+      setTodayRecords(data || []);
+    } catch (error) {
+      console.error('❌ Error loading mindfulness records:', error);
+      setTodayRecords([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const recordMindfulness = async (mindType: 'good' | 'bad') => {
+    if (!user) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
+
+      const { error } = await supabase
+        .from('mindfulness_records')
+        .insert({
+          user_id: user.id,
+          record_date: today,
+          record_time: utcTime,
+          mind_type: mindType,
+          description: description.trim() || undefined
+        });
+
+      if (error) throw error;
+
+      const mindTypeText = mindType === 'good' ? '善心' : '恶心';
+      console.log(`✅ ${mindTypeText}已记录`);
+      
+      setDescription('');
+      loadTodayRecords(); // Refresh data
+
+    } catch (error) {
+      console.error('Error recording mindfulness:', error);
+    }
+  };
+
+  const getTodayStats = () => {
+    const good = todayRecords.filter(r => r.mind_type === 'good').length;
+    const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
+    const total = good + bad;
+    const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
+
+    return { good, bad, total, goodPercent };
+  };
+
+  const formatTime = (timeString: string) => {
+    try {
+      // Convert UTC time to local time for display
+      const utcDate = new Date(`1970-01-01T${timeString}Z`);
+      return utcDate.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeString.substring(0, 5); // Fallback
+    }
+  };
+
+  const stats = getTodayStats();
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <Text className="text-gray-600">加载中...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="px-4 pt-12 pb-6">
+        <Text className="text-2xl font-bold text-gray-800 mb-2">心性观察</Text>
+        <Text className="text-gray-600 mb-6">观察内心善恶念头</Text>
+
+        {/* Today's Statistics Card */}
+        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-800 mb-4">今日统计</Text>
+          <View className="flex-row justify-around mb-4">
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-green-600">{stats.good}</Text>
+              <Text className="text-gray-600">善心</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-primary">{stats.goodPercent}%</Text>
+              <Text className="text-gray-600">善心比例</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-red-600">{stats.bad}</Text>
+              <Text className="text-gray-600">恶心</Text>
+            </View>
+          </View>
+
+          {stats.total > 0 && (
+            <View className="w-full bg-red-100 rounded-full h-3">
+              <View 
+                className="bg-green-500 h-3 rounded-full"
+                style={{ width: `${stats.goodPercent}%` }}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Recording Interface */}
+        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-800 mb-4">记录当前心性</Text>
+
+          <TextInput
+            className="border border-gray-300 rounded-lg px-4 py-3 mb-4"
+            placeholder="描述当前的心境或想法（可选）"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+
+          <View className="flex-row gap-3">
+            <TouchableOpacity 
+              className="flex-1 bg-green-500 rounded-lg py-4 items-center"
+              onPress={() => recordMindfulness('good')}
+            >
+              <Text className="text-white font-semibold text-lg">善心</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              className="flex-1 bg-red-500 rounded-lg py-4 items-center"
+              onPress={() => recordMindfulness('bad')}
+            >
+              <Text className="text-white font-semibold text-lg">恶心</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Today's Records */}
+        {todayRecords.length > 0 && (
+          <View className="bg-white rounded-lg p-6 shadow-sm">
+            <Text className="text-lg font-semibold text-gray-800 mb-4">今日记录</Text>
+            {todayRecords.map((record, index) => (
+              <View key={record.id} className="flex-row justify-between items-center py-2 border-b border-gray-100">
+                <View className="flex-1">
+                  <View className="flex-row items-center">
+                    <View className={`w-3 h-3 rounded-full mr-3 ${
+                      record.mind_type === 'good' ? 'bg-green-500' : 'bg-red-500'
+                    }`} />
+                    <Text className="font-semibold text-gray-800">
+                      {record.mind_type === 'good' ? '善心' : '恶心'}
+                    </Text>
+                  </View>
+                  {record.description && (
+                    <Text className="text-gray-600 text-sm mt-1 ml-6">{record.description}</Text>
+                  )}
+                </View>
+                <Text className="text-gray-500 text-sm">{formatTime(record.record_time)}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+}
+```
+
+#### Step 23: Mindfulness Service (services/mindfulnessService.ts)
+```typescript
+import { supabase } from '../lib/supabase';
+
+export interface MindfulnessRecord {
+  id: string;
+  user_id: string;
+  record_date: string;
+  record_time: string;
+  mind_type: 'good' | 'bad';
+  description?: string;
+  created_at: string;
+}
+
+export const mindfulnessService = {
+  async getTodayRecords(userId: string, date: string): Promise<MindfulnessRecord[]> {
+    const { data, error } = await supabase
+      .from('mindfulness_records')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('record_date', date)
+      .order('record_time');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async recordMindfulness(record: Omit<MindfulnessRecord, 'id' | 'created_at'>): Promise<MindfulnessRecord> {
+    const { data, error } = await supabase
+      .from('mindfulness_records')
+      .insert(record)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getWeeklySummary(userId: string): Promise<{ date: string; good: number; bad: number }[]> {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekAgoStr = weekAgo.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('mindfulness_records')
+      .select('record_date, mind_type')
+      .eq('user_id', userId)
+      .gte('record_date', weekAgoStr)
+      .order('record_date');
+
+    if (error) throw error;
+
+    // Group by date and count good/bad
+    const summary: { [date: string]: { good: number; bad: number } } = {};
+    
+    data?.forEach(record => {
+      if (!summary[record.record_date]) {
+        summary[record.record_date] = { good: 0, bad: 0 };
+      }
+      summary[record.record_date][record.mind_type]++;
+    });
+
+    return Object.entries(summary).map(([date, counts]) => ({
+      date,
+      good: counts.good,
+      bad: counts.bad
+    }));
+  }
+};
+```
+
+#### Step 24: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementation
 ```typescript
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
@@ -1349,7 +1655,7 @@ export default function DashboardScreen() {
               <View className="w-12 h-12 bg-green-500 rounded-full items-center justify-center mb-2">
                 <Text className="text-white text-lg">🧘</Text>
               </View>
-              <Text className="text-gray-700 text-sm">觉察</Text>
+              <Text className="text-gray-700 text-sm">心性观察</Text>
             </TouchableOpacity>
           </View>
         </View>
