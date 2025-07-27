@@ -901,6 +901,661 @@ export default function PracticeScreen() {
 }
 ```
 
+#### Step 20: Study Screen Implementation (app/(tabs)/study.tsx)
+```typescript
+import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { router } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '../../stores/authStore';
+import { supabase } from '../../lib/supabase';
+
+interface Course {
+  id: string;
+  name: string;
+  total_lessons: number;
+  teacher?: string;
+  description?: string;
+}
+
+interface UserCourse {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: 'active' | 'completed' | 'paused';
+  progress_percentage: number;
+  course: Course;
+}
+
+export default function StudyScreen() {
+  const { user } = useAuthStore();
+  const [viewMode, setViewMode] = useState<'home' | 'manage'>('home');
+
+  const { data: userCourses, isLoading, refetch } = useQuery({
+    queryKey: ['userCourses', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select(`
+          *,
+          courses(*)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as UserCourse[];
+    },
+    enabled: !!user,
+  });
+
+  const { data: allCourses } = useQuery({
+    queryKey: ['allCourses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      return data as Course[];
+    },
+  });
+
+  const availableCourses = allCourses?.filter(course => 
+    !userCourses?.some(uc => uc.course_id === course.id)
+  ) || [];
+
+  const joinCourse = async (courseId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_courses')
+        .insert({
+          user_id: user.id,
+          course_id: courseId,
+          status: 'active',
+          progress_percentage: 0
+        });
+
+      if (error) throw error;
+      refetch();
+      setViewMode('home');
+    } catch (error) {
+      console.error('Error joining course:', error);
+    }
+  };
+
+  const recordStudy = async (courseId: string, lessonNumber: number, studyType: '听传承' | '看法本') => {
+    if (!user) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      const { error } = await supabase
+        .from('study_records')
+        .insert({
+          user_id: user.id,
+          course_id: courseId,
+          lesson_number: lessonNumber,
+          study_date: today,
+          study_type: studyType,
+          study_count_for_lesson: 1
+        });
+
+      if (error) throw error;
+      
+      // Update course progress
+      await calculateCourseProgress(courseId);
+      refetch();
+    } catch (error) {
+      console.error('Error recording study:', error);
+    }
+  };
+
+  const calculateCourseProgress = async (courseId: string) => {
+    if (!user) return;
+
+    try {
+      // Get total lessons for course
+      const { data: course } = await supabase
+        .from('courses')
+        .select('total_lessons')
+        .eq('id', courseId)
+        .single();
+
+      if (!course) return;
+
+      // Get unique lessons studied
+      const { data: studyRecords } = await supabase
+        .from('study_records')
+        .select('lesson_number')
+        .eq('user_id', user.id)
+        .eq('course_id', courseId);
+
+      const uniqueLessons = new Set(studyRecords?.map(r => r.lesson_number) || []);
+      const progress = (uniqueLessons.size / course.total_lessons) * 100;
+
+      // Update user course progress
+      await supabase
+        .from('user_courses')
+        .update({ progress_percentage: progress })
+        .eq('user_id', user.id)
+        .eq('course_id', courseId);
+
+    } catch (error) {
+      console.error('Error calculating progress:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#da4347" />
+        <Text className="mt-4 text-gray-600">加载中...</Text>
+      </View>
+    );
+  }
+
+  if (viewMode === 'manage') {
+    return (
+      <ScrollView className="flex-1 bg-gray-50">
+        <View className="px-4 pt-12 pb-6">
+          <View className="flex-row justify-between items-center mb-6">
+            <Text className="text-2xl font-bold text-gray-800">课程管理</Text>
+            <TouchableOpacity onPress={() => setViewMode('home')}>
+              <Text className="text-primary font-semibold">返回</Text>
+            </TouchableOpacity>
+          </View>
+
+          {availableCourses.length > 0 && (
+            <View className="mb-6">
+              <Text className="text-lg font-semibold text-gray-700 mb-4">可加入课程</Text>
+              {availableCourses.map(course => (
+                <View key={course.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+                  <Text className="text-lg font-semibold text-gray-800 mb-2">{course.name}</Text>
+                  <Text className="text-gray-600 mb-2">{course.teacher} • {course.total_lessons}课</Text>
+                  {course.description && (
+                    <Text className="text-gray-500 text-sm mb-3">{course.description}</Text>
+                  )}
+                  <TouchableOpacity
+                    className="bg-primary rounded-lg py-2 px-4 self-end"
+                    onPress={() => joinCourse(course.id)}
+                  >
+                    <Text className="text-white font-semibold">加入学习</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    );
+  }
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="px-4 pt-12 pb-6">
+        <View className="flex-row justify-between items-center mb-6">
+          <Text className="text-2xl font-bold text-gray-800">闻思学习</Text>
+          <TouchableOpacity onPress={() => setViewMode('manage')}>
+            <Text className="text-primary font-semibold">管理课程</Text>
+          </TouchableOpacity>
+        </View>
+
+        {userCourses && userCourses.length > 0 ? (
+          userCourses.map(userCourse => (
+            <View key={userCourse.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+              <Text className="text-lg font-semibold text-gray-800 mb-2">
+                {userCourse.course.name}
+              </Text>
+              <Text className="text-gray-600 mb-2">
+                {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+              </Text>
+              <Text className="text-gray-600 mb-3">
+                进度：{userCourse.progress_percentage.toFixed(1)}%
+              </Text>
+              
+              <View className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <View 
+                  className="bg-primary h-2 rounded-full"
+                  style={{ width: `${userCourse.progress_percentage}%` }}
+                />
+              </View>
+
+              <TouchableOpacity
+                className="bg-primary rounded-lg py-2 px-4"
+                onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+              >
+                <Text className="text-white text-center font-semibold">继续学习</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <View className="bg-white rounded-lg p-6 text-center">
+            <Text className="text-gray-500 text-center mb-4">
+              还没有课程，开始学习吧！
+            </Text>
+            <TouchableOpacity
+              className="bg-primary rounded-lg py-3 px-6"
+              onPress={() => setViewMode('manage')}
+            >
+              <Text className="text-white text-center font-semibold">浏览课程</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+}
+```
+
+#### Step 21: Mindfulness Screen Implementation (app/(tabs)/mindfulness.tsx)
+```typescript
+import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '../../stores/authStore';
+import { supabase } from '../../lib/supabase';
+
+interface MindfulnessRecord {
+  id: string;
+  record_time: string;
+  mind_type: 'good' | 'bad';
+  description?: string;
+}
+
+export default function MindfulnessScreen() {
+  const { user } = useAuthStore();
+  const [description, setDescription] = useState('');
+  const queryClient = useQueryClient();
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const { data: todayRecords = [] } = useQuery({
+    queryKey: ['mindfulnessRecords', user?.id, today],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const { data, error } = await supabase
+        .from('mindfulness_records')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('record_date', today)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as MindfulnessRecord[];
+    },
+    enabled: !!user,
+  });
+
+  const recordMindfulnessMutation = useMutation({
+    mutationFn: async ({ mindType }: { mindType: 'good' | 'bad' }) => {
+      if (!user) throw new Error('No user');
+
+      const now = new Date();
+      const utcTime = now.toISOString().split('T')[1].split('.')[0];
+
+      const { error } = await supabase
+        .from('mindfulness_records')
+        .insert({
+          user_id: user.id,
+          record_date: today,
+          record_time: utcTime,
+          mind_type: mindType,
+          description: description.trim() || null
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mindfulnessRecords', user?.id, today] });
+      setDescription('');
+    },
+  });
+
+  const getTodayStats = () => {
+    const good = todayRecords.filter(r => r.mind_type === 'good').length;
+    const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
+    const total = good + bad;
+    const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
+
+    return { good, bad, total, goodPercent };
+  };
+
+  const stats = getTodayStats();
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="px-4 pt-12 pb-6">
+        <Text className="text-2xl font-bold text-gray-800 mb-6">心性观察</Text>
+
+        {/* Today's Stats */}
+        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">今日统计</Text>
+          
+          <View className="flex-row justify-around mb-4">
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-green-600">{stats.good}</Text>
+              <Text className="text-gray-600">善心</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-primary">{stats.goodPercent}%</Text>
+              <Text className="text-gray-600">善心比例</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-red-600">{stats.bad}</Text>
+              <Text className="text-gray-600">恶心</Text>
+            </View>
+          </View>
+
+          {stats.total > 0 && (
+            <View className="h-2 bg-red-200 rounded-full overflow-hidden">
+              <View 
+                className="h-full bg-green-500"
+                style={{ width: `${stats.goodPercent}%` }}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Record Section */}
+        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">记录当前心性</Text>
+
+          <TextInput
+            className="border border-gray-300 rounded-lg p-4 mb-4 text-gray-800"
+            placeholder="描述当前的心境或想法（可选）"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              className="flex-1 bg-green-500 rounded-lg py-4 px-6"
+              onPress={() => recordMindfulnessMutation.mutate({ mindType: 'good' })}
+              disabled={recordMindfulnessMutation.isPending}
+            >
+              <Text className="text-white text-center font-semibold">善心</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="flex-1 bg-red-500 rounded-lg py-4 px-6"
+              onPress={() => recordMindfulnessMutation.mutate({ mindType: 'bad' })}
+              disabled={recordMindfulnessMutation.isPending}
+            >
+              <Text className="text-white text-center font-semibold">恶心</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Recent Records */}
+        {todayRecords.length > 0 && (
+          <View className="bg-white rounded-lg p-6 shadow-sm">
+            <Text className="text-lg font-semibold text-gray-800 mb-4">今日记录</Text>
+            {todayRecords.slice(0, 5).map((record) => (
+              <View key={record.id} className="flex-row justify-between items-center py-2 border-b border-gray-100">
+                <View className="flex-1">
+                  <Text className={`font-semibold ${record.mind_type === 'good' ? 'text-green-600' : 'text-red-600'}`}>
+                    {record.mind_type === 'good' ? '善心' : '恶心'}
+                  </Text>
+                  {record.description && (
+                    <Text className="text-gray-600 text-sm mt-1">{record.description}</Text>
+                  )}
+                </View>
+                <Text className="text-gray-500 text-sm">
+                  {new Date(`1970-01-01T${record.record_time}Z`).toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+}
+```
+
+#### Step 22: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementation
+```typescript
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '../../stores/authStore';
+import { supabase } from '../../lib/supabase';
+import { router } from 'expo-router';
+
+interface DashboardStats {
+  practiceCount: number;
+  studyCount: number;
+  mindfulnessCount: number;
+  totalActivities: number;
+}
+
+export default function DashboardScreen() {
+  const { user } = useAuthStore();
+  const today = new Date().toISOString().split('T')[0];
+
+  const { data: practices } = useQuery({
+    queryKey: ['userPractices', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          *,
+          practices(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: todayStats } = useQuery({
+    queryKey: ['todayStats', user?.id, today],
+    queryFn: async (): Promise<DashboardStats> => {
+      if (!user) return { practiceCount: 0, studyCount: 0, mindfulnessCount: 0, totalActivities: 0 };
+
+      // Get today's practice records
+      const { data: practiceRecords } = await supabase
+        .from('daily_records')
+        .select('count')
+        .eq('user_id', user.id)
+        .eq('record_date', today);
+
+      // Get today's study records
+      const { data: studyRecords } = await supabase
+        .from('study_records')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('study_date', today);
+
+      // Get today's mindfulness records
+      const { data: mindfulnessRecords } = await supabase
+        .from('mindfulness_records')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('record_date', today);
+
+      const practiceCount = practiceRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
+      const studyCount = studyRecords?.length || 0;
+      const mindfulnessCount = mindfulnessRecords?.length || 0;
+      const totalActivities = practiceCount + studyCount + mindfulnessCount;
+
+      return { practiceCount, studyCount, mindfulnessCount, totalActivities };
+    },
+    enabled: !!user,
+  });
+
+  const { data: userCourses } = useQuery({
+    queryKey: ['userCourses', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select(`
+          *,
+          courses(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .limit(3);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="px-4 pt-12 pb-6">
+        <Text className="text-2xl font-bold text-gray-800 mb-2">今日修行</Text>
+        <Text className="text-gray-600 mb-6">
+          {user?.dharma_name || user?.lay_name || '善友'}，愿您修行精进！
+        </Text>
+
+        {/* Today's Stats Overview */}
+        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-800 mb-4">今日概览</Text>
+          <View className="flex-row justify-around">
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-primary">{todayStats?.practiceCount || 0}</Text>
+              <Text className="text-gray-600">修行次数</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-blue-600">{todayStats?.studyCount || 0}</Text>
+              <Text className="text-gray-600">闻思次数</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-2xl font-bold text-green-600">{todayStats?.mindfulnessCount || 0}</Text>
+              <Text className="text-gray-600">觉察次数</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Active Practices */}
+        {practices && practices.length > 0 && (
+          <View className="mb-6">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-semibold text-gray-800">进行中的修行</Text>
+              <TouchableOpacity onPress={() => router.push('/(tabs)/practice')}>
+                <Text className="text-primary font-semibold">查看全部</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {practices.slice(0, 2).map((practice) => (
+              <TouchableOpacity
+                key={practice.id}
+                className="bg-white rounded-lg p-4 mb-3 shadow-sm"
+                onPress={() => router.push(`/practice-detail/${practice.id}`)}
+              >
+                <Text className="text-lg font-semibold text-gray-800 mb-2">
+                  {practice.practices?.name}
+                </Text>
+                <Text className="text-gray-600 mb-2">
+                  进度：{practice.current_count}/{practice.target_count} {practice.practices?.unit}
+                </Text>
+                <View className="w-full bg-gray-200 rounded-full h-2">
+                  <View 
+                    className="bg-primary h-2 rounded-full"
+                    style={{ 
+                      width: `${Math.min((practice.current_count / practice.target_count) * 100, 100)}%` 
+                    }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Active Courses */}
+        {userCourses && userCourses.length > 0 && (
+          <View className="mb-6">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-lg font-semibold text-gray-800">学习中的课程</Text>
+              <TouchableOpacity onPress={() => router.push('/(tabs)/study')}>
+                <Text className="text-primary font-semibold">查看全部</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {userCourses.slice(0, 2).map((userCourse) => (
+              <TouchableOpacity
+                key={userCourse.id}
+                className="bg-white rounded-lg p-4 mb-3 shadow-sm"
+                onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+              >
+                <Text className="text-lg font-semibold text-gray-800 mb-1">
+                  {userCourse.course.name}
+                </Text>
+                <Text className="text-gray-600 mb-2">
+                  {userCourse.course.teacher} • 进度：{userCourse.progress_percentage.toFixed(1)}%
+                </Text>
+                <View className="w-full bg-gray-200 rounded-full h-2">
+                  <View 
+                    className="bg-blue-500 h-2 rounded-full"
+                    style={{ width: `${userCourse.progress_percentage}%` }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Quick Actions */}
+        <View className="bg-white rounded-lg p-6 shadow-sm">
+          <Text className="text-lg font-semibold text-gray-800 mb-4">快速操作</Text>
+          <View className="flex-row justify-around">
+            <TouchableOpacity
+              className="items-center"
+              onPress={() => router.push('/(tabs)/practice')}
+            >
+              <View className="w-12 h-12 bg-primary rounded-full items-center justify-center mb-2">
+                <Text className="text-white text-lg">🙏</Text>
+              </View>
+              <Text className="text-gray-700 text-sm">修行</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              className="items-center"
+              onPress={() => router.push('/(tabs)/study')}
+            >
+              <View className="w-12 h-12 bg-blue-500 rounded-full items-center justify-center mb-2">
+                <Text className="text-white text-lg">📚</Text>
+              </View>
+              <Text className="text-gray-700 text-sm">闻思</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              className="items-center"
+              onPress={() => router.push('/(tabs)/mindfulness')}
+            >
+              <View className="w-12 h-12 bg-green-500 rounded-full items-center justify-center mb-2">
+                <Text className="text-white text-lg">🧘</Text>
+              </View>
+              <Text className="text-gray-700 text-sm">觉察</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
+```
+
 ## IMPLEMENTATION CHECKLIST
 
 ### ✅ Phase 1: Project Setup
@@ -941,8 +1596,10 @@ export default function PracticeScreen() {
 
 ### ✅ Phase 8: Main App
 - [ ] Setup tab navigation
-- [ ] Create dashboard
+- [ ] Create complete daily dashboard
 - [ ] Implement practice screens
+- [ ] Implement study system screens
+- [ ] Implement mindfulness screens
 
 ### ✅ Phase 9: Icon System
 - [ ] Copy IconSymbol components
