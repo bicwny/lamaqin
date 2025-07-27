@@ -34,8 +34,10 @@ This guide provides step-by-step instructions for creating the Buddhist Practice
 Run these commands in Replit Shell:
 
 ```bash
-npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage nativewind tailwindcss react-native-elements @expo/vector-icons react-native-toast-message
+npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage react-native-elements @expo/vector-icons react-native-toast-message react-native-vector-icons
 ```
+
+Note: Using React Native Elements for default UI components, minimal custom styling.
 
 #### Step 3: Configure Environment Variables
 In Replit Secrets, add:
@@ -95,26 +97,7 @@ module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {
-      colors: {
-        primary: {
-          DEFAULT: '#da4347',
-          light: '#e66a6d',
-          dark: '#b8353a',
-        },
-        secondary: '#2F4F4F',
-        accent: '#FF6B35',
-        text: {
-          primary: '#1F2937',
-          secondary: '#6B7280',
-          tertiary: '#9CA3AF',
-        },
-        success: '#10B981',
-        warning: '#F59E0B',
-        error: '#EF4444',
-        info: '#3B82F6',
-      },
-    },
+    extend: {},
   },
   plugins: [],
 }
@@ -122,7 +105,13 @@ module.exports = {
 
 ### Phase 3: Database and Types Setup
 
-#### Step 6: Create Database Types (types/database.ts)
+#### Step 6: Setup Default UI Library (React Native Elements)
+```bash
+# React Native Elements is already installed in package.json
+# Import default theme and components
+```
+
+#### Step 7: Create Database Types (types/database.ts)
 ```typescript
 export interface User {
   id: string;
