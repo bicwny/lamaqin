@@ -1393,9 +1393,7 @@ export default function MindfulnessScreen() {
   const recordMindfulness = async (mindType: 'good' | 'bad') => {
     if (!user) return;
 
-
-
-try {
+    try {
       const today = new Date().toISOString().split('T')[0];
       const now = new Date();
       const utcTime = now.toISOString().split('T')[1].split('.')[0];
