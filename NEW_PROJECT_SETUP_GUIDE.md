@@ -815,19 +815,171 @@ Use standard Expo vector icons instead of custom IconSymbol system:
 npm install @expo/vector-icons
 ```
 
-### Phase 10: Database Schema (Use Existing)
+### Phase 10: Advanced Features Implementation
 
-#### Step 18: Apply Database Schema
-Use your existing Supabase database with all tables and data. The schema includes:
+#### Step 18: 92 Meditation Topics System
+The app includes a sophisticated 92-topic meditation system for structured practice progression.
 
-- `users` - User profiles
-- `practices` - Practice types
-- `user_practice_projects` - User's practice projects
+**Database Tables:**
+```sql
+-- Meditation topics table
+CREATE TABLE meditation_topics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  practice_id UUID REFERENCES practices(id),
+  topic_number INTEGER NOT NULL,
+  title VARCHAR NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(practice_id, topic_number)
+);
+
+-- Topic progress tracking
+CREATE TABLE user_practice_topic_progress (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  practice_id UUID REFERENCES practices(id),
+  topic_number INTEGER NOT NULL,
+  week_start_date DATE NOT NULL,
+  target_sessions INTEGER DEFAULT 7,
+  completed_sessions INTEGER DEFAULT 0,
+  is_completed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Implementation Features:**
+- Topic selection during meditation recording
+- Weekly progress tracking per topic
+- 92 predefined meditation topics with descriptions
+- Topic completion status and analytics
+
+#### Step 19: Advanced Meditation Recording System
+Enhanced meditation recording with reflection support and topic integration.
+
+**Enhanced meditation_records table:**
+```sql
+ALTER TABLE meditation_records ADD COLUMN IF NOT EXISTS topic_id UUID REFERENCES meditation_topics(id);
+ALTER TABLE meditation_records ADD COLUMN IF NOT EXISTS reflection TEXT;
+ALTER TABLE meditation_records ADD COLUMN IF NOT EXISTS session_number INTEGER;
+ALTER TABLE meditation_records ADD COLUMN IF NOT EXISTS week_start_date DATE DEFAULT CURRENT_DATE - EXTRACT(DOW FROM CURRENT_DATE)::integer;
+```
+
+**Features:**
+- Post-session reflection notes
+- Topic-based session recording
+- Session numbering within topics
+- Quality assessment tracking
+
+#### Step 20: User Course Enrollment System
+Complete course management with enrollment tracking and progress analytics.
+
+**Database Tables:**
+```sql
+-- User course enrollment
+CREATE TABLE user_courses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'paused')),
+  joined_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  completed_date DATE,
+  progress_percentage DECIMAL(5,2) DEFAULT 0.00,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, course_id)
+);
+
+-- Enhanced course lessons with URLs
+ALTER TABLE course_lessons ADD COLUMN IF NOT EXISTS url TEXT;
+ALTER TABLE course_lessons ADD COLUMN IF NOT EXISTS content_summary TEXT;
+```
+
+**Features:**
+- Course enrollment management
+- Progress percentage calculation
+- Course completion tracking
+- Multiple course support per user
+
+#### Step 21: Online Class Integration
+Support for online class URLs and integrated learning experience.
+
+**Implementation:**
+- URL storage in course_lessons table
+- WebView integration for in-app viewing
+- Automatic study record creation when accessing online classes
+- Fallback to external browser for restricted domains
+
+**WebView Component:**
+```typescript
+// components/LessonWebView.tsx
+export function LessonWebView({ url, title }: { url: string; title?: string }) {
+  // Handles embedded viewing with fallback to browser
+  // Records study activity automatically
+  // Supports restricted domains gracefully
+}
+```
+
+#### Step 22: Advanced Practice Configuration
+Sophisticated project setup with presets and goal types.
+
+**Enhanced user_practice_projects table:**
+```sql
+ALTER TABLE user_practice_projects ADD COLUMN IF NOT EXISTS goal_type VARCHAR(20) DEFAULT 'fixed_duration';
+ALTER TABLE user_practice_projects ADD COLUMN IF NOT EXISTS project_name VARCHAR(200);
+ALTER TABLE user_practice_projects ADD COLUMN IF NOT EXISTS preset_project_id UUID;
+ALTER TABLE user_practice_projects ADD COLUMN IF NOT EXISTS target_period VARCHAR(10) DEFAULT 'daily';
+
+-- Preset project names
+CREATE TABLE preset_project_names (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  practice_id UUID REFERENCES practices(id),
+  name VARCHAR(200) NOT NULL,
+  description TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Features:**
+- Goal type selection (fixed duration, ongoing, target-based)
+- Preset project names for common practices
+- Advanced target period configuration
+- Custom project naming
+
+#### Step 23: Study Count Tracking
+Enhanced study tracking with lesson-specific repetition counts.
+
+**Enhanced study_records table:**
+```sql
+ALTER TABLE study_records ADD COLUMN IF NOT EXISTS study_count_for_lesson INTEGER DEFAULT 1;
+```
+
+**Features:**
+- Track multiple study sessions per lesson
+- Repetition count for thorough learning
+- Progress analytics based on study frequency
+- Lesson mastery indicators
+
+### Phase 11: Database Schema (Complete)
+
+#### Step 24: Apply Complete Database Schema
+Use the comprehensive database schema that includes all advanced features:
+
+**Core Tables:**
+- `users` - User profiles with preferences
+- `practices` - Practice types and configurations
+- `user_practice_projects` - Enhanced project management
 - `daily_records` - Count-based practice records
-- `meditation_records` - Time-based practice records
-- `courses` - Study courses
-- `study_records` - Study progress
-- `mindfulness_records` - Mindfulness tracking
+- `meditation_records` - Enhanced time-based records with topics
+- `courses` - Study courses with metadata
+- `study_records` - Enhanced study progress tracking
+- `mindfulness_records` - Mindfulness/heart observation tracking
+
+**Advanced Feature Tables:**
+- `meditation_topics` - 92 meditation topics system
+- `user_practice_topic_progress` - Topic progress tracking
+- `user_courses` - Course enrollment management
+- `preset_project_names` - Practice project presets
+- `course_lessons` - Lessons with URLs and summaries
 
 #### Mindfulness Table SQL (if needed):
 ```sql
@@ -1194,6 +1346,220 @@ export default function MindfulnessScreen() {
 
   const recordMindfulness = async (mindType: 'good' | 'bad') => {
     if (!user) return;
+
+
+
+#### Step 25: Create Meditation Topics Service (services/meditationTopicsService.ts)
+```typescript
+import { supabase } from '../lib/supabase';
+
+export interface MeditationTopic {
+  id: string;
+  practice_id: string;
+  topic_number: number;
+  title: string;
+  description?: string;
+}
+
+export interface TopicProgress {
+  id: string;
+  user_id: string;
+  practice_id: string;
+  topic_number: number;
+  week_start_date: string;
+  target_sessions: number;
+  completed_sessions: number;
+  is_completed: boolean;
+}
+
+export const meditationTopicsService = {
+  async getAllTopics(practiceId: string): Promise<MeditationTopic[]> {
+    const { data, error } = await supabase
+      .from('meditation_topics')
+      .select('*')
+      .eq('practice_id', practiceId)
+      .order('topic_number');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getTopicProgress(userId: string, practiceId: string, topicNumber: number): Promise<TopicProgress | null> {
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('user_practice_topic_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('practice_id', practiceId)
+      .eq('topic_number', topicNumber)
+      .eq('week_start_date', weekStartStr)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data || null;
+  },
+
+  async recordTopicSession(userId: string, practiceId: string, topicNumber: number): Promise<void> {
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+
+    // Get or create progress record
+    let progress = await this.getTopicProgress(userId, practiceId, topicNumber);
+
+    if (!progress) {
+      const { data, error } = await supabase
+        .from('user_practice_topic_progress')
+        .insert({
+          user_id: userId,
+          practice_id: practiceId,
+          topic_number: topicNumber,
+          week_start_date: weekStartStr,
+          completed_sessions: 1
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      progress = data;
+    } else {
+      const newCompletedSessions = progress.completed_sessions + 1;
+      const isCompleted = newCompletedSessions >= progress.target_sessions;
+
+      await supabase
+        .from('user_practice_topic_progress')
+        .update({
+          completed_sessions: newCompletedSessions,
+          is_completed: isCompleted
+        })
+        .eq('id', progress.id);
+    }
+  }
+};
+```
+
+#### Step 26: Create Course Enrollment Service (services/courseEnrollmentService.ts)
+```typescript
+import { supabase } from '../lib/supabase';
+
+export interface UserCourse {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: 'active' | 'completed' | 'paused';
+  joined_date: string;
+  completed_date?: string;
+  progress_percentage: number;
+  course?: {
+    id: string;
+    name: string;
+    total_lessons: number;
+    teacher?: string;
+    description?: string;
+  };
+}
+
+export const courseEnrollmentService = {
+  async enrollInCourse(userId: string, courseId: string): Promise<UserCourse> {
+    const { data, error } = await supabase
+      .from('user_courses')
+      .insert({
+        user_id: userId,
+        course_id: courseId,
+        status: 'active',
+        joined_date: new Date().toISOString().split('T')[0]
+      })
+      .select(`
+        *,
+        courses(*)
+      `)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getUserCourses(userId: string): Promise<UserCourse[]> {
+    const { data, error } = await supabase
+      .from('user_courses')
+      .select(`
+        *,
+        courses(*)
+      `)
+      .eq('user_id', userId)
+      .order('joined_date', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async updateCourseProgress(userId: string, courseId: string): Promise<void> {
+    // Calculate progress based on study records
+    const { data: totalLessons } = await supabase
+      .from('course_lessons')
+      .select('id')
+      .eq('course_id', courseId);
+
+    const { data: studiedLessons } = await supabase
+      .from('study_records')
+      .select('lesson_id')
+      .eq('user_id', userId)
+      .eq('course_id', courseId);
+
+    if (totalLessons && studiedLessons) {
+      const uniqueStudiedLessons = new Set(studiedLessons.map(s => s.lesson_id));
+      const progressPercentage = (uniqueStudiedLessons.size / totalLessons.length) * 100;
+
+      await supabase
+        .from('user_courses')
+        .update({ progress_percentage: progressPercentage })
+        .eq('user_id', userId)
+        .eq('course_id', courseId);
+    }
+  }
+};
+```
+
+#### Step 27: Create Preset Projects Service (services/presetProjectsService.ts)
+```typescript
+import { supabase } from '../lib/supabase';
+
+export interface PresetProject {
+  id: string;
+  practice_id: string;
+  name: string;
+  description?: string;
+  is_active: boolean;
+}
+
+export const presetProjectsService = {
+  async getPresetsByPractice(practiceId: string): Promise<PresetProject[]> {
+    const { data, error } = await supabase
+      .from('preset_project_names')
+      .select('*')
+      .eq('practice_id', practiceId)
+      .eq('is_active', true)
+      .order('name');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createPreset(preset: Omit<PresetProject, 'id'>): Promise<PresetProject> {
+    const { data, error } = await supabase
+      .from('preset_project_names')
+      .insert(preset)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+};
+```
 
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -1704,10 +2070,23 @@ export default function DashboardScreen() {
 - [ ] Configure standard Material Icons
 - [ ] Test icon functionality
 
-### ✅ Phase 10: Database
-- [ ] Verify database schema
-- [ ] Test all connections
-- [ ] Validate data integrity
+### ✅ Phase 10: Advanced Features
+- [ ] Implement 92 meditation topics system
+- [ ] Add topic progress tracking
+- [ ] Create advanced meditation recording with reflections
+- [ ] Setup user course enrollment system
+- [ ] Integrate online class URLs and WebView
+- [ ] Add preset project names system
+- [ ] Implement advanced practice configuration
+- [ ] Add lesson content summaries
+- [ ] Setup study count tracking per lesson
+
+### ✅ Phase 11: Database
+- [ ] Apply complete database schema
+- [ ] Verify all advanced table relationships
+- [ ] Test topic progress functionality
+- [ ] Validate course enrollment system
+- [ ] Test reflection and URL systems
 
 ## NEXT STEPS AFTER BASIC SETUP
 
