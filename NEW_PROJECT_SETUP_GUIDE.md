@@ -35,7 +35,7 @@ This guide provides step-by-step instructions for creating the Buddhist Practice
 Run these commands in Replit Shell:
 
 ```bash
-npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage nativewind tailwindcss react-native-elements @expo/vector-icons expo-symbols react-native-toast-message
+npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage nativewind tailwindcss react-native-elements @expo/vector-icons react-native-toast-message
 ```
 
 #### Step 3: Configure Environment Variables
@@ -715,7 +715,7 @@ export default function LoginScreen() {
 #### Step 15: Tab Layout (app/(tabs)/_layout.tsx)
 ```typescript
 import { Tabs } from 'expo-router';
-import { IconSymbol } from '../../components/ui/IconSymbol';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
@@ -728,35 +728,35 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '今日',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="home" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="practice"
         options={{
           title: '修行',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="flame.fill" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="self-improvement" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="study"
         options={{
           title: '闻思',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="menu-book" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="mindfulness"
         options={{
           title: '觉察',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="brain.head.profile" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="psychology" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: '统计',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="bar-chart" size={28} color={color} />,
         }}
       />
     </Tabs>
@@ -818,14 +818,13 @@ export default function DashboardScreen() {
 }
 ```
 
-### Phase 9: IconSymbol System (Preserve Existing)
+### Phase 9: Icon System Setup
 
-#### Step 17: Copy IconSymbol Components
-Copy the existing IconSymbol components to maintain the icon system:
+#### Step 17: Configure Icon System
+Use standard Expo vector icons instead of custom IconSymbol system:
 
-```typescript
-// components/ui/IconSymbol.tsx (copy from existing project)
-// components/ui/IconSymbol.ios.tsx (copy from existing project)
+```bash
+npm install @expo/vector-icons
 ```
 
 ### Phase 10: Database Schema (Use Existing)
@@ -1602,9 +1601,9 @@ export default function DashboardScreen() {
 - [ ] Implement mindfulness screens
 
 ### ✅ Phase 9: Icon System
-- [ ] Copy IconSymbol components
+- [ ] Install @expo/vector-icons
+- [ ] Configure standard Material Icons
 - [ ] Test icon functionality
-- [ ] Ensure compatibility
 
 ### ✅ Phase 10: Database
 - [ ] Verify database schema
