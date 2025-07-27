@@ -1,4 +1,3 @@
-
 # Buddhist Practice App - Complete Rebuild Guide for New Replit Project
 
 ## OVERVIEW
@@ -283,7 +282,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export async function testConnection() {
   try {
     console.log('🔍 Testing Supabase connection...');
-    
+
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error('❌ Missing Supabase environment variables');
       return false;
@@ -395,7 +394,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   checkAuthState: async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session?.user) {
         const { data: profile } = await supabase
           .from('users')
@@ -900,156 +899,105 @@ export default function PracticeScreen() {
 }
 ```
 
-#### Step 20: Study Screen Implementation (app/(tabs)/study.tsx)
+#### Step 20: Course Detail with Online Class Support (app/course-detail/[courseId].tsx)
 ```typescript
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { router } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
+import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
+import { LessonWebView } from '../../components/LessonWebView';
 
-interface Course {
+interface CourseLesson {
   id: string;
-  name: string;
-  total_lessons: number;
-  teacher?: string;
-  description?: string;
+  lesson_number: number;
+  title: string;
+  url?: string;
+  content_summary?: string;
 }
 
-interface UserCourse {
-  id: string;
-  user_id: string;
-  course_id: string;
-  status: 'active' | 'completed' | 'paused';
-  progress_percentage: number;
-  course: Course;
-}
-
-export default function StudyScreen() {
+export default function CourseDetailScreen() {
+  const { courseId } = useLocalSearchParams<{ courseId: string }>();
   const { user } = useAuthStore();
-  const [viewMode, setViewMode] = useState<'home' | 'manage'>('home');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const queryClient = useQueryClient();
 
-  const { data: userCourses, isLoading, refetch } = useQuery({
-    queryKey: ['userCourses', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select(`
-          *,
-          courses(*)
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as UserCourse[];
-    },
-    enabled: !!user,
-  });
-
-  const { data: allCourses } = useQuery({
-    queryKey: ['allCourses'],
+  const { data: course } = useQuery({
+    queryKey: ['course', courseId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('courses')
         .select('*')
-        .order('name');
+        .eq('id', courseId)
+        .single();
 
       if (error) throw error;
-      return data as Course[];
+      return data;
     },
   });
 
-  const availableCourses = allCourses?.filter(course => 
-    !userCourses?.some(uc => uc.course_id === course.id)
-  ) || [];
-
-  const joinCourse = async (courseId: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('user_courses')
-        .insert({
-          user_id: user.id,
-          course_id: courseId,
-          status: 'active',
-          progress_percentage: 0
-        });
+  const { data: lessons } = useQuery({
+    queryKey: ['courseLessons', courseId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_lessons')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('lesson_number');
 
       if (error) throw error;
-      refetch();
-      setViewMode('home');
-    } catch (error) {
-      console.error('Error joining course:', error);
-    }
-  };
+      return data as CourseLesson[];
+    },
+  });
 
-  const recordStudy = async (courseId: string, lessonNumber: number, studyType: '听传承' | '看法本') => {
-    if (!user) return;
+  const recordStudyMutation = useMutation({
+    mutationFn: async ({ lessonId, lessonNumber, studyType }: {
+      lessonId: string;
+      lessonNumber: number;
+      studyType: '听传承' | '看法本';
+    }) => {
+      if (!user) throw new Error('No user');
 
-    try {
       const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const utcTime = now.toISOString().split('T')[1].split('.')[0];
 
       const { error } = await supabase
         .from('study_records')
         .insert({
           user_id: user.id,
           course_id: courseId,
-          lesson_number: lessonNumber,
+          lesson_id: lessonId,
           study_date: today,
           study_type: studyType,
           study_count_for_lesson: 1
         });
 
       if (error) throw error;
-      
-      // Update course progress
-      await calculateCourseProgress(courseId);
-      refetch();
-    } catch (error) {
-      console.error('Error recording study:', error);
+    },
+    onSuccess: () => {
+      setRefreshTrigger(prev => prev + 1);
+      queryClient.invalidateQueries({ queryKey: ['courseLessons', courseId] });
+    },
+  });
+
+  const handleOpenOnlineClass = (url: string, lessonNumber: number) => {
+    // Record as 听传承 (listening) when opening online class
+    const lesson = lessons?.find(l => l.lesson_number === lessonNumber);
+    if (lesson) {
+      recordStudyMutation.mutate({
+        lessonId: lesson.id,
+        lessonNumber,
+        studyType: '听传承'
+      });
     }
+
+    // Open URL in browser or WebView
+    Linking.openURL(url);
   };
 
-  const calculateCourseProgress = async (courseId: string) => {
-    if (!user) return;
-
-    try {
-      // Get total lessons for course
-      const { data: course } = await supabase
-        .from('courses')
-        .select('total_lessons')
-        .eq('id', courseId)
-        .single();
-
-      if (!course) return;
-
-      // Get unique lessons studied
-      const { data: studyRecords } = await supabase
-        .from('study_records')
-        .select('lesson_number')
-        .eq('user_id', user.id)
-        .eq('course_id', courseId);
-
-      const uniqueLessons = new Set(studyRecords?.map(r => r.lesson_number) || []);
-      const progress = (uniqueLessons.size / course.total_lessons) * 100;
-
-      // Update user course progress
-      await supabase
-        .from('user_courses')
-        .update({ progress_percentage: progress })
-        .eq('user_id', user.id)
-        .eq('course_id', courseId);
-
-    } catch (error) {
-      console.error('Error calculating progress:', error);
-    }
-  };
-
-  if (isLoading) {
+  if (!course || !lessons) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#da4347" />
@@ -1058,268 +1006,124 @@ export default function StudyScreen() {
     );
   }
 
-  if (viewMode === 'manage') {
-    return (
-      <ScrollView className="flex-1 bg-gray-50">
-        <View className="px-4 pt-12 pb-6">
-          <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-2xl font-bold text-gray-800">课程管理</Text>
-            <TouchableOpacity onPress={() => setViewMode('home')}>
-              <Text className="text-primary font-semibold">返回</Text>
-            </TouchableOpacity>
-          </View>
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="px-4 pt-12 pb-6">
+        <Text className="text-2xl font-bold text-gray-800 mb-2">{course.name}</Text>
+        {course.teacher && (
+          <Text className="text-gray-600 mb-4">{course.teacher}</Text>
+        )}
 
-          {availableCourses.length > 0 && (
-            <View className="mb-6">
-              <Text className="text-lg font-semibold text-gray-700 mb-4">可加入课程</Text>
-              {availableCourses.map(course => (
-                <View key={course.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-                  <Text className="text-lg font-semibold text-gray-800 mb-2">{course.name}</Text>
-                  <Text className="text-gray-600 mb-2">{course.teacher} • {course.total_lessons}课</Text>
-                  {course.description && (
-                    <Text className="text-gray-500 text-sm mb-3">{course.description}</Text>
-                  )}
-                  <TouchableOpacity
-                    className="bg-primary rounded-lg py-2 px-4 self-end"
-                    onPress={() => joinCourse(course.id)}
-                  >
-                    <Text className="text-white font-semibold">加入学习</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
+        {lessons.map((lesson) => (
+          <View key={lesson.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+            <View className="flex-row justify-between items-start mb-3">
+              <View className="flex-1">
+                <Text className="text-lg font-semibold text-gray-800 mb-1">
+                  第{lesson.lesson_number}课: {lesson.title}
+                </Text>
+                {lesson.content_summary && (
+                  <Text className="text-gray-600 text-sm mb-2">{lesson.content_summary}</Text>
+                )}
+
+                <LessonProgressDisplay 
+                  userId={user!.id}
+                  courseId={courseId!}
+                  lessonId={lesson.id}
+                  refreshTrigger={refreshTrigger}
+                />
+              </View>
             </View>
-          )}
-        </View>
-      </ScrollView>
+
+            {/* Online Class URL Handling */}
+            {lesson.url && (
+              <View className="mb-3">
+                <TouchableOpacity
+                  className="bg-#### Step 21: LessonWebView Component (components/LessonWebView.tsx)
+```typescript
+import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Linking, Dimensions } from 'react-native';
+import { WebView } from 'react-native-webview';
+
+interface LessonWebViewProps {
+  url: string;
+  title?: string;
+}
+
+export function LessonWebView({ url, title }: LessonWebViewProps) {
+  const { width, height } = Dimensions.get('window');
+  const [loadError, setLoadError] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
+
+  // Known domains that typically don't allow embedding
+  const restrictedDomains = [
+    'google.com',
+    'googleapis.com',
+    'googlesites.com',
+    'youtube.com',
+    'youtu.be',
+    'facebook.com',
+    'twitter.com',
+    'x.com',
+    'instagram.com',
+    'linkedin.com',
+    'github.com'
+  ];
+
+  const isRestrictedDomain = (url: string): boolean => {
+    try {
+      const domain = new URL(url).hostname.toLowerCase();
+      return restrictedDomains.some(restricted => 
+        domain.includes(restricted) || domain.endsWith(`.${restricted}`)
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    // Check if this is likely a restricted domain
+    if (isRestrictedDomain(url)) {
+      setShowFallback(true);
+    }
+  }, [url]);
+
+  const handleOpenInBrowser = () => {
+    Linking.openURL(url);
+  };
+
+  if (showFallback || loadError) {
+    return (
+      <View className="bg-gray-100 rounded-lg p-6 items-center" style={{ height: height * 0.4 }}>
+        <Text className="text-gray-700 font-semibold mb-2">在线课程</Text>
+        {title && <Text className="text-gray-600 mb-4 text-center">{title}</Text>}
+        <Text className="text-gray-500 text-sm text-center mb-4">
+          该课程需要在浏览器中观看
+        </Text>
+        <TouchableOpacity
+          className="bg-blue-500 rounded-lg py-3 px-6"
+          onPress={handleOpenInBrowser}
+        >
+          <Text className="text-white font-semibold">在浏览器中打开</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="px-4 pt-12 pb-6">
-        <View className="flex-row justify-between items-center mb-6">
-          <Text className="text-2xl font-bold text-gray-800">闻思学习</Text>
-          <TouchableOpacity onPress={() => setViewMode('manage')}>
-            <Text className="text-primary font-semibold">管理课程</Text>
-          </TouchableOpacity>
-        </View>
-
-        {userCourses && userCourses.length > 0 ? (
-          userCourses.map(userCourse => (
-            <View key={userCourse.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-semibold text-gray-800 mb-2">
-                {userCourse.course.name}
-              </Text>
-              <Text className="text-gray-600 mb-2">
-                {userCourse.course.teacher} • {userCourse.course.total_lessons}课
-              </Text>
-              <Text className="text-gray-600 mb-3">
-                进度：{userCourse.progress_percentage.toFixed(1)}%
-              </Text>
-              
-              <View className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                <View 
-                  className="bg-primary h-2 rounded-full"
-                  style={{ width: `${userCourse.progress_percentage}%` }}
-                />
-              </View>
-
-              <TouchableOpacity
-                className="bg-primary rounded-lg py-2 px-4"
-                onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
-              >
-                <Text className="text-white text-center font-semibold">继续学习</Text>
-              </TouchableOpacity>
-            </View>
-          ))
-        ) : (
-          <View className="bg-white rounded-lg p-6 text-center">
-            <Text className="text-gray-500 text-center mb-4">
-              还没有课程，开始学习吧！
-            </Text>
-            <TouchableOpacity
-              className="bg-primary rounded-lg py-3 px-6"
-              onPress={() => setViewMode('manage')}
-            >
-              <Text className="text-white text-center font-semibold">浏览课程</Text>
-            </TouchableOpacity>
+    <View style={{ height: height * 0.6 }}>
+      <WebView
+        source={{ uri: url }}
+        style={{ flex: 1 }}
+        onError={() => setLoadError(true)}
+        onHttpError={() => setLoadError(true)}
+        startInLoadingState={true}
+        renderLoading={() => (
+          <View className="flex-1 justify-center items-center bg-gray-100">
+            <Text className="text-gray-600">加载中...</Text>
           </View>
         )}
-      </View>
-    </ScrollView>
-  );
-}
-```
-
-#### Step 21: Mindfulness Screen Implementation (app/(tabs)/mindfulness.tsx)
-```typescript
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthStore } from '../../stores/authStore';
-import { supabase } from '../../lib/supabase';
-
-interface MindfulnessRecord {
-  id: string;
-  record_time: string;
-  mind_type: 'good' | 'bad';
-  description?: string;
-}
-
-export default function MindfulnessScreen() {
-  const { user } = useAuthStore();
-  const [description, setDescription] = useState('');
-  const queryClient = useQueryClient();
-
-  const today = new Date().toISOString().split('T')[0];
-
-  const { data: todayRecords = [] } = useQuery({
-    queryKey: ['mindfulnessRecords', user?.id, today],
-    queryFn: async () => {
-      if (!user) return [];
-      
-      const { data, error } = await supabase
-        .from('mindfulness_records')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('record_date', today)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as MindfulnessRecord[];
-    },
-    enabled: !!user,
-  });
-
-  const recordMindfulnessMutation = useMutation({
-    mutationFn: async ({ mindType }: { mindType: 'good' | 'bad' }) => {
-      if (!user) throw new Error('No user');
-
-      const now = new Date();
-      const utcTime = now.toISOString().split('T')[1].split('.')[0];
-
-      const { error } = await supabase
-        .from('mindfulness_records')
-        .insert({
-          user_id: user.id,
-          record_date: today,
-          record_time: utcTime,
-          mind_type: mindType,
-          description: description.trim() || null
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['mindfulnessRecords', user?.id, today] });
-      setDescription('');
-    },
-  });
-
-  const getTodayStats = () => {
-    const good = todayRecords.filter(r => r.mind_type === 'good').length;
-    const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
-    const total = good + bad;
-    const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
-
-    return { good, bad, total, goodPercent };
-  };
-
-  const stats = getTodayStats();
-
-  return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="px-4 pt-12 pb-6">
-        <Text className="text-2xl font-bold text-gray-800 mb-6">心性观察</Text>
-
-        {/* Today's Stats */}
-        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">今日统计</Text>
-          
-          <View className="flex-row justify-around mb-4">
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-green-600">{stats.good}</Text>
-              <Text className="text-gray-600">善心</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-primary">{stats.goodPercent}%</Text>
-              <Text className="text-gray-600">善心比例</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-red-600">{stats.bad}</Text>
-              <Text className="text-gray-600">恶心</Text>
-            </View>
-          </View>
-
-          {stats.total > 0 && (
-            <View className="h-2 bg-red-200 rounded-full overflow-hidden">
-              <View 
-                className="h-full bg-green-500"
-                style={{ width: `${stats.goodPercent}%` }}
-              />
-            </View>
-          )}
-        </View>
-
-        {/* Record Section */}
-        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">记录当前心性</Text>
-
-          <TextInput
-            className="border border-gray-300 rounded-lg p-4 mb-4 text-gray-800"
-            placeholder="描述当前的心境或想法（可选）"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-          />
-
-          <View className="flex-row gap-4">
-            <TouchableOpacity
-              className="flex-1 bg-green-500 rounded-lg py-4 px-6"
-              onPress={() => recordMindfulnessMutation.mutate({ mindType: 'good' })}
-              disabled={recordMindfulnessMutation.isPending}
-            >
-              <Text className="text-white text-center font-semibold">善心</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-1 bg-red-500 rounded-lg py-4 px-6"
-              onPress={() => recordMindfulnessMutation.mutate({ mindType: 'bad' })}
-              disabled={recordMindfulnessMutation.isPending}
-            >
-              <Text className="text-white text-center font-semibold">恶心</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Recent Records */}
-        {todayRecords.length > 0 && (
-          <View className="bg-white rounded-lg p-6 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-800 mb-4">今日记录</Text>
-            {todayRecords.slice(0, 5).map((record) => (
-              <View key={record.id} className="flex-row justify-between items-center py-2 border-b border-gray-100">
-                <View className="flex-1">
-                  <Text className={`font-semibold ${record.mind_type === 'good' ? 'text-green-600' : 'text-red-600'}`}>
-                    {record.mind_type === 'good' ? '善心' : '恶心'}
-                  </Text>
-                  {record.description && (
-                    <Text className="text-gray-600 text-sm mt-1">{record.description}</Text>
-                  )}
-                </View>
-                <Text className="text-gray-500 text-sm">
-                  {new Date(`1970-01-01T${record.record_time}Z`).toLocaleTimeString('zh-CN', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+      />
+    </View>
   );
 }
 ```
@@ -1455,7 +1259,7 @@ export default function DashboardScreen() {
                 <Text className="text-primary font-semibold">查看全部</Text>
               </TouchableOpacity>
             </View>
-            
+
             {practices.slice(0, 2).map((practice) => (
               <TouchableOpacity
                 key={practice.id}
@@ -1490,7 +1294,7 @@ export default function DashboardScreen() {
                 <Text className="text-primary font-semibold">查看全部</Text>
               </TouchableOpacity>
             </View>
-            
+
             {userCourses.slice(0, 2).map((userCourse) => (
               <TouchableOpacity
                 key={userCourse.id}
@@ -1527,7 +1331,7 @@ export default function DashboardScreen() {
               </View>
               <Text className="text-gray-700 text-sm">修行</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               className="items-center"
               onPress={() => router.push('/(tabs)/study')}
@@ -1537,7 +1341,7 @@ export default function DashboardScreen() {
               </View>
               <Text className="text-gray-700 text-sm">闻思</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               className="items-center"
               onPress={() => router.push('/(tabs)/mindfulness')}
