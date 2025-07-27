@@ -34,10 +34,10 @@ This guide provides step-by-step instructions for creating the Buddhist Practice
 Run these commands in Replit Shell:
 
 ```bash
-npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage react-native-elements @expo/vector-icons react-native-toast-message react-native-vector-icons
+npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage @gluestack-ui/gluestack-ui-provider @gluestack-ui/themed @gluestack-ui/components @expo/vector-icons react-native-toast-message react-native-vector-icons
 ```
 
-Note: Using React Native Elements for default UI components, minimal custom styling.
+Note: Using Gluestack UI for comprehensive template components and modern design system.
 
 #### Step 3: Configure Environment Variables
 In Replit Secrets, add:
