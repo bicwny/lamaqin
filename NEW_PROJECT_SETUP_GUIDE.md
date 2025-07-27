@@ -108,51 +108,7 @@ In Replit Secrets, add:
 
 ### Phase 2: Core Configuration Files
 
-#### Step 4: Update app.json
-Configure your app metadata and build settings:
-
-```json
-{
-  "expo": {
-    "name": "Buddhist Practice",
-    "slug": "buddhist-practice",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "buddhist-practice",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.buddhistpractice"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.yourname.buddhistpractice"
-    },
-    "web": {
-      "bundler": "metro",
-      "hostname": "0.0.0.0",
-      "port": 8081
-    },
-    "plugins": [
-      "expo-router",
-      "expo-splash-screen"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "router": {}
-    }
-  }
-}
-```
-
-#### Step 5: Configure NativeWind (tailwind.config.js)
+#### Step 4: Configure NativeWind (tailwind.config.js)
 ```javascript
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -167,13 +123,13 @@ module.exports = {
 
 ### Phase 3: Database and Types Setup
 
-#### Step 6: Setup Default UI Library (React Native Elements)
+#### Step 5: Setup Default UI Library (React Native Elements)
 ```bash
 # React Native Elements is already installed in package.json
 # Import default theme and components
 ```
 
-#### Step 7: Create Database Types (types/database.ts)
+#### Step 6: Create Database Types (types/database.ts)
 ```typescript
 export interface User {
   id: string;
@@ -1068,7 +1024,7 @@ CREATE INDEX idx_mindfulness_user_date ON mindfulness_records (user_id, record_d
 
 ### Phase 11: Additional Screens (Templates)
 
-#### Step 19: Practice Screen Template (app/(tabs)/practice.tsx)
+#### Step 25: Practice Screen Template (app/(tabs)/practice.tsx)
 ```typescript
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
@@ -1125,7 +1081,7 @@ export default function PracticeScreen() {
 }
 ```
 
-#### Step 20: Course Detail with Online Class Support (app/course-detail/[courseId].tsx)
+#### Step 26: Course Detail with Online Class Support (app/course-detail/[courseId].tsx)
 ```typescript
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
@@ -1264,7 +1220,7 @@ export default function CourseDetailScreen() {
             {lesson.url && (
               <View className="mb-3">
                 <TouchableOpacity
-                  className="bg-#### Step 21: LessonWebView Component (components/LessonWebView.tsx)
+                  className="bg-#### Step 27: LessonWebView Component (components/LessonWebView.tsx)
 ```typescript
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Linking, Dimensions } from 'react-native';
@@ -1354,7 +1310,7 @@ export function LessonWebView({ url, title }: LessonWebViewProps) {
 }
 ```
 
-#### Step 22: Complete Mindfulness System (app/(tabs)/mindfulness.tsx)
+#### Step 28: Complete Mindfulness System (app/(tabs)/mindfulness.tsx)
 ```typescript
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
@@ -1411,7 +1367,7 @@ export default function MindfulnessScreen() {
 
 
 
-#### Step 25: Create Meditation Topics Service (services/meditationTopicsService.ts)
+#### Step 29: Create Meditation Topics Service (services/meditationTopicsService.ts)
 ```typescript
 import { supabase } from '../lib/supabase';
 
@@ -1503,7 +1459,7 @@ export const meditationTopicsService = {
 };
 ```
 
-#### Step 26: Create Course Enrollment Service (services/courseEnrollmentService.ts)
+#### Step 30: Create Course Enrollment Service (services/courseEnrollmentService.ts)
 ```typescript
 import { supabase } from '../lib/supabase';
 
@@ -1585,7 +1541,7 @@ export const courseEnrollmentService = {
 };
 ```
 
-#### Step 27: Create Preset Projects Service (services/presetProjectsService.ts)
+#### Step 31: Create Preset Projects Service (services/presetProjectsService.ts)
 ```typescript
 import { supabase } from '../lib/supabase';
 
@@ -1780,7 +1736,7 @@ export const presetProjectsService = {
 }
 ```
 
-#### Step 23: Mindfulness Service (services/mindfulnessService.ts)
+#### Step 32: Mindfulness Service (services/mindfulnessService.ts)
 ```typescript
 import { supabase } from '../lib/supabase';
 
@@ -1851,7 +1807,7 @@ export const mindfulnessService = {
 };
 ```
 
-#### Step 24: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementation
+#### Step 33: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementation
 ```typescript
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
