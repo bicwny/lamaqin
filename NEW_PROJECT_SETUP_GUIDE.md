@@ -1338,7 +1338,8 @@ export function LessonWebView({ url, title }: LessonWebViewProps) {
 }
 ```
 
-#### Step 28: Complete Mindfulness System (app/(tabs)/mindfulness.tsx)
+### Step 28: Complete Mindfulness System (app/(tabs)/mindfulness.tsx)
+
 ```typescript
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
@@ -1367,10 +1368,8 @@ export default function MindfulnessScreen() {
       setLoading(false);
       return;
     }
-
     try {
       const today = new Date().toISOString().split('T')[0];
-      
       const { data, error } = await supabase
         .from('mindfulness_records')
         .select('*')
@@ -1379,7 +1378,7 @@ export default function MindfulnessScreen() {
         .order('record_time');
 
       if (error) throw error;
-      
+
       console.log('💝 Loaded mindfulness records:', data?.length || 0);
       setTodayRecords(data || []);
     } catch (error) {
@@ -1392,12 +1391,10 @@ export default function MindfulnessScreen() {
 
   const recordMindfulness = async (mindType: 'good' | 'bad') => {
     if (!user) return;
-
     try {
       const today = new Date().toISOString().split('T')[0];
       const now = new Date();
       const utcTime = now.toISOString().split('T')[1].split('.')[0];
-
       const { error } = await supabase
         .from('mindfulness_records')
         .insert({
@@ -1409,13 +1406,11 @@ export default function MindfulnessScreen() {
         });
 
       if (error) throw error;
-
       const mindTypeText = mindType === 'good' ? '善心' : '恶心';
       console.log(`✅ ${mindTypeText}已记录`);
-      
+
       setDescription('');
       loadTodayRecords();
-
     } catch (error) {
       console.error('Error recording mindfulness:', error);
     }
@@ -1426,7 +1421,6 @@ export default function MindfulnessScreen() {
     const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
     const total = good + bad;
     const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
-
     return { good, bad, total, goodPercent };
   };
 
@@ -1460,7 +1454,6 @@ export default function MindfulnessScreen() {
       <View className="px-4 pt-12 pb-6">
         <Text className="text-2xl font-bold text-gray-800 mb-2">心性观察</Text>
         <Text className="text-gray-600 mb-6">观察内心善恶念头</Text>
-
         {/* Today's Statistics Card */}
         <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
           <Text className="text-lg font-semibold text-gray-800 mb-4">今日统计</Text>
@@ -1478,7 +1471,6 @@ export default function MindfulnessScreen() {
               <Text className="text-gray-600">恶心</Text>
             </View>
           </View>
-
           {stats.total > 0 && (
             <View className="w-full bg-red-100 rounded-full h-3">
               <View 
@@ -1488,11 +1480,9 @@ export default function MindfulnessScreen() {
             </View>
           )}
         </View>
-
         {/* Recording Interface */}
         <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
           <Text className="text-lg font-semibold text-gray-800 mb-4">记录当前心性</Text>
-
           <TextInput
             className="border border-gray-300 rounded-lg px-4 py-3 mb-4"
             placeholder="描述当前的心境或想法（可选）"
@@ -1502,7 +1492,6 @@ export default function MindfulnessScreen() {
             numberOfLines={3}
             textAlignVertical="top"
           />
-
           <View className="flex-row gap-3">
             <TouchableOpacity 
               className="flex-1 bg-green-500 rounded-lg py-4 items-center"
@@ -1510,7 +1499,6 @@ export default function MindfulnessScreen() {
             >
               <Text className="text-white font-semibold text-lg">善心</Text>
             </TouchableOpacity>
-
             <TouchableOpacity 
               className="flex-1 bg-red-500 rounded-lg py-4 items-center"
               onPress={() => recordMindfulness('bad')}
@@ -1519,7 +1507,6 @@ export default function MindfulnessScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
         {/* Today's Records */}
         {todayRecords.length > 0 && (
           <View className="bg-white rounded-lg p-6 shadow-sm">
@@ -1527,17 +1514,9 @@ export default function MindfulnessScreen() {
             {todayRecords.map((record) => (
               <View key={record.id} className="flex-row justify-between items-center py-2 border-b border-gray-100">
                 <View className="flex-1">
-                  <View className="flex-row items-center">
-                    <View className={`w-3 h-3 rounded-full mr-3 ${
-                      record.mind_type === 'good' ? 'bg-green-500' : 'bg-red-500'
-                    }`} />
-                    <Text className="font-semibold text-gray-800">
-                      {record.mind_type === 'good' ? '善心' : '恶心'}
-                    </Text>
-                  </View>
-                  {record.description && (
-                    <Text className="text-gray-600 text-sm mt-1 ml-6">{record.description}</Text>
-                  )}
+                  <View className={`w-3 h-3 rounded-full mr-3 ${record.mind_type === 'good' ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <Text className="font-semibold text-gray-800">{record.mind_type === 'good' ? '善心' : '恶心'}</Text>
+                  {record.description && <Text className="text-gray-600 text-sm mt-1 ml-6">{record.description}</Text>}
                 </View>
                 <Text className="text-gray-500 text-sm">{formatTime(record.record_time)}</Text>
               </View>
@@ -1724,7 +1703,8 @@ export const courseEnrollmentService = {
 };
 ```
 
-#### Step 31: Create Preset Projects Service (services/presetProjectsService.ts)
+### Step 31: Create Preset Projects Service (services/presetProjectsService.ts)
+
 ```typescript
 import { supabase } from '../lib/supabase';
 
@@ -1760,163 +1740,86 @@ export const presetProjectsService = {
     return data;
   }
 };
-```
 
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const now = new Date();
-      const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
+// Example usage of mindfulness record insertion
+try {
+  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
 
-      const { error } = await supabase
-        .from('mindfulness_records')
-        .insert({
-          user_id: user.id,
-          record_date: today,
-          record_time: utcTime,
-          mind_type: mindType,
-          description: description.trim() || undefined
-        });
+  const { error } = await supabase
+    .from('mindfulness_records')
+    .insert({
+      user_id: user.id,
+      record_date: today,
+      record_time: utcTime,
+      mind_type: mindType,
+      description: description.trim() || undefined
+    });
 
-      if (error) throw error;
+  if (error) throw error;
+  const mindTypeText = mindType === 'good' ? '善心' : '恶心';
+  console.log(`✅ ${mindTypeText}已记录`);
 
-      const mindTypeText = mindType === 'good' ? '善心' : '恶心';
-      console.log(`✅ ${mindTypeText}已记录`);
-      
-      setDescription('');
-      loadTodayRecords(); // Refresh data
+  setDescription('');
+  loadTodayRecords(); // Refresh data
+} catch (error) {
+  console.error('Error recording mindfulness:', error);
+}
 
-    } catch (error) {
-      console.error('Error recording mindfulness:', error);
-    }
-  };
+// Function to get today's statistics
+const getTodayStats = () => {
+  const good = todayRecords.filter(r => r.mind_type === 'good').length;
+  const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
+  const total = good + bad;
+  const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
 
-  const getTodayStats = () => {
-    const good = todayRecords.filter(r => r.mind_type === 'good').length;
-    const bad = todayRecords.filter(r => r.mind_type === 'bad').length;
-    const total = good + bad;
-    const goodPercent = total > 0 ? Math.round((good / total) * 100) : 0;
+  return { good, bad, total, goodPercent };
+};
 
-    return { good, bad, total, goodPercent };
-  };
-
-  const formatTime = (timeString: string) => {
-    try {
-      // Convert UTC time to local time for display
-      const utcDate = new Date(`1970-01-01T${timeString}Z`);
-      return utcDate.toLocaleTimeString('en-US', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (error) {
-      console.error('Error formatting time:', error);
-      return timeString.substring(0, 5); // Fallback
-    }
-  };
-
-  const stats = getTodayStats();
-
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <Text className="text-gray-600">加载中...</Text>
-      </View>
-    );
+// Function to format time
+const formatTime = (timeString: string) => {
+  try {
+    // Convert UTC time to local time for display
+    const utcDate = new Date(`1970-01-01T${timeString}Z`);
+    return utcDate.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return timeString.substring(0, 5); // Fallback
   }
+};
 
+// Today's statistics
+const stats = getTodayStats();
+
+if (loading) {
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="px-4 pt-12 pb-6">
-        <Text className="text-2xl font-bold text-gray-800 mb-2">心性观察</Text>
-        <Text className="text-gray-600 mb-6">观察内心善恶念头</Text>
-
-        {/* Today's Statistics Card */}
-        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-4">今日统计</Text>
-          <View className="flex-row justify-around mb-4">
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-green-600">{stats.good}</Text>
-              <Text className="text-gray-600">善心</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-primary">{stats.goodPercent}%</Text>
-              <Text className="text-gray-600">善心比例</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-red-600">{stats.bad}</Text>
-              <Text className="text-gray-600">恶心</Text>
-            </View>
-          </View>
-
-          {stats.total > 0 && (
-            <View className="w-full bg-red-100 rounded-full h-3">
-              <View 
-                className="bg-green-500 h-3 rounded-full"
-                style={{ width: `${stats.goodPercent}%` }}
-              />
-            </View>
-          )}
-        </View>
-
-        {/* Recording Interface */}
-        <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-4">记录当前心性</Text>
-
-          <TextInput
-            className="border border-gray-300 rounded-lg px-4 py-3 mb-4"
-            placeholder="描述当前的心境或想法（可选）"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-          />
-
-          <View className="flex-row gap-3">
-            <TouchableOpacity 
-              className="flex-1 bg-green-500 rounded-lg py-4 items-center"
-              onPress={() => recordMindfulness('good')}
-            >
-              <Text className="text-white font-semibold text-lg">善心</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              className="flex-1 bg-red-500 rounded-lg py-4 items-center"
-              onPress={() => recordMindfulness('bad')}
-            >
-              <Text className="text-white font-semibold text-lg">恶心</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Today's Records */}
-        {todayRecords.length > 0 && (
-          <View className="bg-white rounded-lg p-6 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-800 mb-4">今日记录</Text>
-            {todayRecords.map((record, index) => (
-              <View key={record.id} className="flex-row justify-between items-center py-2 border-b border-gray-100">
-                <View className="flex-1">
-                  <View className="flex-row items-center">
-                    <View className={`w-3 h-3 rounded-full mr-3 ${
-                      record.mind_type === 'good' ? 'bg-green-500' : 'bg-red-500'
-                    }`} />
-                    <Text className="font-semibold text-gray-800">
-                      {record.mind_type === 'good' ? '善心' : '恶心'}
-                    </Text>
-                  </View>
-                  {record.description && (
-                    <Text className="text-gray-600 text-sm mt-1 ml-6">{record.description}</Text>
-                  )}
-                </View>
-                <Text className="text-gray-500 text-sm">{formatTime(record.record_time)}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+    <Text>加载中...</Text>
   );
 }
+
+return (
+  <ScrollView>
+    {/* Today's Statistics Card */}
+    <View className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+      <Text className="text-lg font-semibold text-gray-800 mb-4">今日统计</Text>
+      <View className="flex-row justify-around mb-4">
+        <View className="items-center">
+          <Text className="text-2xl font-bold text-green-600">{stats.good}</Text>
+          <Text className="text-gray-600">善心</Text>
+        </View>
+        <View className="items-center">
+          <Text className="text-2xl font-bold text-primary">{stats.goodPercent}%</Text>
+          <Text className="text-gray-600">善心比例</Text>
+        </View>
+        <View className="items-center">
+          <Text className="text-2xl font-bold text-red-600">{stats.bad}</Text>
+          <Text className="text-gray-600">恶心</Text>
+        </View>
+      </View>
+    </View>
+  </ScrollView>
+);
 ```
 
 #### Step 32: Mindfulness Service (services/mindfulnessService.ts)
