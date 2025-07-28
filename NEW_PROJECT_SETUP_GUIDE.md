@@ -35,72 +35,100 @@ This guide provides step-by-step instructions for creating the Buddhist Practice
 Run these commands in Replit Shell:
 
 ```bash
-npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage @gluestack-ui/gluestack-ui-provider @gluestack-ui/themed @gluestack-ui/components @expo/vector-icons react-native-toast-message react-native-vector-icons
+npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage @expo/vector-icons react-native-toast-message react-native-vector-icons
 ```
 
-Note: Using Gluestack UI for comprehensive template components and modern design system.
+Note: Using React Native Elements for comprehensive template components and proven stability.
 
-### Gluestack UI Guidelines
+### React Native Elements Guidelines
 
-#### Setup Gluestack Provider
+#### Setup Theme Provider (Optional)
 ```typescript
 // app/_layout.tsx
-import { GluestackUIProvider } from '@gluestack-ui/themed';
+import { ThemeProvider } from 'react-native-elements';
+
+const theme = {
+  colors: {
+    primary: '#da4347',
+    secondary: '#f0f0f0',
+    success: '#52c41a',
+    warning: '#faad14',
+    error: '#ff4d4f',
+  },
+};
 
 export default function RootLayout() {
   return (
-    <GluestackUIProvider>
+    <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         {/* Your app content */}
       </QueryClientProvider>
-    </GluestackUIProvider>
+    </ThemeProvider>
   );
 }
 ```
 
 #### Component Creation Rules
-**✅ DO:** Use Gluestack components instead of custom styles
+**✅ DO:** Use React Native Elements components with consistent styling
 ```typescript
-import { Box, Button, Text, VStack, HStack } from '@gluestack-ui/themed';
+import { Card, Button, Text, View } from 'react-native-elements';
+import { View as RNView } from 'react-native';
 
 export function PracticeCard() {
   return (
-    <Box bg="$white" p="$4" borderRadius="$lg" shadow="$sm">
-      <VStack space="$3">
-        <Text fontSize="$lg" fontWeight="$bold">Practice Name</Text>
-        <HStack space="$2">
-          <Button action="primary" onPress={handleAction}>
-            <Button.Text>Record</Button.Text>
-          </Button>
-          <Button variant="outline" onPress={handleView}>
-            <Button.Text>View</Button.Text>
-          </Button>
-        </HStack>
-      </VStack>
-    </Box>
+    <Card containerStyle={{ borderRadius: 12, marginBottom: 16 }}>
+      <Card.Title>Practice Name</Card.Title>
+      <Card.Divider />
+      <RNView style={{ flexDirection: 'row', gap: 8 }}>
+        <Button 
+          title="Record" 
+          onPress={handleAction}
+          buttonStyle={{ backgroundColor: '#da4347' }}
+        />
+        <Button 
+          title="View" 
+          type="outline"
+          onPress={handleView}
+        />
+      </RNView>
+    </Card>
   );
 }
 ```
 
-**❌ AVOID:** Custom StyleSheet.create() usage
+**✅ RECOMMENDED:** Combine with NativeWind for consistent styling
 ```typescript
-// Don't do this
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-  }
-});
+import { Card, Button, Input } from 'react-native-elements';
+import { View, Text } from 'react-native';
+
+export function PracticeForm() {
+  return (
+    <View className="p-4">
+      <Card containerStyle={{ borderRadius: 12, marginBottom: 16 }}>
+        <Text className="text-lg font-bold mb-4">Add Practice</Text>
+        <Input
+          placeholder="Practice name"
+          containerStyle={{ marginBottom: 16 }}
+        />
+        <Button 
+          title="Save Practice"
+          buttonStyle={{ backgroundColor: '#da4347', borderRadius: 8 }}
+        />
+      </Card>
+    </View>
+  );
+}
 ```
 
 #### Component Mapping Guide
-- Replace `View` → `Box`
-- Replace `Text` → `Text` (with Gluestack tokens)
-- Replace `TouchableOpacity` → `Button` or `Pressable`
-- Replace custom cards → `Card` component
-- Replace custom inputs → `Input` component
-- Use `VStack`/`HStack` instead of flexbox containers
+- Use `Card` for content containers
+- Use `Button` for all interactive actions
+- Use `Input` for text inputs and forms
+- Use `Header` for navigation headers
+- Use `ListItem` for list displays
+- Use `Avatar` for user profiles
+- Use `Badge` for status indicators
+- Combine with React Native `View` and `Text` for layout
 
 #### Step 3: Configure Environment Variables
 In Replit Secrets, add:
@@ -1042,13 +1070,7 @@ Use the comprehensive database schema that includes all advanced features:
 **Advanced Feature Tables:**
 - `meditation_topics` - 92 meditation topics system
 - `user_practice_topic_progress` - Topic progress tracking
-- `user_courses` - Course enrollment management
-- `preset_project_names` - Practice project presets
-- `course_lessons` - Lessons with URLs and summaries
-
-#### Mindfulness Table SQL (if needed):
-```sql
-CREATE TABLE mindfulness_records (
+- `user_courses` - CourseCREATE TABLE mindfulness_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     record_date DATE NOT NULL,
@@ -1922,7 +1944,7 @@ export const mindfulnessService = {
 
     // Group by date and count good/bad
     const summary: { [date: string]: { good: number; bad: number } } = {};
-    
+
     data?.forEach(record => {
       if (!summary[record.record_date]) {
         summary[record.record_date] = { good: 0, bad: 0 };
@@ -1939,9 +1961,7 @@ export const mindfulnessService = {
 };
 ```
 
-#### Step 33: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementation
-```typescript
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+#### Step 33: Enhanced Daily Dashboard (app/(tabs)/index.tsx) - Complete Implementationimport { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
@@ -2168,256 +2188,3 @@ export default function DashboardScreen() {
     </ScrollView>
   );
 }
-```
-
-## IMPLEMENTATION CHECKLIST
-
-### ✅ Phase 1: Project Setup
-- [ ] Create new Replit project
-- [ ] Install dependencies
-- [ ] Configure environment variables
-
-### ✅ Phase 2: Core Configuration
-- [ ] Update app.json
-- [ ] Configure NativeWind
-- [ ] Setup build configuration
-
-### ✅ Phase 3: Database & Types
-- [ ] Create database types
-- [ ] Setup Supabase client
-- [ ] Test database connection
-
-### ✅ Phase 4: State Management
-- [ ] Create auth store with Zustand
-- [ ] Setup TanStack Query client
-- [ ] Configure caching strategies
-
-### ✅ Phase 5: Core Services
-- [ ] Create practice service
-- [ ] Create meditation service
-- [ ] Create study service
-- [ ] Create mindfulness service
-
-### ✅ Phase 6: App Structure
-- [ ] Setup root layout
-- [ ] Configure routing
-- [ ] Create auth flow
-
-### ✅ Phase 7: Authentication
-- [ ] Create login screen
-- [ ] Create registration screen
-- [ ] Implement OTP verification
-
-### ✅ Phase 8: Main App
-- [ ] Setup tab navigation
-- [ ] Create complete daily dashboard
-- [ ] Implement practice screens
-- [ ] Implement study system screens
-- [ ] Implement mindfulness screens
-
-### ✅ Phase 9: Icon System
-- [ ] Install @expo/vector-icons
-- [ ] Replace IconSymbol components with MaterialIcons
-- [ ] Update all existing icon usage
-- [ ] Remove old IconSymbol files
-- [ ] Test icon functionality
-
-### ✅ Phase 10: Advanced Features
-- [ ] Implement 92 meditation topics system
-- [ ] Add topic progress tracking
-- [ ] Create advanced meditation recording with reflections
-- [ ] Setup user course enrollment system
-- [ ] Integrate online class URLs and WebView
-- [ ] Add preset project names system
-- [ ] Implement advanced practice configuration
-- [ ] Add lesson content summaries
-- [ ] Setup study count tracking per lesson
-
-### ✅ Phase 11: Database
-- [ ] Apply complete database schema
-- [ ] Verify all advanced table relationships
-- [ ] Test topic progress functionality
-- [ ] Validate course enrollment system
-- [ ] Test reflection and URL systems
-
-## NEXT STEPS AFTER BASIC SETUP
-
-1. **Test Core Functionality**
-   - Authentication flow
-   - Basic practice recording
-   - Data persistence
-
-2. **Implement Remaining Screens**
-   - Study system
-   - Mindfulness tracking
-   - Statistics and analytics
-
-3. **Add Advanced Features**
-   - Meditation topics system
-   - Progress analytics
-   - Notification system
-
-4. **Performance Optimization**
-   - Implement proper caching
-   - Optimize queries
-   - Add loading states
-
-5. **Testing & Deployment**
-   - Test on multiple devices
-   - Deploy to Replit hosting
-   - Configure production settings
-
-## FRAMEWORK BENEFITS
-
-This optimized framework provides:
-
-- **40-60% Better Performance**: Modern state management
-- **Better Developer Experience**: TypeScript and modern tools
-- **Easier Maintenance**: Clear separation of concerns
-- **Scalable Architecture**: Ready for future enhancements
-- **Production Ready**: Optimized for performance and reliability
-
-## TROUBLESHOOTING
-
-If you encounter issues:
-
-1. **Database Connection**: Check environment variables in Replit Secrets
-2. **Build Errors**: Clear cache with `npx expo start --clear`
-3. **Type Errors**: Ensure all TypeScript types are properly imported
-4. **Styling Issues**: Verify NativeWind configuration
-5. **State Issues**: Check Zustand store implementations
-
-## SUPPORT
-
-For additional help:
-1. Check Replit console for error messages
-2. Verify Supabase connection with test function
-3. Use React DevTools for debugging
-4. Check network tab for API calls
-
-This guide provides a complete foundation for rebuilding your Buddhist Practice App with modern, performant architecture while preserving all existing functionality and database structure.
-# Buddhist Practice App - Complete Rebuild Guide for New Replit Project
-
-## OVERVIEW
-This guide provides step-by-step instructions for creating the Buddhist Practice App from scratch using an optimized React Native + Expo framework while preserving ALL existing functionality and database logic, using modern standard Expo vector icons.
-
-## RECOMMENDED FRAMEWORK STACK
-
-### Core Technologies
-- **React Native + Expo**: Cross-platform mobile development
-- **TypeScript**: Type safety and better development experience
-- **Zustand**: Lightweight state management (replaces Context API)
-- **TanStack Query**: Server state management and caching
-- **NativeWind**: Tailwind CSS for React Native styling
-- **Supabase**: Backend database and authentication
-- **Expo Router**: File-based routing system
-
-### Why This Stack?
-- **40-60% performance improvement** over Context API
-- **Better caching** with TanStack Query
-- **Smaller bundle size** with Zustand
-- **Modern patterns** for easier maintenance
-- **Type safety** throughout the application
-- **Standard icon system** with Expo vector icons for consistency
-
-## STEP-BY-STEP IMPLEMENTATION
-
-### Phase 1: Project Setup
-
-#### Step 1: Create New Replit Project
-1. Go to Replit.com and click "Create Repl"
-2. Select "React Native" template
-3. Name it "buddhist-practice-app-v2"
-
-#### Step 2: Install Dependencies
-Run these commands in Replit Shell:
-
-```bash
-npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage @gluestack-ui/gluestack-ui-provider @gluestack-ui/themed @gluestack-ui/components @expo/vector-icons react-native-toast-message react-native-vector-icons
-```
-
-Note: Using Gluestack UI for comprehensive template components and modern design system.
-
-### Gluestack UI Guidelines
-
-#### Setup Gluestack Provider
-```typescript
-// app/_layout.tsx
-import { GluestackUIProvider } from '@gluestack-ui/themed';
-
-export default function RootLayout() {
-  return (
-    <GluestackUIProvider>
-      <QueryClientProvider client={queryClient}>
-        {/* Your app content */}
-      </QueryClientProvider>
-    </GluestackUIProvider>
-  );
-}
-```
-
-#### Component Creation Rules
-**✅ DO:** Use Gluestack components instead of custom styles
-```typescript
-import { Box, Button, Text, VStack, HStack } from '@gluestack-ui/themed';
-
-export function PracticeCard() {
-  return (
-    <Box bg="$white" p="$4" borderRadius="$lg" shadow="$sm">
-      <VStack space="$3">
-        <Text fontSize="$lg" fontWeight="$bold">Practice Name</Text>
-        <HStack space="$2">
-          <Button action="primary" onPress={handleAction}>
-            <Button.Text>Record</Button.Text>
-          </Button>
-          <Button variant="outline" onPress={handleView}>
-            <Button.Text>View</Button.Text>
-          </Button>
-        </HStack>
-      </VStack>
-    </Box>
-  );
-}
-```
-
-**❌ AVOID:** Custom StyleSheet.create() usage
-```typescript
-// Don't do this
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-  }
-});
-```
-
-#### Component Mapping Guide
-- Replace `View` → `Box`
-- Replace `Text` → `Text` (with Gluestack tokens)
-- Replace `TouchableOpacity` → `Button` or `Pressable`
-- Replace custom cards → `Card` component
-- Replace custom inputs → `Input` component
-- Use `VStack`/`HStack` instead of flexbox containers
-
-#### Step 3: Configure Environment Variables
-In Replit Secrets, add:
-- `EXPO_PUBLIC_SUPABASE_URL`: Your Supabase project URL
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
-
-### Phase 2: Core Configuration Files
-
-#### Step 4: Configure NativeWind (tailwind.config.js)
-```javascript
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
-  presets: [require("nativewind/preset")],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-```
-
-[... rest of the guide content follows exactly as in your current NEW_PROJECT_SETUP_GUIDE.md ...]
