@@ -1,7 +1,7 @@
 # Buddhist Practice App - Complete Rebuild Guide for New Replit Project
 
 ## OVERVIEW
-This guide provides step-by-step instructions for creating the Buddhist Practice App from scratch using an optimized React Native + Expo framework while preserving ALL existing functionality and database logic.
+This guide provides step-by-step instructions for creating the Buddhist Practice App from scratch using an optimized React Native + Expo framework while preserving ALL existing functionality and database logic, using modern standard Expo vector icons.
 
 ## RECOMMENDED FRAMEWORK STACK
 
@@ -20,6 +20,7 @@ This guide provides step-by-step instructions for creating the Buddhist Practice
 - **Smaller bundle size** with Zustand
 - **Modern patterns** for easier maintenance
 - **Type safety** throughout the application
+- **Standard icon system** with Expo vector icons for consistency
 
 ## STEP-BY-STEP IMPLEMENTATION
 
@@ -828,11 +829,30 @@ export default function DashboardScreen() {
 ### Phase 9: Icon System Setup
 
 #### Step 17: Configure Icon System
-Use standard Expo vector icons instead of custom IconSymbol system:
+Replace the existing IconSymbol system with standard Expo vector icons for better consistency and maintenance:
 
 ```bash
 npm install @expo/vector-icons
 ```
+
+**Important:** This step replaces the custom IconSymbol system. If you have existing screens using IconSymbol, update them to use MaterialIcons:
+
+```typescript
+// Replace this:
+import { IconSymbol } from '@/components/ui/IconSymbol';
+<IconSymbol name="house.fill" size={24} color={color} />
+
+// With this:
+import { MaterialIcons } from '@expo/vector-icons';
+<MaterialIcons name="home" size={24} color={color} />
+```
+
+**Icon Mapping Reference:**
+- `house.fill` → `home`
+- `book.fill` → `book`
+- `chart.bar.fill` → `bar-chart`
+- `person.fill` → `person`
+- `heart.fill` → `favorite`
 
 ### Phase 10: Advanced Features Implementation
 
@@ -2171,7 +2191,9 @@ export default function DashboardScreen() {
 
 ### ✅ Phase 9: Icon System
 - [ ] Install @expo/vector-icons
-- [ ] Configure standard Material Icons
+- [ ] Replace IconSymbol components with MaterialIcons
+- [ ] Update all existing icon usage
+- [ ] Remove old IconSymbol files
 - [ ] Test icon functionality
 
 ### ✅ Phase 10: Advanced Features
