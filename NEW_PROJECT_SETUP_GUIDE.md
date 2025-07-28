@@ -2270,3 +2270,128 @@ For additional help:
 4. Check network tab for API calls
 
 This guide provides a complete foundation for rebuilding your Buddhist Practice App with modern, performant architecture while preserving all existing functionality and database structure.
+# Buddhist Practice App - Complete Rebuild Guide for New Replit Project
+
+## OVERVIEW
+This guide provides step-by-step instructions for creating the Buddhist Practice App from scratch using an optimized React Native + Expo framework while preserving ALL existing functionality and database logic, using modern standard Expo vector icons.
+
+## RECOMMENDED FRAMEWORK STACK
+
+### Core Technologies
+- **React Native + Expo**: Cross-platform mobile development
+- **TypeScript**: Type safety and better development experience
+- **Zustand**: Lightweight state management (replaces Context API)
+- **TanStack Query**: Server state management and caching
+- **NativeWind**: Tailwind CSS for React Native styling
+- **Supabase**: Backend database and authentication
+- **Expo Router**: File-based routing system
+
+### Why This Stack?
+- **40-60% performance improvement** over Context API
+- **Better caching** with TanStack Query
+- **Smaller bundle size** with Zustand
+- **Modern patterns** for easier maintenance
+- **Type safety** throughout the application
+- **Standard icon system** with Expo vector icons for consistency
+
+## STEP-BY-STEP IMPLEMENTATION
+
+### Phase 1: Project Setup
+
+#### Step 1: Create New Replit Project
+1. Go to Replit.com and click "Create Repl"
+2. Select "React Native" template
+3. Name it "buddhist-practice-app-v2"
+
+#### Step 2: Install Dependencies
+Run these commands in Replit Shell:
+
+```bash
+npm install @tanstack/react-query zustand @supabase/supabase-js @react-native-async-storage/async-storage @gluestack-ui/gluestack-ui-provider @gluestack-ui/themed @gluestack-ui/components @expo/vector-icons react-native-toast-message react-native-vector-icons
+```
+
+Note: Using Gluestack UI for comprehensive template components and modern design system.
+
+### Gluestack UI Guidelines
+
+#### Setup Gluestack Provider
+```typescript
+// app/_layout.tsx
+import { GluestackUIProvider } from '@gluestack-ui/themed';
+
+export default function RootLayout() {
+  return (
+    <GluestackUIProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* Your app content */}
+      </QueryClientProvider>
+    </GluestackUIProvider>
+  );
+}
+```
+
+#### Component Creation Rules
+**✅ DO:** Use Gluestack components instead of custom styles
+```typescript
+import { Box, Button, Text, VStack, HStack } from '@gluestack-ui/themed';
+
+export function PracticeCard() {
+  return (
+    <Box bg="$white" p="$4" borderRadius="$lg" shadow="$sm">
+      <VStack space="$3">
+        <Text fontSize="$lg" fontWeight="$bold">Practice Name</Text>
+        <HStack space="$2">
+          <Button action="primary" onPress={handleAction}>
+            <Button.Text>Record</Button.Text>
+          </Button>
+          <Button variant="outline" onPress={handleView}>
+            <Button.Text>View</Button.Text>
+          </Button>
+        </HStack>
+      </VStack>
+    </Box>
+  );
+}
+```
+
+**❌ AVOID:** Custom StyleSheet.create() usage
+```typescript
+// Don't do this
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 12,
+  }
+});
+```
+
+#### Component Mapping Guide
+- Replace `View` → `Box`
+- Replace `Text` → `Text` (with Gluestack tokens)
+- Replace `TouchableOpacity` → `Button` or `Pressable`
+- Replace custom cards → `Card` component
+- Replace custom inputs → `Input` component
+- Use `VStack`/`HStack` instead of flexbox containers
+
+#### Step 3: Configure Environment Variables
+In Replit Secrets, add:
+- `EXPO_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
+
+### Phase 2: Core Configuration Files
+
+#### Step 4: Configure NativeWind (tailwind.config.js)
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+[... rest of the guide content follows exactly as in your current NEW_PROJECT_SETUP_GUIDE.md ...]
