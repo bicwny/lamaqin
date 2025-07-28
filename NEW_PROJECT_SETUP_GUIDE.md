@@ -835,6 +835,32 @@ Replace the existing IconSymbol system with standard Expo vector icons for bette
 npm install @expo/vector-icons
 ```
 
+### Step 17.5: Test iOS and Android Builds
+At this point, your app structure is solid enough for build testing. Use the existing EAS workflows:
+
+**For Android Preview Build:**
+```bash
+npx eas build --platform android --profile preview
+```
+
+**For iOS Preview Build:**
+```bash
+npx eas build --platform ios --profile preview
+```
+
+**Using Replit Workflows:**
+- Run "EAS Publish Preview Android" workflow for Android testing
+- Run "EAS Publish Preview iOS" workflow for iOS testing
+
+**Build Testing Checklist:**
+- [ ] App launches successfully
+- [ ] Navigation works between tabs
+- [ ] Icons display correctly
+- [ ] Basic authentication flow works
+- [ ] No critical build errors or warnings
+
+**Note:** Preview builds are perfect for testing core functionality without production overhead.
+
 **Important:** This step replaces the custom IconSymbol system. If you have existing screens using IconSymbol, update them to use MaterialIcons:
 
 ```typescript
