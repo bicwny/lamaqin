@@ -1,13 +1,13 @@
 {
   "name": "my-app",
-  "main": "expo-router/entry",
+  "main": "index.js",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --web --port 8081",
+    "start": "expo start --web --port 5000",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web --port 8081",
+    "web": "expo start --web --port 5000",
     "test": "jest --watchAll",
     "lint": "expo lint"
   },
