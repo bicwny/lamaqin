@@ -1,6 +1,6 @@
 {
   "name": "my-app",
-  "main": "index.js",
+  "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start --web --port 5000",
@@ -44,9 +44,9 @@
     "metro-minify-terser": "^0.82.5",
     "metro-react-native-babel-transformer": "^0.77.0",
     "nativewind": "^4.1.23",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "react-native": "0.79.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-native": "^0.76.3",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-modal-datetime-picker": "^18.0.0",

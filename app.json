@@ -43,8 +43,7 @@
       "expo-web-browser"
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCanary": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {},
