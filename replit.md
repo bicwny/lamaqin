@@ -24,6 +24,19 @@ Supabase PostgreSQL database handles all persistent data with real-time subscrip
 ## Authentication and Authorization
 Complete authentication system using Supabase Auth with email/password flow. Features include user registration with email verification, password reset functionality, persistent sessions across app launches, and secure token refresh. User data is automatically synced between Supabase Auth and the app's user database table.
 
+## React Native Architecture Configuration
+
+The app uses React Native with a configurable architecture setting in `app.json`:
+
+- **Current Setting**: `"newArchEnabled": false` - Optimized for Expo Go testing and development
+- **Production Option**: `"newArchEnabled": true` - Enables React Native New Architecture (Fabric + TurboModules)
+
+**Testing Configuration**: New Architecture is disabled to ensure compatibility with Expo Go on all devices. This allows seamless testing through QR code scanning without requiring custom development builds.
+
+**Production Deployment**: For App Store/Play Store builds, New Architecture can be enabled to take advantage of improved performance, better gesture handling, and future React Native features. React Native Reanimated 4.1+ requires New Architecture for iOS builds.
+
+**Technical Note**: This configuration affects the build process - Expo Go requires New Architecture disabled, while modern production builds benefit from New Architecture enabled.
+
 ## External Dependencies
 
 - **Supabase**: Backend-as-a-service providing authentication, database, and real-time features
