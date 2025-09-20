@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bicwny.expoonreplit",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,9 +39,6 @@
       ],
       "expo-web-browser"
     ],
-    "experiments": {
-      "typedRoutes": false
-    },
     "extra": {
       "router": {},
       "eas": {

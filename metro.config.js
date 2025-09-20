@@ -1,17 +1,16 @@
 const { getDefaultConfig } = require('expo/metro-config');
-const { withNativeWind } = require('nativewind/metro');
+const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 const config = getDefaultConfig(__dirname);
 
-// Minimal configuration for EAS compatibility
-config.resolver.blockList = /__replco/;
+// Use proper exclusionList for blockList
+config.resolver.blockList = exclusionList([/__replco.*/]);
 
-// Add more robust path handling to prevent undefined errors
-config.resolver.platforms = ['ios', 'android', 'web'];
-config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
+// Sanitize resolver arrays to prevent undefined entries that crash production bundler
+config.resolver.sourceExts = Array.from(new Set(
+  (config.resolver.sourceExts || []).filter(Boolean).concat(['cjs'])
+));
+config.resolver.assetExts = (config.resolver.assetExts || []).filter(Boolean);
 
-// Try to prevent module resolution issues
-config.resolver.unstable_enablePackageExports = false;
-config.resolver.unstable_conditionNames = ['react-native', 'browser', 'require'];
-
-module.exports = withNativeWind(config, { input: './global.css' });
+// Temporarily remove NativeWind to isolate the undefined module issue
+module.exports = config;
