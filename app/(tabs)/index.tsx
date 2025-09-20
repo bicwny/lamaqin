@@ -7,7 +7,7 @@ import { toastService } from '@/lib/toast';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { ConnectionTest } from '@/components/ConnectionTest';
 import { ThemedText } from '@/components/ThemedText';
@@ -720,7 +720,7 @@ export default function HomeScreen() {
         backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -867,7 +867,7 @@ export default function HomeScreen() {
                       <Ionicons 
                         name="add-circle-outline" 
                         size={24} 
-                        color={Colors.primary} 
+                        color={DesignSystem.colors.primary} 
                       />
                     </TouchableOpacity>
                   </View>
@@ -906,7 +906,7 @@ export default function HomeScreen() {
                       <Ionicons 
                         name="add-circle-outline" 
                         size={24} 
-                        color={Colors.primary} 
+                        color={DesignSystem.colors.primary} 
                       />
                     </TouchableOpacity>
                   </View>
@@ -960,7 +960,7 @@ const styles = StyleSheet.create({
   },
   viewMoreText: {
     fontSize: 14,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '600',
   },
   studyCard: {
@@ -1025,7 +1025,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
   },
   readButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
   },
   onlineButton: {
     backgroundColor: '#F59E0B',
@@ -1121,7 +1121,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     borderRadius: 3,
   },
   progressPercent: {

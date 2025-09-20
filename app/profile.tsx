@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import Avatar from '@/components/Avatar';
@@ -142,10 +142,10 @@ export default function ProfileScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -160,7 +160,7 @@ export default function ProfileScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
@@ -179,7 +179,7 @@ export default function ProfileScreen() {
       showBackButton={true}
       onBackPress={() => router.back()}
       scrollable={true}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
           {/* Network Error Banner */}
@@ -248,19 +248,19 @@ export default function ProfileScreen() {
           {/* Action Buttons */}
           <View style={styles.actionSection}>
             <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
-              <Ionicons name="person-outline" size={24} color={Colors.primary} />
+              <Ionicons name="person-outline" size={24} color={DesignSystem.colors.primary} />
               <Text style={styles.actionButtonText}>编辑个人资料</Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="settings-outline" size={24} color={Colors.primary} />
+              <Ionicons name="settings-outline" size={24} color={DesignSystem.colors.primary} />
               <Text style={styles.actionButtonText}>设置</Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="help-circle-outline" size={24} color={Colors.primary} />
+              <Ionicons name="help-circle-outline" size={24} color={DesignSystem.colors.primary} />
               <Text style={styles.actionButtonText}>帮助与支持</Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   errorContainer: {
     flex: 1,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -327,15 +327,15 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     marginBottom: 4,
   },
   location: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
   },
   editButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -361,11 +361,11 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 16,
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
   },
   detailValue: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     flex: 1,
     textAlign: 'right',
     marginLeft: 16,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 16,
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginLeft: 12,
     flex: 1,
   },
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   retryButtonSmall: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,

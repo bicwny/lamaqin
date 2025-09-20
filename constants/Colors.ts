@@ -131,9 +131,7 @@ const SEMANTIC_COLORS = {
   compassionOrange: BRAND_COLORS.accent, // Secondary accent
 };
 
-// Export unified color system
-import { DesignSystem } from './DesignSystem';
-
+// Export unified color system without circular dependency
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
@@ -164,19 +162,17 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
-  // App-specific colors - now using design system
-  primary: DesignSystem.colors.primary,
-  secondary: DesignSystem.colors.background,
-  text: DesignSystem.colors.textPrimary,
-  textSecondary: DesignSystem.colors.textSecondary,
-  textPrimary: DesignSystem.colors.textPrimary,
-  background: DesignSystem.colors.background,
-  surface: DesignSystem.colors.backgroundSecondary,
-  border: DesignSystem.colors.border,
-  success: DesignSystem.colors.success,
-  warning: DesignSystem.colors.warning,
-  error: DesignSystem.colors.error,
-  info: DesignSystem.colors.info,
+
+  // Add legacy compatibility to prevent undefined references
+  text: BRAND_COLORS.textPrimary,
+  textSecondary: BRAND_COLORS.textSecondary,
+  textPrimary: BRAND_COLORS.textPrimary,
+  surface: BRAND_COLORS.surface,
+  success: BRAND_COLORS.success,
+  warning: BRAND_COLORS.warning,
+  error: BRAND_COLORS.error,
+  info: BRAND_COLORS.info,
+  border: BRAND_COLORS.border,
 
   // Utility functions
   opacity: (color: string, opacity: number) => `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`,

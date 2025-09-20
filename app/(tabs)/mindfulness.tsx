@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 
 import { mindfulnessService } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTimezone } from '@/hooks/useTimezone';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { toastService } from '@/lib/toast';
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     letterSpacing: -0.3,
   },
   statLabel: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     letterSpacing: -0.3,
     marginBottom: 8,
   },
