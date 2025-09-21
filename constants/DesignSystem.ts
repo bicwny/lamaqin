@@ -9,85 +9,54 @@ export const DesignSystem = {
     90: 0.9,    // Pressed states
   },
 
-  // Colors
+  // DEPRECATED: Compatibility shim for gradual migration to NativeWind
+  // @deprecated Use Tailwind classes instead: bg-red-500, text-gray-900, border-gray-200, etc.
   colors: {
-    // Primary colors
-    primary: '#da4347',
-    primaryDark: '#b8393d',
-    primaryLight: '#e66a6d',
-
-    // Text colors
-    textPrimary: '#1a1a1a',
-    textSecondary: '#666666',
-    textTertiary: '#999999',
-    textInverse: '#ffffff',
-
+    // Basic colors mapped to Tailwind equivalents
+    primary: '#ef4444',           // red-500
+    textPrimary: '#111827',       // gray-900
+    textSecondary: '#4b5563',     // gray-600
+    textTertiary: '#6b7280',      // gray-500
+    textInverse: '#ffffff',       // white
+    
     // Background colors
-    background: '#f8f9fa',
-    backgroundSecondary: '#ffffff',
-    backgroundTertiary: '#f0f0f0',
-
-    // UI colors
-    border: '#e9ecef',
-    borderLight: '#f0f0f0',
-    borderDark: '#dee2e6',
-
+    background: '#f9fafb',        // gray-50
+    backgroundSecondary: '#ffffff', // white
+    backgroundTertiary: '#f3f4f6', // gray-100
+    
+    // Border colors
+    border: '#e5e7eb',           // gray-200
+    borderLight: '#f3f4f6',      // gray-100
+    borderDark: '#d1d5db',       // gray-300
+    
     // Status colors
-    success: '#2e7d32',
-    warning: '#f59e0b',
-    error: '#dc3545',
-    info: '#3b82f6',
-
-    // Practice completion status
-    practiceComplete: '#2e7d32',
-
-    // Buddhist semantic colors - The Five Taras
-    redTara: '#da4347',             // The Red Tara - Primary practice energy
-    orangeTara: '#FF6B35',          // The Orange Tara - Mindfulness and compassion
-    yellowTara: '#D4AF37',          // The Yellow Tara - Study achievements and wisdom
-    blueTara: '#4A90E2',            // The Blue Tara - Deep contemplation
-    blackTara: '#2C2C2C',           // The Black Tara - Protection and fierce compassion
-    whiteTara: '#ffffff',           // The White Tara - Purity, healing, and long life
-
-    // Practice status colors with Buddhist meaning
-    greenTara: '#2e7d32',           // The Green Tara - Completed practice and growth
-    practiceActive: '#da4347',      // Active practice (Red Tara)
-    practiceInactive: '#999999',    // Inactive practice
-    studyProgress: '#4A90E2',       // Learning progress (Blue Tara)
-    mindfulnessAlert: '#f59e0b',    // Mindful attention needed
-    mindfulnessCalm: '#4A90E2',     // Calm meditation state (Blue Tara)
-
-    // Extended Buddhist contextual colors - Tara variations
-    redTaraLight: '#e66a6d',        // Light Red Tara for hover states
-    redTaraDark: '#b8393d',         // Dark Red Tara for pressed states
-    orangeTaraLight: '#FF8C5A',     // Light Orange Tara for gentle states
-    yellowTaraLight: '#E6C757',     // Light Yellow Tara for progress indicators
-    blueTaraLight: '#6BA3F0',       // Light Blue Tara for calm states
-    blackTaraLight: '#4A4A4A',      // Light Black Tara for protective states
-    whiteTaraLight: '#F8F8F8',      // Light White Tara for subtle backgrounds
-
-    // Success state variations - Green Tara
-    successBackground: '#e8f5e8',   // Light Green Tara background
-    successBorder: '#2e7d32',       // Green Tara border
-
-    // Warning state variations  
-    warningBackground: '#fff3cd',   // Light warning background
-    warningBorder: '#f59e0b',       // Warning border
-
-    // Error state variations
-    errorBackground: '#f8d7da',     // Light error background
-    errorBorder: '#dc3545',         // Error border
-
-    // Utility colors found in code
-    cardShadow: '#000000',          // Shadow color for cards
-    overlayDark: 'rgba(0, 0, 0, 0.5)', // Modal overlay
-    textOnDark: '#ffffff',          // Text on dark backgrounds
-    textOnLight: '#1a1a1a',         // Text on light backgrounds
-
-    // Semantic colors
+    success: '#16a34a',          // green-600
+    warning: '#f59e0b',          // yellow-500
+    error: '#dc2626',            // red-600
+    info: '#3b82f6',             // blue-500
+    
+    // Utility colors
+    cardShadow: '#000000',       // black
+    overlayDark: 'rgba(0, 0, 0, 0.5)',
+    textOnDark: '#ffffff',
+    textOnLight: '#111827',
     cardBackground: '#ffffff',
     modalBackground: '#ffffff',
     overlayBackground: 'rgba(0, 0, 0, 0.5)',
+    
+    // Minimal Buddhist theme compatibility (mapped to red variants)
+    redTara: '#ef4444',          // red-500
+    orangeTara: '#f97316',       // orange-500
+    yellowTara: '#eab308',       // yellow-500
+    blueTara: '#3b82f6',         // blue-500
+    greenTara: '#16a34a',        // green-600
+    blackTara: '#111827',        // gray-900
+    whiteTara: '#ffffff',        // white
+    
+    // Additional compatibility
+    practiceComplete: '#16a34a',  // green-600
+    practiceActive: '#ef4444',    // red-500
+    practiceInactive: '#6b7280',  // gray-500
   },
 
   // Typography
@@ -546,7 +515,8 @@ export const DesignSystem = {
   },
 };
 
-// Color-with-opacity utility functions
+// DEPRECATED: Color-with-opacity utility functions (compatibility shim)
+// @deprecated Use Tailwind opacity classes instead: bg-red-500/50, text-gray-900/75, etc.
 export const colorWithOpacity = {
   // Background color with opacity
   backgroundWithOpacity: (color: string, opacity: keyof typeof DesignSystem.opacity): string => {
@@ -574,45 +544,6 @@ export const colorWithOpacity = {
     const opacityValue = DesignSystem.opacity[opacity];
     const alpha = Math.round(opacityValue * 255).toString(16).padStart(2, '0');
     return `${color}${alpha}`;
-  },
-
-  // Buddhist semantic colors with opacity variants - The Five Taras
-  buddhist: {
-    redTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.redTara, opacity);
-    },
-
-    orangeTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.orangeTara, opacity);
-    },
-
-    yellowTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.yellowTara, opacity);
-    },
-
-    blueTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.blueTara, opacity);
-    },
-
-    greenTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.greenTara, opacity);
-    },
-
-    blackTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.blackTara, opacity);
-    },
-
-    whiteTaraWithOpacity: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.whiteTara, opacity);
-    },
-
-    practiceActiveOverlay: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.overlayWithOpacity(DesignSystem.colors.practiceActive, opacity);
-    },
-
-    practiceCompleteBackground: (opacity: keyof typeof DesignSystem.opacity): string => {
-      return colorWithOpacity.backgroundWithOpacity(DesignSystem.colors.greenTara, opacity);
-    },
   },
 };
 
