@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
+  ScrollView,
   Modal,
   SafeAreaView,
   ActivityIndicator,
@@ -51,6 +52,7 @@ export default function TopicSelectionModal({
   }, [searchQuery, topics]);
 
   const handleTopicSelect = (topic: MeditationTopic) => {
+    console.log('🟢 handleTopicSelect called with topic:', topic.title);
     onSelect(topic);
     onClose();
   };
@@ -61,15 +63,24 @@ export default function TopicSelectionModal({
     return (
       <TouchableOpacity
         style={[styles.topicItem, isSelected && styles.selectedTopicItem]}
-        onPress={() => handleTopicSelect(item)}
+        onPress={() => {
+          console.log('🔵 Topic item pressed:', item.title);
+          handleTopicSelect(item);
+        }}
         activeOpacity={0.7}
         disabled={false}
+        delayLongPress={500}
+        delayPressIn={0}
+        delayPressOut={100}
       >
-        <Text style={[styles.topicTitle, isSelected && styles.selectedTopicTitle]}>
+        <Text 
+          style={[styles.topicTitle, isSelected && styles.selectedTopicTitle]}
+          selectable={false}
+        >
           {item.title}
         </Text>
         {isSelected && (
-          <Text style={styles.checkMark}>✓</Text>
+          <Text style={styles.checkMark} selectable={false}>✓</Text>
         )}
       </TouchableOpacity>
     );
@@ -83,6 +94,7 @@ export default function TopicSelectionModal({
       onRequestClose={onClose}
       supportedOrientations={['portrait']}
       statusBarTranslucent={false}
+      transparent={false}
     >
       <SafeAreaView style={styles.container}>
         {/* Header */}
@@ -118,16 +130,19 @@ export default function TopicSelectionModal({
             <Text style={styles.loadingText}>加载观修内容中...</Text>
           </View>
         ) : (
-          <FlatList
-            data={filteredTopics}
-            renderItem={renderTopicItem}
-            keyExtractor={(item) => item.topic_number.toString()}
+          <ScrollView 
             style={styles.topicsList}
             showsVerticalScrollIndicator={false}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
-          />
+          >
+            {filteredTopics.map((item, index) => (
+              <View key={item.topic_number.toString()}>
+                {renderTopicItem({ item })}
+                {index < filteredTopics.length - 1 && <View style={styles.separator} />}
+              </View>
+            ))}
+          </ScrollView>
         )}
 
         {/* Empty State */}
@@ -146,6 +161,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+    zIndex: 9999,
+    position: 'relative',
   },
   header: {
     flexDirection: 'row',
@@ -203,6 +220,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: 'white',
     minHeight: 56,
+    zIndex: 1,
   },
   selectedTopicItem: {
     backgroundColor: '#f0f8ff',
