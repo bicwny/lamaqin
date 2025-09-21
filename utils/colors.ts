@@ -1,5 +1,5 @@
 
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 /**

@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens } from '@/utils/componentTokens';
 
 // Error types for better categorization
@@ -488,7 +488,7 @@ export default function UnifiedAuthScreen() {
                 disabled={loading}
               >
                 {loading ? (
-                  <ActivityIndicator color={Colors.surface} />
+                  <ActivityIndicator color={DesignSystem.colors.textInverse} />
                 ) : (
                   <Text style={styles.primaryButtonText}>发送验证码</Text>
                 )}
@@ -525,7 +525,7 @@ export default function UnifiedAuthScreen() {
                 disabled={loading}
               >
                 {loading ? (
-                  <ActivityIndicator color={Colors.surface} />
+                  <ActivityIndicator color={DesignSystem.colors.textInverse} />
                 ) : (
                   <Text style={styles.primaryButtonText}>验证登录</Text>
                 )}
@@ -602,7 +602,7 @@ export default function UnifiedAuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -620,12 +620,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 8,
     fontWeight: '500',
   },
@@ -653,16 +653,16 @@ const styles = StyleSheet.create({
   },
   emailText: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     flex: 1,
   },
   changeEmailText: {
     fontSize: 16,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '500',
   },
   primaryButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   primaryButtonText: {
-    color: Colors.surface,
+    color: DesignSystem.colors.textInverse,
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -690,12 +690,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   resendButtonText: {
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontSize: 16,
     textDecorationLine: 'underline',
   },
   resendButtonTextDisabled: {
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     textDecorationLine: 'none',
   },
   helpSection: {
@@ -709,12 +709,12 @@ const styles = StyleSheet.create({
   helpTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: DesignSystem.colors.textPrimary,
     marginBottom: 10,
   },
   helpText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     lineHeight: 20,
   },
   errorStatus: {
