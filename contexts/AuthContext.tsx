@@ -9,6 +9,14 @@ interface User {
   dharma_name?: string;
 }
 
+// Type for Supabase User to handle optional email
+type SupabaseUser = {
+  id: string;
+  email?: string;
+  user_metadata?: { dharma_name?: string };
+  email_confirmed_at?: string;
+};
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -107,12 +115,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user && session.user.email_confirmed_at) {
             console.log('✅ Found verified session for:', session.user.email);
 
-            // Set user immediately
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-              dharma_name: session.user.user_metadata?.dharma_name,
-            });
+            // Set user immediately - validate email first
+            if (session.user.email) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email,
+                dharma_name: session.user.user_metadata?.dharma_name,
+              });
+            } else {
+              console.error('❌ User email is missing from session');
+              setUser(null);
+              return;
+            }
             console.log('✅ User state set successfully');
 
             // Database sync is optional and non-blocking
@@ -203,12 +217,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('⚠️ Failed to store session:', storageError);
         }
 
-        // Set user state
-        safeSetUser({
-          id: session.user.id,
-          email: session.user.email!,
-          dharma_name: session.user.user_metadata?.dharma_name,
-        });
+        // Set user state - validate email first
+        if (session.user.email) {
+          safeSetUser({
+            id: session.user.id,
+            email: session.user.email,
+            dharma_name: session.user.user_metadata?.dharma_name,
+          });
+        } else {
+          console.error('❌ User email is missing from session');
+          safeSetUser(null);
+          return;
+        }
         console.log('✅ User state set successfully');
 
         // Create user in database if doesn't exist (non-blocking)
@@ -271,14 +291,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: error.message };
       }
 
-      if (data.user) {
+      if (data.user && data.user.email) {
         // Create user in database if doesn't exist
         await ensureUserInDatabase(data.user);
         safeSetUser({
           id: data.user.id,
-          email: data.user.email!,
+          email: data.user.email,
           dharma_name: data.user.user_metadata?.dharma_name,
         });
+      } else if (data.user && !data.user.email) {
+        console.error('❌ User email is missing from verification data');
+        return { error: 'Email verification failed - missing email' };
       }
 
       return {};
@@ -446,7 +469,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // 4. Clear Expo SecureStore if available
       try {
-        const { SecureStore } = await import('expo-secure-store');
+        const SecureStore = await import('expo-secure-store');
         console.log('🔒 Clearing Expo SecureStore');
         const keys = await SecureStore.getItemAsync('supabase.auth.token');
         if (keys) {
@@ -478,7 +501,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const ensureUserInDatabase = async (user: User) => {
+  const ensureUserInDatabase = async (user: any) => {
     try {
       console.log('🔍 AuthContext: Checking if user exists in database:', user.email);
 
@@ -508,9 +531,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
 
           console.log('✅ AuthContext: Database health check passed');
-        } catch (fetchError) {
+        } catch (fetchError: any) {
           console.error('❌ AuthContext: Network fetch error during health check:', fetchError);
-          throw new Error(`Network connection failed: ${fetchError.message}`);
+          throw new Error(`Network connection failed: ${fetchError?.message || 'Unknown error'}`);
         }
 
         // Check if user exists by ID (more reliable than email)
