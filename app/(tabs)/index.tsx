@@ -705,7 +705,7 @@ export default function HomeScreen() {
     if (hour < 6) return '夜深了，早点休息';
     if (hour < 12) return '早上好，开始今日修行';
     if (hour < 18) return '下午好，精进不懈';
-    return '晚上好，回顾今日收获';
+    return '像最后一天那样去生活';
   };
 
   if (loading) {
