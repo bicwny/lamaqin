@@ -3,7 +3,7 @@ import { View, StyleSheet, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 
 interface LessonTemplateProps {
   title?: string;
