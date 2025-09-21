@@ -19,8 +19,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
 });
