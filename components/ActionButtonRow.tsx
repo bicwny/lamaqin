@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/Colors';
+import { View, TouchableOpacity, Text } from 'react-native';
 
 interface ActionButton {
   text: string;
@@ -19,25 +18,24 @@ interface ActionButtonRowProps {
 
 export default function ActionButtonRow({ buttons, gap = 12 }: ActionButtonRowProps) {
   return (
-    <View style={[styles.buttonRow, { gap }]}>
+    <View className="flex-row" style={{ gap }}>
       {buttons.map((button, index) => (
         <TouchableOpacity
           key={index}
-          style={[
-            styles.button,
-            {
-              backgroundColor: button.backgroundColor || Colors.primary,
-              flex: button.flex || 1,
-              opacity: button.disabled ? 0.6 : 1,
-            }
-          ]}
+          className={`py-3 px-4 rounded-lg items-center justify-center min-h-[40px] ${
+            button.disabled ? 'opacity-60' : ''
+          }`}
+          style={{
+            backgroundColor: button.backgroundColor || '#ef4444', // red-500 equivalent
+            flex: button.flex || 1,
+          }}
           onPress={button.onPress}
           disabled={button.disabled}
         >
-          <Text style={[
-            styles.buttonText,
-            { color: button.textColor || 'white' }
-          ]}>
+          <Text 
+            className="text-sm font-semibold"
+            style={{ color: button.textColor || 'white' }}
+          >
             {button.text}
           </Text>
         </TouchableOpacity>
@@ -46,20 +44,3 @@ export default function ActionButtonRow({ buttons, gap = 12 }: ActionButtonRowPr
   );
 }
 
-const styles = StyleSheet.create({
-  buttonRow: {
-    flexDirection: 'row',
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
