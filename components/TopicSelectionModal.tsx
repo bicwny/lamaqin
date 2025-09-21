@@ -62,6 +62,8 @@ export default function TopicSelectionModal({
       <TouchableOpacity
         style={[styles.topicItem, isSelected && styles.selectedTopicItem]}
         onPress={() => handleTopicSelect(item)}
+        activeOpacity={0.7}
+        disabled={false}
       >
         <Text style={[styles.topicTitle, isSelected && styles.selectedTopicTitle]}>
           {item.title}
@@ -79,6 +81,8 @@ export default function TopicSelectionModal({
       animationType="slide"
       presentationStyle="pageSheet"
       onRequestClose={onClose}
+      supportedOrientations={['portrait']}
+      statusBarTranslucent={false}
     >
       <SafeAreaView style={styles.container}>
         {/* Header */}
@@ -99,6 +103,11 @@ export default function TopicSelectionModal({
             onChangeText={setSearchQuery}
             autoCapitalize="none"
             clearButtonMode="while-editing"
+            editable={true}
+            autoFocus={false}
+            selectTextOnFocus={true}
+            blurOnSubmit={false}
+            returnKeyType="search"
           />
         </View>
 
@@ -177,6 +186,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e9ecef',
+    minHeight: 44,
+    textAlignVertical: 'center',
   },
   topicsList: {
     flex: 1,
@@ -189,6 +200,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     backgroundColor: 'white',
+    minHeight: 56,
   },
   selectedTopicItem: {
     backgroundColor: '#f0f8ff',
