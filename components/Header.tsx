@@ -1,9 +1,7 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTextStyles, componentHelpers } from '@/utils/componentTokens';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type HeaderContext = 'page' | 'modal' | 'section';
@@ -37,56 +35,65 @@ export default function Header({
 }: HeaderProps) {
   const insets = useSafeAreaInsets();
 
-  const getContextStyles = () => {
+  const getContextClasses = () => {
     switch (context) {
       case 'page':
         return {
-          container: styles.pageContainer,
-          header: styles.pageHeader,
-          title: styles.pageTitle,
+          container: 'bg-white border-b-2 border-white',
+          header: 'flex-row justify-between items-center px-4 py-3 min-h-[60px] border-b border-gray-100',
+          title: 'text-xl font-bold text-center text-gray-900',
         };
       case 'modal':
         return {
-          container: styles.modalContainer,
-          header: styles.modalHeader,
-          title: styles.modalTitle,
+          container: 'bg-white border-b-2 border-blue-500',
+          header: 'flex-row justify-between items-center px-4 py-3 min-h-[56px] border-b border-gray-200',
+          title: 'text-lg font-semibold text-center text-gray-900',
         };
       case 'section':
         return {
-          container: styles.sectionContainer,
-          header: styles.sectionHeader,
-          title: styles.sectionTitle,
+          container: 'bg-transparent',
+          header: 'flex-row justify-between items-center py-2 mb-4 border-b border-gray-100',
+          title: 'text-lg font-semibold text-center text-gray-900',
         };
     }
   };
 
-  const contextStyles = getContextStyles();
+  const contextClasses = getContextClasses();
 
   return (
-    <View style={[contextStyles.container, context === 'page' && { paddingTop: insets.top }]}>
-      <View style={contextStyles.header}>
+    <View 
+      className={contextClasses.container}
+      style={context === 'page' ? { paddingTop: insets.top } : undefined}
+    >
+      <View className={contextClasses.header}>
         {/* Left side */}
         {showBackButton ? (
-          <TouchableOpacity onPress={onBackPress} style={styles.actionButton}>
-            <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.redTara} />
+          <TouchableOpacity 
+            onPress={onBackPress} 
+            className="min-w-[44px] h-11 justify-center items-center rounded-lg bg-transparent"
+          >
+            <Ionicons name="arrow-back" size={24} color="#ef4444" />
           </TouchableOpacity>
         ) : leftAction ? (
-          <TouchableOpacity onPress={leftAction.onPress} style={styles.actionButton}>
+          <TouchableOpacity 
+            onPress={leftAction.onPress} 
+            className="min-w-[44px] h-11 justify-center items-center rounded-lg bg-transparent"
+          >
             {leftAction.component || (
-              <Text style={styles.actionText}>{leftAction.text}</Text>
+              <Text className="text-sm font-semibold text-red-500">{leftAction.text}</Text>
             )}
           </TouchableOpacity>
         ) : (
-          <View style={styles.placeholder} />
+          <View className="min-w-[44px]" />
         )}
 
         {/* Title section */}
-        <View style={styles.titleContainer}>
-          <Text style={contextStyles.title} numberOfLines={1}>
+        <View className="flex-1 items-center">
+          <Text className={contextClasses.title} numberOfLines={1}>
             {title}
           </Text>
           {subtitle && (
-            <Text style={styles.subtitle} numberOfLines={1}>
+            <Text className="text-sm font-medium text-gray-600 text-center mt-1" numberOfLines={1}>
               {subtitle}
             </Text>
           )}
@@ -94,126 +101,19 @@ export default function Header({
 
         {/* Right side */}
         {rightAction ? (
-          <TouchableOpacity onPress={rightAction.onPress} style={styles.actionButton}>
+          <TouchableOpacity 
+            onPress={rightAction.onPress} 
+            className="min-w-[44px] h-11 justify-center items-center rounded-lg bg-transparent"
+          >
             {rightAction.component || (
-              <Text style={styles.actionText}>{rightAction.text}</Text>
+              <Text className="text-sm font-semibold text-red-500">{rightAction.text}</Text>
             )}
           </TouchableOpacity>
         ) : (
-          <View style={styles.placeholder} />
+          <View className="min-w-[44px]" />
         )}
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  // Page header styles - with subtle Tara color accents
-  pageContainer: {
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    // Subtle Tara color accent for page headers
-    borderBottomWidth: 2,
-    borderBottomColor: DesignSystem.colors.whiteTara,
-  },
-  pageHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    minHeight: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
-  },
-  pageTitle: {
-    ...ComponentTextStyles.heading,
-    textAlign: 'center',
-  },
-
-  // Modal header styles - with Tara theming
-  modalContainer: {
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    // Subtle accent for modal distinction
-    borderBottomWidth: 2,
-    borderBottomColor: DesignSystem.colors.blueTara,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    minHeight: 56,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
-  },
-  modalTitle: {
-    ...ComponentTextStyles.subheading,
-    textAlign: 'center',
-  },
-
-  // Section header styles - with Tara spiritual context
-  sectionContainer: {
-    backgroundColor: 'transparent',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 0,
-    paddingVertical: DesignSystem.spacing.sm,
-    marginBottom: DesignSystem.spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.borderLight,
-  },
-  sectionTitle: {
-    ...ComponentTextStyles.subheading,
-    textAlign: 'center',
-  },
-
-  // Common styles with Tara theming
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  subtitle: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
-    textAlign: 'center',
-    marginTop: DesignSystem.spacing.xs,
-  },
-  actionButton: {
-    minWidth: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: DesignSystem.borderRadius.md,
-    // Subtle Tara color on press
-    backgroundColor: 'transparent',
-  },
-  actionText: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.redTara, // Use Red Tara for action buttons
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-  },
-  placeholder: {
-    minWidth: 44,
-  },
-
-  // Tara-specific context styles
-  practiceContext: {
-    borderBottomColor: DesignSystem.colors.redTara,
-  },
-  mindfulnessContext: {
-    borderBottomColor: DesignSystem.colors.orangeTara,
-  },
-  studyContext: {
-    borderBottomColor: DesignSystem.colors.yellowTara,
-  },
-  meditationContext: {
-    borderBottomColor: DesignSystem.colors.blueTara,
-  },
-  successContext: {
-    borderBottomColor: DesignSystem.colors.greenTara,
-  },
-});
