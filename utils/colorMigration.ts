@@ -19,16 +19,16 @@ export const colorMigrationMap = {
   // Background colors
   '#f8f9fa': DesignSystem.colors.background,
   '#F8F9FA': DesignSystem.colors.background,
-  '#ffffff': DesignSystem.colors.backgroundSecondary,
-  '#FFFFFF': DesignSystem.colors.backgroundSecondary,
+  // Note: #ffffff already mapped to textInverse above, using backgroundSecondary for different context
+  'white': DesignSystem.colors.backgroundSecondary,
   '#f0f0f0': DesignSystem.colors.backgroundTertiary,
   '#F0F0F0': DesignSystem.colors.backgroundTertiary,
   
   // Border colors
   '#e9ecef': DesignSystem.colors.border,
   '#E9ECEF': DesignSystem.colors.border,
-  '#f0f0f0': DesignSystem.colors.borderLight,
-  '#F0F0F0': DesignSystem.colors.borderLight,
+  '#f1f1f1': DesignSystem.colors.borderLight,
+  '#F1F1F1': DesignSystem.colors.borderLight,
   '#dee2e6': DesignSystem.colors.borderDark,
   '#DEE2E6': DesignSystem.colors.borderDark,
   
@@ -358,11 +358,4 @@ export const migrationHelpers = {
   }
 };
 
-// Export all utilities
-export {
-  colorMigrationMap,
-  buddhistColors,
-  colorUtils,
-  validateColors,
-  migrationHelpers,
-};
+// Note: All exports are already defined above with individual export statements
