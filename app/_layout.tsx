@@ -1,3 +1,4 @@
+import '../global.css';
 import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
