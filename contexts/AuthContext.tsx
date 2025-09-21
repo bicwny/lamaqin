@@ -154,7 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuthState = async () => {
     try {
       console.log('🔍 Checking auth state...');
-      setLoading(true);
+      safeSetLoading(true);
 
       // First try to get session from storage directly
       let storedSession = null;
@@ -176,8 +176,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('❌ Auth session error:', error);
-        setUser(null);
-        setLoading(false);
+        safeSetUser(null);
+        safeSetLoading(false);
         return;
       }
 
@@ -204,7 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Set user state
-        setUser({
+        safeSetUser({
           id: session.user.id,
           email: session.user.email!,
           dharma_name: session.user.user_metadata?.dharma_name,
@@ -218,24 +218,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (hasStoredSession && storedSession.user) {
         console.log('🔄 Using stored session data for:', storedSession.user.email);
         // Try to restore from stored session
-        setUser({
+        safeSetUser({
           id: storedSession.user.id,
           email: storedSession.user.email,
           dharma_name: storedSession.user.user_metadata?.dharma_name,
         });
       } else if (session?.user && !session.user.email_confirmed_at) {
         console.log('⏳ User exists but email not verified');
-        setUser(null);
+        safeSetUser(null);
       } else {
         console.log('ℹ️ No existing session found');
-        setUser(null);
+        safeSetUser(null);
       }
     } catch (error) {
       console.error('❌ Auth check error:', error);
       // Don't let auth errors prevent the app from loading
-      setUser(null);
+      safeSetUser(null);
     } finally {
-      setLoading(false);
+      safeSetLoading(false);
     }
   };
 
@@ -274,7 +274,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         // Create user in database if doesn't exist
         await ensureUserInDatabase(data.user);
-        setUser({
+        safeSetUser({
           id: data.user.id,
           email: data.user.email!,
           dharma_name: data.user.user_metadata?.dharma_name,
@@ -317,7 +317,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🚪 Current user before logout:', user?.email);
 
       // Set loading to true to prevent any intermediate state issues
-      setLoading(true);
+      safeSetLoading(true);
 
       // Clear ALL possible storage locations
       console.log('🧹 AuthContext: Clearing ALL storage locations...');
@@ -370,8 +370,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Force clear user state immediately
       console.log('🔄 AuthContext: Force clearing user state...');
-      setUser(null);
-      setLoading(false);
+      safeSetUser(null);
+      safeSetLoading(false);
       console.log('✅ AuthContext: User state cleared');
 
       // Force reload to ensure clean state (web only)
@@ -387,8 +387,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('❌ AuthContext: Logout error:', error);
       // Ensure user state is cleared regardless
       console.log('🛡️ AuthContext: Force clearing user state due to error');
-      setUser(null);
-      setLoading(false);
+      safeSetUser(null);
+      safeSetLoading(false);
 
       // Force clear storage even on error
       try {
