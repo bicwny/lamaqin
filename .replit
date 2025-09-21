@@ -8,10 +8,6 @@ channel = "stable-24_05"
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 38907
-externalPort = 3000
-
 [workflows]
 runButton = "Project"
 
@@ -81,4 +77,4 @@ expertMode = true
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["npx", "serve", "dist", "-p", "5000"]
+run = ["npx", "serve", "dist"]
