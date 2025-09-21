@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -35,68 +35,77 @@ export default function Header({
 }: HeaderProps) {
   const insets = useSafeAreaInsets();
 
-  const getContextClasses = () => {
+  const getContextStyles = () => {
     switch (context) {
       case 'page':
         return {
-          container: 'bg-white border-b border-gray-50 shadow-sm',
-          header: 'flex-row justify-between items-center px-5 py-4 min-h-[72px]',
-          title: 'text-2xl font-bold text-center text-gray-900 tracking-wide',
-          subtitle: 'text-base font-medium text-gray-700 text-center mt-1.5 tracking-wide',
+          container: [styles.baseContainer, styles.pageContainer],
+          header: [styles.baseHeader, styles.pageHeader],
+          title: [styles.baseTitle, styles.pageTitle],
+          subtitle: [styles.baseSubtitle, styles.pageSubtitle],
         };
       case 'modal':
         return {
-          container: 'bg-white border-b-2 border-blue-500',
-          header: 'flex-row justify-between items-center px-4 py-3 min-h-[56px] border-b border-gray-200',
-          title: 'text-lg font-semibold text-center text-gray-900',
-          subtitle: 'text-sm font-medium text-gray-600 text-center mt-1',
+          container: [styles.baseContainer, styles.modalContainer],
+          header: [styles.baseHeader, styles.modalHeader],
+          title: [styles.baseTitle, styles.modalTitle],
+          subtitle: [styles.baseSubtitle, styles.modalSubtitle],
         };
       case 'section':
         return {
-          container: 'bg-transparent',
-          header: 'flex-row justify-between items-center py-2 mb-4 border-b border-gray-100',
-          title: 'text-lg font-semibold text-center text-gray-900',
-          subtitle: 'text-sm font-medium text-gray-600 text-center mt-1',
+          container: [styles.baseContainer, styles.sectionContainer],
+          header: [styles.baseHeader, styles.sectionHeader],
+          title: [styles.baseTitle, styles.sectionTitle],
+          subtitle: [styles.baseSubtitle, styles.sectionSubtitle],
+        };
+      default:
+        return {
+          container: [styles.baseContainer, styles.pageContainer],
+          header: [styles.baseHeader, styles.pageHeader],
+          title: [styles.baseTitle, styles.pageTitle],
+          subtitle: [styles.baseSubtitle, styles.pageSubtitle],
         };
     }
   };
 
-  const contextClasses = getContextClasses();
+  const contextStyles = getContextStyles();
 
   return (
     <View 
-      className={contextClasses.container}
-      style={context === 'page' ? { paddingTop: insets.top } : undefined}
+      style={[
+        contextStyles.container,
+        context === 'page' ? { paddingTop: insets.top } : undefined
+      ]}
     >
-      <View className={contextClasses.header}>
+      <View style={contextStyles.header}>
         {/* Left side */}
         {showBackButton ? (
           <TouchableOpacity 
             onPress={onBackPress} 
-            className="min-w-[44px] h-11 justify-center items-center rounded-lg bg-transparent"
+            style={styles.actionButton}
           >
             <Ionicons name="arrow-back" size={24} color="#ef4444" />
           </TouchableOpacity>
         ) : leftAction ? (
           <TouchableOpacity 
             onPress={leftAction.onPress} 
-            className="min-w-[44px] h-11 justify-center items-center rounded-lg bg-transparent"
+            style={styles.actionButton}
           >
             {leftAction.component || (
-              <Text className="text-sm font-semibold text-red-500">{leftAction.text}</Text>
+              <Text style={styles.actionText}>{leftAction.text}</Text>
             )}
           </TouchableOpacity>
         ) : (
-          <View className="min-w-[44px]" />
+          <View style={styles.actionButtonSpacer} />
         )}
 
         {/* Title section */}
-        <View className="flex-1 items-center">
-          <Text className={contextClasses.title} numberOfLines={1}>
+        <View style={styles.titleSection}>
+          <Text style={contextStyles.title} numberOfLines={1}>
             {title}
           </Text>
           {subtitle && (
-            <Text className={contextClasses.subtitle} numberOfLines={1}>
+            <Text style={contextStyles.subtitle} numberOfLines={1}>
               {subtitle}
             </Text>
           )}
@@ -106,17 +115,128 @@ export default function Header({
         {rightAction ? (
           <TouchableOpacity 
             onPress={rightAction.onPress} 
-            className="min-w-[44px] h-11 justify-center items-center rounded-lg bg-transparent"
+            style={styles.actionButton}
           >
             {rightAction.component || (
-              <Text className="text-sm font-semibold text-red-500">{rightAction.text}</Text>
+              <Text style={styles.actionText}>{rightAction.text}</Text>
             )}
           </TouchableOpacity>
         ) : (
-          <View className="min-w-[44px]" />
+          <View style={styles.actionButtonSpacer} />
         )}
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  // Base styles
+  baseContainer: {
+    backgroundColor: 'white',
+  },
+  baseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  baseTitle: {
+    textAlign: 'center',
+    color: '#111827',
+    fontWeight: 'bold',
+  },
+  baseSubtitle: {
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+
+  // Page context styles
+  pageContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#f9fafb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  pageHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    minHeight: 72,
+  },
+  pageTitle: {
+    fontSize: 24,
+    letterSpacing: 0.5,
+  },
+  pageSubtitle: {
+    fontSize: 16,
+    color: '#374151',
+    marginTop: 6,
+    letterSpacing: 0.3,
+  },
+
+  // Modal context styles
+  modalContainer: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#3b82f6',
+  },
+  modalHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 56,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#4b5563',
+    marginTop: 4,
+  },
+
+  // Section context styles
+  sectionContainer: {
+    backgroundColor: 'transparent',
+  },
+  sectionHeader: {
+    paddingVertical: 8,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#4b5563',
+    marginTop: 4,
+  },
+
+  // Common elements
+  titleSection: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  actionButton: {
+    minWidth: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  actionButtonSpacer: {
+    minWidth: 44,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ef4444',
+  },
+});
 
