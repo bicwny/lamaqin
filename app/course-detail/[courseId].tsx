@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'r
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
@@ -174,7 +174,7 @@ export default function CourseDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>加载中...</Text>
@@ -191,7 +191,7 @@ export default function CourseDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>课程未找到</Text>
@@ -206,7 +206,7 @@ export default function CourseDetailScreen() {
       subtitle="课程详情与学习记录"
       showBackButton={true}
       onBackPress={() => router.back()}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
 
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     marginTop: 16,
   },
   sectionTitle: {
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   },
   courseInfoText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontWeight: '500',
     marginBottom: 4,
   },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   },
   lessonProgress: {
     fontSize: 13,
-    color: Colors.textSecondary,
+    color: DesignSystem.colors.textSecondary,
     fontWeight: '500',
     flex: 1,
   },
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
   },
   readButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
   },
   viewButton: {
     backgroundColor: '#F59E0B',
