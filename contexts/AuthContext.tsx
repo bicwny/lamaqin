@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
             } catch (err) {
               console.log('⚠️ Error checking stored session:', err);
-              setUser(null);
+              safeSetUser(null);
             }
           }
           safeSetLoading(false);
@@ -117,14 +117,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Set user immediately - validate email first
             if (session.user.email) {
-              setUser({
+              safeSetUser({
                 id: session.user.id,
                 email: session.user.email,
                 dharma_name: session.user.user_metadata?.dharma_name,
               });
             } else {
               console.error('❌ User email is missing from session');
-              setUser(null);
+              safeSetUser(null);
               return;
             }
             console.log('✅ User state set successfully');
@@ -135,14 +135,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
           } else if (session?.user && !session.user.email_confirmed_at) {
             console.log('⏳ User exists but email not verified');
-            setUser(null);
+            safeSetUser(null);
           } else {
             console.log('ℹ️ No valid session');
-            setUser(null);
+            safeSetUser(null);
           }
         }
 
-        setLoading(false);
+        safeSetLoading(false);
       }
     );
 
