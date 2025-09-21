@@ -77,5 +77,5 @@ expertMode = true
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["npx", "serve", "dist", "-p"]
+run = ["npx", "serve", "dist", "-p", "5000"]
 build = ["npx", "expo", "export", "--platform", "web"]
