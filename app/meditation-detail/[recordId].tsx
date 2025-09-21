@@ -15,7 +15,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
 import { meditationService } from '@/lib/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
@@ -179,10 +179,10 @@ export default function MeditationDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -196,7 +196,7 @@ export default function MeditationDetailScreen() {
         showBackButton={true}
         onBackPress={() => router.back()}
         scrollable={false}
-        backgroundColor={Colors.background}
+        backgroundColor={DesignSystem.colors.background}
       >
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>未找到观修记录</Text>
@@ -214,7 +214,7 @@ export default function MeditationDetailScreen() {
         text: "删除",
         onPress: handleDeleteRecord
       }}
-      backgroundColor={Colors.background}
+      backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
       <KeyboardAvoidingView 
@@ -275,7 +275,7 @@ export default function MeditationDetailScreen() {
                   style={styles.editButton}
                   onPress={() => setIsEditing(true)}
                 >
-                  <Ionicons name="pencil-outline" size={20} color={Colors.primary} />
+                  <Ionicons name="pencil-outline" size={20} color={DesignSystem.colors.primary} />
                   <Text style={styles.editButtonText}>编辑</Text>
                 </TouchableOpacity>
               )}
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sessionBadge: {
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: 16,
-    color: Colors.primary,
+    color: DesignSystem.colors.primary,
     fontWeight: '500',
   },
   editingContainer: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     minHeight: 120,
-    backgroundColor: Colors.background,
+    backgroundColor: DesignSystem.colors.background,
   },
   editingActions: {
     flexDirection: 'row',
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: Colors.primary,
+    backgroundColor: DesignSystem.colors.primary,
     minWidth: 70,
     alignItems: 'center',
   },
