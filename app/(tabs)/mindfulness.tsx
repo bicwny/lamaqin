@@ -5,6 +5,7 @@ import { mindfulnessService } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTimezone } from '@/hooks/useTimezone';
 import { DesignSystem } from '@/constants/DesignSystem';
+import { Colors } from '@/constants/Colors';
 import PageTemplate from '@/components/PageTemplate';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { toastService } from '@/lib/toast';
