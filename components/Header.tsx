@@ -39,21 +39,24 @@ export default function Header({
     switch (context) {
       case 'page':
         return {
-          container: 'bg-white border-b-2 border-white',
-          header: 'flex-row justify-between items-center px-4 py-3 min-h-[60px] border-b border-gray-100',
-          title: 'text-xl font-bold text-center text-gray-900',
+          container: 'bg-white border-b border-gray-50 shadow-sm',
+          header: 'flex-row justify-between items-center px-5 py-4 min-h-[72px]',
+          title: 'text-2xl font-bold text-center text-gray-900 tracking-wide',
+          subtitle: 'text-base font-medium text-gray-700 text-center mt-1.5 tracking-wide',
         };
       case 'modal':
         return {
           container: 'bg-white border-b-2 border-blue-500',
           header: 'flex-row justify-between items-center px-4 py-3 min-h-[56px] border-b border-gray-200',
           title: 'text-lg font-semibold text-center text-gray-900',
+          subtitle: 'text-sm font-medium text-gray-600 text-center mt-1',
         };
       case 'section':
         return {
           container: 'bg-transparent',
           header: 'flex-row justify-between items-center py-2 mb-4 border-b border-gray-100',
           title: 'text-lg font-semibold text-center text-gray-900',
+          subtitle: 'text-sm font-medium text-gray-600 text-center mt-1',
         };
     }
   };
@@ -93,7 +96,7 @@ export default function Header({
             {title}
           </Text>
           {subtitle && (
-            <Text className="text-sm font-medium text-gray-600 text-center mt-1" numberOfLines={1}>
+            <Text className={contextClasses.subtitle} numberOfLines={1}>
               {subtitle}
             </Text>
           )}
