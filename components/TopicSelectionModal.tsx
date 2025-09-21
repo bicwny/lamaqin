@@ -125,6 +125,8 @@ export default function TopicSelectionModal({
             style={styles.topicsList}
             showsVerticalScrollIndicator={false}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
           />
         )}
 
