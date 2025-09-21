@@ -9,9 +9,19 @@ import { toastConfig } from '@/lib/toast';
 function RootLayoutNav() {
   const { user, loading } = useAuth();
   const segments = useSegments();
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (loading) return;
+    // Add a small delay to ensure components are mounted
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (loading || !isReady) return;
 
     const inAuthGroup = segments[0] === 'auth';
 
@@ -19,16 +29,19 @@ function RootLayoutNav() {
     console.log('🔒 Auth Guard - Current segments:', segments);
     console.log('🔒 Auth Guard - In auth group:', inAuthGroup);
 
-    if (!user && !inAuthGroup) {
-      // No user and not in auth group, redirect to login
-      console.log('🔒 Auth Guard - Redirecting to login');
-      router.replace('/auth/login');
-    } else if (user && inAuthGroup) {
-      // User is authenticated but still in auth group, redirect to main app
-      console.log('🔒 Auth Guard - Redirecting to main app');
-      router.replace('/');
-    }
-  }, [user, loading, segments]);
+    // Use setTimeout to defer navigation and prevent state update on unmounted component
+    const navigate = () => {
+      if (!user && !inAuthGroup) {
+        console.log('🔒 Auth Guard - Redirecting to login');
+        router.replace('/auth/login');
+      } else if (user && inAuthGroup) {
+        console.log('🔒 Auth Guard - Redirecting to main app');
+        router.replace('/');
+      }
+    };
+
+    setTimeout(navigate, 0);
+  }, [user, loading, segments, isReady]);
 
   if (loading) {
     return (

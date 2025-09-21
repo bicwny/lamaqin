@@ -25,8 +25,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const mountedRef = React.useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
+    
     // Check for existing session
     checkAuthState();
 
@@ -39,8 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_OUT') {
           console.log('🚪 User signed out - clearing state');
           console.log('🚪 Auth event that might trigger navigation:', event);
-          setUser(null);
-          setLoading(false);
+          safeSetUser(null);
+          safeSetLoading(false);
           try {
             await AsyncStorage.removeItem('@auth_token');
             await AsyncStorage.removeItem('@user_session');
@@ -70,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Only update user if not already set to prevent unnecessary re-renders
             if (!user || user.id !== session.user.id) {
-              setUser({
+              safeSetUser({
                 id: session.user.id,
                 email: session.user.email!,
                 dharma_name: session.user.user_metadata?.dharma_name,
@@ -85,17 +88,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (storedUserData && !user) {
                 const userData = JSON.parse(storedUserData);
                 console.log('🔄 Restoring user from stored data:', userData.email);
-                setUser(userData);
+                safeSetUser(userData);
               } else {
                 console.log('❌ No stored session available, clearing user');
-                setUser(null);
+                safeSetUser(null);
               }
             } catch (err) {
               console.log('⚠️ Error checking stored session:', err);
               setUser(null);
             }
           }
-          setLoading(false);
+          safeSetLoading(false);
           return;
         }
 
@@ -129,8 +132,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mountedRef.current = false;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // Helper function to safely update state only if component is mounted
+  const safeSetUser = (newUser: User | null) => {
+    if (mountedRef.current) {
+      setUser(newUser);
+    }
+  };
+
+  const safeSetLoading = (newLoading: boolean) => {
+    if (mountedRef.current) {
+      setLoading(newLoading);
+    }
+  };
 
   const checkAuthState = async () => {
     try {
