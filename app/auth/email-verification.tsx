@@ -16,7 +16,7 @@ export default function EmailVerificationScreen() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user?.email_confirmed_at) {
           console.log('✅ Email verified, redirecting to app');
-          router.replace('/(tabs)');
+          router.replace('/');
         }
       } catch (error) {
         console.error('Error checking verification status:', error);
@@ -77,7 +77,7 @@ export default function EmailVerificationScreen() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session?.user?.email_confirmed_at) {
-        router.replace('/(tabs)');
+        router.replace('/');
       } else {
         Alert.alert('未验证', '邮箱尚未验证，请检查邮箱');
       }
