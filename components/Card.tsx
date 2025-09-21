@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
-import { componentHelpers } from '@/utils/componentTokens';
 
 interface CardProps {
   children: React.ReactNode;
@@ -11,10 +10,10 @@ interface CardProps {
 }
 
 /**
- * Consolidated Card component
+ * Consolidated Card component using NativeWind utility classes
  * Replaces: standard, practice, course card variants
  * 
- * @param variant - 'outlined' (low shadow) or 'elevated' (high shadow)
+ * @param variant - 'outlined' (light shadow) or 'elevated' (prominent shadow)
  * @param padding - 'compact' (12px), 'comfortable' (16px), 'spacious' (20px)
  */
 export default function Card({ 
@@ -23,10 +22,33 @@ export default function Card({
   padding = 'comfortable', 
   style 
 }: CardProps) {
-  const cardStyle = componentHelpers.getCardStyle(variant, padding);
+  const getVariantClasses = () => {
+    switch (variant) {
+      case 'elevated':
+        return 'bg-white rounded-lg shadow-lg';
+      case 'outlined':
+      default:
+        return 'bg-white rounded-lg border border-gray-200 shadow-sm';
+    }
+  };
+  
+  const getPaddingClasses = () => {
+    switch (padding) {
+      case 'compact':
+        return 'p-3'; // 12px
+      case 'spacious':
+        return 'p-5'; // 20px
+      case 'comfortable':
+      default:
+        return 'p-4'; // 16px
+    }
+  };
   
   return (
-    <View style={[cardStyle, style]}>
+    <View 
+      className={`${getVariantClasses()} ${getPaddingClasses()}`}
+      style={style}
+    >
       {children}
     </View>
   );
