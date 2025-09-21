@@ -8,6 +8,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build:web": "expo export -p web --output-dir dist-web",
+    "serve": "serve dist-web -l tcp://0.0.0.0:5000 --single",
+    "deploy": "npm run build:web && npm run serve",
     "test": "jest --watchAll",
     "lint": "expo lint"
   },
