@@ -26,6 +26,7 @@ export const Colors = {
     warning: designColors.warning,
     error: designColors.error,
     info: designColors.info,
+    icon: designColors.icon,
   },
   
   // Dark theme colors (currently using same as light, but can be customized)
@@ -45,6 +46,7 @@ export const Colors = {
     warning: designColors.warning,
     error: designColors.error,
     info: designColors.info,
+    icon: '#B0B0B0',
   },
 
   // Direct color exports for backward compatibility
@@ -76,12 +78,19 @@ export const Colors = {
   
   // Buddhist theme colors
   redTara: designColors.redTara,
+  redTaraLight: designColors.redTaraLight,
+  redTaraDark: designColors.redTaraDark,
   orangeTara: designColors.orangeTara,
+  orangeTaraLight: designColors.orangeTaraLight,
   yellowTara: designColors.yellowTara,
+  yellowTaraLight: designColors.yellowTaraLight,
   blueTara: designColors.blueTara,
+  blueTaraLight: designColors.blueTaraLight,
   greenTara: designColors.greenTara,
   blackTara: designColors.blackTara,
+  blackTaraLight: designColors.blackTaraLight,
   whiteTara: designColors.whiteTara,
+  whiteTaraLight: designColors.whiteTaraLight,
   
   // Practice colors
   practiceComplete: designColors.practiceComplete,
@@ -94,6 +103,7 @@ export const Colors = {
   cardBackground: designColors.cardBackground,
   modalBackground: designColors.modalBackground,
   overlayBackground: designColors.overlayBackground,
+  successBackground: designColors.successBackground,
 };
 
 export default Colors;

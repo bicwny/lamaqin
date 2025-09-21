@@ -44,19 +44,30 @@ export const DesignSystem = {
     modalBackground: '#ffffff',
     overlayBackground: 'rgba(0, 0, 0, 0.5)',
     
-    // Minimal Buddhist theme compatibility (mapped to red variants)
+    // Buddhist theme colors with light/dark variants
     redTara: '#ef4444',          // red-500
+    redTaraLight: '#fca5a5',     // red-300
+    redTaraDark: '#b91c1c',      // red-700
     orangeTara: '#f97316',       // orange-500
+    orangeTaraLight: '#fdba74',  // orange-300
     yellowTara: '#eab308',       // yellow-500
+    yellowTaraLight: '#fcd34d',  // yellow-300
     blueTara: '#3b82f6',         // blue-500
+    blueTaraLight: '#93c5fd',    // blue-300
     greenTara: '#16a34a',        // green-600
     blackTara: '#111827',        // gray-900
+    blackTaraLight: '#6b7280',   // gray-500
     whiteTara: '#ffffff',        // white
+    whiteTaraLight: '#f9fafb',   // gray-50
     
     // Additional compatibility
     practiceComplete: '#16a34a',  // green-600
     practiceActive: '#ef4444',    // red-500
     practiceInactive: '#6b7280',  // gray-500
+    
+    // Additional semantic colors
+    successBackground: '#dcfce7', // green-100
+    icon: '#6b7280',             // gray-500
   },
 
   // Typography
