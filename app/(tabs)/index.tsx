@@ -711,7 +711,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <PageTemplate
-        title="修行主页"
+        title="当日"
         subtitle={getGreeting()}
         rightAction={{
           component: <Avatar dharmaName={userDharmaName} size={32} />,
@@ -730,7 +730,7 @@ export default function HomeScreen() {
 
   return (
     <PageTemplate
-      title="修行主页"
+      title="当日"
       subtitle={getGreeting()}
       rightAction={{
         component: <Avatar dharmaName={userDharmaName} size={32} />,
