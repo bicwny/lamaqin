@@ -951,7 +951,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 16,
     marginBottom: 12,
-    paddingTop: 8,
+    paddingTop: 4,
   },
   sectionTitle: {
     fontSize: 18,
