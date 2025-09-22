@@ -307,7 +307,7 @@ export default function PracticeScreen() {
   if (loading) {
     return (
       <PageTemplate
-        title="修行记录"
+        title="修行"
         rightAction={{
           text: "添加",
           onPress: handleAddPractice,
@@ -326,7 +326,7 @@ export default function PracticeScreen() {
   if (projects.length === 0) {
     return (
       <PageTemplate
-        title="修行记录"
+        title="修行"
         rightAction={{
           text: "添加",
           onPress: handleAddPractice,
@@ -358,7 +358,7 @@ export default function PracticeScreen() {
 
   return (
     <PageTemplate
-      title="修行记录"
+      title="修行"
       rightAction={{
         text: "添加",
         onPress: handleAddPractice,

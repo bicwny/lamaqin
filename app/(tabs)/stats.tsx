@@ -204,7 +204,7 @@ export default function StatsScreen() {
 
   if (loading) {
     return (
-      <PageTemplate title="📊 统计分析" subtitle="查看您的修行进展" scrollable={false}>
+      <PageTemplate title="回向" subtitle="查看您的修行进展" scrollable={false}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
           <Text style={styles.loadingText}>正在加载统计数据...</Text>
@@ -215,7 +215,7 @@ export default function StatsScreen() {
 
   if (!stats || (stats.totalPractices === 0 && stats.coursesEnrolled === 0)) {
     return (
-      <PageTemplate title="📊 统计分析" subtitle="查看您的修行进展" scrollable={false} padding={0}>
+      <PageTemplate title="回向" subtitle="查看您的修行进展" scrollable={false} padding={0}>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <View style={styles.emptyState}>
             <View style={styles.iconContainer}>
@@ -236,7 +236,7 @@ export default function StatsScreen() {
   }
 
   return (
-    <PageTemplate title="📊 统计分析" subtitle="查看您的修行进展" scrollable={false} padding={0}>
+    <PageTemplate title="回向" subtitle="查看您的修行进展" scrollable={false} padding={0}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         
         {/* Practice Overview */}
