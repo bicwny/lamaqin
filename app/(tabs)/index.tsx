@@ -731,7 +731,7 @@ export default function HomeScreen() {
   return (
     <PageTemplate
       title="修行主页"
-      subtitle={`${getGreeting()} • ${userDharmaName}居士`}
+      subtitle={getGreeting()}
       rightAction={{
         component: <Avatar dharmaName={userDharmaName} size={32} />,
         onPress: navigateToProfile
