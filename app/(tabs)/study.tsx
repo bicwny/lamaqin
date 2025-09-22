@@ -418,7 +418,7 @@ export default function StudyScreen() {
   if (loading) {
     return (
       <PageTemplate
-        title="闻思学习"
+        title="闻思"
         subtitle="系统学习佛法课程"
         scrollable={false}
         backgroundColor={Colors.background}
@@ -436,7 +436,7 @@ export default function StudyScreen() {
     if (userCourses.length === 0) {
       return (
         <PageTemplate
-          title="闻思学习"
+          title="闻思"
           subtitle="系统学习佛法课程"
           scrollable={false}
           backgroundColor={Colors.background}
@@ -450,7 +450,7 @@ export default function StudyScreen() {
 
               <Text style={styles.emptyTitle}>开始你的学习之旅</Text>
               <Text style={styles.emptyDescription}>
-                添加你的第一门课程，开始系统的闻思学习历程
+                添加你的第一门课程，开始系统的闻思历程
               </Text>
 
               <TouchableOpacity 
@@ -468,7 +468,7 @@ export default function StudyScreen() {
 
     return (
       <PageTemplate
-        title="闻思学习"
+        title="闻思"
         subtitle="系统学习佛法课程"
         rightAction={{
           text: "管理课程",

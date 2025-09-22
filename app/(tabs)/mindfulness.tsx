@@ -134,7 +134,7 @@ export default function MindfulnessScreen() {
   if (loading || !timezoneInfo) {
     return (
       <PageTemplate
-        title="心性观察" 
+        title="心性" 
         subtitle="观察内心善恶念头"
         scrollable={false}
         backgroundColor={Colors.background}
@@ -148,7 +148,7 @@ export default function MindfulnessScreen() {
 
   return (
     <PageTemplate
-      title="心性观察" 
+      title="心性" 
       subtitle="观察内心善恶念头"
       scrollable={false}
       backgroundColor={Colors.background}
