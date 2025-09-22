@@ -95,7 +95,6 @@ export default function PageTemplate({
   const content = (
     <View style={[
       styles.content, 
-      { padding: paddingValue }, 
       getShadowStyle(),
       contentContainerStyle
     ]}>
