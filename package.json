@@ -6,13 +6,18 @@
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
-    "ios": "expo start --ios",
+    "ios": "expo start --ios", 
     "web": "expo start --web",
     "build:web": "expo export -p web --output-dir dist-web",
     "serve": "serve dist-web -l tcp://0.0.0.0:5000 --single",
     "deploy": "npm run build:web && npm run serve",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "eas:init": "eas init",
+    "eas:build:ios": "eas build --platform ios",
+    "eas:build:android": "eas build --platform android",
+    "eas:build:ios:preview": "eas build --platform ios --profile preview",
+    "eas:build:android:preview": "eas build --platform android --profile preview"
   },
   "jest": {
     "preset": "jest-expo"
