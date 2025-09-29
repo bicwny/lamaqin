@@ -1294,6 +1294,7 @@ const styles = StyleSheet.create({
   daysInput: {
     flex: 1,
     paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.sm,
     fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
     textAlign: "center",
