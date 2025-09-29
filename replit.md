@@ -47,3 +47,11 @@ The app uses React Native with a configurable architecture setting in `app.json`
 - **React Native Elements**: UI component library for consistent interface elements
 - **Expo Notifications**: Push notification system for practice reminders
 - **Vector Icons**: Icon library for Buddhist-themed iconography
+
+## Recent Changes (September 29, 2025)
+
+### iOS Crash Fix and Dependency Cleanup
+- **Fixed iPhone 16 iOS 18.6.2 crash**: Disabled React Native New Architecture (`newArchEnabled: false`) to resolve startup crashes
+- **Enhanced error handling**: Added timeout mechanisms and error boundaries for better iOS stability
+- **Removed animation dependencies**: Eliminated react-native-reanimated and react-native-worklets to maintain minimal app footprint and resolve New Architecture build conflicts
+- **Improved auth flow**: Added comprehensive error handling in AuthContext for better iOS compatibility
