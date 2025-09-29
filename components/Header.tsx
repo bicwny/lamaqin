@@ -2,7 +2,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type HeaderContext = 'page' | 'modal' | 'section';
 
@@ -33,8 +32,6 @@ export default function Header({
   rightAction,
   leftAction,
 }: HeaderProps) {
-  const insets = useSafeAreaInsets();
-
   const getContextStyles = () => {
     switch (context) {
       case 'page':
@@ -72,10 +69,7 @@ export default function Header({
 
   return (
     <View 
-      style={[
-        contextStyles.container,
-        context === 'page' ? { paddingTop: insets.top } : undefined
-      ]}
+      style={contextStyles.container}
     >
       <View style={contextStyles.header}>
         {/* Left side */}
