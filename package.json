@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:web": "expo export -p web --output-dir dist-web",
-    "serve": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
+    "serve-dist": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
     "serve-web": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
     "deploy": "npm run build:web && npm run serve-web",
     "test": "jest --watchAll",
