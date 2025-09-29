@@ -53,8 +53,8 @@ The app uses React Native with a configurable architecture setting in `app.json`
 ### iOS Crash Fix and Dependency Cleanup
 - **Fixed iPhone 16 iOS 18.6.2 crash**: Disabled React Native New Architecture (`newArchEnabled: false`) to resolve startup crashes
 - **Enhanced error handling**: Added timeout mechanisms and error boundaries for better iOS stability
-- **Resolved iOS build conflict**: Downgraded react-native-reanimated from v4.1.2 to v3.16.7 to maintain compatibility with Legacy Architecture while keeping Expo Router functionality
-- **Fixed dependency conflicts**: Added expo.install.exclude configuration to prevent version mismatches
+- **Resolved iOS build conflict**: Upgraded react-native-reanimated from v3.16.7 to v3.19.1 to fix Folly header compatibility issues with React Native 0.81.4
+- **Fixed Folly build error**: Resolved 'folly/coro/Coroutine.h' file not found error during iOS compilation by using latest Reanimated v3 that supports updated Folly paths
 - **Improved auth flow**: Added comprehensive error handling in AuthContext for better iOS compatibility
 
 **Technical Note**: Expo Router requires React Native Reanimated for navigation animations. Reanimated v4 only works with New Architecture, but v3 works with Legacy Architecture, resolving the iOS build conflict while maintaining all app functionality.
