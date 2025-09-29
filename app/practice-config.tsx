@@ -550,7 +550,7 @@ export default function PracticeConfigScreen() {
         </TouchableOpacity>
 
         {/* DateTimePicker Modal */}
-        {practiceType === "count" && (
+        {Platform.OS !== "web" && (
           <ModalDatetimePicker
             isVisible={isStartDatePickerVisible}
             mode="date"
@@ -614,7 +614,7 @@ export default function PracticeConfigScreen() {
           <Text style={styles.durationSeparator}>至</Text>
           <TouchableOpacity
             style={styles.endDatePickerButton}
-            onPress={() => setCustomDatePickerVisibility(true)}
+            onPress={showCustomDatepicker}
           >
             <Text style={styles.endDatePickerButtonText}>
               {customEndDate.toLocaleDateString('zh-CN')}
@@ -626,7 +626,7 @@ export default function PracticeConfigScreen() {
         
 
         {/* DateTimePicker Modal */}
-        {practiceType === "count" && (
+        {Platform.OS !== "web" && (
           <ModalDatetimePicker
             isVisible={isCustomDatePickerVisible}
             mode="date"
@@ -1163,10 +1163,12 @@ const styles = StyleSheet.create({
   segmentButtonText: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
+    fontWeight: '400' as any,
   },
   segmentButtonTextActive: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textPrimary,
+    fontWeight: '500' as any,
   },
   inputContainer: {
     marginTop: DesignSystem.spacing.lg,
@@ -1193,6 +1195,7 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
     fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
+    fontWeight: '400' as any,
   },
   inputUnit: {
     ...ComponentTextStyles.body,
@@ -1222,6 +1225,7 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
     fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
+    fontWeight: '400' as any,
   },
   goalInputUnit: {
     ...ComponentTextStyles.body,
@@ -1240,6 +1244,7 @@ const styles = StyleSheet.create({
   },
   simpleDateButtonText: {
     ...ComponentTextStyles.body,
+    fontWeight: '400' as any,
   },
   dateButtonIcon: {
     ...ComponentTextStyles.body,
@@ -1266,14 +1271,17 @@ const styles = StyleSheet.create({
     fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
     textAlign: "center",
+    fontWeight: '400' as any,
   },
   daysInputLabel: {
     ...ComponentTextStyles.body,
     marginLeft: DesignSystem.spacing.xs,
+    fontWeight: '400' as any,
   },
   durationSeparator: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textTertiary,
+    fontWeight: '400' as any,
   },
   endDatePickerButton: {
     flexDirection: "row",
@@ -1289,6 +1297,7 @@ const styles = StyleSheet.create({
   },
   endDatePickerButtonText: {
     ...ComponentTextStyles.body,
+    fontWeight: '400' as any,
   },
   durationDisplay: {
     backgroundColor: DesignSystem.colors.background,
@@ -1300,6 +1309,7 @@ const styles = StyleSheet.create({
   durationDisplayText: {
     ...ComponentTextStyles.label,
     textAlign: "center",
+    fontWeight: '400' as any,
   },
   
   previewHeader: {
@@ -1321,7 +1331,7 @@ const styles = StyleSheet.create({
   previewProjectPillText: {
     ...ComponentTextStyles.caption,
     color: DesignSystem.colors.textInverse,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontWeight: '500' as any,
   },
   previewDetails: {
     gap: DesignSystem.spacing.xxs,
@@ -1329,11 +1339,13 @@ const styles = StyleSheet.create({
   previewDetailItem: {
     ...ComponentTextStyles.body,
     lineHeight: DesignSystem.typography.fontSize.base * DesignSystem.typography.lineHeight.relaxed,
+    fontWeight: '400' as any,
   },
   previewPlaceholder: {
     ...ComponentTextStyles.body,
     color: DesignSystem.colors.textTertiary,
     fontStyle: "italic",
+    fontWeight: '400' as any,
   },
   projectNameContainer: {
     position: "relative",
@@ -1374,7 +1386,7 @@ const styles = StyleSheet.create({
   clearButtonText: {
     color: DesignSystem.colors.textInverse,
     fontSize: DesignSystem.typography.fontSize.xs,
-    fontWeight: DesignSystem.typography.fontWeight.bold,
+    fontWeight: '700' as any,
   },
   modalContainer: {
     flex: 1,
@@ -1400,7 +1412,7 @@ const styles = StyleSheet.create({
   modalConfirmButton: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.primary,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    fontWeight: '600' as any,
   },
   modalConfirmButtonDisabled: {
     color: DesignSystem.colors.textTertiary,
@@ -1418,7 +1430,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.base,
     fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    fontWeight: '400' as any,
     color: DesignSystem.colors.textPrimary,
     backgroundColor: DesignSystem.colors.background,
     minHeight: 44,
@@ -1466,6 +1478,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.caption,
     textAlign: "center",
     fontStyle: "italic",
+    fontWeight: '400' as any,
   },
   webDatePicker: {
     backgroundColor: DesignSystem.colors.backgroundTertiary,
@@ -1477,7 +1490,7 @@ const styles = StyleSheet.create({
   },
   webDateInput: {
     fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
+    fontWeight: '400' as any,
     color: DesignSystem.colors.textPrimary,
     backgroundColor: "transparent",
     borderWidth: 0,
