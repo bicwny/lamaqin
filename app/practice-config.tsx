@@ -98,7 +98,7 @@ export default function PracticeConfigScreen() {
   const [projectName, setProjectName] = useState(
     isEditMode && currentProjectName ? currentProjectName : ""
   );
-  const [durationMode, setDurationMode] = useState<"持续进行" | "固定时长">(
+  const [durationMode, setDurationMode] = useState<"持续进行" | "固定时长" | "30天" | "60天" | "100天" | "1年" | "自定义">(
     isEditMode && !currentEndDate ? "持续进行" : "固定时长"
   );
   const [configMode, setConfigMode] = useState<"total" | "daily">(
@@ -167,7 +167,7 @@ export default function PracticeConfigScreen() {
         startDate.getTime() + days * 24 * 60 * 60 * 1000,
       );
       setCustomEndDate(newEndDate);
-      setDurationMode("自定义");
+      setDurationMode("自定义" as "持续进行" | "固定时长" | "30天" | "60天" | "100天" | "1年" | "自定义");
     } else if (!isNaN(days) && days <= 0) {
       toastService.error("天数必须大于0");
     }
@@ -180,7 +180,7 @@ export default function PracticeConfigScreen() {
       (selectedDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
     );
     setCustomDays(daysDiff.toString());
-    setDurationMode("自定义");
+    setDurationMode("自定义" as "持续进行" | "固定时长" | "30天" | "60天" | "100天" | "1年" | "自定义");
   };
 
   useEffect(() => {
@@ -556,7 +556,7 @@ export default function PracticeConfigScreen() {
             mode="date"
             onConfirm={handleStartDateConfirm}
             onCancel={hideStartDatePicker}
-            value={startDate}
+            date={startDate}
           />
         )}
 
@@ -576,11 +576,18 @@ export default function PracticeConfigScreen() {
 
         {showStartDatePicker && Platform.OS === "web" && (
           <View style={styles.webDatePicker}>
-            <TextInput
-              style={styles.webDateInput}
+            <input
+              style={{
+                ...styles.webDateInput,
+                border: '1px solid #ccc',
+                borderRadius: 8,
+                padding: 12,
+                fontSize: 16,
+                width: '100%'
+              } as any}
               type="date"
               value={startDate.toISOString().split("T")[0]}
-              onChange={(event) => {
+              onChange={(event: any) => {
                 const newDate = new Date(event.target.value);
                 setStartDate(newDate);
                 setShowStartDatePicker(false);
@@ -625,7 +632,7 @@ export default function PracticeConfigScreen() {
             mode="date"
             onConfirm={handleCustomDateConfirm}
             onCancel={hideCustomDatePicker}
-            value={customEndDate}
+            date={customEndDate}
             minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
           />
         )}
@@ -647,8 +654,15 @@ export default function PracticeConfigScreen() {
 
         {showCustomDatePicker && Platform.OS === "web" && (
           <View style={styles.webDatePicker}>
-            <TextInput
-              style={styles.webDateInput}
+            <input
+              style={{
+                ...styles.webDateInput,
+                border: '1px solid #ccc',
+                borderRadius: 8,
+                padding: 12,
+                fontSize: 16,
+                width: '100%'
+              } as any}
               type="date"
               value={customEndDate.toISOString().split("T")[0]}
               min={
@@ -656,7 +670,7 @@ export default function PracticeConfigScreen() {
                   .toISOString()
                   .split("T")[0]
               }
-              onChange={(event) => {
+              onChange={(event: any) => {
                 const newDate = new Date(event.target.value);
                 handleEndDateChange(newDate);
                 setShowCustomDatePicker(false);
