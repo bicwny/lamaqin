@@ -1151,9 +1151,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: DesignSystem.colors.backgroundTertiary,
     borderRadius: DesignSystem.borderRadius.lg,
-    padding: DesignSystem.spacing.xxs,
+    padding: DesignSystem.spacing.sm,
     borderWidth: 1,
     borderColor: DesignSystem.colors.borderLight,
+    marginVertical: DesignSystem.spacing.md,
   },
   segmentButton: {
     flex: 1,
@@ -1180,6 +1181,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginTop: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.sm,
   },
   inputLabel: {
     ...ComponentTextStyles.label,
@@ -1192,9 +1194,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: DesignSystem.colors.backgroundTertiary,
     borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.xs,
     borderWidth: 1,
     borderColor: DesignSystem.colors.border,
+    marginVertical: DesignSystem.spacing.xs,
   },
   inputPrefix: {
     ...ComponentTextStyles.body,
@@ -1213,9 +1217,11 @@ const styles = StyleSheet.create({
   },
   goalTypeContainer: {
     marginBottom: DesignSystem.spacing.xl,
+    marginTop: DesignSystem.spacing.md,
   },
   goalInputContainer: {
-    marginTop: DesignSystem.spacing.sm,
+    marginTop: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   goalInputLabel: {
     ...ComponentTextStyles.subheading,
@@ -1271,6 +1277,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: DesignSystem.spacing.md,
     marginBottom: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.sm,
   },
   daysInputContainer: {
     flexDirection: "row",
@@ -1323,7 +1330,8 @@ const styles = StyleSheet.create({
   durationDisplay: {
     backgroundColor: `${DesignSystem.colors.primary}10`,
     borderRadius: DesignSystem.borderRadius.md,
-    padding: DesignSystem.spacing.md,
+    padding: DesignSystem.spacing.lg,
+    marginVertical: DesignSystem.spacing.md,
     borderLeftWidth: 4,
     borderLeftColor: DesignSystem.colors.primary,
     borderWidth: 1,
@@ -1362,7 +1370,8 @@ const styles = StyleSheet.create({
   },
   previewDetails: {
     gap: DesignSystem.spacing.sm,
-    padding: DesignSystem.spacing.sm,
+    padding: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.sm,
     backgroundColor: `${DesignSystem.colors.backgroundTertiary}80`,
     borderRadius: DesignSystem.borderRadius.md,
   },
