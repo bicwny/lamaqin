@@ -1146,8 +1146,10 @@ const styles = StyleSheet.create({
   segmentedControl: {
     flexDirection: "row",
     backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    padding: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.xxs,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.borderLight,
   },
   segmentButton: {
     flex: 1,
@@ -1158,7 +1160,9 @@ const styles = StyleSheet.create({
   },
   segmentButtonActive: {
     backgroundColor: DesignSystem.colors.backgroundSecondary,
-    ...DesignSystem.shadow.sm,
+    ...DesignSystem.shadow.md,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.primary,
   },
   segmentButtonText: {
     ...ComponentTextStyles.label,
@@ -1167,8 +1171,8 @@ const styles = StyleSheet.create({
   },
   segmentButtonTextActive: {
     ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textPrimary,
-    fontWeight: '500' as any,
+    color: DesignSystem.colors.primary,
+    fontWeight: '600' as any,
   },
   inputContainer: {
     marginTop: DesignSystem.spacing.lg,
@@ -1210,26 +1214,31 @@ const styles = StyleSheet.create({
   goalInputLabel: {
     ...ComponentTextStyles.subheading,
     marginBottom: DesignSystem.spacing.sm,
+    color: DesignSystem.colors.textPrimary,
   },
   goalInputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundTertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    borderWidth: 2,
+    borderColor: DesignSystem.colors.borderLight,
+    minHeight: 56,
+    ...DesignSystem.shadow.sm,
   },
   goalTextInput: {
     flex: 1,
     paddingVertical: DesignSystem.spacing.md,
-    fontSize: DesignSystem.typography.fontSize.base,
+    fontSize: DesignSystem.typography.fontSize.lg,
     color: DesignSystem.colors.textPrimary,
-    fontWeight: '400' as any,
+    fontWeight: '600' as any,
   },
   goalInputUnit: {
     ...ComponentTextStyles.body,
     marginLeft: DesignSystem.spacing.sm,
+    color: DesignSystem.colors.primary,
+    fontWeight: '500' as any,
   },
   simpleDateButton: {
     flexDirection: "row",
@@ -1300,11 +1309,13 @@ const styles = StyleSheet.create({
     fontWeight: '400' as any,
   },
   durationDisplay: {
-    backgroundColor: DesignSystem.colors.background,
-    borderRadius: DesignSystem.borderRadius.sm,
-    padding: DesignSystem.spacing.sm,
-    borderLeftWidth: 3,
+    backgroundColor: `${DesignSystem.colors.primary}10`,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.md,
+    borderLeftWidth: 4,
     borderLeftColor: DesignSystem.colors.primary,
+    borderWidth: 1,
+    borderColor: `${DesignSystem.colors.primary}30`,
   },
   durationDisplayText: {
     ...ComponentTextStyles.label,
@@ -1315,18 +1326,22 @@ const styles = StyleSheet.create({
   previewHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.lg,
     flexWrap: "wrap",
     gap: DesignSystem.spacing.sm,
+    paddingBottom: DesignSystem.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   previewPracticeName: {
     ...ComponentTextStyles.subheading,
   },
   previewProjectPill: {
     backgroundColor: DesignSystem.colors.primary,
-    borderRadius: DesignSystem.borderRadius.lg,
-    paddingHorizontal: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.borderRadius.full,
+    paddingHorizontal: DesignSystem.spacing.md,
     paddingVertical: DesignSystem.spacing.xs,
+    ...DesignSystem.shadow.sm,
   },
   previewProjectPillText: {
     ...ComponentTextStyles.caption,
