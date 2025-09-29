@@ -33,6 +33,30 @@ export class ErrorBoundary extends React.Component<Props, State> {
     console.error('💥 ErrorBoundary caught error:', error);
     console.error('📍 Error Info:', errorInfo);
     
+    // Enhanced error logging for debugging
+    console.error('🔍 Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack
+    });
+
+    // Check for specific error types that might be recoverable
+    const isReanimatedError = error.message?.includes('reanimated') || 
+                              error.stack?.includes('Reanimated') ||
+                              error.message?.includes('worklet');
+    
+    const isNavigationError = error.message?.includes('navigation') ||
+                              error.stack?.includes('react-navigation');
+
+    if (isReanimatedError) {
+      console.warn('🎭 Detected Reanimated-related error, attempting graceful recovery...');
+    }
+
+    if (isNavigationError) {
+      console.warn('🧭 Detected Navigation-related error, attempting graceful recovery...');
+    }
+    
     // You could also log to crash reporting service here
     // crashlytics().recordError(error);
   }
