@@ -631,6 +631,7 @@ const styles = StyleSheet.create({
   },
   input: {
     ...ComponentTokens.input.standard,
+    fontWeight: '400' as any,  // Override to fix type issue
   },
   emailDisplay: {
     flexDirection: 'row',
