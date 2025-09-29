@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-on-replit",
-    "slug": "expo-on-replit",
+    "name": "三殊胜",
+    "slug": "san-shu-sheng",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bicwny.expoonreplit",
+      "bundleIdentifier": "com.bicwny.sanshusheng",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
