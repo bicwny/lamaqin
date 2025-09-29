@@ -1136,7 +1136,7 @@ export default function PracticeConfigScreen() {
 const styles = StyleSheet.create({
   section: componentHelpers.getCardWithBottomMargin(
     'outlined',
-    'comfortable',
+    'md',
     'comfortable'
   ),
   sectionTitle: {
