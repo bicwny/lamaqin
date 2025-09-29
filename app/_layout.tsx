@@ -1,6 +1,7 @@
 import '../global.css';
 import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { router, useSegments } from 'expo-router';
@@ -91,9 +92,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-      <Toast config={toastConfig} />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <RootLayoutNav />
+        <Toast config={toastConfig} />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
