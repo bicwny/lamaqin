@@ -24,7 +24,21 @@
     },
     "web": {
       "bundler": "metro",
-      "fontDisplay": "swap"
+      "fontDisplay": "swap",
+      "display": "standalone",
+      "name": "三殊胜",
+      "shortName": "三殊胜",
+      "backgroundColor": "#ffffff",
+      "themeColor": "#000000",
+      "orientation": "portrait",
+      "scope": "/",
+      "startUrl": "/",
+      "meta": {
+        "apple": {
+          "mobileWebAppCapable": "yes",
+          "mobileWebAppStatusBarStyle": "black-translucent"
+        }
+      }
     },
     "plugins": [
       "expo-router",
