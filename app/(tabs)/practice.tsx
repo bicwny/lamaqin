@@ -308,6 +308,7 @@ export default function PracticeScreen() {
     return (
       <PageTemplate
         title="修行"
+        subtitle="如人饮水，冷暖自知"
         rightAction={{
           text: "添加",
           onPress: handleAddPractice,
@@ -327,6 +328,7 @@ export default function PracticeScreen() {
     return (
       <PageTemplate
         title="修行"
+        subtitle="如人饮水，冷暖自知"
         rightAction={{
           text: "添加",
           onPress: handleAddPractice,
@@ -359,6 +361,7 @@ export default function PracticeScreen() {
   return (
     <PageTemplate
       title="修行"
+      subtitle="如人饮水，冷暖自知"
       rightAction={{
         text: "添加",
         onPress: handleAddPractice,
