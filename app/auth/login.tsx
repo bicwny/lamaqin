@@ -447,9 +447,9 @@ export default function UnifiedAuthScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.logo}>🙏</Text>
-          <Text style={styles.title}>修行追踪</Text>
+          <Text style={styles.title}>三殊胜</Text>
           <Text style={styles.subtitle}>
-            {step === 'email' ? '输入邮箱开始您的修行之旅' : '请输入邮箱验证码'}
+            {step === 'email' ? '当知胜义俱生智，唯依积资净障力，乃与具证师加持，依止他法诚愚痴' : '请输入邮箱验证码'}
           </Text>
         </View>
 
