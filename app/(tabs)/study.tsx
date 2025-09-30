@@ -419,7 +419,7 @@ export default function StudyScreen() {
     return (
       <PageTemplate
         title="闻思"
-        subtitle="系统学习佛法课程"
+        subtitle="好好闻思，别乱跑。"
         scrollable={false}
         backgroundColor={Colors.background}
       >
@@ -437,7 +437,7 @@ export default function StudyScreen() {
       return (
         <PageTemplate
           title="闻思"
-          subtitle="系统学习佛法课程"
+          subtitle="好好闻思，别乱跑。"
           scrollable={false}
           backgroundColor={Colors.background}
           padding={0}
@@ -469,7 +469,7 @@ export default function StudyScreen() {
     return (
       <PageTemplate
         title="闻思"
-        subtitle="系统学习佛法课程"
+        subtitle="好好闻思，别乱跑。"
         rightAction={{
           text: "管理课程",
           onPress: () => setViewMode('manage')
