@@ -406,8 +406,7 @@ export default function PracticeDetailScreen() {
             {progress.target.toLocaleString()} {project.practices.unit}
           </Text>
           <Text style={styles.dailyTargetText}>
-            每日目标：{project.daily_target.toLocaleString()}{" "}
-            {project.practices.unit}
+            每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
           </Text>
         </View>
       );
@@ -553,9 +552,7 @@ export default function PracticeDetailScreen() {
                     {progress.current.toLocaleString()}
                   </Text>
                   <Text style={styles.totalCountAndDays}>
-                    {progress.target.toLocaleString()} {project.practices.unit}{" "}
-                    •{" "}
-                    {totalWeeks
+                    {progress.target.toLocaleString()} {project.practices.unit} • {totalWeeks
                       ? `${Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天`
                       : "持续进行"}
                   </Text>

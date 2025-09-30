@@ -735,8 +735,7 @@ export default function PracticeConfigScreen() {
 
             <View style={styles.previewDetails}>
               <Text style={styles.previewDetailItem}>
-                📅 {formatDate(startDate)} →{" "}
-                {formatDate(
+                📅 {formatDate(startDate)} → {formatDate(
                   durationMode === "自定义"
                     ? customEndDate
                     : new Date(
@@ -753,30 +752,25 @@ export default function PracticeConfigScreen() {
                             60 *
                             1000,
                       ),
-                )}{" "}
-                ({days} 天)
+                )} ({days} 天)
               </Text>
 
               {configMode === "total" && totalTarget ? (
                 <View>
                   <Text style={styles.previewDetailItem}>
-                    🎯 总目标: {parseInt(totalTarget).toLocaleString()}{" "}
-                    {practiceUnit}
+                    🎯 总目标: {parseInt(totalTarget).toLocaleString()} {practiceUnit}
                   </Text>
                   <Text style={styles.previewDetailItem}>
-                    📊 每日目标: {suggestedDaily.toLocaleString()}{" "}
-                    {practiceUnit}
+                    📊 每日目标: {suggestedDaily.toLocaleString()} {practiceUnit}
                   </Text>
                 </View>
               ) : configMode === "daily" && dailyTarget ? (
                 <View>
                   <Text style={styles.previewDetailItem}>
-                    🎯 每日目标: {parseInt(dailyTarget).toLocaleString()}{" "}
-                    {practiceUnit}
+                    🎯 每日目标: {parseInt(dailyTarget).toLocaleString()} {practiceUnit}
                   </Text>
                   <Text style={styles.previewDetailItem}>
-                    📊 预计总数: {projectedTotal.toLocaleString()}{" "}
-                    {practiceUnit}
+                    📊 预计总数: {projectedTotal.toLocaleString()} {practiceUnit}
                   </Text>
                 </View>
               ) : (
@@ -801,8 +795,7 @@ export default function PracticeConfigScreen() {
 
             <View style={styles.previewDetails}>
               <Text style={styles.previewDetailItem}>
-                📅 {formatDate(startDate)} →{" "}
-                {formatDate(
+                📅 {formatDate(startDate)} → {formatDate(
                   durationMode === "自定义"
                     ? customEndDate
                     : new Date(
@@ -819,8 +812,7 @@ export default function PracticeConfigScreen() {
                             60 *
                             1000,
                       ),
-                )}{" "}
-                ({days} 天)
+                )} ({days} 天)
               </Text>
 
               {sessionsTarget ? (
