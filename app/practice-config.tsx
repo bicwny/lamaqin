@@ -611,7 +611,9 @@ export default function PracticeConfigScreen() {
             />
             <Text style={styles.daysInputLabel}>天</Text>
           </View>
-          <Text style={styles.durationSeparator}>至</Text>
+          <View style={styles.orSeparatorRow}>
+            <Text style={styles.orSeparatorText}>或</Text>
+          </View>
           <TouchableOpacity
             style={styles.endDatePickerButton}
             onPress={showCustomDatepicker}
@@ -1272,8 +1274,7 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
   },
   smartDurationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
     gap: DesignSystem.spacing.md,
     marginBottom: DesignSystem.spacing.md,
     marginTop: DesignSystem.spacing.sm,
@@ -1286,7 +1287,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.md,
     borderWidth: 1.5,
     borderColor: DesignSystem.colors.border,
-    flex: 1,
     minHeight: 48,
     ...DesignSystem.shadow.sm,
   },
@@ -1304,7 +1304,11 @@ const styles = StyleSheet.create({
     marginLeft: DesignSystem.spacing.xs,
     fontWeight: '400' as any,
   },
-  durationSeparator: {
+  orSeparatorRow: {
+    alignItems: "center",
+    marginVertical: DesignSystem.spacing.xs,
+  },
+  orSeparatorText: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textTertiary,
     fontWeight: '400' as any,
@@ -1318,7 +1322,6 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
     borderWidth: 1.5,
     borderColor: DesignSystem.colors.border,
-    flex: 2,
     justifyContent: "space-between",
     minHeight: 48,
     ...DesignSystem.shadow.sm,
