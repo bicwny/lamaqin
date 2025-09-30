@@ -1016,6 +1016,7 @@ export default function PracticeConfigScreen() {
       backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
+      <View style={styles.contentWrapper}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
@@ -1060,6 +1061,7 @@ export default function PracticeConfigScreen() {
           : renderTimeBasedConfig()}
         {renderTimePlanning()}
         {renderSmartSummary()}
+      </View>
 
       {/* Project Selection Modal */}
       <Modal
@@ -1134,6 +1136,11 @@ export default function PracticeConfigScreen() {
 }
 
 const styles = StyleSheet.create({
+  contentWrapper: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
+  },
   section: componentHelpers.getCardWithBottomMargin(
     'outlined',
     'md',

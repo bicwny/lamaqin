@@ -150,7 +150,11 @@ export default function AddPracticeScreen() {
       backgroundVariant="dharma" // Red Tara background for practice energy & determination
       padding={0}
     >
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {renderPracticeSelector()}
       </ScrollView>
     </PageTemplate>
@@ -160,6 +164,11 @@ export default function AddPracticeScreen() {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   loadingContainer: {
     flex: 1,
