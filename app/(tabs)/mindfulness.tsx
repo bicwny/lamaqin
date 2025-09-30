@@ -135,7 +135,7 @@ export default function MindfulnessScreen() {
     return (
       <PageTemplate
         title="心性" 
-        subtitle="观察内心善恶念头"
+        subtitle="心性如虚空，妄念是彩虹"
         scrollable={false}
         backgroundColor={Colors.background}
       >
@@ -149,7 +149,7 @@ export default function MindfulnessScreen() {
   return (
     <PageTemplate
       title="心性" 
-      subtitle="观察内心善恶念头"
+      subtitle="心性如虚空，妄念是彩虹"
       scrollable={false}
       backgroundColor={Colors.background}
       padding={0}
