@@ -1,5 +1,6 @@
 import '../global.css';
 import { Stack } from 'expo-router';
+import Head from 'expo-router/head';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ActivityIndicator, View } from 'react-native';
@@ -54,17 +55,26 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="auth" options={{ headerShown: false }} />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
-      <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
-      <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
-      <Stack.Screen name="add-practice" options={{ headerShown: false }} />
-      <Stack.Screen name="practice-config" options={{ headerShown: false }} />
-      <Stack.Screen name="practice-history" options={{ headerShown: false }} />
-      <Stack.Screen name="meditation-history" options={{ headerShown: false }} />
-      <Stack.Screen name="lesson-viewer" options={{ headerShown: false }} />
+    <>
+      <Head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="三殊胜" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon.png" />
+      </Head>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
+        <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
+        <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
+        <Stack.Screen name="add-practice" options={{ headerShown: false }} />
+        <Stack.Screen name="practice-config" options={{ headerShown: false }} />
+        <Stack.Screen name="practice-history" options={{ headerShown: false }} />
+        <Stack.Screen name="meditation-history" options={{ headerShown: false }} />
+        <Stack.Screen name="lesson-viewer" options={{ headerShown: false }} />
       <Stack.Screen 
         name="modals/custom-record" 
         options={{ presentation: 'modal', headerShown: false }} 
@@ -86,7 +96,8 @@ function RootLayoutNav() {
         options={{ headerShown: false }} 
       />
       <Stack.Screen name="+not-found" />
-    </Stack>
+      </Stack>
+    </>
   );
 }
 

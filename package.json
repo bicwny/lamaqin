@@ -8,7 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "expo export -p web --output-dir dist-web",
+    "build:web": "expo export -p web --output-dir dist-web && node scripts/add-pwa-meta-tags.js",
     "serve": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
     "serve-dist": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
     "serve-web": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",

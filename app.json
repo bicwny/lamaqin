@@ -24,6 +24,7 @@
     },
     "web": {
       "bundler": "metro",
+      "output": "static",
       "fontDisplay": "swap",
       "display": "standalone",
       "name": "三殊胜",
