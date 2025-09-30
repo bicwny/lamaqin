@@ -426,7 +426,9 @@ const styles = StyleSheet.create({
     fontSize: DesignSystem.typography.fontSize.base,
   },
   listContainer: {
-    padding: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   practiceItem: {
     ...ComponentTokens.card.variants.outlined,

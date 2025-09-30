@@ -154,7 +154,7 @@ export default function MindfulnessScreen() {
       backgroundColor={Colors.background}
       padding={0}
     >
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 
       {timezoneInfo && (
         <Text style={styles.timezoneDisplay}>
@@ -233,7 +233,11 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 16,
+  },
+  scrollContent: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   loadingContainer: {
     flex: 1,
