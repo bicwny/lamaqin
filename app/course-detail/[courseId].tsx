@@ -132,7 +132,7 @@ export default function CourseDetailScreen() {
     }
   };
 
-  const recordStudy = async (lessonNumber: number, studyType: '听传承' | '看法本') => {
+  const recordStudy = async (lessonNumber: number, studyType: '听传承' | '看法本' | '共修' | '讲考') => {
     if (!user || !courseId) return;
 
     try {
@@ -242,42 +242,60 @@ export default function CourseDetailScreen() {
               />
             </View>
 
-            <View style={styles.recordButtons}>
-              <TouchableOpacity 
-                style={[styles.recordButton, styles.listenButton]}
-                onPress={() => recordStudy(lesson.lesson_number, '听传承')}
-              >
-                <Text style={styles.recordButtonText}>听传承</Text>
-              </TouchableOpacity>
+            <View style={styles.recordButtonsContainer}>
+              <View style={styles.recordButtonRow}>
+                <TouchableOpacity 
+                  style={[styles.recordButton, styles.listenButton]}
+                  onPress={() => recordStudy(lesson.lesson_number, '听传承')}
+                >
+                  <Text style={styles.recordButtonText}>听传承</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={[styles.recordButton, styles.readButton]}
-                onPress={() => recordStudy(lesson.lesson_number, '看法本')}
-              >
-                <Text style={styles.recordButtonText}>看法本</Text>
-              </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.recordButton, styles.readButton]}
+                  onPress={() => recordStudy(lesson.lesson_number, '看法本')}
+                >
+                  <Text style={styles.recordButtonText}>看法本</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={[styles.recordButton, styles.viewButton]}
-                onPress={() => {
-                  if (lesson.url) {
-                    Linking.openURL(lesson.url).catch(err => {
-                      console.error('Failed to open URL:', err);
-                      toastService.error({ 
-                        title: '无法打开链接', 
-                        message: '请检查网络连接或稍后重试' 
+                <TouchableOpacity 
+                  style={[styles.recordButton, styles.viewButton]}
+                  onPress={() => {
+                    if (lesson.url) {
+                      Linking.openURL(lesson.url).catch(err => {
+                        console.error('Failed to open URL:', err);
+                        toastService.error({ 
+                          title: '无法打开链接', 
+                          message: '请检查网络连接或稍后重试' 
+                        });
                       });
-                    });
-                  } else {
-                    toastService.info({ 
-                      title: '暂无在线链接', 
-                      message: '该课程资源正在准备中' 
-                    });
-                  }
-                }}
-              >
-                <Text style={styles.recordButtonText}>在线课程</Text>
-              </TouchableOpacity>
+                    } else {
+                      toastService.info({ 
+                        title: '暂无在线链接', 
+                        message: '该课程资源正在准备中' 
+                      });
+                    }
+                  }}
+                >
+                  <Text style={styles.recordButtonText}>在线课程</Text>
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.recordButtonRow}>
+                <TouchableOpacity 
+                  style={[styles.recordButton, styles.groupButton]}
+                  onPress={() => recordStudy(lesson.lesson_number, '共修')}
+                >
+                  <Text style={styles.recordButtonText}>共修</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.recordButton, styles.examButton]}
+                  onPress={() => recordStudy(lesson.lesson_number, '讲考')}
+                >
+                  <Text style={styles.recordButtonText}>讲考</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         ))}
@@ -373,6 +391,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  recordButtonsContainer: {
+    gap: 8,
+  },
+  recordButtonRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
   recordButtons: {
     flexDirection: 'row',
     gap: 10,
@@ -397,6 +422,12 @@ const styles = StyleSheet.create({
   },
   viewButton: {
     backgroundColor: '#F59E0B',
+  },
+  groupButton: {
+    backgroundColor: '#8B5CF6',
+  },
+  examButton: {
+    backgroundColor: '#EC4899',
   },
   recordButtonText: {
     color: '#fff',
