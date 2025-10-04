@@ -30,12 +30,14 @@ export default function MeditationRecordScreen() {
     practiceId, 
     practiceProjectId, 
     practiceName,
-    editRecordId 
+    editRecordId,
+    preselectedTopicNumber 
   } = useLocalSearchParams<{
     practiceId: string;
     practiceProjectId: string;
     practiceName: string;
     editRecordId?: string;
+    preselectedTopicNumber?: string;
   }>();
 
   const [duration, setDuration] = useState('');
@@ -72,7 +74,10 @@ export default function MeditationRecordScreen() {
       
       // Set initial selected topic
       if (topics.length > 0) {
-        const initialTopicNumber = parseInt(sessionNumber);
+        // If preselectedTopicNumber is provided, use it; otherwise use session number or default to first topic
+        const initialTopicNumber = preselectedTopicNumber 
+          ? parseInt(preselectedTopicNumber) 
+          : parseInt(sessionNumber);
         const initialTopic = topics.find(t => t.topic_number === initialTopicNumber) || topics[0];
         setSelectedTopic(initialTopic);
         setSessionNumber(initialTopic.topic_number.toString());

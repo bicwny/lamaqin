@@ -190,12 +190,12 @@ export default function PracticeScreen() {
     }
 
     if (project.practices.type === "time") {
-      // For meditation practices, navigate to the meditation record modal
+      // For meditation practices, navigate to history page to see all topics
       router.push({
-        pathname: "/modals/meditation-record",
+        pathname: "/meditation-history",
         params: {
-          practiceProjectId: projectId,
           practiceId: project.practice_id,
+          practiceProjectId: projectId,
           practiceName: practiceName,
         },
       });

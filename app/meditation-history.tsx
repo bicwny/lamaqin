@@ -451,7 +451,22 @@ export default function MeditationHistoryScreen() {
               </View>
 
               {topicStats.map((topic) => (
-                <View key={topic.id} style={styles.topicCard}>
+                <TouchableOpacity
+                  key={topic.id}
+                  style={styles.topicCard}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/modals/meditation-record',
+                      params: {
+                        practiceId,
+                        practiceProjectId,
+                        practiceName,
+                        preselectedTopicNumber: topic.topic_number.toString()
+                      }
+                    });
+                  }}
+                  activeOpacity={0.7}
+                >
                   <View style={styles.topicHeader}>
                     <Text style={styles.topicTitle}>{topic.title}</Text>
                     <Text style={styles.topicNumber}>第{topic.topic_number}修法</Text>
@@ -478,7 +493,7 @@ export default function MeditationHistoryScreen() {
                       {topic.description}
                     </Text>
                   )}
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )
