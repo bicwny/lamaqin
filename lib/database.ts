@@ -1177,15 +1177,33 @@ export const classCurriculumService = {
 
   async createPracticeProjectsForClass(userId: string, classId: string): Promise<void> {
     const requiredPractices = await this.getClassRequiredPractices(classId);
+    const now = new Date();
 
-    const projectsToCreate = requiredPractices.map(req => ({
-      user_id: userId,
-      practice_id: req.practice_id,
-      target_count: req.target_count,
-      daily_target: req.daily_target,
-      current_count: 0,
-      status: 'active' as const
-    }));
+    const projectsToCreate = requiredPractices.map(req => {
+      const baseProject = {
+        user_id: userId,
+        practice_id: req.practice_id,
+        target_count: req.target_count,
+        daily_target: req.daily_target,
+        current_count: 0,
+        status: 'active' as const,
+        start_date: now.toISOString().split('T')[0],
+      };
+
+      // Calculate end date for count-based practices with both target_count and daily_target
+      if (req.practice_category === 'count' && req.target_count && req.daily_target) {
+        const durationDays = Math.ceil(req.target_count / req.daily_target);
+        const endDate = new Date(now);
+        // Subtract 1 because start date is day 1 (inclusive)
+        endDate.setDate(endDate.getDate() + durationDays - 1);
+        return {
+          ...baseProject,
+          target_end_date: endDate.toISOString().split('T')[0],
+        };
+      }
+
+      return baseProject;
+    });
 
     if (projectsToCreate.length > 0) {
       const { error } = await supabase
