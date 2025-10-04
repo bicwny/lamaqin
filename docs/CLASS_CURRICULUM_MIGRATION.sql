@@ -367,9 +367,9 @@ FROM class_curricula cc CROSS JOIN practices p
 WHERE cc.class_name = '加行' AND p.name = '前行实修法'
 ON CONFLICT (class_id, practice_id) DO NOTHING;
 
--- 净土 count-based practice (南无阿弥陀佛 - 5000/day, no total limit)
-INSERT INTO class_required_practices (class_id, practice_id, daily_target, practice_category)
-SELECT cc.id, p.id, 5000, 'count'
+-- 净土 count-based practice (南无阿弥陀佛 - 6,000,000 total, 5000/day)
+INSERT INTO class_required_practices (class_id, practice_id, target_count, daily_target, practice_category)
+SELECT cc.id, p.id, 6000000, 5000, 'count'
 FROM class_curricula cc CROSS JOIN practices p
 WHERE cc.class_name = '净土' AND p.name = '南无阿弥陀佛'
 ON CONFLICT (class_id, practice_id) DO NOTHING;
