@@ -1113,6 +1113,19 @@ export const classCurriculumService = {
         overall_progress_percentage: 0
       });
 
+    // Auto-enroll user in required courses
+    const requiredCourses = await this.getClassRequiredCourses(classId);
+    for (const rc of requiredCourses) {
+      try {
+        await studyService.joinCourse(userId, rc.course_id);
+      } catch (err) {
+        // Ignore if already enrolled (duplicate key error)
+        if ((err as any)?.code !== '23505') {
+          console.error(`Failed to enroll in course ${rc.course_id}:`, err);
+        }
+      }
+    }
+
     return data;
   },
 
@@ -1244,6 +1257,25 @@ export const classCurriculumService = {
     }
 
     return updatedCount;
+  },
+
+  async syncUserCoursesWithClassRequirements(userId: string, classId: string): Promise<number> {
+    const requiredCourses = await this.getClassRequiredCourses(classId);
+    let enrolledCount = 0;
+
+    for (const rc of requiredCourses) {
+      try {
+        await studyService.joinCourse(userId, rc.course_id);
+        enrolledCount++;
+      } catch (err) {
+        // Ignore if already enrolled (duplicate key error)
+        if ((err as any)?.code !== '23505') {
+          console.error(`Failed to enroll in course ${rc.course_id}:`, err);
+        }
+      }
+    }
+
+    return enrolledCount;
   },
 
   async updateEnrollmentStatus(

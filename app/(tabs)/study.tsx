@@ -128,6 +128,22 @@ export default function StudyScreen() {
     try {
       console.log('🔄 Loading study data for user:', user.id);
 
+      // Auto-sync courses for enrolled classes
+      try {
+        const enrolledClasses = await classCurriculumService.getUserEnrolledClasses(user.id);
+        console.log('📚 Enrolled classes:', enrolledClasses.map(c => c.class_curriculum.class_name));
+        
+        for (const enrollment of enrolledClasses) {
+          if (enrollment.status === 'active') {
+            console.log(`🔄 Syncing courses for ${enrollment.class_curriculum.class_name}...`);
+            const count = await classCurriculumService.syncUserCoursesWithClassRequirements(user.id, enrollment.class_id);
+            console.log(`✅ Synced ${count} courses for ${enrollment.class_curriculum.class_name}`);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Failed to sync class courses:', err);
+      }
+
       // Load user's courses
       const userCoursesData = await getUserCourses(user.id);
       setUserCourses(userCoursesData);
