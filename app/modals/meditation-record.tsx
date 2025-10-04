@@ -66,15 +66,26 @@ export default function MeditationRecordScreen() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!loadingTopics && 
+        !isEditing && 
+        meditationTopics.length > 0 && 
+        !preselectedTopicNumber && 
+        !showTopicModal &&
+        !selectedTopic) {
+      console.log('🎯 Auto-showing topic modal for new record');
+      setShowTopicModal(true);
+    }
+  }, [loadingTopics, isEditing, meditationTopics.length, preselectedTopicNumber, showTopicModal, selectedTopic]);
+
   const loadMeditationTopics = async () => {
     try {
       console.log('🔄 Loading meditation topics for practice:', practiceId);
       const topics = await meditationService.getMeditationTopics(practiceId);
       setMeditationTopics(topics);
       
-      // Set initial selected topic
-      if (topics.length > 0) {
-        // If preselectedTopicNumber is provided, use it; otherwise use session number or default to first topic
+      // Set initial selected topic only if preselectedTopicNumber is provided or editing
+      if (topics.length > 0 && (preselectedTopicNumber || isEditing)) {
         const initialTopicNumber = preselectedTopicNumber 
           ? parseInt(preselectedTopicNumber) 
           : parseInt(sessionNumber);
@@ -180,8 +191,20 @@ export default function MeditationRecordScreen() {
   };
 
   const handleTopicSelect = (topic: { topic_number: number; title: string; description?: string }) => {
+    console.log('✅ Topic selected:', topic.title);
     setSelectedTopic(topic);
     setSessionNumber(topic.topic_number.toString());
+    // Close the modal directly without going through handleTopicModalClose
+    setShowTopicModal(false);
+  };
+
+  const handleTopicModalClose = () => {
+    if (!selectedTopic && !isEditing && meditationTopics.length > 0) {
+      console.log('🔙 No topic selected on new record with topics - navigating back');
+      handleClose();
+    } else {
+      setShowTopicModal(false);
+    }
   };
 
   const handleClose = () => {
@@ -258,24 +281,25 @@ export default function MeditationRecordScreen() {
               </View>
 
               {/* Topic Selection - only show if there are topics or still loading */}
-              {(loadingTopics || meditationTopics.length > 0) && (
+              {loadingTopics ? (
                 <View style={styles.inputSection}>
                   <Text style={styles.inputLabel}>选择观修内容</Text>
-                  {loadingTopics ? (
-                    <ActivityIndicator style={styles.loadingIndicator} />
-                  ) : meditationTopics.length > 0 ? (
+                  <ActivityIndicator style={styles.loadingIndicator} />
+                </View>
+              ) : selectedTopic && meditationTopics.length > 0 ? (
+                <View style={styles.inputSection}>
+                  <Text style={styles.inputLabel}>观修内容</Text>
+                  <View style={styles.topicDisplayContainer}>
+                    <Text style={styles.topicDisplayText}>{selectedTopic.title}</Text>
                     <TouchableOpacity
-                      style={styles.topicSelector}
+                      style={styles.changeTopicButton}
                       onPress={() => setShowTopicModal(true)}
                     >
-                      <Text style={styles.topicSelectorText}>
-                        {selectedTopic ? selectedTopic.title : '请选择观修内容'}
-                      </Text>
-                      <Text style={styles.topicSelectorArrow}>›</Text>
+                      <Text style={styles.changeTopicButtonText}>更改</Text>
                     </TouchableOpacity>
-                  ) : null}
+                  </View>
                 </View>
-              )}
+              ) : null}
 
               {/* Reflection Input */}
               <View style={styles.inputSection}>
@@ -306,7 +330,7 @@ export default function MeditationRecordScreen() {
       {/* Topic Selection Modal - Outside of KeyboardAvoidingView for proper web interaction */}
       <TopicSelectionModal
         visible={showTopicModal}
-        onClose={() => setShowTopicModal(false)}
+        onClose={handleTopicModalClose}
         onSelect={handleTopicSelect}
         topics={meditationTopics}
         selectedTopicNumber={selectedTopic?.topic_number}
@@ -429,6 +453,35 @@ const styles = StyleSheet.create({
     ...createStyles.buttonText('primary'),
     color: DesignSystem.colors.textInverse,
     fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+  },
+  topicDisplayContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  topicDisplayText: {
+    ...createStyles.body('base'),
+    flex: 1,
+    color: DesignSystem.colors.textPrimary,
+  },
+  changeTopicButton: {
+    paddingVertical: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.primary,
+    borderRadius: DesignSystem.borderRadius.sm,
+    marginLeft: DesignSystem.spacing.md,
+  },
+  changeTopicButtonText: {
+    ...createStyles.buttonText('primary'),
+    color: DesignSystem.colors.textInverse,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
 });

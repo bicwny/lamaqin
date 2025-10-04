@@ -54,7 +54,7 @@ export default function TopicSelectionModal({
   const handleTopicSelect = (topic: MeditationTopic) => {
     console.log('🟢 handleTopicSelect called with topic:', topic.title);
     onSelect(topic);
-    onClose();
+    // Don't call onClose() here - let the parent handle closing after state updates
   };
 
   const renderTopicItem = ({ item }: { item: MeditationTopic }) => {
