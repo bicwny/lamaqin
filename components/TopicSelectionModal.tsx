@@ -96,68 +96,79 @@ export default function TopicSelectionModal({
       statusBarTranslucent={false}
       transparent={false}
     >
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
-            <Text style={styles.cancelButtonText}>取消</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>选择观修内容</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-
-        {/* Search Input */}
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="搜索观修内容..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoCapitalize="none"
-            clearButtonMode="while-editing"
-            editable={true}
-            autoFocus={false}
-            selectTextOnFocus={true}
-            blurOnSubmit={false}
-            returnKeyType="search"
-          />
-        </View>
-
-        {/* Content */}
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>加载观修内容中...</Text>
+      <TouchableOpacity 
+        style={styles.modalOverlay} 
+        activeOpacity={1}
+        onPress={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <SafeAreaView style={styles.container}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
+              <Text style={styles.cancelButtonText}>取消</Text>
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>选择观修内容</Text>
+            <View style={styles.headerSpacer} />
           </View>
-        ) : (
-          <ScrollView 
-            style={styles.topicsList}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="on-drag"
-          >
-            {filteredTopics.map((item, index) => (
-              <View key={item.topic_number.toString()}>
-                {renderTopicItem({ item })}
-                {index < filteredTopics.length - 1 && <View style={styles.separator} />}
-              </View>
-            ))}
-          </ScrollView>
-        )}
 
-        {/* Empty State */}
-        {!loading && filteredTopics.length === 0 && searchQuery.length > 0 && (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>未找到匹配的观修内容</Text>
-            <Text style={styles.emptySubtext}>请尝试其他关键词</Text>
+          {/* Search Input */}
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="搜索观修内容..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoCapitalize="none"
+              clearButtonMode="while-editing"
+              editable={true}
+              autoFocus={false}
+              selectTextOnFocus={true}
+              blurOnSubmit={false}
+              returnKeyType="search"
+            />
           </View>
-        )}
-      </SafeAreaView>
+
+          {/* Content */}
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+              <Text style={styles.loadingText}>加载观修内容中...</Text>
+            </View>
+          ) : (
+            <ScrollView 
+              style={styles.topicsList}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+            >
+              {filteredTopics.map((item, index) => (
+                <View key={item.topic_number.toString()}>
+                  {renderTopicItem({ item })}
+                  {index < filteredTopics.length - 1 && <View style={styles.separator} />}
+                </View>
+              ))}
+            </ScrollView>
+          )}
+
+          {/* Empty State */}
+          {!loading && filteredTopics.length === 0 && searchQuery.length > 0 && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>未找到匹配的观修内容</Text>
+              <Text style={styles.emptySubtext}>请尝试其他关键词</Text>
+            </View>
+          )}
+        </SafeAreaView>
+      </TouchableOpacity>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
