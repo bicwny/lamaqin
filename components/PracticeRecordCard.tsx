@@ -27,6 +27,7 @@ interface PracticeRecordCardProps {
   onEdit?: () => void;
   onDelete?: () => void;
   showActions?: boolean;
+  hasTopics?: boolean;
 }
 
 export default function PracticeRecordCard({
@@ -39,6 +40,7 @@ export default function PracticeRecordCard({
   onEdit,
   onDelete,
   showActions = false,
+  hasTopics = false,
 }: PracticeRecordCardProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -60,11 +62,19 @@ export default function PracticeRecordCard({
 
   const renderRecordContent = () => {
     if (practiceType === "time") {
-      return (
-        <Text style={styles.recordCount}>
-          第{record.session_number || 1}座 · {record.duration_minutes}分钟
-        </Text>
-      );
+      if (hasTopics) {
+        return (
+          <Text style={styles.recordCount}>
+            第{record.session_number || 1}座 · {record.duration_minutes}分钟
+          </Text>
+        );
+      } else {
+        return (
+          <Text style={styles.recordCount}>
+            {record.duration_minutes}分钟
+          </Text>
+        );
+      }
     } else {
       return (
         <Text style={styles.recordCount}>

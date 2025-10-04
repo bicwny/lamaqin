@@ -82,6 +82,7 @@ export default function PracticeDetailScreen() {
   const [todayRecords, setTodayRecords] = useState<MeditationRecord[]>([]);
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
   const [practiceRecords, setPracticeRecords] = useState<any[]>([]);
+  const [hasMeditationTopics, setHasMeditationTopics] = useState(false);
 
   useEffect(() => {
     if (user && practiceId) {
@@ -164,6 +165,15 @@ export default function PracticeDetailScreen() {
     if (!user?.id) return;
 
     try {
+      // Check if practice has meditation topics
+      const { data: topicsData, error: topicsError } = await supabase
+        .from("meditation_topics")
+        .select("id")
+        .eq("practice_id", projectData.practice_id)
+        .limit(1);
+      
+      setHasMeditationTopics((topicsData && topicsData.length > 0) || false);
+
       const today = new Date().toISOString().split("T")[0];
 
       // Get today's records
@@ -363,6 +373,7 @@ export default function PracticeDetailScreen() {
           practiceType="time"
           practiceUnit={project.practices.unit}
           isLast={index === recentRecords.length - 1}
+          hasTopics={hasMeditationTopics}
           onPress={() =>
             router.push({
               pathname: "/meditation-detail/[recordId]",
