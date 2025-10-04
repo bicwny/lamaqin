@@ -88,6 +88,50 @@ All practices require 100,000 repetitions with specific daily targets:
 
 ---
 
+## 3.2. 净土 (Pure Land) Requirements
+
+### Course Requirements
+**6 courses, 161 total lessons:**
+
+| Course | Lessons |
+|--------|---------|
+| 佛说阿弥陀经释 (Amitabha Sutra Commentary) | 4 |
+| 普贤行愿品释 (Samantabhadra's Aspiration Commentary) | 12 |
+| 亲友书讲记 (Letter to a Friend) | 20 |
+| 藏传净土法 (Tibetan Pure Land Practice) | 104 |
+| 修心利刃轮释 (Wheel of Sharp Weapons Commentary) | 20 |
+| 愿海精髓讲记 (Ocean of Aspiration Essence) | 1 |
+| **Total** | **161** |
+
+**Study Types (same as all classes):**
+- **Required (for completion):** 听上师传承 + 看法本
+- **Optional (status tracking):** 共修 + 讲考 (参加/缺席)
+
+### Count-Based Practice (1 practice)
+**南无阿弥陀佛** (Amitabha Buddha Name Recitation)
+- **Daily target:** 5,000 repetitions
+- **No total count limit** - ongoing daily practice
+
+---
+
+## 3.3. Global Study Type Rules
+
+**Unless otherwise specified, all lessons in all classes follow this pattern:**
+
+### Required Study Types (for lesson completion):
+- ✓ 听上师传承 (Listen to master's transmission) ×1
+- ✓ 看法本 (Read dharma text) ×1
+
+### Optional Administrative Records (status tracking):
+- ⊙ 共修 (Group study): 参加 (attended) OR 缺席 (absent)
+- ⊙ 讲考 (Teaching exam): 参加 (attended) OR 缺席 (absent)
+
+**UX Implementation:**
+- Required types: Checkboxes (must complete both for lesson to count as "done")
+- Optional status: Dropdowns/radio buttons (for administrative record, doesn't affect progress)
+
+---
+
 ## 4. Database Schema Design
 
 ### New Tables
