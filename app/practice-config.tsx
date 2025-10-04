@@ -269,8 +269,13 @@ export default function PracticeConfigScreen() {
         setSuggestedDaily(suggested);
       } else if (configMode === "daily" && dailyTarget) {
         const daily = parseInt(dailyTarget);
-        const projected = daily * days;
-        setProjectedTotal(projected);
+        // If there's a fixed target_count, use it instead of calculating
+        if (totalTarget && parseInt(totalTarget) > 0) {
+          setProjectedTotal(parseInt(totalTarget));
+        } else {
+          const projected = daily * days;
+          setProjectedTotal(projected);
+        }
       }
     }
   };
