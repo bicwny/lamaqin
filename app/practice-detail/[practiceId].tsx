@@ -444,7 +444,22 @@ export default function PracticeDetailScreen() {
         .join("；");
 
       if (isTimeBasedWeekly) {
-        return null;
+        const weeklyCount = weeklyRecords.length;
+        const weeklyTarget = project.daily_target;
+        const totalDone = project.current_count;
+        const totalTarget = project.target_count;
+
+        return (
+          <View style={styles.progressDetails}>
+            <Text style={styles.progressText}>
+              {totalDone}/{totalTarget}座
+            </Text>
+            <Text style={styles.dailyTargetText}>
+              本周：{weeklyCount}/{weeklyTarget}座
+              {weeklyCount >= weeklyTarget ? " ✅" : ""}
+            </Text>
+          </View>
+        );
       } else {
         return (
           <View style={styles.progressDetails}>
