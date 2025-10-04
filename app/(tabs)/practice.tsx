@@ -266,7 +266,7 @@ export default function PracticeScreen() {
           <View style={styles.progressInfo}>
             <Text style={styles.progressText}>
               {progress.current.toLocaleString()}/
-              {progress.target.toLocaleString()} {item.practices.unit}
+              {progress.target.toLocaleString()} {item.practices.type === 'time' ? '座' : item.practices.unit}
             </Text>
           </View>
           <View style={styles.progressBarContainer}>
