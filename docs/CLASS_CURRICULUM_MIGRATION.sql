@@ -212,7 +212,7 @@ ON CONFLICT (name) DO NOTHING;
 -- ============================================
 
 -- First, deduplicate practices table by keeping the first occurrence
--- Step 1: Update references to duplicates
+-- Step 1: Update references to duplicates in daily_records
 WITH duplicates AS (
   SELECT id, name, 
          ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
@@ -227,10 +227,50 @@ practices_to_remove AS (
   JOIN practices_to_keep k ON d.name = k.name
   WHERE d.rn > 1
 )
-UPDATE practice_records pr
+UPDATE daily_records dr
 SET practice_id = ptr.new_id
 FROM practices_to_remove ptr
-WHERE pr.practice_id = ptr.old_id;
+WHERE dr.practice_id = ptr.old_id;
+
+-- Update references in meditation_records
+WITH duplicates AS (
+  SELECT id, name, 
+         ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
+  FROM practices
+),
+practices_to_keep AS (
+  SELECT id, name FROM duplicates WHERE rn = 1
+),
+practices_to_remove AS (
+  SELECT d.id as old_id, k.id as new_id 
+  FROM duplicates d
+  JOIN practices_to_keep k ON d.name = k.name
+  WHERE d.rn > 1
+)
+UPDATE meditation_records mr
+SET practice_id = ptr.new_id
+FROM practices_to_remove ptr
+WHERE mr.practice_id = ptr.old_id;
+
+-- Update references in user_practice_projects
+WITH duplicates AS (
+  SELECT id, name, 
+         ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
+  FROM practices
+),
+practices_to_keep AS (
+  SELECT id, name FROM duplicates WHERE rn = 1
+),
+practices_to_remove AS (
+  SELECT d.id as old_id, k.id as new_id 
+  FROM duplicates d
+  JOIN practices_to_keep k ON d.name = k.name
+  WHERE d.rn > 1
+)
+UPDATE user_practice_projects upp
+SET practice_id = ptr.new_id
+FROM practices_to_remove ptr
+WHERE upp.practice_id = ptr.old_id;
 
 -- Step 2: Delete duplicate practices
 WITH duplicates AS (
