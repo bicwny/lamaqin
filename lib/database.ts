@@ -1181,8 +1181,8 @@ export const classCurriculumService = {
     const projectsToCreate = requiredPractices.map(req => ({
       user_id: userId,
       practice_id: req.practice_id,
-      target_count: req.target_count || 0,
-      daily_target: req.daily_target || 0,
+      target_count: req.target_count,
+      daily_target: req.daily_target,
       current_count: 0,
       status: 'active' as const
     }));
@@ -1194,6 +1194,38 @@ export const classCurriculumService = {
 
       if (error) throw error;
     }
+  },
+
+  async syncPracticeProjectsWithClassRequirements(userId: string, classId: string): Promise<number> {
+    const requiredPractices = await this.getClassRequiredPractices(classId);
+    
+    let updatedCount = 0;
+
+    for (const req of requiredPractices) {
+      const { data: existingProject } = await supabase
+        .from('user_practice_projects')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('practice_id', req.practice_id)
+        .eq('status', 'active')
+        .single();
+
+      if (existingProject && (existingProject.target_count === 0 || existingProject.target_count === null)) {
+        const { error } = await supabase
+          .from('user_practice_projects')
+          .update({
+            target_count: req.target_count,
+            daily_target: req.daily_target
+          })
+          .eq('id', existingProject.id);
+
+        if (!error) {
+          updatedCount++;
+        }
+      }
+    }
+
+    return updatedCount;
   },
 
   async updateEnrollmentStatus(
