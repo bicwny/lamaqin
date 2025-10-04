@@ -288,7 +288,9 @@ export default function CourseDetailScreen() {
                 >
                   <Text style={styles.primaryButtonText}>看法本</Text>
                 </TouchableOpacity>
-
+              </View>
+              
+              <View style={styles.recordButtonRow}>
                 <TouchableOpacity 
                   style={[styles.recordButton, styles.secondaryButton, styles.viewButton]}
                   onPress={() => {
@@ -310,9 +312,7 @@ export default function CourseDetailScreen() {
                 >
                   <Text style={[styles.secondaryButtonText, styles.viewButtonText]}>在线课程</Text>
                 </TouchableOpacity>
-              </View>
-              
-              <View style={styles.recordButtonRow}>
+
                 <TouchableOpacity 
                   style={[styles.recordButton, styles.secondaryButton, styles.groupButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '共修')}
