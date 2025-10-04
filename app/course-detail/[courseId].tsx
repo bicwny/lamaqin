@@ -292,7 +292,7 @@ export default function CourseDetailScreen() {
               
               <View style={styles.recordButtonRow}>
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.secondaryButton, styles.viewButton]}
+                  style={[styles.recordButton, styles.secondaryButton]}
                   onPress={() => {
                     if (lesson.url) {
                       Linking.openURL(lesson.url).catch(err => {
@@ -310,21 +310,21 @@ export default function CourseDetailScreen() {
                     }
                   }}
                 >
-                  <Text style={[styles.secondaryButtonText, styles.viewButtonText]}>在线课程</Text>
+                  <Text style={styles.secondaryButtonText}>在线课程</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.secondaryButton, styles.groupButton]}
+                  style={[styles.recordButton, styles.secondaryButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '共修')}
                 >
-                  <Text style={[styles.secondaryButtonText, styles.groupButtonText]}>共修</Text>
+                  <Text style={styles.secondaryButtonText}>共修</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.secondaryButton, styles.examButton]}
+                  style={[styles.recordButton, styles.secondaryButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '讲考')}
                 >
-                  <Text style={[styles.secondaryButtonText, styles.examButtonText]}>讲考</Text>
+                  <Text style={styles.secondaryButtonText}>讲考</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -491,21 +491,13 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
+    borderColor: '#6B7280',
   },
   listenButton: {
     backgroundColor: '#10B981',
   },
   readButton: {
     backgroundColor: DesignSystem.colors.primary,
-  },
-  viewButton: {
-    borderColor: '#F59E0B',
-  },
-  groupButton: {
-    borderColor: '#8B5CF6',
-  },
-  examButton: {
-    borderColor: '#EC4899',
   },
   primaryButtonText: {
     color: '#fff',
@@ -517,15 +509,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: -0.2,
-  },
-  viewButtonText: {
-    color: '#F59E0B',
-  },
-  groupButtonText: {
-    color: '#8B5CF6',
-  },
-  examButtonText: {
-    color: '#EC4899',
+    color: '#6B7280',
   },
   recordButtonText: {
     color: '#fff',
