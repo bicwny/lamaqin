@@ -16,7 +16,7 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
   refreshTrigger?: number;
   showOnlyIcon?: boolean;
 }) => {
-  const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0 });
+  const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0, 共修: 0, 讲考: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +26,12 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
   const loadCounts = async () => {
     try {
       const summary = await studyService.getLessonStudySummary(userId, courseId, lessonId);
-      setCounts({ 听传承: summary.听传承, 看法本: summary.看法本 });
+      setCounts({ 
+        听传承: summary.听传承, 
+        看法本: summary.看法本,
+        共修: summary.共修,
+        讲考: summary.讲考
+      });
     } catch (error) {
       console.error('Error loading lesson counts:', error);
     } finally {
@@ -51,6 +56,13 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
       <Text style={styles.lessonProgress}>
         听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
       </Text>
+      {(counts.共修 > 0 || counts.讲考 > 0) && (
+        <Text style={[styles.lessonProgress, { fontSize: 12, color: '#666', marginTop: 2 }]}>
+          {counts.共修 > 0 && `共修: ${counts.共修}次`}
+          {counts.共修 > 0 && counts.讲考 > 0 && ' | '}
+          {counts.讲考 > 0 && `讲考: ${counts.讲考}次`}
+        </Text>
+      )}
     </View>
   );
 };

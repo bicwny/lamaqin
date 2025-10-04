@@ -906,18 +906,22 @@ export const studyService = {
     const summary = {
       听传承: 0,
       看法本: 0,
-      details: [] as Array<{ date: string; type: '听传承' | '看法本'; count: number }>
+      共修: 0,
+      讲考: 0,
+      details: [] as Array<{ date: string; type: '听传承' | '看法本' | '共修' | '讲考'; count: number }>
     };
 
     records.forEach(record => {
       // Each record represents one instance of study
-      const studyType = record.study_type as '听传承' | '看法本';
-      summary[studyType] += 1; // Count each record as one instance
-      summary.details.push({
-        date: record.study_date,
-        type: studyType,
-        count: 1
-      });
+      const studyType = record.study_type as '听传承' | '看法本' | '共修' | '讲考';
+      if (studyType) {
+        summary[studyType] += 1; // Count each record as one instance
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          count: 1
+        });
+      }
     });
 
     return summary;
