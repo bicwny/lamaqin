@@ -125,10 +125,16 @@ export default function PracticeConfigScreen() {
   // Time planning
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [customEndDate, setCustomEndDate] = useState(
-    new Date(new Date().getTime() + 60 * 24 * 60 * 60 * 1000),
-  ); // Default to 60 days from now
+    isEditMode && currentEndDate 
+      ? new Date(currentEndDate)
+      : new Date(new Date().getTime() + 60 * 24 * 60 * 60 * 1000),
+  );
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
-  const [customDays, setCustomDays] = useState("60"); // Default to 60 days
+  const [customDays, setCustomDays] = useState(
+    isEditMode && currentEndDate && currentStartDate 
+      ? Math.ceil((new Date(currentEndDate).getTime() - new Date(currentStartDate).getTime()) / (1000 * 60 * 60 * 24)).toString()
+      : "60"
+  );
 
   // Calculated values
   const [suggestedDaily, setSuggestedDaily] = useState(0);
