@@ -194,7 +194,7 @@ export default function PracticeScreen() {
       router.push({
         pathname: "/modals/meditation-record",
         params: {
-          projectId: projectId,
+          practiceProjectId: projectId,
           practiceId: project.practice_id,
           practiceName: practiceName,
         },
