@@ -90,19 +90,13 @@ export default function TopicSelectionModal({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle="fullScreen"
       onRequestClose={onClose}
       supportedOrientations={['portrait']}
       statusBarTranslucent={false}
       transparent={false}
     >
-      <TouchableOpacity 
-        style={styles.modalOverlay} 
-        activeOpacity={1}
-        onPress={(e) => {
-          e.stopPropagation();
-        }}
-      >
+      <View style={styles.modalOverlay}>
         <SafeAreaView style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
@@ -160,7 +154,7 @@ export default function TopicSelectionModal({
             </View>
           )}
         </SafeAreaView>
-      </TouchableOpacity>
+      </View>
     </Modal>
   );
 }
