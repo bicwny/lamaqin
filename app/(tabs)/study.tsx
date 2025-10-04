@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList, Linking, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { studyService } from '@/lib/database';
+import { studyService, classCurriculumService } from '@/lib/database';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { DesignSystem } from '@/constants/DesignSystem';
