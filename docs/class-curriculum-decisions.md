@@ -82,8 +82,8 @@ All practices require 100,000 repetitions with specific daily targets:
 
 ### Session-Based Practice
 **前行实修法** (Foundational Practice Sessions)
-- **Total sessions:** 92
-- **Frequency:** 4 sessions per week (23 weeks)
+- **Total sessions:** 724
+- **Frequency:** 4 sessions per week (181 weeks)
 - **Duration:** Minimum 30 minutes per session
 
 ---

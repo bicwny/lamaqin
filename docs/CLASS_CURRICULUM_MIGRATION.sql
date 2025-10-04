@@ -360,9 +360,9 @@ FROM class_curricula cc CROSS JOIN practices p
 WHERE cc.class_name = '加行' AND p.name = '莲师上师瑜伽'
 ON CONFLICT (class_id, practice_id) DO NOTHING;
 
--- 加行 session-based practice (92 sessions, 4/week, 30min minimum)
+-- 加行 session-based practice (724 sessions, 4/week for 181 weeks, 30min minimum)
 INSERT INTO class_required_practices (class_id, practice_id, total_sessions, weekly_sessions, min_duration_minutes, practice_category)
-SELECT cc.id, p.id, 92, 4, 30, 'session'
+SELECT cc.id, p.id, 724, 4, 30, 'session'
 FROM class_curricula cc CROSS JOIN practices p
 WHERE cc.class_name = '加行' AND p.name = '前行实修法'
 ON CONFLICT (class_id, practice_id) DO NOTHING;
