@@ -190,9 +190,9 @@ export default function PracticeScreen() {
     }
 
     if (project.practices.type === "time") {
-      // For meditation practices, navigate to history page to see all topics
+      // For time-based practices, open meditation record modal directly
       router.push({
-        pathname: "/meditation-history",
+        pathname: "/modals/meditation-record",
         params: {
           practiceId: project.practice_id,
           practiceProjectId: projectId,
