@@ -11,6 +11,7 @@ import {
   Modal,
   SafeAreaView,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
@@ -86,19 +87,10 @@ export default function TopicSelectionModal({
     );
   };
 
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-      supportedOrientations={['portrait']}
-      statusBarTranslucent={false}
-      transparent={false}
-    >
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
+  const modalContent = (
+    <>
+      {/* Header */}
+      <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
             <Text style={styles.cancelButtonText}>取消</Text>
           </TouchableOpacity>
@@ -152,17 +144,53 @@ export default function TopicSelectionModal({
             <Text style={styles.emptySubtext}>请尝试其他关键词</Text>
           </View>
         )}
+    </>
+  );
+
+  if (Platform.OS === 'web') {
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={onClose}
+        transparent={false}
+      >
+        <View style={styles.webModalWrapper} pointerEvents="box-none">
+          <SafeAreaView style={styles.container} pointerEvents="auto">
+            {modalContent}
+          </SafeAreaView>
+        </View>
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+      supportedOrientations={['portrait']}
+      statusBarTranslucent={false}
+      transparent={false}
+    >
+      <SafeAreaView style={styles.container}>
+        {modalContent}
       </SafeAreaView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  webModalWrapper: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
-    zIndex: 9999,
-    position: 'relative',
   },
   header: {
     flexDirection: 'row',
@@ -173,10 +201,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
+    zIndex: 10,
   },
   cancelButton: {
     paddingVertical: 8,
     paddingHorizontal: 4,
+    cursor: Platform.OS === 'web' ? 'pointer' : undefined,
   },
   cancelButtonText: {
     color: Colors.primary,
@@ -211,6 +241,7 @@ const styles = StyleSheet.create({
   topicsList: {
     flex: 1,
     backgroundColor: 'white',
+    zIndex: 1,
   },
   topicItem: {
     flexDirection: 'row',
@@ -220,7 +251,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: 'white',
     minHeight: 56,
-    zIndex: 1,
+    cursor: Platform.OS === 'web' ? 'pointer' : undefined,
   },
   selectedTopicItem: {
     backgroundColor: '#f0f8ff',
