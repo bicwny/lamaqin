@@ -642,8 +642,9 @@ export const studyService = {
     course_id: string;
     lesson_number: number;
     study_date: string;
-    study_type: '听传承' | '看法本';
+    study_type: '听传承' | '看法本' | '共修' | '讲考';
     study_count_for_lesson: number;
+    status?: '参加' | '缺席';  // Only used for 共修/讲考
   }) {
     try {
       // First, get the lesson record - handle potential duplicates by taking the first one
@@ -665,7 +666,32 @@ export const studyService = {
 
       const lesson = lessons[0]; // Take the first lesson if there are duplicates
 
-      const studyRecord = {
+      // For 共修/讲考, check if a record already exists and update it
+      if (record.study_type === '共修' || record.study_type === '讲考') {
+        const { data: existing } = await supabase
+          .from('study_records')
+          .select('id')
+          .eq('user_id', record.user_id)
+          .eq('lesson_id', lesson.id)
+          .eq('study_type', record.study_type)
+          .maybeSingle();
+
+        if (existing) {
+          // Update existing record with new status
+          const { data, error } = await supabase
+            .from('study_records')
+            .update({ status: record.status })
+            .eq('id', existing.id)
+            .select()
+            .single();
+
+          if (error) throw error;
+          return data;
+        }
+      }
+
+      // Insert new record
+      const studyRecord: any = {
         user_id: record.user_id,
         course_id: record.course_id,
         lesson_id: lesson.id,
@@ -673,6 +699,11 @@ export const studyService = {
         study_type: record.study_type,
         study_count_for_lesson: record.study_count_for_lesson
       };
+
+      // Add status for 共修/讲考
+      if (record.study_type === '共修' || record.study_type === '讲考') {
+        studyRecord.status = record.status;
+      }
 
       const { data, error } = await supabase
         .from('study_records')
@@ -685,8 +716,10 @@ export const studyService = {
         throw error;
       }
 
-      // Update progress after recording
-      await this.calculateProgress(record.user_id, record.course_id);
+      // Update progress after recording (only for required types)
+      if (record.study_type === '听传承' || record.study_type === '看法本') {
+        await this.calculateProgress(record.user_id, record.course_id);
+      }
 
       return data;
     } catch (err) {
@@ -894,7 +927,7 @@ export const studyService = {
   async getLessonStudySummary(userId: string, courseId: string, lessonId: string) {
     const { data, error } = await supabase
       .from('study_records')
-      .select('study_type, study_count_for_lesson, study_date')
+      .select('study_type, study_count_for_lesson, study_date, status')
       .eq('user_id', userId)
       .eq('course_id', courseId)
       .eq('lesson_id', lessonId)
@@ -906,20 +939,41 @@ export const studyService = {
     const summary = {
       听传承: 0,
       看法本: 0,
-      共修: 0,
-      讲考: 0,
-      details: [] as Array<{ date: string; type: '听传承' | '看法本' | '共修' | '讲考'; count: number }>
+      共修: null as '参加' | '缺席' | null,
+      讲考: null as '参加' | '缺席' | null,
+      details: [] as Array<{ date: string; type: string; count?: number; status?: '参加' | '缺席' }>
     };
 
     records.forEach(record => {
-      // Each record represents one instance of study
-      const studyType = record.study_type as '听传承' | '看法本' | '共修' | '讲考';
-      if (studyType) {
-        summary[studyType] += 1; // Count each record as one instance
+      const studyType = record.study_type;
+      
+      if (studyType === '听传承') {
+        summary.听传承 += 1;
         summary.details.push({
           date: record.study_date,
           type: studyType,
           count: 1
+        });
+      } else if (studyType === '看法本') {
+        summary.看法本 += 1;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          count: 1
+        });
+      } else if (studyType === '共修') {
+        summary.共修 = record.status as '参加' | '缺席' | null;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          status: record.status as '参加' | '缺席'
+        });
+      } else if (studyType === '讲考') {
+        summary.讲考 = record.status as '参加' | '缺席' | null;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          status: record.status as '参加' | '缺席'
         });
       }
     });

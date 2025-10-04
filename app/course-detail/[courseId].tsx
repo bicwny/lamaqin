@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,7 +16,12 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
   refreshTrigger?: number;
   showOnlyIcon?: boolean;
 }) => {
-  const [counts, setCounts] = useState({ 听传承: 0, 看法本: 0, 共修: 0, 讲考: 0 });
+  const [summary, setSummary] = useState({ 
+    听传承: 0, 
+    看法本: 0, 
+    共修: null as '参加' | '缺席' | null, 
+    讲考: null as '参加' | '缺席' | null 
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,13 +30,8 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
 
   const loadCounts = async () => {
     try {
-      const summary = await studyService.getLessonStudySummary(userId, courseId, lessonId);
-      setCounts({ 
-        听传承: summary.听传承, 
-        看法本: summary.看法本,
-        共修: summary.共修,
-        讲考: summary.讲考
-      });
+      const data = await studyService.getLessonStudySummary(userId, courseId, lessonId);
+      setSummary(data);
     } catch (error) {
       console.error('Error loading lesson counts:', error);
     } finally {
@@ -43,7 +43,7 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
     return <Text style={styles.lessonProgress}>加载中...</Text>;
   }
 
-  const isCompleted = counts.听传承 > 0 && counts.看法本 > 0;
+  const isCompleted = summary.听传承 > 0 && summary.看法本 > 0;
 
   if (showOnlyIcon) {
     return isCompleted ? (
@@ -54,13 +54,13 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
   return (
     <View style={styles.lessonProgressContainer}>
       <Text style={styles.lessonProgress}>
-        听传承: {counts.听传承}次 | 看法本: {counts.看法本}次
+        听传承: {summary.听传承}次 | 看法本: {summary.看法本}次
       </Text>
-      {(counts.共修 > 0 || counts.讲考 > 0) && (
+      {(summary.共修 || summary.讲考) && (
         <Text style={[styles.lessonProgress, { fontSize: 12, color: '#666', marginTop: 2 }]}>
-          {counts.共修 > 0 && `共修: ${counts.共修}次`}
-          {counts.共修 > 0 && counts.讲考 > 0 && ' | '}
-          {counts.讲考 > 0 && `讲考: ${counts.讲考}次`}
+          {summary.共修 && `共修: ${summary.共修}`}
+          {summary.共修 && summary.讲考 && ' | '}
+          {summary.讲考 && `讲考: ${summary.讲考}`}
         </Text>
       )}
     </View>
@@ -144,8 +144,18 @@ export default function CourseDetailScreen() {
     }
   };
 
-  const recordStudy = async (lessonNumber: number, studyType: '听传承' | '看法本' | '共修' | '讲考') => {
+  const [statusPickerVisible, setStatusPickerVisible] = useState(false);
+  const [pendingRecord, setPendingRecord] = useState<{ lessonNumber: number; studyType: '共修' | '讲考' } | null>(null);
+
+  const recordStudy = async (lessonNumber: number, studyType: '听传承' | '看法本' | '共修' | '讲考', status?: '参加' | '缺席') => {
     if (!user || !courseId) return;
+
+    // For 共修/讲考, show status picker if no status provided
+    if ((studyType === '共修' || studyType === '讲考') && !status) {
+      setPendingRecord({ lessonNumber, studyType });
+      setStatusPickerVisible(true);
+      return;
+    }
 
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -156,12 +166,13 @@ export default function CourseDetailScreen() {
         lesson_number: lessonNumber,
         study_date: today,
         study_type: studyType,
-        study_count_for_lesson: 1
+        study_count_for_lesson: 1,
+        status: status  // Only used for 共修/讲考
       });
 
       toastService.success({
         title: '学习记录已保存',
-        message: `${studyType}完成 - 继续加油！`
+        message: status ? `${studyType}: ${status}` : `${studyType}完成 - 继续加油！`
       });
 
       // Trigger refresh of lesson counts
@@ -176,6 +187,14 @@ export default function CourseDetailScreen() {
         message: '网络异常，请稍后重试' 
       });
     }
+  };
+
+  const handleStatusSelect = async (status: '参加' | '缺席') => {
+    if (pendingRecord) {
+      await recordStudy(pendingRecord.lessonNumber, pendingRecord.studyType, status);
+      setPendingRecord(null);
+    }
+    setStatusPickerVisible(false);
   };
 
   if (loading) {
@@ -311,6 +330,47 @@ export default function CourseDetailScreen() {
             </View>
           </View>
         ))}
+
+        {/* Status Picker Modal for 共修/讲考 */}
+        <Modal
+          visible={statusPickerVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setStatusPickerVisible(false)}
+        >
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setStatusPickerVisible(false)}
+          >
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>
+                {pendingRecord?.studyType}状态
+              </Text>
+              
+              <TouchableOpacity
+                style={[styles.statusButton, styles.attendedButton]}
+                onPress={() => handleStatusSelect('参加')}
+              >
+                <Text style={styles.statusButtonText}>✓ 参加</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.statusButton, styles.absentButton]}
+                onPress={() => handleStatusSelect('缺席')}
+              >
+                <Text style={styles.statusButtonText}>✗ 缺席</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setStatusPickerVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>取消</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
 
     </PageTemplate>
   );
@@ -449,5 +509,51 @@ const styles = StyleSheet.create({
   },
   lessonItemSpacing: {
     marginTop: 12,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    maxWidth: 300,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  statusButton: {
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  attendedButton: {
+    backgroundColor: '#10B981',
+  },
+  absentButton: {
+    backgroundColor: '#EF4444',
+  },
+  statusButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cancelButton: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#6B7280',
+    fontSize: 15,
+    fontWeight: '500',
   },
 });
