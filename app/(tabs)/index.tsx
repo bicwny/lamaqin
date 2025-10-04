@@ -893,11 +893,6 @@ export default function HomeScreen() {
                     本周 {practice.weekSessions}/{practice.weekTarget}座
                     {practice.status === 'completed' && ' 已完成'}
                   </Text>
-                  {practice.todaySessions > 0 && practice.todayDetails && (
-                    <Text style={styles.todayDetailsColumn} numberOfLines={2}>
-                      今日：{practice.todayDetails}
-                    </Text>
-                  )}
 
                   {/* Action Button for Weekly Practices */}
                   <View style={styles.practiceActions}>
