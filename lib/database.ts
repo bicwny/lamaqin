@@ -1043,3 +1043,199 @@ export type UserCourse = {
   updated_at: string;
   course: any;
 };
+
+// ============================================
+// CLASS CURRICULUM SYSTEM SERVICES
+// ============================================
+
+import type {
+  ClassCurriculum,
+  ClassRequiredCourse,
+  ClassRequiredPractice,
+  UserEnrolledClass,
+  UserClassProgress,
+  EnrolledClassWithDetails
+} from '@/types/database';
+
+export const classCurriculumService = {
+  async getAllClassCurricula(): Promise<ClassCurriculum[]> {
+    const { data, error } = await supabase
+      .from('class_curricula')
+      .select('*')
+      .order('display_order');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getClassCurriculumByName(className: string): Promise<ClassCurriculum | null> {
+    const { data, error } = await supabase
+      .from('class_curricula')
+      .select('*')
+      .eq('class_name', className)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async enrollUserInClass(userId: string, classId: string): Promise<UserEnrolledClass> {
+    const { data: existingEnrollment } = await supabase
+      .from('user_enrolled_classes')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('class_id', classId)
+      .single();
+
+    if (existingEnrollment) {
+      return existingEnrollment;
+    }
+
+    const { data, error } = await supabase
+      .from('user_enrolled_classes')
+      .insert({
+        user_id: userId,
+        class_id: classId,
+        status: 'active'
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    await supabase
+      .from('user_class_progress')
+      .insert({
+        user_id: userId,
+        class_id: classId,
+        courses_completed: 0,
+        practices_completed: 0,
+        overall_progress_percentage: 0
+      });
+
+    return data;
+  },
+
+  async getUserEnrolledClasses(userId: string): Promise<EnrolledClassWithDetails[]> {
+    const { data, error } = await supabase
+      .from('user_enrolled_classes')
+      .select(`
+        *,
+        class_curriculum:class_curricula!inner(*)
+      `)
+      .eq('user_id', userId)
+      .order('enrolled_at', { ascending: false });
+
+    if (error) throw error;
+
+    const enrichedData = await Promise.all(
+      (data || []).map(async (enrollment: any) => {
+        const [courses, practices, progress] = await Promise.all([
+          this.getClassRequiredCourses(enrollment.class_id),
+          this.getClassRequiredPractices(enrollment.class_id),
+          this.getUserClassProgress(userId, enrollment.class_id)
+        ]);
+
+        return {
+          ...enrollment,
+          class_curriculum: enrollment.class_curriculum,
+          required_courses: courses,
+          required_practices: practices,
+          progress
+        };
+      })
+    );
+
+    return enrichedData;
+  },
+
+  async getClassRequiredCourses(classId: string): Promise<(ClassRequiredCourse & { course: any })[]> {
+    const { data, error } = await supabase
+      .from('class_required_courses')
+      .select(`
+        *,
+        course:courses(*)
+      `)
+      .eq('class_id', classId);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getClassRequiredPractices(classId: string): Promise<(ClassRequiredPractice & { practice: any })[]> {
+    const { data, error } = await supabase
+      .from('class_required_practices')
+      .select(`
+        *,
+        practice:practices(*)
+      `)
+      .eq('class_id', classId);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async createPracticeProjectsForClass(userId: string, classId: string): Promise<void> {
+    const requiredPractices = await this.getClassRequiredPractices(classId);
+
+    const projectsToCreate = requiredPractices.map(req => ({
+      user_id: userId,
+      practice_id: req.practice_id,
+      target_count: req.target_count || 0,
+      daily_target: req.daily_target || 0,
+      current_count: 0,
+      status: 'active' as const
+    }));
+
+    if (projectsToCreate.length > 0) {
+      const { error } = await supabase
+        .from('user_practice_projects')
+        .insert(projectsToCreate);
+
+      if (error) throw error;
+    }
+  },
+
+  async updateEnrollmentStatus(
+    userId: string, 
+    classId: string, 
+    status: 'active' | 'completed' | 'paused'
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('user_enrolled_classes')
+      .update({ 
+        status,
+        completed_at: status === 'completed' ? new Date().toISOString() : null
+      })
+      .eq('user_id', userId)
+      .eq('class_id', classId);
+
+    if (error) throw error;
+  },
+
+  async getUserClassProgress(userId: string, classId: string): Promise<UserClassProgress | null> {
+    const { data, error } = await supabase
+      .from('user_class_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('class_id', classId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  },
+
+  async updateClassProgress(
+    userId: string,
+    classId: string,
+    updates: Partial<UserClassProgress>
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('user_class_progress')
+      .update(updates)
+      .eq('user_id', userId)
+      .eq('class_id', classId);
+
+    if (error) throw error;
+  }
+};

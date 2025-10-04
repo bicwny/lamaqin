@@ -106,9 +106,25 @@ The app includes a connection test that will automatically check if Supabase is 
 - 🔴 Red status: Database connection failed
 - 🟡 Yellow status: Using mock data (fallback mode)
 
+## Class Curriculum Migration (NEW)
+
+After completing the basic setup above, run the class curriculum migration to enable the class-based system:
+
+1. Open the file `docs/CLASS_CURRICULUM_MIGRATION.sql`
+2. Copy the entire SQL script
+3. Paste and run it in your Supabase SQL editor
+4. This will create tables and seed data for 加行 and 净土 classes
+
+The migration adds:
+- Class curriculum structure (class_curricula, class_required_courses, class_required_practices)
+- User enrollment tracking (user_enrolled_classes, user_class_progress)
+- Course and lesson tables with study type tracking
+- Pre-configured data for 加行 (146 lessons, 7 practices) and 净土 (161 lessons, 1 practice)
+
 ## Next Steps
 1. Add your environment variables
 2. Run the SQL schema setup
-3. Restart your Expo development server
-4. Check the connection status in the app
-5. Start tracking your Buddhist practice!
+3. Run the class curriculum migration
+4. Restart your Expo development server
+5. Check the connection status in the app
+6. Start tracking your Buddhist practice!

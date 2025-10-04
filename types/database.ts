@@ -106,8 +106,10 @@ export interface StudyRecord {
   lesson_id: string;
   study_date: string;
   study_time?: string; // UTC time (HH:MM:SS)
-  study_type?: '听传承' | '看法本';
+  study_type?: '听上师传承' | '看法本' | '共修' | '讲考';
   study_count_for_lesson: number;
+  completed?: boolean;
+  status?: '参加' | '缺席';
   created_at: string;
 }
 
@@ -181,4 +183,69 @@ export interface MindfulnessStats {
   daily: { good: number; bad: number };
   weekly: Array<{ date: Date; goodPercent: number }>;
   trends: 'improving' | 'declining' | 'stable';
+}
+
+// ============================================
+// CLASS CURRICULUM SYSTEM TYPES
+// ============================================
+
+export interface ClassCurriculum {
+  id: string;
+  class_name: '加行' | '入行' | '正科' | '净土';
+  display_order: number;
+  description?: string;
+  created_at: string;
+}
+
+export interface ClassRequiredCourse {
+  id: string;
+  class_id: string;
+  course_id: string;
+  required_study_types: string[];
+  optional_status_fields: string[];
+  created_at: string;
+}
+
+export interface ClassRequiredPractice {
+  id: string;
+  class_id: string;
+  practice_id: string;
+  target_count?: number;
+  daily_target?: number;
+  total_sessions?: number;
+  weekly_sessions?: number;
+  min_duration_minutes?: number;
+  practice_category: 'count' | 'session';
+  is_required: boolean;
+  created_at: string;
+}
+
+export interface UserEnrolledClass {
+  id: string;
+  user_id: string;
+  class_id: string;
+  status: 'active' | 'completed' | 'paused';
+  enrolled_at: string;
+  completed_at?: string;
+  created_at: string;
+}
+
+export interface UserClassProgress {
+  id: string;
+  user_id: string;
+  class_id: string;
+  courses_completed: number;
+  practices_completed: number;
+  overall_progress_percentage: number;
+  started_at: string;
+  completed_at?: string;
+  created_at: string;
+}
+
+// UI types for class curriculum
+export interface EnrolledClassWithDetails extends UserEnrolledClass {
+  class_curriculum: ClassCurriculum;
+  required_courses: (ClassRequiredCourse & { course: Course })[];
+  required_practices: (ClassRequiredPractice & { practice: Practice })[];
+  progress?: UserClassProgress;
 }
