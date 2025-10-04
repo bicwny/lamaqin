@@ -62,6 +62,8 @@ export interface UserPracticeProject {
   user_id: string;
   theme_id?: string;
   practice_id: string;
+  project_name?: string;
+  preset_project_id?: string;
   target_count: number;
   start_date?: string;
   target_end_date?: string;
