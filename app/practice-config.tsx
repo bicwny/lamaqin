@@ -636,8 +636,6 @@ export default function PracticeConfigScreen() {
           </TouchableOpacity>
         </View>
 
-        
-
         {/* DateTimePicker Modal */}
         {Platform.OS !== "web" && (
           <ModalDatetimePicker
