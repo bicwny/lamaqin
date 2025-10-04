@@ -104,11 +104,11 @@ export default function MeditationHistoryScreen() {
       const topicsData = await meditationService.getMeditationTopics(practiceId);
       setTopics(topicsData);
 
-      // Calculate topic statistics - only include records with valid topic_number
+      // Calculate topic statistics - only include records with valid session_number
       const topicCounts = topicsData.map(topic => {
         const recordsForTopic = allRecords.filter(record => {
-          // Only match records that have a valid topic_number
-          return record.topic_number && record.topic_number === topic.topic_number;
+          // Match records by session_number (which represents the topic number)
+          return record.session_number && record.session_number === topic.topic_number;
         });
 
         return {
