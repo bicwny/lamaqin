@@ -444,17 +444,7 @@ export default function PracticeDetailScreen() {
         .join("；");
 
       if (isTimeBasedWeekly) {
-        const weeklyCount = weeklyRecords.length;
-        const weeklyTarget = project.daily_target;
-
-        return (
-          <View style={styles.progressDetails}>
-            <Text style={styles.progressText}>每周目标：{weeklyTarget}座</Text>
-            {todayCount > 0 && todayDetails && (
-              <Text style={styles.sessionDetails}>今日：{todayDetails}</Text>
-            )}
-          </View>
-        );
+        return null;
       } else {
         return (
           <View style={styles.progressDetails}>
