@@ -354,8 +354,19 @@ export default function PracticeDetailScreen() {
     if (!project) return null;
 
     if (project.practices.type === "time") {
-      // Show recent meditation records
-      const recentRecords = [...todayRecords, ...weeklyRecords]
+      // Show recent meditation records (deduplicate by ID since today's records appear in both arrays)
+      // Only use weeklyRecords if this is actually a weekly practice
+      const recordsToUse = project.target_period === "weekly" 
+        ? [...todayRecords, ...weeklyRecords]
+        : todayRecords;
+      
+      const uniqueRecordsMap = new Map();
+      recordsToUse.forEach(record => {
+        if (!uniqueRecordsMap.has(record.id)) {
+          uniqueRecordsMap.set(record.id, record);
+        }
+      });
+      const recentRecords = Array.from(uniqueRecordsMap.values())
         .sort(
           (a, b) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
