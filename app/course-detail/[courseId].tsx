@@ -276,21 +276,21 @@ export default function CourseDetailScreen() {
             <View style={styles.recordButtonsContainer}>
               <View style={styles.recordButtonRow}>
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.listenButton]}
+                  style={[styles.recordButton, styles.primaryButton, styles.listenButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '听传承')}
                 >
-                  <Text style={styles.recordButtonText}>听传承</Text>
+                  <Text style={styles.primaryButtonText}>听传承</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.readButton]}
+                  style={[styles.recordButton, styles.primaryButton, styles.readButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '看法本')}
                 >
-                  <Text style={styles.recordButtonText}>看法本</Text>
+                  <Text style={styles.primaryButtonText}>看法本</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.viewButton]}
+                  style={[styles.recordButton, styles.secondaryButton, styles.viewButton]}
                   onPress={() => {
                     if (lesson.url) {
                       Linking.openURL(lesson.url).catch(err => {
@@ -308,23 +308,23 @@ export default function CourseDetailScreen() {
                     }
                   }}
                 >
-                  <Text style={styles.recordButtonText}>在线课程</Text>
+                  <Text style={[styles.secondaryButtonText, styles.viewButtonText]}>在线课程</Text>
                 </TouchableOpacity>
               </View>
               
               <View style={styles.recordButtonRow}>
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.groupButton]}
+                  style={[styles.recordButton, styles.secondaryButton, styles.groupButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '共修')}
                 >
-                  <Text style={styles.recordButtonText}>共修</Text>
+                  <Text style={[styles.secondaryButtonText, styles.groupButtonText]}>共修</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.recordButton, styles.examButton]}
+                  style={[styles.recordButton, styles.secondaryButton, styles.examButton]}
                   onPress={() => recordStudy(lesson.lesson_number, '讲考')}
                 >
-                  <Text style={styles.recordButtonText}>讲考</Text>
+                  <Text style={[styles.secondaryButtonText, styles.examButtonText]}>讲考</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -480,11 +480,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  primaryButton: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
   },
   listenButton: {
     backgroundColor: '#10B981',
@@ -493,13 +499,33 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary,
   },
   viewButton: {
-    backgroundColor: '#F59E0B',
+    borderColor: '#F59E0B',
   },
   groupButton: {
-    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
   },
   examButton: {
-    backgroundColor: '#EC4899',
+    borderColor: '#EC4899',
+  },
+  primaryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  secondaryButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+  },
+  viewButtonText: {
+    color: '#F59E0B',
+  },
+  groupButtonText: {
+    color: '#8B5CF6',
+  },
+  examButtonText: {
+    color: '#EC4899',
   },
   recordButtonText: {
     color: '#fff',
