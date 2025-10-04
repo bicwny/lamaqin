@@ -665,16 +665,11 @@ export const studyService = {
 
       const lesson = lessons[0]; // Take the first lesson if there are duplicates
 
-      // Store UTC timestamp
-      const now = new Date();
-      const utcTime = now.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS in UTC
-
       const studyRecord = {
         user_id: record.user_id,
         course_id: record.course_id,
         lesson_id: lesson.id,
         study_date: record.study_date,
-        study_time: utcTime, // Store UTC time
         study_type: record.study_type,
         study_count_for_lesson: record.study_count_for_lesson
       };
