@@ -50,9 +50,19 @@ Users select a class level that determines:
 
 ### Course Requirements
 **前行广释** - 146 lessons
-- **Study types required per lesson:**
-  - 听上师传承 (Listen to master's transmission) ×1
-  - 看法本 (Read dharma text) ×1
+
+**Required Study Types (for lesson completion):**
+- 听上师传承 (Listen to master's transmission) ×1
+- 看法本 (Read dharma text) ×1
+
+**Optional Administrative Records:**
+- 共修登记 (Group study registration) ×1
+- 讲考登记 (Teaching exam registration) ×1
+
+**Progress Tracking:**
+- A lesson is marked "complete" when both required study types are finished
+- Optional records are for personal/administrative tracking only
+- Course progress: (lessons with both required types completed) / 146
 
 ### Count-Based Practices (6 practices)
 All practices require 100,000 repetitions with specific daily targets:
@@ -98,9 +108,14 @@ CREATE TABLE class_required_courses (
   class_id UUID REFERENCES class_curricula(id),
   course_id UUID REFERENCES courses(id),
   required_study_types TEXT[],     -- ['听上师传承', '看法本']
+  optional_study_types TEXT[],     -- ['共修登记', '讲考登记']
   created_at TIMESTAMP
 );
 ```
+
+**Notes:**
+- `required_study_types`: Must be completed for lesson progress
+- `optional_study_types`: For administrative record-keeping only
 
 #### `class_required_practices`
 Defines practice requirements for each class.
@@ -192,59 +207,77 @@ Add visual indicators showing:
 
 ---
 
-## 6. Open Questions & Decisions Needed
+## 6. Class Enrollment Model
 
-### Class Enrollment Model
+### ✅ Decision: Concurrent Enrollment (Multiple Classes)
 
-**Question:** Should users be able to enroll in multiple classes simultaneously or only one at a time?
+**Users can enroll in multiple classes simultaneously.**
 
-#### Option A: Sequential Progression (One Class at a Time)
-**Pros:**
-- Clear focus on current curriculum level
-- Simpler UI and progress tracking
-- Matches traditional Buddhist curriculum progression
-- Less overwhelming for users
+### Rationale
+- Allows practitioners to maintain previous class practices while advancing to new curriculum
+- Supports review and reinforcement alongside new learning
+- Example: User completing 加行 can keep it active while starting 入行
+- More flexibility for experienced practitioners
 
-**Cons:**
-- Cannot practice previous class requirements simultaneously
-- No flexibility for review/maintenance of completed practices
+### Implementation
 
-**Implementation:**
-- User has one active class stored in `users.class_name`
-- Completed classes tracked in `user_class_progress` with completion dates
-- When advancing, update `class_name` and auto-load new requirements
+#### Database Structure
+**New table:** `user_enrolled_classes`
+```sql
+CREATE TABLE user_enrolled_classes (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  class_id UUID REFERENCES class_curricula(id),
+  status TEXT DEFAULT 'active',     -- 'active', 'completed', 'paused'
+  enrolled_at TIMESTAMP,
+  completed_at TIMESTAMP,
+  created_at TIMESTAMP,
+  UNIQUE(user_id, class_id)
+);
+```
 
-#### Option B: Concurrent Enrollment (Multiple Classes)
-**Pros:**
-- Can maintain previous class practices while learning new curriculum
-- More flexible for experienced practitioners
-- Supports review and reinforcement
+**Supports:**
+- Multiple active enrollments per user
+- Status tracking for each enrollment
+- Completion timestamps for historical record
 
-**Cons:**
-- More complex UI (need filtering/switching between classes)
-- Potentially overwhelming practice list
-- Harder to track "current focus"
+#### UX Design
 
-**Implementation:**
-- Many-to-many relationship via `user_enrolled_classes`
-- Each enrollment has status: 'active', 'completed', 'paused'
-- UI needs class filtering/grouping
+**闻思 Tab (Study):**
+- Show all courses grouped by enrolled classes
+- No sub-tabs needed - simple visual grouping
+```
+【加行】
+  前行广释  ✓ 146/146
+  
+【入行】
+  入行论    ○ 5/119
+```
+- Users can freely navigate between courses
+- Progress tracked per class automatically
 
-**UX Considerations for Option B:**
-- Tabbed view to switch between classes
-- Collapsible sections (active expanded, completed collapsed)
-- "Primary class" setting to determine default view
+**当日 Tab (Daily Practice):**
+- **Option 1:** Tabbed/segmented control to switch between classes
+- **Option 2:** Collapsible sections (active expanded, completed collapsed)
+- **Option 3:** Filter dropdown to select which class practices to display
 
-### Recommendation
-**Start with Option A (Sequential)** for simplicity. Can add concurrent enrollment in future if users request it.
+**Settings:**
+- "Primary Class" setting to determine default view on app launch
+- Quick-switch between enrolled classes
+
+### Study Navigation
+- User can click any lesson from any enrolled class
+- Lesson viewer shows class badge: `【加行】前行广释 第5课`
+- Progress updates in the appropriate class automatically
+- No restrictions on cross-class navigation
 
 ---
 
 ## 7. Implementation Roadmap
 
 ### Phase 1: Database Setup
-- [ ] Create new tables: `class_curricula`, `class_required_courses`, `class_required_practices`, `user_class_progress`
-- [ ] Populate 加行 requirements data
+- [ ] Create new tables: `class_curricula`, `class_required_courses`, `class_required_practices`, `user_class_progress`, `user_enrolled_classes`
+- [ ] Populate 加行 requirements data (courses, practices, study types)
 - [ ] Create database migration scripts
 
 ### Phase 2: Backend API
@@ -275,9 +308,11 @@ Add visual indicators showing:
 5. Auto-generate new practice projects for new class requirements
 
 ### Progress Calculation
-- Course progress: (lessons with all required study types completed) / total lessons
-- Practice progress: current_count / target_count
-- Overall class progress: weighted average of all requirements
+- **Lesson completion:** Both required study types must be completed (听上师传承 + 看法本)
+  - Optional study types (共修登记, 讲考登记) do not affect lesson completion status
+- **Course progress:** (lessons with all required study types completed) / total lessons
+- **Practice progress:** current_count / target_count (or sessions_completed / total_sessions)
+- **Overall class progress:** weighted average of all course and practice requirements
 
 ---
 
