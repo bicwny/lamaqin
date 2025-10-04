@@ -193,124 +193,126 @@ export default function MeditationRecordScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
-    >
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
-        <Stack.Screen options={{ headerShown: false }} />
-        
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleClose}
-            >
-              <Ionicons name="close" size={24} color={Colors.text} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>
-              {isEditing ? '编辑观修记录' : '记录新的观修'}
-            </Text>
-          </View>
-
-          <View style={styles.headerRight}>
-            <TouchableOpacity 
-              style={[styles.saveHeaderButton, loading && styles.saveHeaderButtonDisabled]}
-              onPress={handleSave}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
-              ) : (
-                <Text style={styles.saveHeaderButtonText}>保存</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Content */}
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.content}>
-            <Text style={styles.practiceTitle}>{practiceName}</Text>
-
-            {/* Duration Input */}
-            <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>观修时长（分钟）</Text>
-              <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
-              <TextInput
-                style={styles.textInput}
-                value={duration}
-                onChangeText={setDuration}
-                keyboardType="numeric"
-                placeholder="30"
-              />
+    <>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
+      >
+        <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
+          <Stack.Screen options={{ headerShown: false }} />
+          
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.headerLeft}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={handleClose}
+              >
+                <Ionicons name="close" size={24} color={Colors.text} />
+              </TouchableOpacity>
             </View>
 
-            {/* Topic Selection - only show if there are topics or still loading */}
-            {(loadingTopics || meditationTopics.length > 0) && (
+            <View style={styles.headerCenter}>
+              <Text style={styles.headerTitle}>
+                {isEditing ? '编辑观修记录' : '记录新的观修'}
+              </Text>
+            </View>
+
+            <View style={styles.headerRight}>
+              <TouchableOpacity 
+                style={[styles.saveHeaderButton, loading && styles.saveHeaderButtonDisabled]}
+                onPress={handleSave}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
+                ) : (
+                  <Text style={styles.saveHeaderButtonText}>保存</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Content */}
+          <ScrollView 
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.content}>
+              <Text style={styles.practiceTitle}>{practiceName}</Text>
+
+              {/* Duration Input */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>选择观修内容</Text>
-                {loadingTopics ? (
-                  <ActivityIndicator style={styles.loadingIndicator} />
-                ) : meditationTopics.length > 0 ? (
-                  <TouchableOpacity
-                    style={styles.topicSelector}
-                    onPress={() => setShowTopicModal(true)}
-                  >
-                    <Text style={styles.topicSelectorText}>
-                      {selectedTopic ? selectedTopic.title : '请选择观修内容'}
-                    </Text>
-                    <Text style={styles.topicSelectorArrow}>›</Text>
-                  </TouchableOpacity>
-                ) : null}
+                <Text style={styles.inputLabel}>观修时长（分钟）</Text>
+                <Text style={styles.inputHint}>请输入观修时长，如：30</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={duration}
+                  onChangeText={setDuration}
+                  keyboardType="numeric"
+                  placeholder="30"
+                />
               </View>
-            )}
 
-            {/* Reflection Input */}
-            <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>观后感（可选）</Text>
-              <Text style={styles.inputHint}>
-                记录您在这次观修中的体验、感悟和思考...
-              </Text>
-              <TextInput
-                style={[styles.textInput, styles.multilineInput]}
-                value={reflection}
-                onChangeText={setReflection}
-                multiline
-                numberOfLines={6}
-                placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
-                textAlignVertical="top"
-              />
-              <Text style={styles.characterCount}>
-                {reflection.length} 字
-              </Text>
+              {/* Topic Selection - only show if there are topics or still loading */}
+              {(loadingTopics || meditationTopics.length > 0) && (
+                <View style={styles.inputSection}>
+                  <Text style={styles.inputLabel}>选择观修内容</Text>
+                  {loadingTopics ? (
+                    <ActivityIndicator style={styles.loadingIndicator} />
+                  ) : meditationTopics.length > 0 ? (
+                    <TouchableOpacity
+                      style={styles.topicSelector}
+                      onPress={() => setShowTopicModal(true)}
+                    >
+                      <Text style={styles.topicSelectorText}>
+                        {selectedTopic ? selectedTopic.title : '请选择观修内容'}
+                      </Text>
+                      <Text style={styles.topicSelectorArrow}>›</Text>
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
+              )}
+
+              {/* Reflection Input */}
+              <View style={styles.inputSection}>
+                <Text style={styles.inputLabel}>观后感（可选）</Text>
+                <Text style={styles.inputHint}>
+                  记录您在这次观修中的体验、感悟和思考...
+                </Text>
+                <TextInput
+                  style={[styles.textInput, styles.multilineInput]}
+                  value={reflection}
+                  onChangeText={setReflection}
+                  multiline
+                  numberOfLines={6}
+                  placeholder="例如：今日观修思维闲暇之本体，深感人身难得..."
+                  textAlignVertical="top"
+                />
+                <Text style={styles.characterCount}>
+                  {reflection.length} 字
+                </Text>
+              </View>
+
+              
             </View>
-
-            
-          </View>
-        </ScrollView>
-        
-        {/* Topic Selection Modal */}
-        <TopicSelectionModal
-          visible={showTopicModal}
-          onClose={() => setShowTopicModal(false)}
-          onSelect={handleTopicSelect}
-          topics={meditationTopics}
-          selectedTopicNumber={selectedTopic?.topic_number}
-          loading={loadingTopics}
-        />
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+          </ScrollView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+      
+      {/* Topic Selection Modal - Outside of KeyboardAvoidingView for proper web interaction */}
+      <TopicSelectionModal
+        visible={showTopicModal}
+        onClose={() => setShowTopicModal(false)}
+        onSelect={handleTopicSelect}
+        topics={meditationTopics}
+        selectedTopicNumber={selectedTopic?.topic_number}
+        loading={loadingTopics}
+      />
+    </>
   );
 }
 
