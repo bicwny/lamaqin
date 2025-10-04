@@ -155,10 +155,39 @@ ON CONFLICT (class_name) DO NOTHING;
 -- 3. SEED COURSES
 -- ============================================
 
--- First, ensure courses table has unique constraint on name
+-- First, deduplicate courses table by keeping the first occurrence
+-- Step 1: Update references to duplicates
+WITH duplicates AS (
+  SELECT id, name, 
+         ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
+  FROM courses
+),
+courses_to_keep AS (
+  SELECT id, name FROM duplicates WHERE rn = 1
+),
+courses_to_remove AS (
+  SELECT d.id as old_id, k.id as new_id 
+  FROM duplicates d
+  JOIN courses_to_keep k ON d.name = k.name
+  WHERE d.rn > 1
+)
+UPDATE study_records sr
+SET course_id = ctr.new_id
+FROM courses_to_remove ctr
+WHERE sr.course_id = ctr.old_id;
+
+-- Step 2: Delete duplicate courses
+WITH duplicates AS (
+  SELECT id, 
+         ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
+  FROM courses
+)
+DELETE FROM courses 
+WHERE id IN (SELECT id FROM duplicates WHERE rn > 1);
+
+-- Step 3: Add unique constraint
 DO $$ 
 BEGIN
-  -- Add unique constraint if it doesn't exist
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint 
     WHERE conname = 'courses_name_key'
@@ -182,10 +211,39 @@ ON CONFLICT (name) DO NOTHING;
 -- 4. SEED PRACTICES
 -- ============================================
 
--- First, ensure practices table has unique constraint on name
+-- First, deduplicate practices table by keeping the first occurrence
+-- Step 1: Update references to duplicates
+WITH duplicates AS (
+  SELECT id, name, 
+         ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
+  FROM practices
+),
+practices_to_keep AS (
+  SELECT id, name FROM duplicates WHERE rn = 1
+),
+practices_to_remove AS (
+  SELECT d.id as old_id, k.id as new_id 
+  FROM duplicates d
+  JOIN practices_to_keep k ON d.name = k.name
+  WHERE d.rn > 1
+)
+UPDATE practice_records pr
+SET practice_id = ptr.new_id
+FROM practices_to_remove ptr
+WHERE pr.practice_id = ptr.old_id;
+
+-- Step 2: Delete duplicate practices
+WITH duplicates AS (
+  SELECT id, 
+         ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at, id) as rn
+  FROM practices
+)
+DELETE FROM practices 
+WHERE id IN (SELECT id FROM duplicates WHERE rn > 1);
+
+-- Step 3: Add unique constraint
 DO $$ 
 BEGIN
-  -- Add unique constraint if it doesn't exist
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint 
     WHERE conname = 'practices_name_key'
