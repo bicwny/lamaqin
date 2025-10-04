@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -11,21 +11,59 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/Colors';
 import { ComponentTokens } from '@/utils/componentTokens';
 import { useAuth } from '@/contexts/AuthContext';
+import { classCurriculumService } from '@/lib/database';
+import type { ClassCurriculum } from '@/types/database';
 import PageTemplate from '@/components/PageTemplate';
 
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
-  const [currentClass, setCurrentClass] = useState('');
+  const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
   const [practiceYears, setPracticeYears] = useState('');
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingClasses, setLoadingClasses] = useState(true);
+  const [availableClasses, setAvailableClasses] = useState<ClassCurriculum[]>([]);
+
+  useEffect(() => {
+    loadDataAndClasses();
+  }, [user]);
+
+  const loadDataAndClasses = async () => {
+    if (!user) return;
+    
+    try {
+      const [classes, enrolledClasses] = await Promise.all([
+        classCurriculumService.getAllClassCurricula(),
+        classCurriculumService.getUserEnrolledClasses(user.id)
+      ]);
+      
+      setAvailableClasses(classes);
+      setSelectedClassIds(enrolledClasses.map(e => e.class_id));
+    } catch (error) {
+      console.error('Error loading classes:', error);
+      Alert.alert('提示', '加载班级列表失败，请稍后重试');
+    } finally {
+      setLoadingClasses(false);
+    }
+  };
+
+  const toggleClassSelection = (classId: string) => {
+    setSelectedClassIds(prev => {
+      if (prev.includes(classId)) {
+        return prev.filter(id => id !== classId);
+      } else {
+        return [...prev, classId];
+      }
+    });
+  };
 
   const handleSaveProfile = async () => {
     if (!user) {
@@ -35,12 +73,17 @@ export default function ProfileSetupScreen() {
 
     setLoading(true);
     try {
+      const classNames = selectedClassIds
+        .map(id => availableClasses.find(c => c.id === id)?.class_name)
+        .filter(Boolean)
+        .join(', ');
+
       // Update user metadata in Supabase Auth
       const { error: authError } = await supabase.auth.updateUser({
         data: {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
-          class_name: currentClass.trim() || null,
+          class_name: classNames || null,
           practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         }
@@ -58,7 +101,7 @@ export default function ProfileSetupScreen() {
           email: user.email,
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
-          class_name: currentClass.trim() || null,
+          class_name: classNames || null,
           practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
           updated_at: new Date().toISOString()
@@ -68,6 +111,41 @@ export default function ProfileSetupScreen() {
         console.error('Database update error:', dbError);
         Alert.alert('保存失败', '数据库更新失败，请稍后重试');
         return;
+      }
+
+      // Get current enrollments
+      const currentEnrollments = await classCurriculumService.getUserEnrolledClasses(user.id);
+      const currentClassIds = currentEnrollments.map(e => e.class_id);
+      
+      // Determine which classes to add and which to remove
+      const classesToAdd = selectedClassIds.filter(id => !currentClassIds.includes(id));
+      const classesToRemove = currentClassIds.filter(id => !selectedClassIds.includes(id));
+      
+      // Remove deselected classes
+      for (const classId of classesToRemove) {
+        try {
+          await classCurriculumService.updateEnrollmentStatus(user.id, classId, 'paused');
+          console.log(`⏸️ Paused enrollment in class ${classId}`);
+        } catch (error) {
+          console.error(`Error pausing class ${classId}:`, error);
+          Alert.alert('提示', '部分班级退出失败，请稍后重试');
+        }
+      }
+      
+      // Enroll in newly selected classes
+      for (const classId of classesToAdd) {
+        try {
+          await classCurriculumService.enrollUserInClass(user.id, classId);
+          await classCurriculumService.createPracticeProjectsForClass(user.id, classId);
+          console.log(`✅ Enrolled in class ${classId}`);
+        } catch (enrollError) {
+          console.error(`Error enrolling in class ${classId}:`, enrollError);
+          Alert.alert('提示', '部分班级加入失败，请稍后重试');
+        }
+      }
+      
+      if (classesToAdd.length > 0 || classesToRemove.length > 0) {
+        console.log(`📊 Enrollment updated: +${classesToAdd.length} -${classesToRemove.length}`);
       }
 
       // For profile setup, navigate directly without alert to avoid staying on page
@@ -126,14 +204,46 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📚 当前学修班级（可选）</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="如：加行班、净土班等"
-              value={currentClass}
-              onChangeText={setCurrentClass}
-              autoCapitalize="words"
-            />
+            <Text style={styles.inputLabel}>📚 选择学修班级（可选，可多选）</Text>
+            {loadingClasses ? (
+              <View style={styles.classLoadingContainer}>
+                <ActivityIndicator size="small" color={Colors.primary} />
+                <Text style={styles.classLoadingText}>加载班级列表中...</Text>
+              </View>
+            ) : (
+              <View style={styles.classOptionsContainer}>
+                {availableClasses.map((classItem) => (
+                  <TouchableOpacity
+                    key={classItem.id}
+                    style={[
+                      styles.classOption,
+                      selectedClassIds.includes(classItem.id) && styles.classOptionSelected
+                    ]}
+                    onPress={() => toggleClassSelection(classItem.id)}
+                  >
+                    <View style={[
+                      styles.checkbox,
+                      selectedClassIds.includes(classItem.id) && styles.checkboxSelected
+                    ]}>
+                      {selectedClassIds.includes(classItem.id) && (
+                        <Text style={styles.checkmark}>✓</Text>
+                      )}
+                    </View>
+                    <View style={styles.classOptionTextContainer}>
+                      <Text style={[
+                        styles.classOptionText,
+                        selectedClassIds.includes(classItem.id) && styles.classOptionTextSelected
+                      ]}>
+                        {classItem.class_name}
+                      </Text>
+                      {classItem.description && (
+                        <Text style={styles.classOptionDescription}>{classItem.description}</Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
 
           <View style={styles.inputGroup}>
@@ -267,5 +377,69 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
+  },
+  classLoadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  classLoadingText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  classOptionsContainer: {
+    gap: 12,
+  },
+  classOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.border,
+  },
+  classOptionSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: '#F0F4FF',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  checkboxSelected: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  checkmark: {
+    color: Colors.surface,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  classOptionTextContainer: {
+    flex: 1,
+  },
+  classOptionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  classOptionTextSelected: {
+    color: Colors.primary,
+  },
+  classOptionDescription: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 4,
   },
 });

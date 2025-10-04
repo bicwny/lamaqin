@@ -48,6 +48,45 @@ The app uses React Native with a configurable architecture setting in `app.json`
 - **Expo Notifications**: Push notification system for practice reminders
 - **Vector Icons**: Icon library for Buddhist-themed iconography
 
+## Recent Changes (October 4, 2025)
+
+### Class-Based Curriculum System - IN PROGRESS 🚧
+
+**Feature:** Implementing a class-based curriculum structure where users can enroll in multiple Buddhist study classes simultaneously (加行, 净土) and automatically receive all required practices, courses, and study materials for their selected curricula.
+
+**Completed:**
+1. ✅ Database schema design and migration SQL (docs/CLASS_CURRICULUM_MIGRATION.sql)
+   - 5 new tables: class_curricula, class_required_courses, class_required_practices, user_enrolled_classes, user_class_progress
+   - Seeded data for 加行 (146 lessons, 7 practices) and 净土 (161 lessons, 1 practice)
+   - Unique constraints on courses.name and practices.name to prevent duplicates
+   - Backward-compatible with existing study_records table
+
+2. ✅ TypeScript types (types/database.ts)
+   - New interfaces: ClassCurriculum, ClassRequiredCourse, ClassRequiredPractice, UserEnrolledClass, UserClassProgress
+   - Updated StudyRecord to support 听上师传承, 看法本, 共修, 讲考 with status tracking (参加/缺席)
+
+3. ✅ Backend API (lib/database.ts)
+   - classCurriculumService with full CRUD operations
+   - Enrollment, progress tracking, and auto-creation of practice projects
+   - Fixed FK query issues for concurrent class enrollment support
+
+4. ✅ Profile setup integration (app/profile-setup.tsx)
+   - Multi-select class enrollment UI with checkboxes
+   - Auto-enrollment and practice project creation on profile save
+   - Loads available classes from database dynamically
+
+**Next Steps:**
+- Update lesson study tracking UI to support required/optional study types
+- Update 闻思 tab to group courses by enrolled classes
+- Update 当日 tab to display practices from enrolled classes
+- End-to-end testing with both 加行 and 净土 enrollments
+
+**Key Design Decisions:**
+- Concurrent enrollment supported (users can be in multiple classes)
+- Required study types (听上师传承 + 看法本) must be completed for lesson progress
+- Optional status fields (共修, 讲考) track attendance (参加/缺席) without affecting progress
+- Database migration runs on both fresh and existing databases safely
+
 ## Recent Changes (September 29, 2025)
 
 ### iPhone 16 Crash Resolution - FIXED ✅
