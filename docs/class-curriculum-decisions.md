@@ -55,14 +55,18 @@ Users select a class level that determines:
 - 听上师传承 (Listen to master's transmission) ×1
 - 看法本 (Read dharma text) ×1
 
-**Optional Administrative Records:**
-- 共修登记 (Group study registration) ×1
-- 讲考登记 (Teaching exam registration) ×1
+**Optional Administrative Records (status tracking):**
+- 共修 (Group study): 参加 (attended) OR 缺席 (absent)
+- 讲考 (Teaching exam): 参加 (attended) OR 缺席 (absent)
 
 **Progress Tracking:**
 - A lesson is marked "complete" when both required study types are finished
-- Optional records are for personal/administrative tracking only
+- Optional status fields (共修, 讲考) are for personal/administrative tracking only
 - Course progress: (lessons with both required types completed) / 146
+
+**UX Notes:**
+- Required types: Simple checkboxes (completed or not)
+- Optional status fields: Dropdown or radio buttons with two options (参加/缺席)
 
 ### Count-Based Practices (6 practices)
 All practices require 100,000 repetitions with specific daily targets:
@@ -108,14 +112,14 @@ CREATE TABLE class_required_courses (
   class_id UUID REFERENCES class_curricula(id),
   course_id UUID REFERENCES courses(id),
   required_study_types TEXT[],     -- ['听上师传承', '看法本']
-  optional_study_types TEXT[],     -- ['共修登记', '讲考登记']
+  optional_status_fields TEXT[],   -- ['共修', '讲考']
   created_at TIMESTAMP
 );
 ```
 
 **Notes:**
-- `required_study_types`: Must be completed for lesson progress
-- `optional_study_types`: For administrative record-keeping only
+- `required_study_types`: Boolean checkboxes, must be completed for lesson progress
+- `optional_status_fields`: Status dropdowns (参加/缺席), for administrative record-keeping only
 
 #### `class_required_practices`
 Defines practice requirements for each class.
@@ -309,7 +313,8 @@ CREATE TABLE user_enrolled_classes (
 
 ### Progress Calculation
 - **Lesson completion:** Both required study types must be completed (听上师传承 + 看法本)
-  - Optional study types (共修登记, 讲考登记) do not affect lesson completion status
+  - Optional status fields (共修, 讲考) do not affect lesson completion status
+  - Users can mark 参加 or 缺席 for administrative tracking without impacting progress
 - **Course progress:** (lessons with all required study types completed) / total lessons
 - **Practice progress:** current_count / target_count (or sessions_completed / total_sessions)
 - **Overall class progress:** weighted average of all course and practice requirements
