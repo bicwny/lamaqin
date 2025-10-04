@@ -415,6 +415,35 @@ export const meditationService = {
     }
 
     console.log('✅ Meditation record saved successfully:', data);
+
+    // Update practice project current_count for time-based practices
+    try {
+      const { data: projects, error: projectError } = await supabase
+        .from('user_practice_projects')
+        .select('id, current_count, practices!inner(type)')
+        .eq('user_id', record.user_id)
+        .eq('practice_id', record.practice_id)
+        .eq('status', 'active');
+
+      if (!projectError && projects && projects.length > 0) {
+        const project = projects[0] as any;
+        // Only increment count for time-based practices
+        if (project.practices?.type === 'time') {
+          await supabase
+            .from('user_practice_projects')
+            .update({ 
+              current_count: (project.current_count || 0) + 1,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', project.id);
+          console.log('✅ Updated practice project count:', project.id);
+        }
+      }
+    } catch (updateError) {
+      console.error('⚠️ Error updating practice project count:', updateError);
+      // Don't throw - record was saved successfully
+    }
+
     return data;
   },
 
@@ -479,10 +508,10 @@ export const meditationService = {
   async deleteMeditationRecord(recordId: string, userId: string): Promise<void> {
     console.log('🗑️ deleteMeditationRecord called with:', { recordId, userId });
 
-    // First check if the record exists and belongs to the user
+    // First check if the record exists and belongs to the user, and get practice_id
     const { data: existingRecord, error: fetchError } = await supabase
       .from('meditation_records')
-      .select('id, user_id')
+      .select('id, user_id, practice_id')
       .eq('id', recordId)
       .eq('user_id', userId)
       .single();
@@ -511,6 +540,34 @@ export const meditationService = {
     }
 
     console.log('✅ Record deleted successfully from database');
+
+    // Update practice project current_count for time-based practices
+    try {
+      const { data: projects, error: projectError } = await supabase
+        .from('user_practice_projects')
+        .select('id, current_count, practices!inner(type)')
+        .eq('user_id', userId)
+        .eq('practice_id', existingRecord.practice_id)
+        .eq('status', 'active');
+
+      if (!projectError && projects && projects.length > 0) {
+        const project = projects[0] as any;
+        // Only decrement count for time-based practices
+        if (project.practices?.type === 'time' && project.current_count > 0) {
+          await supabase
+            .from('user_practice_projects')
+            .update({ 
+              current_count: project.current_count - 1,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', project.id);
+          console.log('✅ Decremented practice project count:', project.id);
+        }
+      }
+    } catch (updateError) {
+      console.error('⚠️ Error updating practice project count:', updateError);
+      // Don't throw - record was deleted successfully
+    }
   },
 
   // 🆕 获取观修方法目录
