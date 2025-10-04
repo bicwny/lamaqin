@@ -745,7 +745,6 @@ const styles = StyleSheet.create({
   dailyTargetText: {
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.md,
   },
   progressBarContainer: {
     flexDirection: "row",
@@ -780,23 +779,23 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
   },
   secondaryButtonNew: {
-    ...componentHelpers.getButtonStyle("secondary", "medium"),
+    ...componentHelpers.getButtonStyle("secondary", "small"),
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   primaryButtonNew: {
-    ...componentHelpers.getButtonStyle("primary", "medium"),
+    ...componentHelpers.getButtonStyle("primary", "small"),
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: DesignSystem.colors.redTara, // Red Tara for practice energy and action
   },
   secondaryButtonTextNew: {
-    ...componentHelpers.getButtonTextStyle("secondary", "medium"),
+    ...componentHelpers.getButtonTextStyle("secondary", "small"),
   },
   primaryButtonTextNew: {
-    ...componentHelpers.getButtonTextStyle("primary", "medium"),
+    ...componentHelpers.getButtonTextStyle("primary", "small"),
     color: DesignSystem.colors.whiteTara, // White Tara for purity and clarity on Red Tara background
   },
   recordsCard: componentHelpers.getCardWithBottomMargin(
