@@ -1,8 +1,19 @@
 import { supabase, testConnection } from './supabase';
-import { Database } from '@/types/database';
+import type { 
+  User, 
+  Practice, 
+  UserPracticeProject, 
+  DailyRecord, 
+  MeditationRecord, 
+  StudyRecord, 
+  MindfulnessRecord 
+} from '@/types/database';
 
 // Re-export testConnection for convenience
 export { testConnection };
+
+// Re-export types
+export type { User, Practice, UserPracticeProject, DailyRecord, MeditationRecord, StudyRecord, MindfulnessRecord };
 
 // Legacy function exports for backward compatibility
 export async function getUserPracticeProjects(userId: string) {
@@ -16,15 +27,6 @@ export async function getTodayRecords(userId: string, date: string) {
 export async function createDailyRecord(record: Omit<DailyRecord, 'id' | 'created_at'>) {
   return await dailyRecordService.recordPractice(record);
 }
-
-export type User = Database['public']['Tables']['users']['Row'];
-export type Theme = Database['public']['Tables']['themes']['Row'];
-export type Practice = Database['public']['Tables']['practices']['Row'];
-export type UserPracticeProject = Database['public']['Tables']['user_practice_projects']['Row'];
-export type DailyRecord = Database['public']['Tables']['daily_records']['Row'];
-export type MeditationRecord = Database['public']['Tables']['meditation_records']['Row'];
-export type StudyRecord = Database['public']['Tables']['study_records']['Row'];
-export type MindfulnessRecord = Database['public']['Tables']['mindfulness_records']['Row'];
 
 interface PracticeRecord {
   user_id: string;
@@ -112,61 +114,6 @@ export const practiceService = {
     }
   },
 
-  async getAllThemes(): Promise<Theme[]> {
-    const { data, error } = await supabase
-      .from('themes')
-      .select('*')
-      .order('created_at');
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  async getThemePractices(themeId: string) {
-    const { data, error } = await supabase
-      .from('theme_practices')
-      .select(`
-        *,
-        practice:practices(*)
-      `)
-      .eq('theme_id', themeId);
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  async joinTheme(userId: string, themeId: string): Promise<UserPracticeProject[]> {
-    // Get all practices in the theme
-    const themePractices = await this.getThemePractices(themeId);
-
-    const createdProjects = [];
-
-    for (const themePractice of themePractices) {
-      // Allow multiple projects for the same practice with different goals
-      const { data: newProject, error } = await supabase
-        .from('user_practice_projects')
-        .insert({
-          user_id: userId,
-          theme_id: themeId,
-          practice_id: themePractice.practice_id,
-          target_count: themePractice.target_count,
-          daily_target: Math.ceil(themePractice.target_count / 365), // Default daily target
-          status: 'not_started'
-        })
-        .select(`
-          *,
-          practices(*)
-        `)
-        .single();
-
-      if (!error && newProject) {
-        createdProjects.push(newProject);
-      }
-    }
-
-    return createdProjects;
-  },
-
   async getAllPractices(): Promise<Practice[]> {
     const { data, error } = await supabase
       .from('practices')
@@ -199,20 +146,6 @@ export const practiceService = {
     }
 
     console.log('📋 User practice projects:', data);
-    return data || [];
-  },
-
-  async getAllPractices() {
-    const { data, error } = await supabase
-      .from('practices')
-      .select('id, name, type, unit, description')
-      .order('name');
-
-    if (error) {
-      console.error('Error fetching practices:', error);
-      throw error;
-    }
-
     return data || [];
   },
 
@@ -919,10 +852,11 @@ export const studyService = {
     
     studyRecords.forEach(record => {
       if (!lessonCompletionMap.has(record.lesson_id)) {
+        const lesson = Array.isArray(record.lesson) ? record.lesson[0] : record.lesson;
         lessonCompletionMap.set(record.lesson_id, { 
           听传承: false, 
           看法本: false,
-          lessonNumber: record.lesson?.lesson_number || 0
+          lessonNumber: lesson?.lesson_number || 0
         });
       }
       
