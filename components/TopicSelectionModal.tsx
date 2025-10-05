@@ -175,12 +175,14 @@ export default function TopicSelectionModal({
         visible={visible}
         animationType="slide"
         presentationStyle="fullScreen"
-        onRequestClose={onClose}
+        onRequestClose={handleCancel}
         transparent={false}
       >
-        <SafeAreaView style={styles.container}>
-          {modalContent}
-        </SafeAreaView>
+        <View style={styles.webModalOverlay}>
+          <SafeAreaView style={styles.webModalContent}>
+            {modalContent}
+          </SafeAreaView>
+        </View>
       </Modal>
     );
   }
@@ -203,6 +205,17 @@ export default function TopicSelectionModal({
 }
 
 const styles = StyleSheet.create({
+  webModalOverlay: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    pointerEvents: 'box-none' as any,
+  },
+  webModalContent: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+    pointerEvents: 'auto' as any,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
