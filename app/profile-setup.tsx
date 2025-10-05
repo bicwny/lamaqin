@@ -197,6 +197,12 @@ export default function ProfileSetupScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.logo}>🌸</Text>
+          {user?.email && (
+            <View style={styles.emailContainer}>
+              <Text style={styles.emailLabel}>正在为以下账号完善资料：</Text>
+              <Text style={styles.emailText}>{user.email}</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.form}>
@@ -314,6 +320,25 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 48,
     marginBottom: 10,
+  },
+  emailContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#F0F4FF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E7FF',
+  },
+  emailLabel: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  emailText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.primary,
   },
   form: {
     width: '100%',
