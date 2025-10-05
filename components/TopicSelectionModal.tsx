@@ -178,11 +178,9 @@ export default function TopicSelectionModal({
         onRequestClose={handleCancel}
         transparent={false}
       >
-        <View style={styles.webModalOverlay}>
-          <SafeAreaView style={styles.webModalContent}>
-            {modalContent}
-          </SafeAreaView>
-        </View>
+        <SafeAreaView style={styles.webModalContent}>
+          {modalContent}
+        </SafeAreaView>
       </Modal>
     );
   }
@@ -205,16 +203,9 @@ export default function TopicSelectionModal({
 }
 
 const styles = StyleSheet.create({
-  webModalOverlay: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'box-none' as any,
-  },
   webModalContent: {
     flex: 1,
     backgroundColor: '#f8f9fa',
-    pointerEvents: 'auto' as any,
   },
   container: {
     flex: 1,
