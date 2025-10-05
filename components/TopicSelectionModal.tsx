@@ -121,7 +121,11 @@ export default function TopicSelectionModal({
         </View>
 
         {/* Search Input */}
-        <View style={styles.searchContainer}>
+        <View 
+          style={styles.searchContainer}
+          onStartShouldSetResponder={() => true}
+          onResponderRelease={(e) => e.stopPropagation()}
+        >
           <TextInput
             style={styles.searchInput}
             placeholder="搜索观修内容..."
@@ -134,6 +138,11 @@ export default function TopicSelectionModal({
             selectTextOnFocus={true}
             blurOnSubmit={false}
             returnKeyType="search"
+            onFocus={(e) => {
+              if (Platform.OS === 'web') {
+                e.stopPropagation();
+              }
+            }}
           />
         </View>
 
@@ -178,7 +187,14 @@ export default function TopicSelectionModal({
         onRequestClose={handleCancel}
         transparent={false}
       >
-        <SafeAreaView style={styles.webModalContent}>
+        <SafeAreaView 
+          style={styles.webModalContent}
+          onStartShouldSetResponder={() => true}
+          onResponderRelease={(e) => {
+            e.stopPropagation();
+            return true;
+          }}
+        >
           {modalContent}
         </SafeAreaView>
       </Modal>
