@@ -299,6 +299,18 @@ export default function MeditationHistoryScreen() {
           <TouchableOpacity
             style={[
               styles.toggleButton,
+              viewMode === 'chronological' && styles.toggleButtonActive
+            ]}
+            onPress={() => setViewMode('chronological')}
+          >
+            <Text style={[
+              styles.toggleButtonText,
+              viewMode === 'chronological' && styles.toggleButtonTextActive
+            ]}>座数</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
               viewMode === 'by_topic' && styles.toggleButtonActive
             ]}
             onPress={() => setViewMode('by_topic')}
@@ -307,18 +319,6 @@ export default function MeditationHistoryScreen() {
               styles.toggleButtonText,
               viewMode === 'by_topic' && styles.toggleButtonTextActive
             ]}>主题</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              viewMode === 'chronological' && styles.toggleButtonActive
-            ]}
-            onPress={() => setViewMode('chronological')}
-          >
-            <Text style={[
-              styles.toggleButtonText,
-              viewMode === 'chronological' && styles.toggleButtonTextActive
-            ]}>时间</Text>
           </TouchableOpacity>
         </View>
       </View>
