@@ -17,29 +17,38 @@ export default function Index() {
       }
 
       try {
-        // Check if user has dharma name in the database
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('dharma_name')
-          .eq('id', user.id)
-          .single();
+        // Check if user has required profile fields and class enrollment
+        const [userData, enrolledClasses] = await Promise.all([
+          supabase
+            .from('users')
+            .select('dharma_name, lay_name')
+            .eq('id', user.id)
+            .single()
+            .then(r => r.data),
+          supabase
+            .from('user_class_progress')
+            .select('class_id')
+            .eq('user_id', user.id)
+            .neq('enrollment_status', 'paused')
+            .then(r => r.data || [])
+        ]);
 
-        if (error) {
-          console.error('Error checking profile completion:', error);
-          // If there's an error fetching user data, assume profile is incomplete
-          setProfileComplete(false);
-        } else {
-          // Profile is complete if user has a dharma name
-          const hasCompletedProfile = !!(userData?.dharma_name && userData.dharma_name.trim().length > 0);
-          setProfileComplete(hasCompletedProfile);
-          
-          console.log('📋 Profile completion check:', {
-            userId: user.id,
-            email: user.email,
-            dharmaName: userData?.dharma_name,
-            isComplete: hasCompletedProfile
-          });
-        }
+        // Profile is complete if user has dharma_name, lay_name, AND at least one active class enrollment
+        const hasDharmaName = !!(userData?.dharma_name && userData.dharma_name.trim().length > 0);
+        const hasLayName = !!(userData?.lay_name && userData.lay_name.trim().length > 0);
+        const hasClassEnrollment = enrolledClasses.length > 0;
+        const hasCompletedProfile = hasDharmaName && hasLayName && hasClassEnrollment;
+        
+        setProfileComplete(hasCompletedProfile);
+        
+        console.log('📋 Profile completion check:', {
+          userId: user.id,
+          email: user.email,
+          dharmaName: userData?.dharma_name,
+          layName: userData?.lay_name,
+          enrolledClassCount: enrolledClasses.length,
+          isComplete: hasCompletedProfile
+        });
       } catch (error) {
         console.error('Error in profile completion check:', error);
         setProfileComplete(false);
