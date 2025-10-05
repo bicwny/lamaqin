@@ -19,8 +19,8 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
   const [summary, setSummary] = useState({ 
     听传承: 0, 
     看法本: 0, 
-    共修: null as '参加' | '缺席' | null, 
-    讲考: null as '参加' | '缺席' | null 
+    共修: null as '回顾' | '串讲' | '参加' | '缺席' | null, 
+    讲考: null as '讲考' | '提问' | '参加' | '缺席' | null 
   });
   const [loading, setLoading] = useState(true);
 
@@ -147,7 +147,11 @@ export default function CourseDetailScreen() {
   const [statusPickerVisible, setStatusPickerVisible] = useState(false);
   const [pendingRecord, setPendingRecord] = useState<{ lessonNumber: number; studyType: '共修' | '讲考' } | null>(null);
 
-  const recordStudy = async (lessonNumber: number, studyType: '听传承' | '看法本' | '共修' | '讲考', status?: '参加' | '缺席') => {
+  const recordStudy = async (
+    lessonNumber: number, 
+    studyType: '听传承' | '看法本' | '共修' | '讲考', 
+    status?: '回顾' | '串讲' | '参加' | '缺席' | '讲考' | '提问'
+  ) => {
     if (!user || !courseId) return;
 
     // For 共修/讲考, show status picker if no status provided
@@ -189,7 +193,7 @@ export default function CourseDetailScreen() {
     }
   };
 
-  const handleStatusSelect = async (status: '参加' | '缺席') => {
+  const handleStatusSelect = async (status: '回顾' | '串讲' | '参加' | '缺席' | '讲考' | '提问') => {
     if (pendingRecord) {
       await recordStudy(pendingRecord.lessonNumber, pendingRecord.studyType, status);
       setPendingRecord(null);
@@ -345,22 +349,72 @@ export default function CourseDetailScreen() {
           >
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>
-                {pendingRecord?.studyType}状态
+                {pendingRecord?.studyType}
               </Text>
               
-              <TouchableOpacity
-                style={[styles.statusButton, styles.attendedButton]}
-                onPress={() => handleStatusSelect('参加')}
-              >
-                <Text style={styles.statusButtonText}>✓ 参加</Text>
-              </TouchableOpacity>
+              {pendingRecord?.studyType === '共修' && (
+                <>
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.primaryStatusButton]}
+                    onPress={() => handleStatusSelect('回顾')}
+                  >
+                    <Text style={styles.statusButtonText}>回顾</Text>
+                  </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.statusButton, styles.absentButton]}
-                onPress={() => handleStatusSelect('缺席')}
-              >
-                <Text style={styles.statusButtonText}>✗ 缺席</Text>
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.primaryStatusButton]}
+                    onPress={() => handleStatusSelect('串讲')}
+                  >
+                    <Text style={styles.statusButtonText}>串讲</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.attendedButton]}
+                    onPress={() => handleStatusSelect('参加')}
+                  >
+                    <Text style={styles.statusButtonText}>✓ 参加</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.absentButton]}
+                    onPress={() => handleStatusSelect('缺席')}
+                  >
+                    <Text style={styles.statusButtonText}>✗ 缺席</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {pendingRecord?.studyType === '讲考' && (
+                <>
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.primaryStatusButton]}
+                    onPress={() => handleStatusSelect('讲考')}
+                  >
+                    <Text style={styles.statusButtonText}>讲考</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.primaryStatusButton]}
+                    onPress={() => handleStatusSelect('提问')}
+                  >
+                    <Text style={styles.statusButtonText}>提问</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.attendedButton]}
+                    onPress={() => handleStatusSelect('参加')}
+                  >
+                    <Text style={styles.statusButtonText}>✓ 参加</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.statusButton, styles.absentButton]}
+                    onPress={() => handleStatusSelect('缺席')}
+                  >
+                    <Text style={styles.statusButtonText}>✗ 缺席</Text>
+                  </TouchableOpacity>
+                </>
+              )}
 
               <TouchableOpacity
                 style={styles.cancelButton}
@@ -545,6 +599,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 12,
+  },
+  primaryStatusButton: {
+    backgroundColor: '#3B82F6',
   },
   attendedButton: {
     backgroundColor: '#10B981',

@@ -109,7 +109,7 @@ export interface StudyRecord {
   study_type?: '听上师传承' | '看法本' | '共修' | '讲考';
   study_count_for_lesson: number;
   completed?: boolean;
-  status?: '参加' | '缺席';
+  status?: '回顾' | '串讲' | '参加' | '缺席' | '讲考' | '提问';
   created_at: string;
 }
 
