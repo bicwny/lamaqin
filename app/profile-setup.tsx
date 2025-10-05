@@ -39,9 +39,13 @@ export default function ProfileSetupScreen() {
     if (!user) return;
     
     try {
-      const [classes, enrolledClasses, userData] = await Promise.all([
+      const [classes, activeEnrollments, userData] = await Promise.all([
         classCurriculumService.getAllClassCurricula(),
-        classCurriculumService.getUserEnrolledClasses(user.id),
+        supabase
+          .from('user_class_progress')
+          .select('class_id')
+          .eq('user_id', user.id)
+          .neq('enrollment_status', 'paused'),
         supabase
           .from('users')
           .select('dharma_name, lay_name, location')
@@ -50,7 +54,8 @@ export default function ProfileSetupScreen() {
       ]);
       
       setAvailableClasses(classes);
-      setSelectedClassIds(enrolledClasses.map(e => e.class_id));
+      // Only show active (non-paused) enrollments
+      setSelectedClassIds((activeEnrollments.data || []).map(e => e.class_id));
       
       // Pre-fill existing user data
       if (userData.data) {
