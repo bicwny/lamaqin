@@ -29,11 +29,10 @@ export default function Index() {
             .from('user_class_progress')
             .select('class_id')
             .eq('user_id', user.id)
-            .neq('enrollment_status', 'paused')
             .then(r => r.data || [])
         ]);
 
-        // Profile is complete if user has dharma_name, lay_name, AND at least one active class enrollment
+        // Profile is complete if user has dharma_name, lay_name, AND at least one class enrollment (any status)
         const hasDharmaName = !!(userData?.dharma_name && userData.dharma_name.trim().length > 0);
         const hasLayName = !!(userData?.lay_name && userData.lay_name.trim().length > 0);
         const hasClassEnrollment = enrolledClasses.length > 0;

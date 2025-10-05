@@ -63,6 +63,20 @@ The app uses React Native with a configurable architecture setting in `app.json`
 
 ## Recent Changes (October 5, 2025)
 
+### Profile Completion Criteria Update - COMPLETED ✅
+- **Change**: Profile is now considered complete if user has ANY class enrollment, regardless of status (active, paused, or completed)
+- **Previous Behavior**: Only active enrollments counted, forcing users with paused classes to re-enroll
+- **New Behavior**: Users with paused or completed classes can access the main app, providing maximum flexibility
+- **Rationale**: Users may take breaks from study (pausing classes) but should still have app access
+- **Impact**: Users who paused all their classes can now access the app without being redirected to profile setup
+- **Technical**: Removed `.neq('enrollment_status', 'paused')` filter from profile completion check in `app/index.tsx`
+
+### Profile Setup Data Loading - COMPLETED ✅
+- **Added**: Profile setup now loads existing user data from Supabase and pre-fills form fields
+- **Fields Loaded**: dharma_name (法名), lay_name (俗名), location (所在地区)
+- **Class Selection**: Pre-selects only active (non-paused) enrollments to match profile completion logic
+- **User Email Display**: Added email indicator at top of form to remind users which account they're configuring
+
 ### Class Curriculum Database Migration - COMPLETED ✅
 - **Issue Identified**: Users selecting "前行" class during profile setup were not receiving their required practices due to missing database tables
 - **Root Cause**: The `class_required_practices`, `user_enrolled_classes`, and related tables didn't exist in Supabase database
