@@ -39,13 +39,25 @@ export default function ProfileSetupScreen() {
     if (!user) return;
     
     try {
-      const [classes, enrolledClasses] = await Promise.all([
+      const [classes, enrolledClasses, userData] = await Promise.all([
         classCurriculumService.getAllClassCurricula(),
-        classCurriculumService.getUserEnrolledClasses(user.id)
+        classCurriculumService.getUserEnrolledClasses(user.id),
+        supabase
+          .from('users')
+          .select('dharma_name, lay_name, location')
+          .eq('id', user.id)
+          .single()
       ]);
       
       setAvailableClasses(classes);
       setSelectedClassIds(enrolledClasses.map(e => e.class_id));
+      
+      // Pre-fill existing user data
+      if (userData.data) {
+        setDharmaName(userData.data.dharma_name || '');
+        setLayName(userData.data.lay_name || '');
+        setLocation(userData.data.location || '');
+      }
     } catch (error) {
       console.error('Error loading classes:', error);
       toastService.error({ title: '加载失败', message: '加载班级列表失败，请稍后重试' });
