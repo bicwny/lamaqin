@@ -121,11 +121,7 @@ export default function TopicSelectionModal({
         </View>
 
         {/* Search Input */}
-        <View 
-          style={styles.searchContainer}
-          onStartShouldSetResponder={() => true}
-          onResponderRelease={(e) => e.stopPropagation()}
-        >
+        <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
             placeholder="搜索观修内容..."
@@ -138,11 +134,6 @@ export default function TopicSelectionModal({
             selectTextOnFocus={true}
             blurOnSubmit={false}
             returnKeyType="search"
-            onFocus={(e) => {
-              if (Platform.OS === 'web') {
-                e.stopPropagation();
-              }
-            }}
           />
         </View>
 
@@ -187,16 +178,18 @@ export default function TopicSelectionModal({
         onRequestClose={handleCancel}
         transparent={false}
       >
-        <SafeAreaView 
-          style={styles.webModalContent}
-          onStartShouldSetResponder={() => true}
-          onResponderRelease={(e) => {
+        <TouchableOpacity 
+          style={styles.webModalBackdrop}
+          activeOpacity={1}
+          onPress={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            return true;
           }}
         >
-          {modalContent}
-        </SafeAreaView>
+          <SafeAreaView style={styles.webModalContent}>
+            {modalContent}
+          </SafeAreaView>
+        </TouchableOpacity>
       </Modal>
     );
   }
@@ -219,6 +212,11 @@ export default function TopicSelectionModal({
 }
 
 const styles = StyleSheet.create({
+  webModalBackdrop: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   webModalContent: {
     flex: 1,
     backgroundColor: '#f8f9fa',
