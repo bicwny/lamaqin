@@ -50,6 +50,15 @@ The app uses React Native with a configurable architecture setting in `app.json`
 
 ## Recent Changes (October 5, 2025)
 
+### Web Nested Modal Fix - COMPLETED ✅
+- **Root Cause Identified**: Nested modals on web platform (Expo Router modal containing React Native Modal) had event propagation issue where child modal clicks bubbled up to parent modal's outside-click listener, causing both modals to dismiss
+- **Architectural Issue**: React Native Modal on web renders to a portal outside the parent modal's DOM tree, making stopPropagation ineffective
+- **Solution Implemented**: Replaced React Native Modal with absolutely positioned overlay View on web platform that stays within parent's DOM tree
+- **Event Handling**: Added capture-phase event handlers (onClickCapture, onMouseDownCapture, onPointerDownCapture, onTouchStartCapture) with stopPropagation to prevent all events from bubbling to parent
+- **Platform-Specific**: Web uses overlay View approach; iOS/Android continue using native Modal component (no changes to mobile behavior)
+- **Components Updated**: TopicSelectionModal.tsx now has separate rendering logic for web vs. native platforms
+- **Verified Fix**: Architect confirmed all interactions (search input, topic selection, cancel/confirm buttons) work correctly without dismissing parent modal
+
 ### Enhanced Study Record Status Options - COMPLETED ✅
 - **Updated 共修 (Group Study) status options**: Expanded from simple attendance tracking to include specific activities: 回顾 (review), 串讲 (connecting lecture), 参加 (attended), 缺席 (absent)
 - **Updated 讲考 (Teaching Exam) status options**: Now supports: 讲考 (teaching exam), 提问 (questions), 参加 (attended), 缺席 (absent)
