@@ -19,7 +19,20 @@ The app uses Supabase as the backend-as-a-service, providing authentication, rea
 Authentication follows a complete email-based flow including registration, email verification, password reset, and session persistence. The system maintains user profiles with Buddhist context (dharma names, practice years, current class).
 
 ## Data Storage Solutions
-Supabase PostgreSQL database handles all persistent data with real-time subscriptions for live updates. The app uses AsyncStorage (mobile) and localStorage (web) for session persistence and offline data caching. Practice records, progress tracking, and user preferences are synchronized across devices through Supabase's real-time features.
+
+**Database Architecture:**
+- **Primary Database**: Supabase PostgreSQL (external cloud service)
+  - Handles all persistent data with real-time subscriptions
+  - Complete schema defined in `docs/SUPABASE_COMPLETE_MIGRATION.sql`
+  - All migrations must be run in Supabase SQL Editor (not locally)
+  
+- **Local Storage**: AsyncStorage (mobile) and localStorage (web)
+  - Session persistence and offline data caching only
+  - No local PostgreSQL database is used
+  
+- **Important**: The app does NOT use Replit's built-in PostgreSQL database. All database operations connect to Supabase via the Supabase JavaScript client using `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` environment variables.
+
+Practice records, progress tracking, and user preferences are synchronized across devices through Supabase's real-time features.
 
 ## Authentication and Authorization
 Complete authentication system using Supabase Auth with email/password flow. Features include user registration with email verification, password reset functionality, persistent sessions across app launches, and secure token refresh. User data is automatically synced between Supabase Auth and the app's user database table.
@@ -50,6 +63,21 @@ The app uses React Native with a configurable architecture setting in `app.json`
 
 ## Recent Changes (October 5, 2025)
 
+### Class Curriculum Database Migration - COMPLETED ✅
+- **Issue Identified**: Users selecting "前行" class during profile setup were not receiving their required practices due to missing database tables
+- **Root Cause**: The `class_required_practices`, `user_enrolled_classes`, and related tables didn't exist in Supabase database
+- **Solution**: Executed complete database migration (`SUPABASE_COMPLETE_MIGRATION.sql`) creating all necessary tables with seeded data
+- **Migration Results**: Successfully created 16 tables with 2 class curricula, 12 courses, 31 practices, 7 class-course links, and 8 class-practice links
+- **Database Clarification**: App uses only Supabase PostgreSQL (external), NOT Replit's local database. All migrations run in Supabase SQL Editor.
+- **Cleanup**: Archived old local migration files to avoid confusion, documented single-database architecture in replit.md
+- **Verification**: Users selecting "前行" now correctly receive 1 course (前行广释) and 7 practices automatically
+
+### Profile Setup Validation Enhancement - COMPLETED ✅
+- **Removed Field**: Eliminated "⏰ 修行年限（可选）" (Practice Years) field from profile setup to simplify onboarding
+- **Required Fields**: Law name (法名), lay name (俗名), and class selection are mandatory
+- **Toast Notifications**: Replaced native alerts with consistent toast messages for validation errors
+- **Help Text Updated**: Reflects only location as optional field after practice years removal
+
 ### Web Nested Modal Fix - COMPLETED ✅
 - **Root Cause Identified**: Nested modals on web platform (Expo Router modal containing React Native Modal) had event propagation issue where child modal clicks bubbled up to parent modal's outside-click listener, causing both modals to dismiss
 - **Architectural Issue**: React Native Modal on web renders to a portal outside the parent modal's DOM tree, making stopPropagation ineffective
@@ -68,16 +96,15 @@ The app uses React Native with a configurable architecture setting in `app.json`
 
 ## Recent Changes (October 4, 2025)
 
-### Class-Based Curriculum System - IN PROGRESS 🚧
+### Class-Based Curriculum System - COMPLETED ✅
 
-**Feature:** Implementing a class-based curriculum structure where users can enroll in multiple Buddhist study classes simultaneously (加行, 净土) and automatically receive all required practices, courses, and study materials for their selected curricula.
+**Feature:** Class-based curriculum structure where users can enroll in multiple Buddhist study classes simultaneously (加行, 净土) and automatically receive all required practices, courses, and study materials for their selected curricula.
 
-**Completed:**
-1. ✅ Database schema design and migration SQL (docs/CLASS_CURRICULUM_MIGRATION.sql)
+**Implementation:**
+1. ✅ Database schema and migration (docs/SUPABASE_COMPLETE_MIGRATION.sql)
    - 5 new tables: class_curricula, class_required_courses, class_required_practices, user_enrolled_classes, user_class_progress
    - Seeded data for 加行 (146 lessons, 7 practices) and 净土 (161 lessons, 1 practice)
-   - Unique constraints on courses.name and practices.name to prevent duplicates
-   - Backward-compatible with existing study_records table
+   - Migration successfully executed on Supabase database
 
 2. ✅ TypeScript types (types/database.ts)
    - New interfaces: ClassCurriculum, ClassRequiredCourse, ClassRequiredPractice, UserEnrolledClass, UserClassProgress
@@ -92,18 +119,18 @@ The app uses React Native with a configurable architecture setting in `app.json`
    - Multi-select class enrollment UI with checkboxes
    - Auto-enrollment and practice project creation on profile save
    - Loads available classes from database dynamically
+   - Verified working: Users selecting 前行 receive 1 course + 7 practices automatically
 
-**Next Steps:**
-- Update lesson study tracking UI to support required/optional study types
+**Future Enhancements:**
+- Update lesson study tracking UI to show required vs optional study types
 - Update 闻思 tab to group courses by enrolled classes
-- Update 当日 tab to display practices from enrolled classes
-- End-to-end testing with both 加行 and 净土 enrollments
+- Update 当日 tab to filter practices by enrolled classes
 
 **Key Design Decisions:**
 - Concurrent enrollment supported (users can be in multiple classes)
 - Required study types (听上师传承 + 看法本) must be completed for lesson progress
 - Optional status fields (共修, 讲考) track attendance (参加/缺席) without affecting progress
-- Database migration runs on both fresh and existing databases safely
+- Single Supabase database for all environments (no local dev database)
 
 ## Recent Changes (September 29, 2025)
 
