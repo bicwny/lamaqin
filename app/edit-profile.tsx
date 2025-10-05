@@ -29,7 +29,6 @@ export default function EditProfileScreen() {
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
   const [availableClasses, setAvailableClasses] = useState<ClassCurriculum[]>([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
-  const [practiceYears, setPracticeYears] = useState('');
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -45,7 +44,7 @@ export default function EditProfileScreen() {
       const [userData, classes, enrolledClasses] = await Promise.all([
         supabase
           .from('users')
-          .select('dharma_name, lay_name, location, practice_years, class_name')
+          .select('dharma_name, lay_name, location, class_name')
           .eq('id', user.id)
           .single()
           .then(r => r.data),
@@ -57,7 +56,6 @@ export default function EditProfileScreen() {
         setDharmaName(userData.dharma_name || '');
         setLayName(userData.lay_name || '');
         setLocation(userData.location || '');
-        setPracticeYears(userData.practice_years ? userData.practice_years.toString() : '');
         setCurrentClass(userData.class_name || '');
       }
       
@@ -87,6 +85,21 @@ export default function EditProfileScreen() {
       return;
     }
 
+    if (!dharmaName.trim()) {
+      toastService.error({ title: '验证失败', message: '请输入法名' });
+      return;
+    }
+
+    if (!layName.trim()) {
+      toastService.error({ title: '验证失败', message: '请输入俗名' });
+      return;
+    }
+
+    if (selectedClassIds.length === 0) {
+      toastService.error({ title: '验证失败', message: '请至少选择一个班级' });
+      return;
+    }
+
     setLoading(true);
     try {
       const classNames = selectedClassIds
@@ -98,10 +111,9 @@ export default function EditProfileScreen() {
       const { error: dbError } = await supabase
         .from('users')
         .update({
-          dharma_name: dharmaName.trim() || null,
-          lay_name: layName.trim() || null,
+          dharma_name: dharmaName.trim(),
+          lay_name: layName.trim(),
           class_name: classNames || currentClass.trim() || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         })
         .eq('id', user.id);
@@ -146,10 +158,9 @@ export default function EditProfileScreen() {
       // Also update auth metadata for consistency
       const { error: authError } = await supabase.auth.updateUser({
         data: {
-          dharma_name: dharmaName.trim() || null,
-          lay_name: layName.trim() || null,
+          dharma_name: dharmaName.trim(),
+          lay_name: layName.trim(),
           class_name: classNames || currentClass.trim() || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         }
       });
@@ -225,7 +236,7 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>俗名</ThemedText>
+              <ThemedText style={styles.label}>俗名 *</ThemedText>
               <TextInput
                 style={styles.input}
                 value={layName}
@@ -237,7 +248,7 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>班级</ThemedText>
+              <ThemedText style={styles.label}>班级 *</ThemedText>
               {loadingClasses ? (
                 <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
               ) : (
@@ -270,18 +281,6 @@ export default function EditProfileScreen() {
                   )}
                 </View>
               )}
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>修行年限</ThemedText>
-              <TextInput
-                style={styles.input}
-                value={practiceYears}
-                onChangeText={setPracticeYears}
-                placeholder="请输入修行年数"
-                placeholderTextColor="#999"
-                keyboardType="numeric"
-              />
             </View>
 
             <View style={styles.inputGroup}>
