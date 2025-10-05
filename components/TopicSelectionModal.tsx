@@ -40,6 +40,16 @@ export default function TopicSelectionModal({
 }: TopicSelectionModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTopics, setFilteredTopics] = useState<MeditationTopic[]>([]);
+  const [pendingSelection, setPendingSelection] = useState<MeditationTopic | null>(null);
+
+  useEffect(() => {
+    if (visible && selectedTopicNumber) {
+      const currentlySelected = topics.find(t => t.topic_number === selectedTopicNumber);
+      setPendingSelection(currentlySelected || null);
+    } else if (visible) {
+      setPendingSelection(null);
+    }
+  }, [visible, selectedTopicNumber, topics]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -52,27 +62,33 @@ export default function TopicSelectionModal({
     }
   }, [searchQuery, topics]);
 
-  const handleTopicSelect = (topic: MeditationTopic) => {
-    console.log('🟢 handleTopicSelect called with topic:', topic.title);
-    onSelect(topic);
+  const handleTopicTap = (topic: MeditationTopic) => {
+    console.log('🔵 Topic tapped (pending selection):', topic.title);
+    setPendingSelection(topic);
+  };
+
+  const handleConfirmSelection = () => {
+    if (pendingSelection) {
+      console.log('✅ Confirming selection:', pendingSelection.title);
+      onSelect(pendingSelection);
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    console.log('❌ Cancelled without applying changes');
+    setPendingSelection(null);
     onClose();
   };
 
   const renderTopicItem = ({ item }: { item: MeditationTopic }) => {
-    const isSelected = selectedTopicNumber === item.topic_number;
+    const isSelected = pendingSelection?.topic_number === item.topic_number;
     
     return (
       <TouchableOpacity
         style={[styles.topicItem, isSelected && styles.selectedTopicItem]}
-        onPress={() => {
-          console.log('🔵 Topic item pressed:', item.title);
-          handleTopicSelect(item);
-        }}
+        onPress={() => handleTopicTap(item)}
         activeOpacity={0.7}
-        disabled={false}
-        delayLongPress={500}
-        delayPressIn={0}
-        delayPressOut={100}
       >
         <Text 
           style={[styles.topicTitle, isSelected && styles.selectedTopicTitle]}
@@ -91,11 +107,17 @@ export default function TopicSelectionModal({
     <>
       {/* Header */}
       <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
+          <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
             <Text style={styles.cancelButtonText}>取消</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>选择观修内容</Text>
-          <View style={styles.headerSpacer} />
+          <TouchableOpacity 
+            onPress={handleConfirmSelection} 
+            style={[styles.doneButton, !pendingSelection && styles.doneButtonDisabled]}
+            disabled={!pendingSelection}
+          >
+            <Text style={[styles.doneButtonText, !pendingSelection && styles.doneButtonTextDisabled]}>完成</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Search Input */}
@@ -211,8 +233,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
-  headerSpacer: {
-    width: 60,
+  doneButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    cursor: Platform.OS === 'web' ? 'pointer' : undefined,
+  },
+  doneButtonDisabled: {
+    opacity: 0.4,
+  },
+  doneButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  doneButtonTextDisabled: {
+    color: '#999',
   },
   searchContainer: {
     padding: 16,
