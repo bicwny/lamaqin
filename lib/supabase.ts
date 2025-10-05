@@ -85,7 +85,8 @@ export async function testConnection() {
       .select("name")
       .limit(1);
 
-    const { data, error } = await Promise.race([connectionTest, timeoutPromise]);
+    const result = await Promise.race([connectionTest, timeoutPromise]) as Awaited<typeof connectionTest>;
+    const { data, error } = result;
 
     if (error) {
       console.error("❌ Supabase connection error:", error);
