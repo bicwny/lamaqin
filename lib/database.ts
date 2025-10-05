@@ -862,6 +862,27 @@ export const studyService = {
         .single();
 
       if (insertError) {
+        // If already enrolled (duplicate key), fetch the existing record
+        if (insertError.code === '23505') {
+          const { data: existingCourse, error: fetchError } = await supabase
+            .from('user_courses')
+            .select(`
+              *,
+              course:courses(*)
+            `)
+            .eq('user_id', userId)
+            .eq('course_id', courseId)
+            .single();
+
+          if (fetchError) {
+            console.error('❌ Error fetching existing enrollment:', fetchError);
+            throw fetchError;
+          }
+
+          return existingCourse;
+        }
+        
+        // For other errors, log and throw
         console.error('❌ Error inserting user course:', insertError);
         throw insertError;
       }
@@ -883,7 +904,10 @@ export const studyService = {
         course: courseData
       };
     } catch (err) {
-      console.error('❌ joinCourse failed:', err);
+      // Only log if it's not a duplicate key error
+      if ((err as any)?.code !== '23505') {
+        console.error('❌ joinCourse failed:', err);
+      }
       throw err;
     }
   },
