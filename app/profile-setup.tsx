@@ -6,7 +6,6 @@ import {
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -20,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { classCurriculumService } from '@/lib/database';
 import type { ClassCurriculum } from '@/types/database';
 import PageTemplate from '@/components/PageTemplate';
+import { toastService } from '@/lib/toast';
 
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
@@ -49,7 +49,7 @@ export default function ProfileSetupScreen() {
       setSelectedClassIds(enrolledClasses.map(e => e.class_id));
     } catch (error) {
       console.error('Error loading classes:', error);
-      Alert.alert('提示', '加载班级列表失败，请稍后重试');
+      toastService.error({ title: '加载失败', message: '加载班级列表失败，请稍后重试' });
     } finally {
       setLoadingClasses(false);
     }
@@ -67,23 +67,23 @@ export default function ProfileSetupScreen() {
 
   const handleSaveProfile = async () => {
     if (!user) {
-      Alert.alert('错误', '用户信息未找到');
+      toastService.error({ title: '错误', message: '用户信息未找到' });
       return;
     }
 
     // Validation - matching edit-profile.tsx requirements
     if (!dharmaName.trim()) {
-      Alert.alert('验证失败', '请输入法名');
+      toastService.error({ title: '验证失败', message: '请输入法名' });
       return;
     }
 
     if (!layName.trim()) {
-      Alert.alert('验证失败', '请输入俗名');
+      toastService.error({ title: '验证失败', message: '请输入俗名' });
       return;
     }
 
     if (selectedClassIds.length === 0) {
-      Alert.alert('验证失败', '请至少选择一个班级');
+      toastService.error({ title: '验证失败', message: '请至少选择一个班级' });
       return;
     }
 
@@ -125,7 +125,10 @@ export default function ProfileSetupScreen() {
 
       if (dbError) {
         console.error('Database update error:', dbError);
-        Alert.alert('保存失败', '数据库更新失败，请稍后重试');
+        toastService.error({
+          title: '保存失败',
+          message: '数据库更新失败，请稍后重试'
+        });
         return;
       }
 
@@ -144,7 +147,7 @@ export default function ProfileSetupScreen() {
           console.log(`⏸️ Paused enrollment in class ${classId}`);
         } catch (error) {
           console.error(`Error pausing class ${classId}:`, error);
-          Alert.alert('提示', '部分班级退出失败，请稍后重试');
+          toastService.error({ title: '提示', message: '部分班级退出失败，请稍后重试' });
         }
       }
       
@@ -156,7 +159,7 @@ export default function ProfileSetupScreen() {
           console.log(`✅ Enrolled in class ${classId}`);
         } catch (enrollError) {
           console.error(`Error enrolling in class ${classId}:`, enrollError);
-          Alert.alert('提示', '部分班级加入失败，请稍后重试');
+          toastService.error({ title: '提示', message: '部分班级加入失败，请稍后重试' });
         }
       }
       
@@ -164,12 +167,19 @@ export default function ProfileSetupScreen() {
         console.log(`📊 Enrollment updated: +${classesToAdd.length} -${classesToRemove.length}`);
       }
 
-      // For profile setup, navigate directly without alert to avoid staying on page
+      // For profile setup, show success message before navigating
+      toastService.success({
+        title: '保存成功',
+        message: '个人资料已完成'
+      });
       console.log('✅ Profile saved successfully, navigating to main app');
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Profile save error:', error);
-      Alert.alert('保存失败', '网络错误，请稍后重试');
+      toastService.error({
+        title: '保存失败',
+        message: '网络错误，请稍后重试'
+      });
     } finally {
       setLoading(false);
     }
@@ -353,16 +363,6 @@ const styles = StyleSheet.create({
     color: Colors.surface,
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  skipButton: {
-    alignItems: 'center',
-    marginTop: 15,
-    paddingVertical: 10,
-  },
-  skipButtonText: {
-    color: Colors.textSecondary,
-    fontSize: 16,
-    textDecorationLine: 'underline',
   },
   noteSection: {
     marginTop: 30,
