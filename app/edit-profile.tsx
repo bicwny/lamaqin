@@ -27,6 +27,7 @@ export default function EditProfileScreen() {
   const [layName, setLayName] = useState('');
   const [currentClass, setCurrentClass] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
+  const [enrolledClassIds, setEnrolledClassIds] = useState<string[]>([]);
   const [availableClasses, setAvailableClasses] = useState<ClassCurriculum[]>([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [location, setLocation] = useState('');
@@ -41,7 +42,7 @@ export default function EditProfileScreen() {
     if (!user?.id) return;
 
     try {
-      const [userData, classes, enrolledClasses] = await Promise.all([
+      const [userData, classes, allEnrollments, activeEnrollments] = await Promise.all([
         supabase
           .from('users')
           .select('dharma_name, lay_name, location, class_name')
@@ -49,7 +50,15 @@ export default function EditProfileScreen() {
           .single()
           .then(r => r.data),
         classCurriculumService.getAllClassCurricula(),
-        classCurriculumService.getUserEnrolledClasses(user.id)
+        supabase
+          .from('user_class_progress')
+          .select('class_id')
+          .eq('user_id', user.id),
+        supabase
+          .from('user_class_progress')
+          .select('class_id')
+          .eq('user_id', user.id)
+          .eq('enrollment_status', 'active')
       ]);
 
       if (userData) {
@@ -60,7 +69,10 @@ export default function EditProfileScreen() {
       }
       
       setAvailableClasses(classes);
-      setSelectedClassIds(enrolledClasses.map(e => e.class_id));
+      // Track all enrolled classes (for disabling checkboxes)
+      setEnrolledClassIds((allEnrollments.data || []).map(e => e.class_id));
+      // Only show active (non-paused) enrollments as selected
+      setSelectedClassIds((activeEnrollments.data || []).map(e => e.class_id));
     } catch (error) {
       console.error('❌ Error loading profile:', error);
     } finally {
@@ -70,6 +82,11 @@ export default function EditProfileScreen() {
   };
 
   const toggleClassSelection = (classId: string) => {
+    // Prevent toggling if already enrolled
+    if (enrolledClassIds.includes(classId)) {
+      return;
+    }
+    
     setSelectedClassIds(prev => {
       if (prev.includes(classId)) {
         return prev.filter(id => id !== classId);
@@ -254,28 +271,49 @@ export default function EditProfileScreen() {
               ) : (
                 <View style={styles.classSelectionContainer}>
                   {availableClasses.length > 0 ? (
-                    availableClasses.map((classItem) => (
-                      <TouchableOpacity
-                        key={classItem.id}
-                        style={styles.classCheckbox}
-                        onPress={() => toggleClassSelection(classItem.id)}
-                      >
-                        <View style={[
-                          styles.checkbox,
-                          selectedClassIds.includes(classItem.id) && styles.checkboxSelected
-                        ]}>
-                          {selectedClassIds.includes(classItem.id) && (
-                            <ThemedText style={styles.checkmark}>✓</ThemedText>
-                          )}
-                        </View>
-                        <View style={styles.classInfo}>
-                          <ThemedText style={styles.className}>{classItem.class_name}</ThemedText>
-                          {classItem.description && (
-                            <ThemedText style={styles.classDescription}>{classItem.description}</ThemedText>
-                          )}
-                        </View>
-                      </TouchableOpacity>
-                    ))
+                    availableClasses.map((classItem) => {
+                      const isEnrolled = enrolledClassIds.includes(classItem.id);
+                      const isSelected = selectedClassIds.includes(classItem.id);
+                      
+                      return (
+                        <TouchableOpacity
+                          key={classItem.id}
+                          style={[
+                            styles.classCheckbox,
+                            isEnrolled && styles.classCheckboxDisabled
+                          ]}
+                          onPress={() => toggleClassSelection(classItem.id)}
+                          disabled={isEnrolled}
+                        >
+                          <View style={[
+                            styles.checkbox,
+                            isSelected && styles.checkboxSelected,
+                            isEnrolled && styles.checkboxDisabled
+                          ]}>
+                            {isSelected && (
+                              <ThemedText style={styles.checkmark}>✓</ThemedText>
+                            )}
+                          </View>
+                          <View style={styles.classInfo}>
+                            <ThemedText style={[
+                              styles.className,
+                              isEnrolled && styles.classNameDisabled
+                            ]}>
+                              {classItem.class_name}
+                              {isEnrolled && ' (已加入)'}
+                            </ThemedText>
+                            {classItem.description && (
+                              <ThemedText style={[
+                                styles.classDescription,
+                                isEnrolled && styles.classDescriptionDisabled
+                              ]}>
+                                {classItem.description}
+                              </ThemedText>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })
                   ) : (
                     <ThemedText style={styles.noClassesText}>暂无可选班级</ThemedText>
                   )}
@@ -424,5 +462,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     fontStyle: 'italic',
+  },
+  classCheckboxDisabled: {
+    opacity: 0.5,
+    backgroundColor: '#F5F5F5',
+  },
+  checkboxDisabled: {
+    backgroundColor: '#E0E0E0',
+    borderColor: '#BDBDBD',
+  },
+  classNameDisabled: {
+    color: '#9E9E9E',
+  },
+  classDescriptionDisabled: {
+    color: '#BDBDBD',
   },
 });

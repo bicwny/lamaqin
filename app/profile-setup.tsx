@@ -50,7 +50,7 @@ export default function ProfileSetupScreen() {
           .from('user_class_progress')
           .select('class_id')
           .eq('user_id', user.id)
-          .neq('enrollment_status', 'paused'),
+          .eq('enrollment_status', 'active'),
         supabase
           .from('users')
           .select('dharma_name, lay_name, location')
