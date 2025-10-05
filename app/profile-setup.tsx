@@ -26,7 +26,6 @@ export default function ProfileSetupScreen() {
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
-  const [practiceYears, setPracticeYears] = useState('');
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingClasses, setLoadingClasses] = useState(true);
@@ -100,7 +99,6 @@ export default function ProfileSetupScreen() {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
           class_name: classNames || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
         }
       });
@@ -118,7 +116,6 @@ export default function ProfileSetupScreen() {
           dharma_name: dharmaName.trim() || null,
           lay_name: layName.trim() || null,
           class_name: classNames || null,
-          practice_years: practiceYears ? parseInt(practiceYears) : null,
           location: location.trim() || null,
           updated_at: new Date().toISOString()
         });
@@ -269,17 +266,6 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>⏰ 修行年限（可选）</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="修行多少年了"
-              value={practiceYears}
-              onChangeText={setPracticeYears}
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
             <TextInput
               style={styles.input}
@@ -306,7 +292,7 @@ export default function ProfileSetupScreen() {
             <Text style={styles.noteTitle}>💡 温馨提示</Text>
             <Text style={styles.noteText}>
               • 法名、俗名和班级为必填项{'\n'}
-              • 修行年限和常住地为可选项{'\n'}
+              • 常住地为可选项{'\n'}
               • 您可以随时在个人资料页面修改{'\n'}
               • 我们会保护您的隐私信息
             </Text>
