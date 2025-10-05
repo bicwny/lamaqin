@@ -182,7 +182,7 @@ export default function ProfileSetupScreen() {
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>👤 法名（可选）</Text>
+            <Text style={styles.inputLabel}>👤 法名 *</Text>
             <TextInput
               style={styles.input}
               placeholder="如：多吉、白玛等"
@@ -193,7 +193,7 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>🏷️ 俗名（可选）</Text>
+            <Text style={styles.inputLabel}>🏷️ 俗名 *</Text>
             <TextInput
               style={styles.input}
               placeholder="您的姓名"
@@ -204,7 +204,7 @@ export default function ProfileSetupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>📚 选择学修班级（可选，可多选）</Text>
+            <Text style={styles.inputLabel}>📚 选择学修班级 *（可多选）</Text>
             {loadingClasses ? (
               <View style={styles.classLoadingContainer}>
                 <ActivityIndicator size="small" color={Colors.primary} />
