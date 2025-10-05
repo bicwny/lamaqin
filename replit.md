@@ -48,6 +48,15 @@ The app uses React Native with a configurable architecture setting in `app.json`
 - **Expo Notifications**: Push notification system for practice reminders
 - **Vector Icons**: Icon library for Buddhist-themed iconography
 
+## Recent Changes (October 5, 2025)
+
+### Enhanced Study Record Status Options - COMPLETED ✅
+- **Updated 共修 (Group Study) status options**: Expanded from simple attendance tracking to include specific activities: 回顾 (review), 串讲 (connecting lecture), 参加 (attended), 缺席 (absent)
+- **Updated 讲考 (Teaching Exam) status options**: Now supports: 讲考 (teaching exam), 提问 (questions), 参加 (attended), 缺席 (absent)
+- **Type system updates**: Modified StudyRecord interface to support six new status values while maintaining backward compatibility
+- **UI improvements**: Course detail screen now shows context-specific status pickers based on study type with distinct button styling
+- **Data flow verified**: Status values are properly persisted to database and displayed in lesson progress summaries
+
 ## Recent Changes (October 4, 2025)
 
 ### Class-Based Curriculum System - IN PROGRESS 🚧
