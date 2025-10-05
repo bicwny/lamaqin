@@ -71,6 +71,22 @@ export default function ProfileSetupScreen() {
       return;
     }
 
+    // Validation - matching edit-profile.tsx requirements
+    if (!dharmaName.trim()) {
+      Alert.alert('验证失败', '请输入法名');
+      return;
+    }
+
+    if (!layName.trim()) {
+      Alert.alert('验证失败', '请输入俗名');
+      return;
+    }
+
+    if (selectedClassIds.length === 0) {
+      Alert.alert('验证失败', '请至少选择一个班级');
+      return;
+    }
+
     setLoading(true);
     try {
       const classNames = selectedClassIds
@@ -159,10 +175,6 @@ export default function ProfileSetupScreen() {
     }
   };
 
-  const handleSkip = () => {
-    console.log('⏭️ Skipping profile setup, navigating to main app');
-    router.replace('/(tabs)');
-  };
 
   return (
     <PageTemplate
@@ -280,18 +292,11 @@ export default function ProfileSetupScreen() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.skipButton} 
-            onPress={handleSkip}
-            disabled={loading}
-          >
-            <Text style={styles.skipButtonText}>暂时跳过</Text>
-          </TouchableOpacity>
-
           <View style={styles.noteSection}>
             <Text style={styles.noteTitle}>💡 温馨提示</Text>
             <Text style={styles.noteText}>
-              • 所有信息都是可选的{'\n'}
+              • 法名、俗名和班级为必填项{'\n'}
+              • 修行年限和常住地为可选项{'\n'}
               • 您可以随时在个人资料页面修改{'\n'}
               • 我们会保护您的隐私信息
             </Text>
