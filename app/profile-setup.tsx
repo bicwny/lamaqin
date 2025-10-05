@@ -26,6 +26,7 @@ export default function ProfileSetupScreen() {
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
+  const [enrolledClassIds, setEnrolledClassIds] = useState<string[]>([]);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingClasses, setLoadingClasses] = useState(true);
@@ -39,8 +40,12 @@ export default function ProfileSetupScreen() {
     if (!user) return;
     
     try {
-      const [classes, activeEnrollments, userData] = await Promise.all([
+      const [classes, allEnrollments, activeEnrollments, userData] = await Promise.all([
         classCurriculumService.getAllClassCurricula(),
+        supabase
+          .from('user_class_progress')
+          .select('class_id')
+          .eq('user_id', user.id),
         supabase
           .from('user_class_progress')
           .select('class_id')
@@ -54,7 +59,9 @@ export default function ProfileSetupScreen() {
       ]);
       
       setAvailableClasses(classes);
-      // Only show active (non-paused) enrollments
+      // Track all enrolled classes (for disabling checkboxes)
+      setEnrolledClassIds((allEnrollments.data || []).map(e => e.class_id));
+      // Only show active (non-paused) enrollments as selected
       setSelectedClassIds((activeEnrollments.data || []).map(e => e.class_id));
       
       // Pre-fill existing user data
@@ -72,6 +79,11 @@ export default function ProfileSetupScreen() {
   };
 
   const toggleClassSelection = (classId: string) => {
+    // Prevent toggling if already enrolled
+    if (enrolledClassIds.includes(classId)) {
+      return;
+    }
+    
     setSelectedClassIds(prev => {
       if (prev.includes(classId)) {
         return prev.filter(id => id !== classId);
@@ -254,36 +266,51 @@ export default function ProfileSetupScreen() {
               </View>
             ) : (
               <View style={styles.classOptionsContainer}>
-                {availableClasses.map((classItem) => (
-                  <TouchableOpacity
-                    key={classItem.id}
-                    style={[
-                      styles.classOption,
-                      selectedClassIds.includes(classItem.id) && styles.classOptionSelected
-                    ]}
-                    onPress={() => toggleClassSelection(classItem.id)}
-                  >
-                    <View style={[
-                      styles.checkbox,
-                      selectedClassIds.includes(classItem.id) && styles.checkboxSelected
-                    ]}>
-                      {selectedClassIds.includes(classItem.id) && (
-                        <Text style={styles.checkmark}>✓</Text>
-                      )}
-                    </View>
-                    <View style={styles.classOptionTextContainer}>
-                      <Text style={[
-                        styles.classOptionText,
-                        selectedClassIds.includes(classItem.id) && styles.classOptionTextSelected
+                {availableClasses.map((classItem) => {
+                  const isEnrolled = enrolledClassIds.includes(classItem.id);
+                  const isSelected = selectedClassIds.includes(classItem.id);
+                  
+                  return (
+                    <TouchableOpacity
+                      key={classItem.id}
+                      style={[
+                        styles.classOption,
+                        isSelected && styles.classOptionSelected,
+                        isEnrolled && styles.classOptionDisabled
+                      ]}
+                      onPress={() => toggleClassSelection(classItem.id)}
+                      disabled={isEnrolled}
+                    >
+                      <View style={[
+                        styles.checkbox,
+                        isSelected && styles.checkboxSelected,
+                        isEnrolled && styles.checkboxDisabled
                       ]}>
-                        {classItem.class_name}
-                      </Text>
-                      {classItem.description && (
-                        <Text style={styles.classOptionDescription}>{classItem.description}</Text>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                        {isSelected && (
+                          <Text style={styles.checkmark}>✓</Text>
+                        )}
+                      </View>
+                      <View style={styles.classOptionTextContainer}>
+                        <Text style={[
+                          styles.classOptionText,
+                          isSelected && styles.classOptionTextSelected,
+                          isEnrolled && styles.classOptionTextDisabled
+                        ]}>
+                          {classItem.class_name}
+                          {isEnrolled && ' (已加入)'}
+                        </Text>
+                        {classItem.description && (
+                          <Text style={[
+                            styles.classOptionDescription,
+                            isEnrolled && styles.classOptionDescriptionDisabled
+                          ]}>
+                            {classItem.description}
+                          </Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             )}
           </View>
@@ -474,5 +501,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textSecondary,
     marginTop: 4,
+  },
+  classOptionDisabled: {
+    opacity: 0.5,
+    backgroundColor: '#F5F5F5',
+  },
+  checkboxDisabled: {
+    backgroundColor: '#E0E0E0',
+    borderColor: '#BDBDBD',
+  },
+  classOptionTextDisabled: {
+    color: '#9E9E9E',
+  },
+  classOptionDescriptionDisabled: {
+    color: '#BDBDBD',
   },
 });
