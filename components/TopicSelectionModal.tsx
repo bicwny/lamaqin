@@ -170,27 +170,25 @@ export default function TopicSelectionModal({
   );
 
   if (Platform.OS === 'web') {
+    if (!visible) return null;
+    
+    const handleEvent = (e: any) => {
+      e.stopPropagation();
+    };
+    
     return (
-      <Modal
-        visible={visible}
-        animationType="slide"
-        presentationStyle="fullScreen"
-        onRequestClose={handleCancel}
-        transparent={false}
+      <View 
+        style={styles.webOverlayContainer}
+        // @ts-ignore - Web-only event handlers
+        onClickCapture={handleEvent}
+        onMouseDownCapture={handleEvent}
+        onPointerDownCapture={handleEvent}
+        onTouchStartCapture={handleEvent}
       >
-        <TouchableOpacity 
-          style={styles.webModalBackdrop}
-          activeOpacity={1}
-          onPress={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <SafeAreaView style={styles.webModalContent}>
-            {modalContent}
-          </SafeAreaView>
-        </TouchableOpacity>
-      </Modal>
+        <SafeAreaView style={styles.webModalContent}>
+          {modalContent}
+        </SafeAreaView>
+      </View>
     );
   }
 
@@ -212,10 +210,14 @@ export default function TopicSelectionModal({
 }
 
 const styles = StyleSheet.create({
-  webModalBackdrop: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
+  webOverlayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+    backgroundColor: '#f8f9fa',
   },
   webModalContent: {
     flex: 1,
