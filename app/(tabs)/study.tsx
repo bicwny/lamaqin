@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Colors } from '@/constants/Colors';
+import { ComponentTokens } from '@/utils/componentTokens';
 import PageHeader from '@/components/PageHeader';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -817,46 +818,22 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   courseCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   manageCourseCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   availableCourseCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   courseHeader: {
     marginBottom: 12,

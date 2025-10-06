@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
 import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens } from '@/utils/componentTokens';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
@@ -451,17 +452,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   courseInfoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   courseInfoTitle: {
     fontSize: 16,
@@ -477,16 +470,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   lessonItem: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
   },
   lessonHeader: {
     marginBottom: 12,

@@ -9,6 +9,7 @@ import { getCurrentDateInTimezone } from '@/lib/timezone';
 
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Colors } from '@/constants/Colors';
+import { ComponentTokens } from '@/utils/componentTokens';
 import PageTemplate from '@/components/PageTemplate';
 import { ConnectionTest } from '@/components/ConnectionTest';
 import { ThemedText } from '@/components/ThemedText';
@@ -965,18 +966,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   studyCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.borderDark,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   studyCardHeader: {
     flexDirection: 'row',
@@ -1044,18 +1037,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   practiceCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.borderDark,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   practiceGrid: {
     flexDirection: 'row',
@@ -1064,18 +1049,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   practiceCardColumn: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginBottom: ComponentTokens.card.margin.comfortable,
     width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.borderDark,
   },
   practiceHeader: {
     marginBottom: 6,
