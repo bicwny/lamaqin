@@ -719,6 +719,7 @@ export default function HomeScreen() {
         }}
         scrollable={false}
         backgroundColor={Colors.background}
+        padding={0}
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
