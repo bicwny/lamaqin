@@ -975,8 +975,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.borderDark,
   },
   studyCardHeader: {
     flexDirection: 'row',
@@ -1054,6 +1054,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.borderDark,
   },
   practiceGrid: {
     flexDirection: 'row',
