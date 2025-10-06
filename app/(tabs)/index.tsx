@@ -969,7 +969,7 @@ const styles = StyleSheet.create({
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.spacious,
     marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.comfortable,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   studyCardHeader: {
     flexDirection: 'row',
@@ -1040,7 +1040,7 @@ const styles = StyleSheet.create({
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
     marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.comfortable,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   practiceGrid: {
     flexDirection: 'row',
@@ -1051,7 +1051,7 @@ const styles = StyleSheet.create({
   practiceCardColumn: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.comfortable,
+    marginBottom: ComponentTokens.card.margin.spacious,
     width: '48%',
   },
   practiceHeader: {

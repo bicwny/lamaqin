@@ -9,6 +9,7 @@ import { Colors } from '@/constants/Colors';
 import PageTemplate from '@/components/PageTemplate';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { toastService } from '@/lib/toast';
+import { ComponentTokens } from '@/utils/componentTokens';
 
 interface MindfulnessRecord {
   id: string;
@@ -246,17 +247,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   statsCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   statsTitle: {
     fontSize: 18,
@@ -297,17 +290,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
   },
   recordCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.spacious,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   recordTitle: {
     fontSize: 18,

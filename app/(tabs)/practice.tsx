@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   practiceItem: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.comfortable,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   practiceHeader: {
     flexDirection: "row",
