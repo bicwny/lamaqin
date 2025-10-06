@@ -238,7 +238,6 @@ export default function CourseDetailScreen() {
   return (
     <PageTemplate
       title={userCourse.course.name}
-      subtitle="课程详情与学习记录"
       showBackButton={true}
       onBackPress={() => router.back()}
       backgroundColor={DesignSystem.colors.background}

@@ -683,7 +683,6 @@ export default function StudyScreen() {
     return (
       <PageTemplate
         title={selectedCourse.course.name}
-        subtitle="课程详情与学习记录"
         showBackButton={true}
         onBackPress={() => setViewMode('home')}
         scrollable={false}
