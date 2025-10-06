@@ -449,11 +449,12 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     marginTop: 16,
     marginBottom: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   courseInfoCard: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.spacious,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
   courseInfoTitle: {
@@ -472,6 +473,7 @@ const styles = StyleSheet.create({
   lessonItem: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
   },
   lessonHeader: {
     marginBottom: 12,
