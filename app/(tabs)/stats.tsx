@@ -6,6 +6,7 @@ import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { ComponentTokens } from '@/utils/componentTokens';
 
 interface StatsData {
   // Practice Overview
@@ -375,20 +376,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 80,
     flex: 1,
     minWidth: '45%',
     maxWidth: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
   },
   statNumber: {
     fontSize: 24,
