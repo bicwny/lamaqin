@@ -27,6 +27,7 @@ export default function ProfileSetupScreen() {
   const [layName, setLayName] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
   const [enrolledClassIds, setEnrolledClassIds] = useState<string[]>([]);
+  const [enrollmentStatuses, setEnrollmentStatuses] = useState<Record<string, 'active' | 'paused' | 'completed'>>({});
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingClasses, setLoadingClasses] = useState(true);
@@ -40,17 +41,12 @@ export default function ProfileSetupScreen() {
     if (!user) return;
     
     try {
-      const [classes, allEnrollments, activeEnrollments, userData] = await Promise.all([
+      const [classes, allEnrollments, userData] = await Promise.all([
         classCurriculumService.getAllClassCurricula(),
         supabase
-          .from('user_class_progress')
-          .select('class_id')
+          .from('user_enrolled_classes')
+          .select('class_id, status')
           .eq('user_id', user.id),
-        supabase
-          .from('user_class_progress')
-          .select('class_id')
-          .eq('user_id', user.id)
-          .eq('enrollment_status', 'active'),
         supabase
           .from('users')
           .select('dharma_name, lay_name, location')
@@ -59,10 +55,25 @@ export default function ProfileSetupScreen() {
       ]);
       
       setAvailableClasses(classes);
-      // Track all enrolled classes (for disabling checkboxes)
-      setEnrolledClassIds((allEnrollments.data || []).map(e => e.class_id));
-      // Only show active (non-paused) enrollments as selected
-      setSelectedClassIds((activeEnrollments.data || []).map(e => e.class_id));
+      
+      // Build enrollment status map
+      const statusMap: Record<string, 'active' | 'paused' | 'completed'> = {};
+      const enrolledIds: string[] = [];
+      const activeIds: string[] = [];
+      
+      (allEnrollments.data || []).forEach(enrollment => {
+        enrolledIds.push(enrollment.class_id);
+        statusMap[enrollment.class_id] = enrollment.status as 'active' | 'paused' | 'completed';
+        
+        // Only active enrollments are selected
+        if (enrollment.status === 'active') {
+          activeIds.push(enrollment.class_id);
+        }
+      });
+      
+      setEnrolledClassIds(enrolledIds);
+      setEnrollmentStatuses(statusMap);
+      setSelectedClassIds(activeIds);
       
       // Pre-fill existing user data
       if (userData.data) {
@@ -269,35 +280,39 @@ export default function ProfileSetupScreen() {
                 {availableClasses.map((classItem) => {
                   const isEnrolled = enrolledClassIds.includes(classItem.id);
                   const isSelected = selectedClassIds.includes(classItem.id);
+                  const enrollmentStatus = enrollmentStatuses[classItem.id];
+                  
+                  const statusLabel = enrollmentStatus === 'completed' ? '圆满' : '已加入';
                   
                   return (
                     <TouchableOpacity
                       key={classItem.id}
                       style={[
                         styles.classOption,
-                        isSelected && styles.classOptionSelected,
+                        isSelected && !isEnrolled && styles.classOptionSelected,
                         isEnrolled && styles.classOptionDisabled
                       ]}
                       onPress={() => toggleClassSelection(classItem.id)}
                       disabled={isEnrolled}
                     >
-                      <View style={[
-                        styles.checkbox,
-                        isSelected && styles.checkboxSelected,
-                        isEnrolled && styles.checkboxDisabled
-                      ]}>
-                        {isSelected && (
-                          <Text style={styles.checkmark}>✓</Text>
-                        )}
-                      </View>
+                      {!isEnrolled && (
+                        <View style={[
+                          styles.checkbox,
+                          isSelected && styles.checkboxSelected
+                        ]}>
+                          {isSelected && (
+                            <Text style={styles.checkmark}>✓</Text>
+                          )}
+                        </View>
+                      )}
                       <View style={styles.classOptionTextContainer}>
                         <Text style={[
                           styles.classOptionText,
-                          isSelected && styles.classOptionTextSelected,
+                          isSelected && !isEnrolled && styles.classOptionTextSelected,
                           isEnrolled && styles.classOptionTextDisabled
                         ]}>
                           {classItem.class_name}
-                          {isEnrolled && ' (已加入)'}
+                          {isEnrolled && ` (${statusLabel})`}
                         </Text>
                         {classItem.description && (
                           <Text style={[
