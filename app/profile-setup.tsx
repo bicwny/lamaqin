@@ -289,8 +289,7 @@ export default function ProfileSetupScreen() {
                       key={classItem.id}
                       style={[
                         styles.classOption,
-                        isSelected && !isEnrolled && styles.classOptionSelected,
-                        isEnrolled && styles.classOptionDisabled
+                        isSelected && !isEnrolled && styles.classOptionSelected
                       ]}
                       onPress={() => toggleClassSelection(classItem.id)}
                       disabled={isEnrolled}
@@ -308,17 +307,13 @@ export default function ProfileSetupScreen() {
                       <View style={styles.classOptionTextContainer}>
                         <Text style={[
                           styles.classOptionText,
-                          isSelected && !isEnrolled && styles.classOptionTextSelected,
-                          isEnrolled && styles.classOptionTextDisabled
+                          isSelected && !isEnrolled && styles.classOptionTextSelected
                         ]}>
                           {classItem.class_name}
                           {isEnrolled && ` (${statusLabel})`}
                         </Text>
                         {classItem.description && (
-                          <Text style={[
-                            styles.classOptionDescription,
-                            isEnrolled && styles.classOptionDescriptionDisabled
-                          ]}>
+                          <Text style={styles.classOptionDescription}>
                             {classItem.description}
                           </Text>
                         )}

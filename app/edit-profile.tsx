@@ -292,10 +292,7 @@ export default function EditProfileScreen() {
                       return (
                         <TouchableOpacity
                           key={classItem.id}
-                          style={[
-                            styles.classCheckbox,
-                            isEnrolled && styles.classCheckboxDisabled
-                          ]}
+                          style={styles.classCheckbox}
                           onPress={() => toggleClassSelection(classItem.id)}
                           disabled={isEnrolled}
                         >
@@ -310,18 +307,12 @@ export default function EditProfileScreen() {
                             </View>
                           )}
                           <View style={styles.classInfo}>
-                            <ThemedText style={[
-                              styles.className,
-                              isEnrolled && styles.classNameDisabled
-                            ]}>
+                            <ThemedText style={styles.className}>
                               {classItem.class_name}
                               {isEnrolled && ` (${statusLabel})`}
                             </ThemedText>
                             {classItem.description && (
-                              <ThemedText style={[
-                                styles.classDescription,
-                                isEnrolled && styles.classDescriptionDisabled
-                              ]}>
+                              <ThemedText style={styles.classDescription}>
                                 {classItem.description}
                               </ThemedText>
                             )}
