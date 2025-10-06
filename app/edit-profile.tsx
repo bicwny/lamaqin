@@ -28,6 +28,7 @@ export default function EditProfileScreen() {
   const [currentClass, setCurrentClass] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
   const [enrolledClassIds, setEnrolledClassIds] = useState<string[]>([]);
+  const [enrollmentStatuses, setEnrollmentStatuses] = useState<Record<string, 'active' | 'paused' | 'completed'>>({});
   const [availableClasses, setAvailableClasses] = useState<ClassCurriculum[]>([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [location, setLocation] = useState('');
@@ -42,7 +43,7 @@ export default function EditProfileScreen() {
     if (!user?.id) return;
 
     try {
-      const [userData, classes, allEnrollments, activeEnrollments] = await Promise.all([
+      const [userData, classes, allEnrollments] = await Promise.all([
         supabase
           .from('users')
           .select('dharma_name, lay_name, location, class_name')
@@ -51,14 +52,9 @@ export default function EditProfileScreen() {
           .then(r => r.data),
         classCurriculumService.getAllClassCurricula(),
         supabase
-          .from('user_class_progress')
-          .select('class_id')
-          .eq('user_id', user.id),
-        supabase
-          .from('user_class_progress')
-          .select('class_id')
+          .from('user_enrolled_classes')
+          .select('class_id, status')
           .eq('user_id', user.id)
-          .eq('enrollment_status', 'active')
       ]);
 
       if (userData) {
@@ -69,10 +65,25 @@ export default function EditProfileScreen() {
       }
       
       setAvailableClasses(classes);
-      // Track all enrolled classes (for disabling checkboxes)
-      setEnrolledClassIds((allEnrollments.data || []).map(e => e.class_id));
-      // Only show active (non-paused) enrollments as selected
-      setSelectedClassIds((activeEnrollments.data || []).map(e => e.class_id));
+      
+      // Build enrollment status map
+      const statusMap: Record<string, 'active' | 'paused' | 'completed'> = {};
+      const enrolledIds: string[] = [];
+      const activeIds: string[] = [];
+      
+      (allEnrollments.data || []).forEach(enrollment => {
+        enrolledIds.push(enrollment.class_id);
+        statusMap[enrollment.class_id] = enrollment.status as 'active' | 'paused' | 'completed';
+        
+        // Only active enrollments are selected
+        if (enrollment.status === 'active') {
+          activeIds.push(enrollment.class_id);
+        }
+      });
+      
+      setEnrolledClassIds(enrolledIds);
+      setEnrollmentStatuses(statusMap);
+      setSelectedClassIds(activeIds);
     } catch (error) {
       console.error('❌ Error loading profile:', error);
     } finally {
@@ -274,6 +285,9 @@ export default function EditProfileScreen() {
                     availableClasses.map((classItem) => {
                       const isEnrolled = enrolledClassIds.includes(classItem.id);
                       const isSelected = selectedClassIds.includes(classItem.id);
+                      const enrollmentStatus = enrollmentStatuses[classItem.id];
+                      
+                      const statusLabel = enrollmentStatus === 'completed' ? '圆满' : '已加入';
                       
                       return (
                         <TouchableOpacity
@@ -285,22 +299,23 @@ export default function EditProfileScreen() {
                           onPress={() => toggleClassSelection(classItem.id)}
                           disabled={isEnrolled}
                         >
-                          <View style={[
-                            styles.checkbox,
-                            isSelected && styles.checkboxSelected,
-                            isEnrolled && styles.checkboxDisabled
-                          ]}>
-                            {isSelected && (
-                              <ThemedText style={styles.checkmark}>✓</ThemedText>
-                            )}
-                          </View>
+                          {!isEnrolled && (
+                            <View style={[
+                              styles.checkbox,
+                              isSelected && styles.checkboxSelected
+                            ]}>
+                              {isSelected && (
+                                <ThemedText style={styles.checkmark}>✓</ThemedText>
+                              )}
+                            </View>
+                          )}
                           <View style={styles.classInfo}>
                             <ThemedText style={[
                               styles.className,
                               isEnrolled && styles.classNameDisabled
                             ]}>
                               {classItem.class_name}
-                              {isEnrolled && ' (已加入)'}
+                              {isEnrolled && ` (${statusLabel})`}
                             </ThemedText>
                             {classItem.description && (
                               <ThemedText style={[
