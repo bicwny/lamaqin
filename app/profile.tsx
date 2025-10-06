@@ -236,13 +236,6 @@ export default function ProfileScreen() {
                 <Text style={styles.detailValue}>{profile.bio}</Text>
               </View>
             )}
-
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>加入时间</Text>
-              <Text style={styles.detailValue}>
-                {new Date(profile?.created_at || '').toLocaleDateString('zh-CN')}
-              </Text>
-            </View>
           </View>
 
           {/* Action Buttons */}
@@ -250,18 +243,6 @@ export default function ProfileScreen() {
             <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
               <Ionicons name="person-outline" size={24} color={DesignSystem.colors.primary} />
               <Text style={styles.actionButtonText}>编辑个人资料</Text>
-              <Ionicons name="chevron-forward" size={20} color="#999" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="settings-outline" size={24} color={DesignSystem.colors.primary} />
-              <Text style={styles.actionButtonText}>设置</Text>
-              <Ionicons name="chevron-forward" size={20} color="#999" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="help-circle-outline" size={24} color={DesignSystem.colors.primary} />
-              <Text style={styles.actionButtonText}>帮助与支持</Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
 
