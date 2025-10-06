@@ -680,8 +680,7 @@ export default function HomeScreen() {
           user_id: user.id,
           practice_project_id: practice.id,
           record_date: recordDate,
-          count: amount,
-          notes: '快速完成今日目标'
+          count: amount
         });
 
       if (recordError) throw recordError;
