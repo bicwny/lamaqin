@@ -1338,6 +1338,21 @@ export const classCurriculumService = {
         return selectedPracticeIds.has(req.practice_id);
       })
       .map(req => {
+        // Handle session-based practices (meditation sessions)
+        if (req.practice_category === 'session') {
+          return {
+            user_id: userId,
+            practice_id: req.practice_id,
+            target_count: req.target_count,
+            daily_target: null,
+            current_count: 0,
+            status: 'active' as const,
+            start_date: now.toISOString().split('T')[0],
+            target_period: 'weekly' as const,
+          };
+        }
+
+        // Handle count-based practices (mantras, prostrations, etc.)
         const baseProject = {
           user_id: userId,
           practice_id: req.practice_id,
@@ -1346,10 +1361,11 @@ export const classCurriculumService = {
           current_count: 0,
           status: 'active' as const,
           start_date: now.toISOString().split('T')[0],
+          target_period: 'daily' as const,
         };
 
         // Calculate end date for count-based practices with both target_count and daily_target
-        if (req.practice_category === 'count' && req.target_count && req.daily_target) {
+        if (req.target_count && req.daily_target) {
           const durationDays = Math.ceil(req.target_count / req.daily_target);
           const endDate = new Date(now);
           // Subtract 1 because start date is day 1 (inclusive)
@@ -1387,16 +1403,34 @@ export const classCurriculumService = {
         .single();
 
       if (existingProject && (existingProject.target_count === 0 || existingProject.target_count === null)) {
-        const { error } = await supabase
-          .from('user_practice_projects')
-          .update({
-            target_count: req.target_count,
-            daily_target: req.daily_target
-          })
-          .eq('id', existingProject.id);
+        // Handle session-based practices
+        if (req.practice_category === 'session') {
+          const { error } = await supabase
+            .from('user_practice_projects')
+            .update({
+              target_count: req.target_count,
+              daily_target: null,
+              target_period: 'weekly'
+            })
+            .eq('id', existingProject.id);
 
-        if (!error) {
-          updatedCount++;
+          if (!error) {
+            updatedCount++;
+          }
+        } else {
+          // Handle count-based practices
+          const { error } = await supabase
+            .from('user_practice_projects')
+            .update({
+              target_count: req.target_count,
+              daily_target: req.daily_target,
+              target_period: 'daily'
+            })
+            .eq('id', existingProject.id);
+
+          if (!error) {
+            updatedCount++;
+          }
         }
       }
     }
@@ -1605,6 +1639,21 @@ export const classCurriculumService = {
                !existingProjectPracticeIds.has(req.practice_id);
       })
       .map(req => {
+        // Handle session-based practices (meditation sessions)
+        if (req.practice_category === 'session') {
+          return {
+            user_id: userId,
+            practice_id: req.practice_id,
+            target_count: req.target_count,
+            daily_target: null,
+            current_count: 0,
+            status: 'active' as const,
+            start_date: now.toISOString().split('T')[0],
+            target_period: 'weekly' as const,
+          };
+        }
+
+        // Handle count-based practices (mantras, prostrations, etc.)
         const baseProject = {
           user_id: userId,
           practice_id: req.practice_id,
@@ -1613,10 +1662,11 @@ export const classCurriculumService = {
           current_count: 0,
           status: 'active' as const,
           start_date: now.toISOString().split('T')[0],
+          target_period: 'daily' as const,
         };
 
         // Calculate end date for count-based practices with both target_count and daily_target
-        if (req.practice_category === 'count' && req.target_count && req.daily_target) {
+        if (req.target_count && req.daily_target) {
           const durationDays = Math.ceil(req.target_count / req.daily_target);
           const endDate = new Date(now);
           endDate.setDate(endDate.getDate() + durationDays - 1);
