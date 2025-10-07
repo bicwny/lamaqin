@@ -217,6 +217,8 @@ export interface ClassRequiredPractice {
   min_duration_minutes?: number;
   practice_category: 'count' | 'session';
   is_required: boolean;
+  is_optional?: boolean;
+  choice_group?: string;
   created_at: string;
 }
 

@@ -32,10 +32,18 @@ export default function ProfileSetupScreen() {
   const [loading, setLoading] = useState(false);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [availableClasses, setAvailableClasses] = useState<ClassCurriculum[]>([]);
+  
+  // Practice choice system states
+  const [optionalPracticeGroups, setOptionalPracticeGroups] = useState<Map<string, Map<string, any[]>>>(new Map());
+  const [selectedPractices, setSelectedPractices] = useState<Map<string, Map<string, string[]>>>(new Map());
 
   useEffect(() => {
     loadDataAndClasses();
   }, [user]);
+
+  useEffect(() => {
+    loadOptionalPracticesForSelectedClasses();
+  }, [selectedClassIds]);
 
   const loadDataAndClasses = async () => {
     if (!user) return;
@@ -89,6 +97,36 @@ export default function ProfileSetupScreen() {
     }
   };
 
+  const loadOptionalPracticesForSelectedClasses = async () => {
+    const newGroups = new Map<string, Map<string, any[]>>();
+    const newSelections = new Map<string, Map<string, string[]>>();
+    
+    for (const classId of selectedClassIds) {
+      try {
+        const groups = await classCurriculumService.getOptionalPracticesByChoiceGroup(classId);
+        if (groups.size > 0) {
+          newGroups.set(classId, groups);
+          
+          // Initialize empty selections for this class if not already set
+          if (!selectedPractices.has(classId)) {
+            const classSelections = new Map<string, string[]>();
+            groups.forEach((_, groupName) => {
+              classSelections.set(groupName, []);
+            });
+            newSelections.set(classId, classSelections);
+          } else {
+            newSelections.set(classId, selectedPractices.get(classId)!);
+          }
+        }
+      } catch (error) {
+        console.error(`Error loading optional practices for class ${classId}:`, error);
+      }
+    }
+    
+    setOptionalPracticeGroups(newGroups);
+    setSelectedPractices(newSelections);
+  };
+
   const toggleClassSelection = (classId: string) => {
     // Prevent toggling if already enrolled
     if (enrolledClassIds.includes(classId)) {
@@ -101,6 +139,23 @@ export default function ProfileSetupScreen() {
       } else {
         return [...prev, classId];
       }
+    });
+  };
+
+  const togglePracticeSelection = (classId: string, groupName: string, practiceId: string) => {
+    setSelectedPractices(prev => {
+      const newMap = new Map(prev);
+      const classMap = newMap.get(classId) || new Map<string, string[]>();
+      const groupPractices = classMap.get(groupName) || [];
+      
+      if (groupPractices.includes(practiceId)) {
+        classMap.set(groupName, groupPractices.filter(id => id !== practiceId));
+      } else {
+        classMap.set(groupName, [...groupPractices, practiceId]);
+      }
+      
+      newMap.set(classId, classMap);
+      return newMap;
     });
   };
 
@@ -124,6 +179,24 @@ export default function ProfileSetupScreen() {
     if (selectedClassIds.length === 0) {
       toastService.error({ title: '验证失败', message: '请至少选择一个班级' });
       return;
+    }
+
+    // Validate practice choices - ensure at least one practice is selected for each choice group
+    for (const classId of selectedClassIds) {
+      const groups = optionalPracticeGroups.get(classId);
+      if (groups) {
+        for (const [groupName, practices] of groups) {
+          const selectedForGroup = selectedPractices.get(classId)?.get(groupName) || [];
+          if (selectedForGroup.length === 0) {
+            const className = availableClasses.find(c => c.id === classId)?.class_name || '该班级';
+            toastService.error({ 
+              title: '验证失败', 
+              message: `${className} 的 ${groupName} 请至少选择一项修法` 
+            });
+            return;
+          }
+        }
+      }
     }
 
     setLoading(true);
@@ -192,6 +265,24 @@ export default function ProfileSetupScreen() {
       for (const classId of classesToAdd) {
         try {
           await classCurriculumService.enrollUserInClass(user.id, classId);
+          
+          // Save practice choices if this class has optional practices
+          const groups = optionalPracticeGroups.get(classId);
+          if (groups) {
+            for (const [groupName, practices] of groups) {
+              const selectedForGroup = selectedPractices.get(classId)?.get(groupName) || [];
+              if (selectedForGroup.length > 0) {
+                await classCurriculumService.saveUserPracticeChoices(
+                  user.id,
+                  classId,
+                  groupName,
+                  selectedForGroup
+                );
+              }
+            }
+          }
+          
+          // Create practice projects (will respect saved choices)
           await classCurriculumService.createPracticeProjectsForClass(user.id, classId);
           console.log(`✅ Enrolled in class ${classId}`);
         } catch (enrollError) {
@@ -324,6 +415,65 @@ export default function ProfileSetupScreen() {
               </View>
             )}
           </View>
+
+          {/* Practice Choice UI - shown when selected classes have optional practices */}
+          {Array.from(optionalPracticeGroups.entries()).map(([classId, groups]) => {
+            const className = availableClasses.find(c => c.id === classId)?.class_name || '';
+            if (!selectedClassIds.includes(classId)) return null;
+            
+            return (
+              <View key={classId} style={styles.practiceChoiceSection}>
+                <Text style={styles.practiceChoiceTitle}>
+                  🧘 {className} 观修选择 *（至少选择一项）
+                </Text>
+                {Array.from(groups.entries()).map(([groupName, practices]) => {
+                  const selectedForGroup = selectedPractices.get(classId)?.get(groupName) || [];
+                  
+                  return (
+                    <View key={groupName} style={styles.practiceGroupContainer}>
+                      <Text style={styles.practiceGroupLabel}>{groupName}:</Text>
+                      {practices.map((practice: any) => {
+                        const isSelected = selectedForGroup.includes(practice.practice_id);
+                        
+                        return (
+                          <TouchableOpacity
+                            key={practice.practice_id}
+                            style={[
+                              styles.practiceOption,
+                              isSelected && styles.practiceOptionSelected
+                            ]}
+                            onPress={() => togglePracticeSelection(classId, groupName, practice.practice_id)}
+                          >
+                            <View style={[
+                              styles.checkbox,
+                              isSelected && styles.checkboxSelected
+                            ]}>
+                              {isSelected && (
+                                <Text style={styles.checkmark}>✓</Text>
+                              )}
+                            </View>
+                            <View style={styles.practiceOptionTextContainer}>
+                              <Text style={[
+                                styles.practiceOptionText,
+                                isSelected && styles.practiceOptionTextSelected
+                              ]}>
+                                {practice.practice?.name || '未知修法'}
+                              </Text>
+                              {practice.practice?.description && (
+                                <Text style={styles.practiceOptionDescription}>
+                                  {practice.practice.description}
+                                </Text>
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })}
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
@@ -525,5 +675,59 @@ const styles = StyleSheet.create({
   },
   classOptionDescriptionDisabled: {
     color: '#BDBDBD',
+  },
+  // Practice choice styles
+  practiceChoiceSection: {
+    marginBottom: 20,
+    padding: 16,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFE082',
+  },
+  practiceChoiceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  practiceGroupContainer: {
+    marginTop: 12,
+  },
+  practiceGroupLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+    marginBottom: 8,
+  },
+  practiceOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 8,
+  },
+  practiceOptionSelected: {
+    borderColor: '#FF9800',
+    backgroundColor: '#FFF3E0',
+  },
+  practiceOptionTextContainer: {
+    flex: 1,
+  },
+  practiceOptionText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  practiceOptionTextSelected: {
+    color: '#FF9800',
+  },
+  practiceOptionDescription: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 4,
   },
 });
