@@ -1326,31 +1326,42 @@ export const classCurriculumService = {
     const requiredPractices = await this.getClassRequiredPractices(classId);
     const now = new Date();
 
-    const projectsToCreate = requiredPractices.map(req => {
-      const baseProject = {
-        user_id: userId,
-        practice_id: req.practice_id,
-        target_count: req.target_count,
-        daily_target: req.daily_target,
-        current_count: 0,
-        status: 'active' as const,
-        start_date: now.toISOString().split('T')[0],
-      };
+    // Get user's practice choices
+    const userChoices = await this.getUserPracticeChoices(userId, classId);
+    const selectedPracticeIds = new Set(userChoices.map(c => c.practice_id));
 
-      // Calculate end date for count-based practices with both target_count and daily_target
-      if (req.practice_category === 'count' && req.target_count && req.daily_target) {
-        const durationDays = Math.ceil(req.target_count / req.daily_target);
-        const endDate = new Date(now);
-        // Subtract 1 because start date is day 1 (inclusive)
-        endDate.setDate(endDate.getDate() + durationDays - 1);
-        return {
-          ...baseProject,
-          target_end_date: endDate.toISOString().split('T')[0],
+    const projectsToCreate = requiredPractices
+      .filter(req => {
+        // Include if it's required (not optional)
+        if (!req.is_optional) return true;
+        // Include if it's optional AND user selected it
+        return selectedPracticeIds.has(req.practice_id);
+      })
+      .map(req => {
+        const baseProject = {
+          user_id: userId,
+          practice_id: req.practice_id,
+          target_count: req.target_count,
+          daily_target: req.daily_target,
+          current_count: 0,
+          status: 'active' as const,
+          start_date: now.toISOString().split('T')[0],
         };
-      }
 
-      return baseProject;
-    });
+        // Calculate end date for count-based practices with both target_count and daily_target
+        if (req.practice_category === 'count' && req.target_count && req.daily_target) {
+          const durationDays = Math.ceil(req.target_count / req.daily_target);
+          const endDate = new Date(now);
+          // Subtract 1 because start date is day 1 (inclusive)
+          endDate.setDate(endDate.getDate() + durationDays - 1);
+          return {
+            ...baseProject,
+            target_end_date: endDate.toISOString().split('T')[0],
+          };
+        }
+
+        return baseProject;
+      });
 
     if (projectsToCreate.length > 0) {
       const { error } = await supabase
@@ -1453,5 +1464,84 @@ export const classCurriculumService = {
       .eq('class_id', classId);
 
     if (error) throw error;
+  },
+
+  // Practice Choice System
+  async saveUserPracticeChoices(
+    userId: string,
+    classId: string,
+    choiceGroup: string,
+    practiceIds: string[]
+  ): Promise<void> {
+    // Delete existing choices for this group first
+    await supabase
+      .from('user_practice_choices')
+      .delete()
+      .eq('user_id', userId)
+      .eq('class_id', classId)
+      .eq('choice_group', choiceGroup);
+
+    // Insert new choices
+    if (practiceIds.length > 0) {
+      const choices = practiceIds.map(practiceId => ({
+        user_id: userId,
+        class_id: classId,
+        practice_id: practiceId,
+        choice_group: choiceGroup
+      }));
+
+      const { error } = await supabase
+        .from('user_practice_choices')
+        .insert(choices);
+
+      if (error) throw error;
+    }
+  },
+
+  async getUserPracticeChoices(
+    userId: string,
+    classId: string,
+    choiceGroup?: string
+  ): Promise<any[]> {
+    let query = supabase
+      .from('user_practice_choices')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('class_id', classId);
+
+    if (choiceGroup) {
+      query = query.eq('choice_group', choiceGroup);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getOptionalPracticesByChoiceGroup(classId: string): Promise<Map<string, any[]>> {
+    const { data, error } = await supabase
+      .from('class_required_practices')
+      .select(`
+        *,
+        practice:practices(*)
+      `)
+      .eq('class_id', classId)
+      .eq('is_optional', true)
+      .not('choice_group', 'is', null);
+
+    if (error) throw error;
+
+    // Group by choice_group
+    const grouped = new Map<string, any[]>();
+    (data || []).forEach(item => {
+      const group = item.choice_group;
+      if (!grouped.has(group)) {
+        grouped.set(group, []);
+      }
+      grouped.get(group)!.push(item);
+    });
+
+    return grouped;
   }
 };
