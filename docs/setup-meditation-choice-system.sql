@@ -18,11 +18,11 @@ ADD COLUMN IF NOT EXISTS is_optional BOOLEAN DEFAULT FALSE;
 -- 创建用户修法选择表
 -- Create user practice choices table
 CREATE TABLE IF NOT EXISTS user_practice_choices (
-  id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  class_id VARCHAR NOT NULL REFERENCES class_curriculum(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  class_id UUID NOT NULL REFERENCES class_curricula(id) ON DELETE CASCADE,
   choice_group VARCHAR(100) NOT NULL,
-  practice_id VARCHAR NOT NULL REFERENCES practices(id) ON DELETE CASCADE,
+  practice_id UUID NOT NULL REFERENCES practices(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
   -- 确保同一用户在同一班级的同一选择组中不会有重复的修法
@@ -49,7 +49,7 @@ SELECT
   '班级 (Class)' as type,
   id, 
   class_name 
-FROM class_curriculum 
+FROM class_curricula 
 WHERE class_name = '预科：入行';
 
 SELECT 
@@ -90,7 +90,7 @@ SELECT
   crp.choice_group,
   crp.is_optional
 FROM class_required_practices crp
-JOIN class_curriculum cc ON crp.class_id = cc.id
+JOIN class_curricula cc ON crp.class_id = cc.id
 JOIN practices p ON crp.practice_id = p.id
 WHERE cc.class_name = '预科：入行'
   AND crp.is_optional = TRUE;
@@ -107,7 +107,7 @@ SELECT
   p.name as practice_name,
   p.description
 FROM class_required_practices crp
-JOIN class_curriculum cc ON crp.class_id = cc.id
+JOIN class_curricula cc ON crp.class_id = cc.id
 JOIN practices p ON crp.practice_id = p.id
 WHERE crp.is_optional = TRUE
 ORDER BY cc.class_name, crp.choice_group, p.name;
@@ -123,7 +123,7 @@ SELECT
   p.name as selected_practice
 FROM user_practice_choices upc
 JOIN users u ON upc.user_id = u.id
-JOIN class_curriculum cc ON upc.class_id = cc.id
+JOIN class_curricula cc ON upc.class_id = cc.id
 JOIN practices p ON upc.practice_id = p.id
 WHERE upc.user_id = '<USER_ID>'
 ORDER BY cc.class_name, upc.choice_group;

@@ -132,7 +132,7 @@ SELECT
   p.name as selected_practice
 FROM user_practice_choices upc
 JOIN users u ON upc.user_id = u.id
-JOIN class_curriculum cc ON upc.class_id = cc.id
+JOIN class_curricula cc ON upc.class_id = cc.id
 JOIN practices p ON upc.practice_id = p.id
 WHERE u.dharma_name = '<USER_DHARMA_NAME>'
 ORDER BY cc.class_name, upc.choice_group;
