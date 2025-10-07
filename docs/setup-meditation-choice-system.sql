@@ -56,7 +56,8 @@ SELECT
   '修法 (Practices)' as type,
   id,
   name,
-  category
+  type,
+  description
 FROM practices 
 WHERE name IN (
   '《入行论广释》201观修',
