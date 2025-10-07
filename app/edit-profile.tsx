@@ -281,6 +281,14 @@ export default function EditProfileScreen() {
               }
             }
           }
+          
+          // Sync practice projects for this class based on updated choices
+          try {
+            await classCurriculumService.syncPracticeProjectsForClass(user.id, classId);
+            console.log(`🔄 Synced practice projects for class ${classId}`);
+          } catch (error) {
+            console.error(`Error syncing practice projects for class ${classId}:`, error);
+          }
         }
       }
 

@@ -1543,5 +1543,99 @@ export const classCurriculumService = {
     });
 
     return grouped;
+  },
+
+  async syncPracticeProjectsForClass(userId: string, classId: string): Promise<void> {
+    // Get all required practices for this class
+    const requiredPractices = await this.getClassRequiredPractices(classId);
+    
+    // Get user's current practice choices
+    const userChoices = await this.getUserPracticeChoices(userId, classId);
+    const selectedPracticeIds = new Set(userChoices.map(c => c.practice_id));
+    
+    // Get all current practice projects for this class
+    const practicesInClass = requiredPractices.map(rp => rp.practice_id);
+    const { data: currentProjects } = await supabase
+      .from('user_practice_projects')
+      .select('id, practice_id')
+      .eq('user_id', userId)
+      .in('practice_id', practicesInClass);
+    
+    const existingProjectPracticeIds = new Set(
+      (currentProjects || []).map(p => p.practice_id)
+    );
+    
+    // Determine which practices should exist based on requirements and choices
+    const shouldExistPracticeIds = new Set(
+      requiredPractices
+        .filter(req => {
+          // Include if it's required (not optional)
+          if (!req.is_optional) return true;
+          // Include if it's optional AND user selected it
+          return selectedPracticeIds.has(req.practice_id);
+        })
+        .map(req => req.practice_id)
+    );
+    
+    // Delete projects for optional practices that are no longer selected
+    const projectsToDelete = (currentProjects || [])
+      .filter(p => {
+        const req = requiredPractices.find(r => r.practice_id === p.practice_id);
+        // Delete if it's optional AND not selected anymore
+        return req?.is_optional && !selectedPracticeIds.has(p.practice_id);
+      })
+      .map(p => p.id);
+    
+    if (projectsToDelete.length > 0) {
+      const { error } = await supabase
+        .from('user_practice_projects')
+        .delete()
+        .in('id', projectsToDelete);
+      
+      if (error) throw error;
+      console.log(`🗑️ Deleted ${projectsToDelete.length} practice projects`);
+    }
+    
+    // Create projects for newly selected optional practices
+    const now = new Date();
+    const projectsToCreate = requiredPractices
+      .filter(req => {
+        // Only create if it should exist AND doesn't exist yet
+        return shouldExistPracticeIds.has(req.practice_id) && 
+               !existingProjectPracticeIds.has(req.practice_id);
+      })
+      .map(req => {
+        const baseProject = {
+          user_id: userId,
+          practice_id: req.practice_id,
+          target_count: req.target_count,
+          daily_target: req.daily_target,
+          current_count: 0,
+          status: 'active' as const,
+          start_date: now.toISOString().split('T')[0],
+        };
+
+        // Calculate end date for count-based practices with both target_count and daily_target
+        if (req.practice_category === 'count' && req.target_count && req.daily_target) {
+          const durationDays = Math.ceil(req.target_count / req.daily_target);
+          const endDate = new Date(now);
+          endDate.setDate(endDate.getDate() + durationDays - 1);
+          return {
+            ...baseProject,
+            target_end_date: endDate.toISOString().split('T')[0],
+          };
+        }
+
+        return baseProject;
+      });
+    
+    if (projectsToCreate.length > 0) {
+      const { error } = await supabase
+        .from('user_practice_projects')
+        .insert(projectsToCreate);
+      
+      if (error) throw error;
+      console.log(`✅ Created ${projectsToCreate.length} practice projects`);
+    }
   }
 };
