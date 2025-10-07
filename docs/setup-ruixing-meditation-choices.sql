@@ -8,8 +8,8 @@
 
 INSERT INTO practices (id, name, type, unit, description)
 VALUES 
-  (gen_random_uuid(), '《入行论广释》201观修', 'session', '座', '入行论观修 - 第1课至第201课的系统观修'),
-  (gen_random_uuid(), '《前行实修法》第59-92修法', 'session', '座', '前行实修 - 第59至92修法的系统观修')
+  (gen_random_uuid(), '《入行论广释》201观修', 'time', '座', '入行论观修 - 第1课至第201课的系统观修'),
+  (gen_random_uuid(), '《前行实修法》第59-92修法', 'time', '座', '前行实修 - 第59至92修法的系统观修')
 ON CONFLICT (name) DO NOTHING;
 
 -- 步骤2: 获取班级ID和修法ID
@@ -52,9 +52,9 @@ VALUES (
   '<PRACTICE_ID_1>',
   '观修选择',
   TRUE,
-  NULL,  -- session类型不需要target_count
-  NULL,  -- session类型不需要daily_target
-  'session'
+  NULL,  -- time类型的观修不需要target_count
+  NULL,  -- time类型的观修不需要daily_target
+  'time'
 )
 ON CONFLICT DO NOTHING;
 
@@ -71,7 +71,7 @@ VALUES (
   TRUE,
   NULL,
   NULL,
-  'session'
+  'time'
 )
 ON CONFLICT DO NOTHING;
 */
