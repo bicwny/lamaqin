@@ -1345,8 +1345,8 @@ export const classCurriculumService = {
           return {
             user_id: userId,
             practice_id: req.practice_id,
-            total_target: req.target_count,
-            weekly_target: req.weekly_sessions || req.daily_target,
+            total_target: req.total_target,
+            weekly_target: req.weekly_target || req.daily_target,
             daily_target: null,
             current_count: 0,
             status: 'active' as const,
@@ -1411,8 +1411,8 @@ export const classCurriculumService = {
           const { error } = await supabase
             .from('user_practice_projects')
             .update({
-              total_target: req.target_count,
-              weekly_target: req.weekly_sessions || req.daily_target,
+              total_target: req.total_target,
+              weekly_target: req.weekly_target || req.daily_target,
               daily_target: null,
               target_period: 'weekly'
             })
@@ -1426,7 +1426,7 @@ export const classCurriculumService = {
           const { error } = await supabase
             .from('user_practice_projects')
             .update({
-              total_target: req.target_count,
+              total_target: req.total_target,
               daily_target: req.daily_target,
               target_period: 'daily'
             })
@@ -1648,8 +1648,8 @@ export const classCurriculumService = {
           return {
             user_id: userId,
             practice_id: req.practice_id,
-            total_target: req.target_count,
-            weekly_target: req.weekly_sessions || req.daily_target,
+            total_target: req.total_target,
+            weekly_target: req.weekly_target || req.daily_target,
             daily_target: null,
             current_count: 0,
             status: 'active' as const,
