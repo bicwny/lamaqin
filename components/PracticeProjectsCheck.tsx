@@ -69,10 +69,13 @@ export function PracticeProjectsCheck() {
             {project.practices?.name || '未知修行'}
           </Text>
           <Text style={styles.projectDetails}>
-            目标: {project.current_count}/{project.target_count} {project.practices?.unit}
+            目标: {project.current_count}/{project.total_target} {project.practices?.unit}
           </Text>
           <Text style={styles.projectDetails}>
-            每日目标: {project.daily_target} {project.practices?.unit}
+            {project.target_period === 'weekly' 
+              ? `每周目标: ${project.weekly_target || '-'} 座`
+              : `每日目标: ${project.daily_target || '-'} ${project.practices?.unit}`
+            }
           </Text>
           <Text style={styles.projectStatus}>状态: {project.status}</Text>
         </View>

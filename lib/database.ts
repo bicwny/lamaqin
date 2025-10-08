@@ -152,13 +152,14 @@ export const practiceService = {
   async createUserPracticeProject(
     userId: string,
     practiceId: string,
-    targetCount: number,
+    totalTarget: number,
     dailyTarget: number,
     startDate?: string,
     targetEndDate?: string,
     targetPeriod?: 'daily' | 'weekly',
     themeId?: string,
-    goalType?: string
+    goalType?: string,
+    weeklyTarget?: number
   ) {
     const { data, error } = await supabase
       .from('user_practice_projects')
@@ -166,8 +167,9 @@ export const practiceService = {
         user_id: userId,
         practice_id: practiceId,
         theme_id: themeId || null,
-        target_count: targetCount,
+        total_target: totalTarget,
         daily_target: dailyTarget,
+        weekly_target: weeklyTarget || null,
         start_date: startDate || new Date().toISOString().split('T')[0],
         target_end_date: targetEndDate || null,
         target_period: targetPeriod || 'daily',
@@ -1343,7 +1345,8 @@ export const classCurriculumService = {
           return {
             user_id: userId,
             practice_id: req.practice_id,
-            target_count: req.target_count,
+            total_target: req.target_count,
+            weekly_target: req.weekly_sessions || req.daily_target,
             daily_target: null,
             current_count: 0,
             status: 'active' as const,
@@ -1356,7 +1359,7 @@ export const classCurriculumService = {
         const baseProject = {
           user_id: userId,
           practice_id: req.practice_id,
-          target_count: req.target_count,
+          total_target: req.target_count,
           daily_target: req.daily_target,
           current_count: 0,
           status: 'active' as const,
@@ -1364,7 +1367,7 @@ export const classCurriculumService = {
           target_period: 'daily' as const,
         };
 
-        // Calculate end date for count-based practices with both target_count and daily_target
+        // Calculate end date for count-based practices with both total_target and daily_target
         if (req.target_count && req.daily_target) {
           const durationDays = Math.ceil(req.target_count / req.daily_target);
           const endDate = new Date(now);
@@ -1402,13 +1405,14 @@ export const classCurriculumService = {
         .eq('status', 'active')
         .single();
 
-      if (existingProject && (existingProject.target_count === 0 || existingProject.target_count === null)) {
+      if (existingProject && (existingProject.total_target === 0 || existingProject.total_target === null)) {
         // Handle session-based practices
         if (req.practice_category === 'session') {
           const { error } = await supabase
             .from('user_practice_projects')
             .update({
-              target_count: req.target_count,
+              total_target: req.target_count,
+              weekly_target: req.weekly_sessions || req.daily_target,
               daily_target: null,
               target_period: 'weekly'
             })
@@ -1422,7 +1426,7 @@ export const classCurriculumService = {
           const { error } = await supabase
             .from('user_practice_projects')
             .update({
-              target_count: req.target_count,
+              total_target: req.target_count,
               daily_target: req.daily_target,
               target_period: 'daily'
             })
@@ -1644,7 +1648,8 @@ export const classCurriculumService = {
           return {
             user_id: userId,
             practice_id: req.practice_id,
-            target_count: req.target_count,
+            total_target: req.target_count,
+            weekly_target: req.weekly_sessions || req.daily_target,
             daily_target: null,
             current_count: 0,
             status: 'active' as const,
@@ -1657,7 +1662,7 @@ export const classCurriculumService = {
         const baseProject = {
           user_id: userId,
           practice_id: req.practice_id,
-          target_count: req.target_count,
+          total_target: req.target_count,
           daily_target: req.daily_target,
           current_count: 0,
           status: 'active' as const,
@@ -1665,7 +1670,7 @@ export const classCurriculumService = {
           target_period: 'daily' as const,
         };
 
-        // Calculate end date for count-based practices with both target_count and daily_target
+        // Calculate end date for count-based practices with both total_target and daily_target
         if (req.target_count && req.daily_target) {
           const durationDays = Math.ceil(req.target_count / req.daily_target);
           const endDate = new Date(now);
