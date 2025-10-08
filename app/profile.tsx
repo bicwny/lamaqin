@@ -243,11 +243,11 @@ export default function ProfileScreen() {
             <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
               <Ionicons name="person-outline" size={24} color={DesignSystem.colors.primary} />
               <Text style={styles.actionButtonText}>编辑个人资料</Text>
-              <Ionicons name="chevron-forward" size={20} color="#999" />
+              <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.actionButton, styles.signOutButton]} onPress={handleSignOut}>
-              <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+              <Ionicons name="log-out-outline" size={24} color={DesignSystem.colors.error} />
               <Text style={[styles.actionButtonText, styles.signOutText]}>退出登录</Text>
             </TouchableOpacity>
           </View>
@@ -262,145 +262,135 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
+    marginTop: DesignSystem.spacing.lg,
+    fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textSecondary,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: DesignSystem.spacing.xl,
   },
   errorText: {
-    fontSize: 16,
-    color: '#FF3B30',
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.error,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: DesignSystem.spacing.xl,
   },
   retryButton: {
-    backgroundColor: DesignSystem.colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    ...DesignSystem.components.button.primary,
   },
   retryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: DesignSystem.colors.textInverse,
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white',
-    marginBottom: 20,
+    ...DesignSystem.components.card.standard,
+    marginTop: DesignSystem.spacing.lg,
+    // Card padding is appropriate here since it's a single content block
   },
   profileInfo: {
     flex: 1,
-    marginLeft: 16,
+    marginLeft: DesignSystem.spacing.lg,
   },
   dharmaName: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 4,
-    color: '#000',
+    fontSize: DesignSystem.typography.fontSize.xl,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.xs,
+    color: DesignSystem.colors.textPrimary,
   },
   email: {
-    fontSize: 14,
+    fontSize: DesignSystem.typography.fontSize.sm,
     color: DesignSystem.colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: DesignSystem.spacing.xs,
   },
   location: {
-    fontSize: 14,
+    fontSize: DesignSystem.typography.fontSize.sm,
     color: DesignSystem.colors.textSecondary,
   },
-  editButton: {
-    backgroundColor: DesignSystem.colors.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  editButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
   profileDetails: {
-    backgroundColor: 'white',
-    paddingVertical: 10,
-    marginBottom: 20,
+    ...DesignSystem.components.card.standard,
+    padding: 0, // Remove card padding for list-style rows
+    paddingVertical: DesignSystem.spacing.md,
   },
   detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   detailLabel: {
-    fontSize: 16,
+    fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   detailValue: {
-    fontSize: 16,
+    fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textSecondary,
     flex: 1,
     textAlign: 'right',
-    marginLeft: 16,
+    marginLeft: DesignSystem.spacing.lg,
   },
   actionSection: {
-    backgroundColor: 'white',
-    paddingVertical: 10,
+    ...DesignSystem.components.card.standard,
+    padding: 0, // Remove card padding for list-style rows
+    paddingVertical: DesignSystem.spacing.md,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DesignSystem.colors.borderLight,
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
-    marginLeft: 12,
+    marginLeft: DesignSystem.spacing.md,
     flex: 1,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
   },
   signOutButton: {
     borderBottomWidth: 0,
   },
   signOutText: {
-    color: '#FF3B30',
+    color: DesignSystem.colors.error,
   },
   errorBanner: {
-    backgroundColor: '#FFF3CD',
-    borderColor: '#FFEAA7',
+    backgroundColor: DesignSystem.colors.warning + '20',
+    borderColor: DesignSystem.colors.warning,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    margin: 16,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.md,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginVertical: DesignSystem.spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   errorBannerText: {
-    fontSize: 14,
-    color: '#856404',
+    fontSize: DesignSystem.typography.fontSize.sm,
+    color: DesignSystem.colors.textPrimary,
     flex: 1,
   },
   retryButtonSmall: {
     backgroundColor: DesignSystem.colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginLeft: 8,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.xxs,
+    borderRadius: DesignSystem.borderRadius.sm,
+    marginLeft: DesignSystem.spacing.sm,
   },
   retryButtonSmallText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
+    color: DesignSystem.colors.textInverse,
+    fontSize: DesignSystem.typography.fontSize.xs,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
 });
