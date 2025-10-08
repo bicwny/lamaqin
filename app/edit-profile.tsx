@@ -418,7 +418,9 @@ export default function EditProfileScreen() {
                             )}
                             <View style={styles.classInfo}>
                               <ThemedText style={styles.className}>
-                                {classItem.class_name}
+                                {classItem.class_name === '预科：入行' 
+                                  ? '🧘 预科：入行 观修选择 *（至少选择一项）'
+                                  : classItem.class_name}
                                 {isEnrolled && ` (${statusLabel})`}
                               </ThemedText>
                               {classItem.description && (
