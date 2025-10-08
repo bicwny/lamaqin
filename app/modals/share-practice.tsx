@@ -239,10 +239,6 @@ export default function SharePracticeModal() {
               圆满地道功德已  唯愿速得金刚持
             </Text>
           </View>
-
-          <Text style={styles.footerHint}>
-            💡 复制后，打开WhatsApp粘贴即可分享
-          </Text>
         </View>
       )}
     </ModalTemplate>
