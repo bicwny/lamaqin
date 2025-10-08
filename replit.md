@@ -26,6 +26,15 @@ The app uses React Native with a configurable architecture setting in `app.json`
 ## System Design Choices
 The application supports a class-based curriculum system, allowing users to enroll in multiple Buddhist study classes concurrently. Upon enrollment, users automatically receive all required practices, courses, and study materials specific to their selected curricula. This system includes database schema for class curricula, required courses, and practices, alongside user enrollment and progress tracking. Required study types must be completed for lesson progress, while optional activities track attendance without affecting core progress.
 
+### Configured Classes
+- **加行** (display_order: 1): Foundation stage - basic practice and merit accumulation
+- **预科：入行** (display_order: 2): Preparatory stage - Study and meditation on Bodhisattva's Way. Includes meditation choice system with 2 options: 《入行论广释》201观修 or 前行实修法
+- **正科** (display_order: 3): Core stage - formal study of Buddhist teachings. Includes count-based practices (莲师心咒 1000/day, 百字明 100/day) and meditation choice system with 3 options
+- **净土** (display_order: 4): Pure Land class - chanting for rebirth in Amitabha's Western Pure Land
+
+### Practice Choice System
+Some classes offer optional practice choices where users must select at least one practice from a choice group during enrollment. The system tracks selections using the `choice_group` field in `class_required_practices` table, with `is_optional=true` marking choices. User selections are stored in `user_practice_choices` table and automatically synced to create corresponding practice projects.
+
 # External Dependencies
 
 -   **Supabase**: Backend-as-a-service for authentication, database, and real-time features.
