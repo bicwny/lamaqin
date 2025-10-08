@@ -11,6 +11,9 @@ Preferred communication style: Simple, everyday language.
 ## Frontend Architecture
 The application leverages Expo Router for file-based routing and a tab-based navigation structure, categorizing practices into daily, study, mindfulness, and statistics. A "Five Taras" Buddhist-themed design system dictates the UI, employing semantic colors for different practice types. Global state management, particularly for authentication and user sessions, is handled using React Context. The UI is constructed from reusable design tokens and a comprehensive component library to ensure consistency.
 
+### Key Features
+- **Practice Sharing**: Users can share their daily practice summary via the "分享" button on the daily view. The share modal (`app/modals/share-practice.tsx`) formats today's practice data in a WhatsApp-friendly format (e.g., "10/7:\n当法：顶礼300，供曼扎2000，百字明130，前行实修法 2座") and provides clipboard copy functionality using expo-clipboard.
+
 ## Backend Architecture
 Supabase serves as the backend-as-a-service, providing authentication, a real-time database, and API functionality. The database schema includes tables for users, practices, courses, practice records, and progress tracking. All data operations are managed through the Supabase JavaScript client, which supports automatic session management and offline synchronization. The authentication system features a complete email-based flow with registration, verification, password reset, and session persistence, maintaining user profiles with Buddhist-specific information.
 
