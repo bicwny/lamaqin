@@ -222,6 +222,24 @@ export default function SharePracticeModal() {
             <Text style={styles.copyButtonText}>复制到剪贴板</Text>
           </TouchableOpacity>
 
+          <View style={styles.dedicationContainer}>
+            <Text style={styles.dedicationText}>
+              所南德义檀嘉热巴涅    此福已得一切智{'\n'}
+              托内尼波札南潘协将    摧伏一切过患敌{'\n'}
+              杰嘎纳齐瓦隆彻巴耶    生老病死犹波涛{'\n'}
+              哲波措利卓瓦卓瓦效    愿度有海诸有情
+            </Text>
+            
+            <Text style={styles.dedicationText}>
+              文殊师利勇猛智  普贤慧行亦复然{'\n'}
+              我今回向诸善根  随彼一切常修学{'\n'}
+              三世诸佛所称叹  如是最胜诸大愿{'\n'}
+              我今回向诸善根  为得普贤殊胜行{'\n'}
+              生生世世不离师  恒时享用盛法乐{'\n'}
+              圆满地道功德已  唯愿速得金刚持
+            </Text>
+          </View>
+
           <Text style={styles.footerHint}>
             💡 复制后，打开WhatsApp粘贴即可分享
           </Text>
@@ -277,6 +295,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: DesignSystem.typography.fontSize.base,
     fontWeight: DesignSystem.typography.fontWeight.semibold as any,
+  },
+  dedicationContainer: {
+    marginTop: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.md,
+  },
+  dedicationText: {
+    ...createStyles.body('sm') as any,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: DesignSystem.spacing.md,
   },
   footerHint: {
     ...createStyles.caption() as any,
