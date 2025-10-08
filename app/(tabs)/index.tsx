@@ -504,24 +504,24 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Practice Cards in Two Columns */}
-            <View style={styles.practiceGrid}>
+            {/* Practice Cards */}
+            <View>
               {/* Daily Practices */}
               {dailyPractices.map((practice) => (
                 <TouchableOpacity 
                   key={practice.id} 
-                  style={styles.practiceCardColumn}
+                  style={styles.practiceCard}
                   onPress={() => handlePracticeCardTap(practice)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
+                    <Text style={styles.practiceName} numberOfLines={1}>
                       {practice.name}
                     </Text>
                   </View>
 
                   <View style={styles.countPercentageRow}>
-                    <Text style={styles.practiceCountColumn}>
+                    <Text style={styles.practiceCount}>
                       {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
                     </Text>
                     <Text style={styles.progressPercent}>
@@ -571,16 +571,16 @@ export default function HomeScreen() {
               {weeklyPractices.map((practice) => (
                 <TouchableOpacity 
                   key={practice.id} 
-                  style={styles.practiceCardColumn}
+                  style={styles.practiceCard}
                   onPress={() => handlePracticeCardTap(practice)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceNameColumn} numberOfLines={1}>
+                    <Text style={styles.practiceName} numberOfLines={1}>
                       {practice.name}
                     </Text>
                   </View>
-                  <Text style={styles.weeklyProgressColumn}>
+                  <Text style={styles.weeklyProgress}>
                     本周 {practice.weekSessions}/{practice.weekTarget}座
                     {practice.status === 'completed' && ' 已完成'}
                   </Text>
@@ -661,18 +661,6 @@ const styles = StyleSheet.create({
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-  practiceGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-  practiceCardColumn: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginBottom: ComponentTokens.card.margin.spacious,
-    width: '48%',
-  },
   practiceHeader: {
     marginBottom: 6,
   },
@@ -691,18 +679,8 @@ const styles = StyleSheet.create({
     color: Colors.text,
     flex: 1,
   },
-  practiceNameColumn: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-    flex: 1,
-  },
   practiceCount: {
     fontSize: 14,
-    color: Colors.textSecondary,
-  },
-  practiceCountColumn: {
-    fontSize: 12,
     color: Colors.textSecondary,
   },
   countPercentageRow: {
@@ -739,17 +717,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
     marginBottom: 4,
-  },
-  weeklyProgressColumn: {
-    fontSize: 11,
-    color: Colors.text,
-    marginBottom: 2,
-  },
-  todayDetailsColumn: {
-    fontSize: 9,
-    color: Colors.textSecondary,
-    fontStyle: 'italic',
-    marginBottom: 2,
   },
   noPracticeText: {
     fontSize: 16,
