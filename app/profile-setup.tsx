@@ -372,108 +372,106 @@ export default function ProfileSetupScreen() {
                   const isEnrolled = enrolledClassIds.includes(classItem.id);
                   const isSelected = selectedClassIds.includes(classItem.id);
                   const enrollmentStatus = enrollmentStatuses[classItem.id];
+                  const groups = optionalPracticeGroups.get(classItem.id);
+                  const hasOptionalPractices = groups && groups.size > 0;
                   
                   const statusLabel = enrollmentStatus === 'completed' ? '圆满' : '已加入';
                   
                   return (
-                    <TouchableOpacity
-                      key={classItem.id}
-                      style={[
-                        styles.classOption,
-                        isSelected && !isEnrolled && styles.classOptionSelected
-                      ]}
-                      onPress={() => toggleClassSelection(classItem.id)}
-                      disabled={isEnrolled}
-                    >
-                      {!isEnrolled && (
-                        <View style={[
-                          styles.checkbox,
-                          isSelected && styles.checkboxSelected
-                        ]}>
-                          {isSelected && (
-                            <Text style={styles.checkmark}>✓</Text>
+                    <React.Fragment key={classItem.id}>
+                      <TouchableOpacity
+                        style={[
+                          styles.classOption,
+                          isSelected && !isEnrolled && styles.classOptionSelected
+                        ]}
+                        onPress={() => toggleClassSelection(classItem.id)}
+                        disabled={isEnrolled}
+                      >
+                        {!isEnrolled && (
+                          <View style={[
+                            styles.checkbox,
+                            isSelected && styles.checkboxSelected
+                          ]}>
+                            {isSelected && (
+                              <Text style={styles.checkmark}>✓</Text>
+                            )}
+                          </View>
+                        )}
+                        <View style={styles.classOptionTextContainer}>
+                          <Text style={[
+                            styles.classOptionText,
+                            isSelected && !isEnrolled && styles.classOptionTextSelected
+                          ]}>
+                            {classItem.class_name}
+                            {isEnrolled && ` (${statusLabel})`}
+                          </Text>
+                          {classItem.description && (
+                            <Text style={styles.classOptionDescription}>
+                              {classItem.description}
+                            </Text>
                           )}
                         </View>
-                      )}
-                      <View style={styles.classOptionTextContainer}>
-                        <Text style={[
-                          styles.classOptionText,
-                          isSelected && !isEnrolled && styles.classOptionTextSelected
-                        ]}>
-                          {classItem.class_name}
-                          {isEnrolled && ` (${statusLabel})`}
-                        </Text>
-                        {classItem.description && (
-                          <Text style={styles.classOptionDescription}>
-                            {classItem.description}
+                      </TouchableOpacity>
+
+                      {/* Practice Choice UI - shown right below the class if it has optional practices and is selected */}
+                      {isSelected && hasOptionalPractices && (
+                        <View style={styles.practiceChoiceSection}>
+                          <Text style={styles.practiceChoiceTitle}>
+                            🧘 {classItem.class_name} 观修选择 *（至少选择一项）
                           </Text>
-                        )}
-                      </View>
-                    </TouchableOpacity>
+                          {Array.from(groups.entries()).map(([groupName, practices]) => {
+                            const selectedForGroup = selectedPractices.get(classItem.id)?.get(groupName) || [];
+                            
+                            return (
+                              <View key={groupName} style={styles.practiceGroupContainer}>
+                                <Text style={styles.practiceGroupLabel}>{groupName}:</Text>
+                                {practices.map((practice: any) => {
+                                  const isPracticeSelected = selectedForGroup.includes(practice.practice_id);
+                                  
+                                  return (
+                                    <TouchableOpacity
+                                      key={practice.practice_id}
+                                      style={[
+                                        styles.practiceOption,
+                                        isPracticeSelected && styles.practiceOptionSelected
+                                      ]}
+                                      onPress={() => togglePracticeSelection(classItem.id, groupName, practice.practice_id)}
+                                    >
+                                      <View style={[
+                                        styles.checkbox,
+                                        isPracticeSelected && styles.checkboxSelected
+                                      ]}>
+                                        {isPracticeSelected && (
+                                          <Text style={styles.checkmark}>✓</Text>
+                                        )}
+                                      </View>
+                                      <View style={styles.practiceOptionTextContainer}>
+                                        <Text style={[
+                                          styles.practiceOptionText,
+                                          isPracticeSelected && styles.practiceOptionTextSelected
+                                        ]}>
+                                          {practice.practice?.name || '未知修法'}
+                                        </Text>
+                                        {practice.practice?.description && (
+                                          <Text style={styles.practiceOptionDescription}>
+                                            {practice.practice.description}
+                                          </Text>
+                                        )}
+                                      </View>
+                                    </TouchableOpacity>
+                                  );
+                                })}
+                              </View>
+                            );
+                          })}
+                        </View>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </View>
             )}
           </View>
-
-          {/* Practice Choice UI - shown when selected classes have optional practices */}
-          {Array.from(optionalPracticeGroups.entries()).map(([classId, groups]) => {
-            const className = availableClasses.find(c => c.id === classId)?.class_name || '';
-            if (!selectedClassIds.includes(classId)) return null;
-            
-            return (
-              <View key={classId} style={styles.practiceChoiceSection}>
-                <Text style={styles.practiceChoiceTitle}>
-                  🧘 {className} 观修选择 *（至少选择一项）
-                </Text>
-                {Array.from(groups.entries()).map(([groupName, practices]) => {
-                  const selectedForGroup = selectedPractices.get(classId)?.get(groupName) || [];
-                  
-                  return (
-                    <View key={groupName} style={styles.practiceGroupContainer}>
-                      <Text style={styles.practiceGroupLabel}>{groupName}:</Text>
-                      {practices.map((practice: any) => {
-                        const isSelected = selectedForGroup.includes(practice.practice_id);
-                        
-                        return (
-                          <TouchableOpacity
-                            key={practice.practice_id}
-                            style={[
-                              styles.practiceOption,
-                              isSelected && styles.practiceOptionSelected
-                            ]}
-                            onPress={() => togglePracticeSelection(classId, groupName, practice.practice_id)}
-                          >
-                            <View style={[
-                              styles.checkbox,
-                              isSelected && styles.checkboxSelected
-                            ]}>
-                              {isSelected && (
-                                <Text style={styles.checkmark}>✓</Text>
-                              )}
-                            </View>
-                            <View style={styles.practiceOptionTextContainer}>
-                              <Text style={[
-                                styles.practiceOptionText,
-                                isSelected && styles.practiceOptionTextSelected
-                              ]}>
-                                {practice.practice?.name || '未知修法'}
-                              </Text>
-                              {practice.practice?.description && (
-                                <Text style={styles.practiceOptionDescription}>
-                                  {practice.practice.description}
-                                </Text>
-                              )}
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })}
 
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
