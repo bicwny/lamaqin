@@ -1,7 +1,9 @@
 -- ========================================
--- 正科班级完整设置
+-- 正科班级完整设置 (Supabase版本)
 -- Complete Setup for 正科 (Main Curriculum) Class
 -- ========================================
+-- 在 Supabase SQL Editor 中运行此脚本
+-- Run this script in Supabase SQL Editor
 
 -- 步骤1: 创建正科班级
 -- Step 1: Create the 正科 class
@@ -96,7 +98,7 @@ INSERT INTO class_required_practices (
   id, 
   class_id, 
   practice_id, 
-  target_count,
+  total_target,
   daily_target, 
   practice_category,
   is_required,
@@ -122,7 +124,7 @@ INSERT INTO class_required_practices (
   id, 
   class_id, 
   practice_id, 
-  target_count,
+  total_target,
   daily_target, 
   practice_category,
   is_required,
@@ -151,10 +153,9 @@ INSERT INTO class_required_practices (
   id, 
   class_id, 
   practice_id, 
-  target_count,
+  total_target,
   daily_target, 
-  total_sessions,
-  weekly_sessions,
+  weekly_target,
   min_duration_minutes,
   practice_category,
   is_required,
@@ -167,7 +168,6 @@ SELECT
   p.id,
   NULL,
   NULL,
-  NULL,     -- 持续修行，无总座数限制
   7,        -- 每周7次（每天一座）
   NULL,     -- 时间不限
   'session',
@@ -185,10 +185,9 @@ INSERT INTO class_required_practices (
   id, 
   class_id, 
   practice_id, 
-  target_count,
+  total_target,
   daily_target, 
-  total_sessions,
-  weekly_sessions,
+  weekly_target,
   min_duration_minutes,
   practice_category,
   is_required,
@@ -201,7 +200,6 @@ SELECT
   p.id,
   NULL,
   NULL,
-  NULL,     -- 持续修行，无总座数限制
   7,        -- 每周7次（每天一座）
   NULL,     -- 时间不限
   'session',
@@ -219,10 +217,9 @@ INSERT INTO class_required_practices (
   id, 
   class_id, 
   practice_id, 
-  target_count,
+  total_target,
   daily_target, 
-  total_sessions,
-  weekly_sessions,
+  weekly_target,
   min_duration_minutes,
   practice_category,
   is_required,
@@ -235,7 +232,6 @@ SELECT
   p.id,
   NULL,
   NULL,
-  NULL,     -- 持续修行，无总座数限制
   7,        -- 每周7次（每天一座）
   NULL,     -- 时间不限
   'session',
@@ -262,11 +258,11 @@ SELECT
   END as requirement_type,
   CASE 
     WHEN crp.practice_category = 'count' THEN CONCAT(COALESCE(crp.daily_target::text, '无'), '遍/天')
-    WHEN crp.practice_category = 'time' THEN CONCAT(COALESCE(crp.weekly_sessions::text, '无'), '座/周')
+    WHEN crp.practice_category = 'session' THEN CONCAT(COALESCE(crp.weekly_target::text, '无'), '座/周')
   END as daily_requirement,
   CASE
-    WHEN crp.target_count IS NULL THEN '持续修行'
-    ELSE CONCAT(crp.target_count, '遍')
+    WHEN crp.total_target IS NULL THEN '持续修行'
+    ELSE CONCAT(crp.total_target, '遍')
   END as total_target
 FROM class_required_practices crp
 JOIN class_curricula cc ON crp.class_id = cc.id
