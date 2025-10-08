@@ -917,12 +917,16 @@ export default function PracticeConfigScreen() {
           start_date: startDateObj.toISOString().split("T")[0],
           target_end_date: endDate.toISOString().split("T")[0],
           target_count: targetCount,
-          current_count: 0,
           status: "active",
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
           project_name: selectedPresetId ? null : projectName || null,
         };
+        
+        // Preserve current_count when editing, set to 0 when creating new
+        if (!isEditMode) {
+          projectData.current_count = 0;
+        }
       } else {
         // Count-based practice configuration
         const startDateObj = new Date(startDate);
@@ -946,13 +950,17 @@ export default function PracticeConfigScreen() {
           daily_target: finalDailyTarget,
           start_date: startDateObj.toISOString().split("T")[0],
           target_end_date: endDate.toISOString().split("T")[0],
-          current_count: 0,
           status: "active",
           target_period: "daily",
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
           project_name: selectedPresetId ? null : projectName || null,
         };
+        
+        // Preserve current_count when editing, set to 0 when creating new
+        if (!isEditMode) {
+          projectData.current_count = 0;
+        }
       }
 
       if (isEditMode && projectId) {

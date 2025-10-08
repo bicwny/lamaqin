@@ -445,7 +445,7 @@ export default function PracticeDetailScreen() {
 
       if (isTimeBasedWeekly) {
         const weeklyCount = weeklyRecords.length;
-        const weeklyTarget = project.target_count || 0;
+        const weeklyTarget = project.daily_target;
         const totalDone = project.current_count;
         const totalTarget = project.target_count;
 
