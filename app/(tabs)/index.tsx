@@ -220,7 +220,8 @@ export default function HomeScreen() {
           const todaySessions = todayRecords.length;
 
           let status: 'completed' | 'in_progress' | 'pending' = 'pending';
-          if (weekSessions >= project.daily_target) status = 'completed';
+          const weekTarget = project.weekly_target || 7; // Default to 7 if not set
+          if (weekSessions >= weekTarget) status = 'completed';
           else if (weekSessions > 0) status = 'in_progress';
 
           const todayDetails = todayRecords.length > 0 
@@ -231,7 +232,7 @@ export default function HomeScreen() {
             id: project.id,
             name: project.practices.name,
             weekSessions,
-            weekTarget: project.daily_target,
+            weekTarget: weekTarget,
             todaySessions,
             status,
             todayDetails,
