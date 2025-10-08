@@ -45,7 +45,7 @@ export default function EditProfileScreen() {
 
   useEffect(() => {
     loadOptionalPracticesAndChoices();
-  }, [enrolledClassIds]);
+  }, [enrolledClassIds, selectedClassIds]);
 
   const loadUserProfile = async () => {
     if (!user?.id) return;
@@ -106,7 +106,10 @@ export default function EditProfileScreen() {
     const newGroups = new Map<string, Map<string, any[]>>();
     const newSelections = new Map<string, Map<string, string[]>>();
     
-    for (const classId of enrolledClassIds) {
+    // Get all classes that need practice loading (enrolled + selected)
+    const classIdsToLoad = Array.from(new Set([...enrolledClassIds, ...selectedClassIds]));
+    
+    for (const classId of classIdsToLoad) {
       try {
         const [groups, userChoices] = await Promise.all([
           classCurriculumService.getOptionalPracticesByChoiceGroup(classId),
