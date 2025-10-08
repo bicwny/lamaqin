@@ -30,10 +30,7 @@ export default function SharePracticeModal() {
   const [summary, setSummary] = useState<string>('');
   const [dharmaName, setDharmaName] = useState<string>('');
   const [dateTitle, setDateTitle] = useState<string>('');
-  const [showDedication, setShowDedication] = useState(false);
   const { timezoneInfo } = useTimezone();
-
-  const DEDICATION_TEXT = '文殊师利勇猛智，普贤慧行亦复然，我今回向诸善根，随彼一切常修学。三世诸佛所称叹，如是最胜诸大愿，我今回向诸善根，为得普贤殊胜行。';
 
   useEffect(() => {
     if (user) {
@@ -172,17 +169,12 @@ export default function SharePracticeModal() {
     return `${dharmaName}：${practiceStrings.join('，')}`;
   };
 
-  const handleToggleDedication = () => {
-    setShowDedication(prev => !prev);
-  };
-
   const handleCopy = async () => {
     try {
-      const textToCopy = showDedication ? DEDICATION_TEXT : summary;
-      await Clipboard.setStringAsync(textToCopy);
+      await Clipboard.setStringAsync(summary);
       toastService.success({
         title: '已复制',
-        message: showDedication ? '回向文已复制到剪贴板' : '修行总结已复制到剪贴板'
+        message: '修行总结已复制到剪贴板'
       });
     } catch (error) {
       console.error('❌ Error copying to clipboard:', error);
@@ -215,31 +207,12 @@ export default function SharePracticeModal() {
         </View>
       ) : (
         <View style={styles.content}>
-          <Text style={styles.sectionTitle}>{showDedication ? '回向' : dateTitle}</Text>
-          <Text style={styles.hint}>
-            {showDedication ? '回向文' : '点击下方按钮复制，然后粘贴到WhatsApp分享'}
-          </Text>
+          <Text style={styles.sectionTitle}>{dateTitle}</Text>
+          <Text style={styles.hint}>点击下方按钮复制，然后粘贴到WhatsApp分享</Text>
 
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryText}>
-              {showDedication ? DEDICATION_TEXT : summary}
-            </Text>
+            <Text style={styles.summaryText}>{summary}</Text>
           </View>
-
-          <TouchableOpacity 
-            style={styles.dedicationButton}
-            onPress={handleToggleDedication}
-          >
-            <Ionicons 
-              name={showDedication ? "arrow-back-outline" : "book-outline"} 
-              size={20} 
-              color={DesignSystem.colors.primary} 
-              style={styles.copyIcon} 
-            />
-            <Text style={styles.dedicationButtonText}>
-              {showDedication ? "返回总结" : "回向"}
-            </Text>
-          </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.copyButton}
@@ -285,24 +258,6 @@ const styles = StyleSheet.create({
     ...createStyles.body('lg') as any,
     lineHeight: 28,
     color: DesignSystem.colors.textPrimary,
-  },
-  dedicationButton: {
-    backgroundColor: DesignSystem.colors.background,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: DesignSystem.spacing.md,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.primary,
-  },
-  dedicationButtonText: {
-    ...createStyles.buttonText('primary') as any,
-    color: DesignSystem.colors.primary,
-    fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
   },
   copyButton: {
     backgroundColor: DesignSystem.colors.primary,
