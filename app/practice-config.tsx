@@ -99,7 +99,7 @@ export default function PracticeConfigScreen() {
     isEditMode && currentProjectName ? currentProjectName : ""
   );
   const [durationMode, setDurationMode] = useState<"持续进行" | "固定时长" | "30天" | "60天" | "100天" | "1年" | "自定义">(
-    isEditMode && !currentEndDate ? "持续进行" : "固定时长"
+    isEditMode && !currentEndDate ? "持续进行" : isEditMode && currentEndDate ? "自定义" : "固定时长"
   );
   const [configMode, setConfigMode] = useState<"total" | "daily">(
     isEditMode && currentGoalType ? currentGoalType as "total" | "daily" : "total"
