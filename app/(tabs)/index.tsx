@@ -19,16 +19,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { RefreshControl } from 'react-native';
 import Avatar from '@/components/Avatar';
 
-interface NextLesson {
-  courseId: string;
-  courseName: string;
-  lessonNumber: number;
-  lessonTitle: string;
-  progress: string;
-  lessonId: string;
-  url?: string;
-}
-
 interface DailyPractice {
   id: string;
   name: string;
@@ -56,16 +46,6 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
-  const [courseLessons, setCourseLessons] = useState<Array<{
-    courseId: string;
-    courseName: string;
-    lessonNumber: number;
-    lessonTitle: string;
-    progress: string;
-    lessonId: string;
-    url?: string;
-    isCompleted?: boolean;
-  }>>([]);
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
 
@@ -110,7 +90,6 @@ export default function HomeScreen() {
     try {
       setLoading(true);
       await Promise.all([
-        loadCourseLessons(),
         loadDailyPractices(),
         loadWeeklyPractices(),
         loadUserProfile()
@@ -126,153 +105,6 @@ export default function HomeScreen() {
     setRefreshing(true);
     await loadDashboardData();
     setRefreshing(false);
-  };
-
-  const loadCourseLessons = async () => {
-    try {
-      // Get user's active courses with progress
-      const { data: userCourses, error } = await supabase
-        .from('user_courses')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('progress_percentage', { ascending: false });
-
-      if (error) throw error;
-
-      if (!userCourses || userCourses.length === 0) {
-        setCourseLessons([]);
-        return;
-      }
-
-      const allCourseLessons = [];
-
-      for (const userCourse of userCourses) {
-        // Get study records to find the next incomplete lesson
-        const { data: studyRecords, error: studyError } = await supabase
-          .from('study_records')
-          .select(`
-            lesson_id,
-            study_type,
-            lesson:course_lessons(lesson_number, title, id)
-          `)
-          .eq('user_id', user.id)
-          .eq('course_id', userCourse.course_id);
-
-        if (studyError) throw studyError;
-
-        // Get all lessons for this course to find the next one
-        const { data: allLessons, error: lessonsError } = await supabase
-          .from('course_lessons')
-          .select('*')
-          .eq('course_id', userCourse.course_id)
-          .order('lesson_number');
-
-        if (lessonsError) throw lessonsError;
-
-        // Find completed lessons (both 听传承 and 看法本)
-        const lessonCompletionMap = new Map();
-        studyRecords?.forEach(record => {
-          if (!lessonCompletionMap.has(record.lesson_id)) {
-            lessonCompletionMap.set(record.lesson_id, { 
-              听传承: false, 
-              看法本: false,
-              lessonNumber: record.lesson?.lesson_number || 0,
-              title: record.lesson?.title || `第${record.lesson?.lesson_number || 0}课`
-            });
-          }
-
-          const lessonData = lessonCompletionMap.get(record.lesson_id);
-          if (record.study_type === '听传承') {
-            lessonData.听传承 = true;
-          } else if (record.study_type === '看法本') {
-            lessonData.看法本 = true;
-          }
-        });
-
-        // Check if all lessons are completed
-        const completedLessons = Array.from(lessonCompletionMap.values()).filter(
-          lesson => lesson.听传承 && lesson.看法本
-        ).length;
-
-        const isAllLessonsCompleted = completedLessons >= userCourse.course.total_lessons;
-
-        // If all lessons are completed and course is still active, update status and skip adding to display
-        if (isAllLessonsCompleted && userCourse.status === 'active') {
-          // Update course status to completed - this will hide the card immediately
-          await supabase
-            .from('user_courses')
-            .update({ 
-              status: 'completed',
-              completed_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user.id)
-            .eq('course_id', userCourse.course_id);
-
-          // Skip adding this course to the display since it's now completed
-          continue;
-        }
-
-        // Find the next incomplete lesson
-        let nextLessonNumber = 1;
-        let nextLessonId = '';
-        let nextLessonTitle = '';
-        let nextLessonUrl = '';
-        let listenCount = 0;
-        let readCount = 0;
-
-        for (let i = 1; i <= userCourse.course.total_lessons; i++) {
-          const lessonData = Array.from(lessonCompletionMap.values()).find(l => l.lessonNumber === i);
-          if (!lessonData || !lessonData.听传承 || !lessonData.看法本) {
-            nextLessonNumber = i;
-            const nextLesson = allLessons?.find(l => l.lesson_number === i);
-            if (nextLesson) {
-              nextLessonId = nextLesson.id;
-              nextLessonTitle = nextLesson.title || `第${i}课`;
-              nextLessonUrl = nextLesson.url || '';
-
-              // Get study counts for this specific lesson
-              const lessonStudyRecords = studyRecords?.filter(record => 
-                record.lesson?.lesson_number === i
-              ) || [];
-
-              listenCount = lessonStudyRecords.filter(record => 
-                record.study_type === '听传承'
-              ).length;
-
-              readCount = lessonStudyRecords.filter(record => 
-                record.study_type === '看法本'
-              ).length;
-            } else {
-              // If no lesson found, use fallback title
-              nextLessonTitle = `第${i}课`;
-            }
-            break;
-          }
-        }
-
-        allCourseLessons.push({
-          courseId: userCourse.course_id,
-          courseName: userCourse.course.name,
-          lessonNumber: nextLessonNumber,
-          lessonTitle: nextLessonTitle,
-          lessonId: nextLessonId,
-          url: nextLessonUrl,
-          progress: `听传承: ${listenCount}次 | 看法本: ${readCount}次`,
-          isCompleted: false
-        });
-      }
-
-      setCourseLessons(allCourseLessons);
-
-    } catch (error) {
-      console.error('Error loading course lessons:', error);
-      setCourseLessons([]);
-    }
   };
 
   const loadDailyPractices = async () => {
@@ -436,91 +268,6 @@ export default function HomeScreen() {
 
   const navigateToProfile = () => {
     router.push('/profile');
-  };
-
-  const navigateToStudy = () => {
-    router.push('/(tabs)/study');
-  };
-
-  const recordStudy = async (courseId: string, lessonNumber: number, studyType: '听传承' | '看法本') => {
-    if (!user) return;
-
-    try {
-      // Optimistic update: immediately update the progress text
-      setCourseLessons(prev => prev.map(lesson => {
-        if (lesson.courseId === courseId && lesson.lessonNumber === lessonNumber) {
-          const currentProgress = lesson.progress;
-          const [listenPart, readPart] = currentProgress.split(' | ');
-          const listenCount = parseInt(listenPart.match(/\d+/)?.[0] || '0');
-          const readCount = parseInt(readPart.match(/\d+/)?.[0] || '0');
-
-          const newListenCount = studyType === '听传承' ? listenCount + 1 : listenCount;
-          const newReadCount = studyType === '看法本' ? readCount + 1 : readCount;
-
-          return {
-            ...lesson,
-            progress: `听传承: ${newListenCount}次 | 看法本: ${newReadCount}次`
-          };
-        }
-        return lesson;
-      }));
-
-      // Show success toast immediately
-      toastService.success({
-        title: '学习记录已保存',
-        message: `${studyType}完成 - 继续加油！`
-      });
-
-      const today = new Date().toISOString().split('T')[0];
-
-      // Find the lesson
-      const { data: lessons, error: lessonError } = await supabase
-        .from('course_lessons')
-        .select('id')
-        .eq('course_id', courseId)
-        .eq('lesson_number', lessonNumber)
-        .limit(1);
-
-      if (lessonError || !lessons || lessons.length === 0) {
-        toastService.error({
-          title: '课程信息有误',
-          message: '无法找到对应的课程内容'
-        });
-        // Revert optimistic update
-        loadCourseLessons();
-        return;
-      }
-
-      const studyRecord = {
-        user_id: user.id,
-        course_id: courseId,
-        lesson_id: lessons[0].id,
-        study_date: today,
-        study_type: studyType,
-        study_count_for_lesson: 1
-      };
-
-      const { error } = await supabase
-        .from('study_records')
-        .insert(studyRecord);
-
-      if (error) throw error;
-
-      // Background refresh to ensure data consistency
-      setTimeout(() => {
-        loadCourseLessons();
-      }, 1000);
-
-    } catch (error) {
-      console.error('Error recording study:', error);
-      toastService.error({
-        title: '保存失败',
-        message: '网络异常，请稍后重试'
-      });
-
-      // Revert optimistic update on error
-      loadCourseLessons();
-    }
   };
 
   const navigateToPractice = () => {
@@ -748,63 +495,6 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-          
-
-          {/* Study Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日学习</Text>
-              <TouchableOpacity onPress={navigateToStudy}>
-                <Text style={styles.viewMoreText}>查看更多</Text>
-              </TouchableOpacity>
-            </View>
-
-            {courseLessons.length === 0 ? (
-              <TouchableOpacity style={styles.studyCard} onPress={navigateToStudy}>
-                <Text style={styles.noStudyText}>暂无课程</Text>
-              </TouchableOpacity>
-            ) : (
-              courseLessons.map((nextLesson, index) => (
-                <View 
-                  key={index} 
-                  style={styles.studyCard}
-                >
-                  <View style={styles.studyCardHeader}>
-                    <View style={styles.studyCardTitleContainer}>
-                      <TouchableOpacity onPress={() => router.push(`/course-detail/${nextLesson.courseId}`)}>
-                        <Text style={styles.courseName}>{nextLesson.courseName}</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.continueStudyText}>继续学习 · {nextLesson.lessonTitle}</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.progressText}>{nextLesson.progress}</Text>
-                  <View style={styles.quickActionButtons}>
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.listenButton]}
-                      onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '听传承')}
-                    >
-                      <Text style={styles.quickActionButtonText}>听传承</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={[styles.quickActionButton, styles.readButton]}
-                      onPress={() => recordStudy(nextLesson.courseId, nextLesson.lessonNumber, '看法本')}
-                    >
-                      <Text style={styles.quickActionButtonText}>看法本</Text>
-                    </TouchableOpacity>
-                    {nextLesson.url ? (
-                      <TouchableOpacity 
-                        style={[styles.quickActionButton, styles.onlineButton]}
-                        onPress={() => Linking.openURL(nextLesson.url || '')}
-                      >
-                        <Text style={styles.quickActionButtonText}>在线课程</Text>
-                      </TouchableOpacity>
-                    ) : null}
-                  </View>
-                </View>
-              ))
-            )}
-          </View>
-
           {/* Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -965,77 +655,6 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.primary,
     fontWeight: '600',
   },
-  studyCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
-  },
-  studyCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  studyCardTitleContainer: {
-    flex: 1,
-  },
-  courseName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 4,
-    letterSpacing: -0.3,
-  },
-  continueStudyText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  progressText: {
-    fontSize: 13,
-    color: '#888',
-    marginBottom: 12,
-  },
-  quickActionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  quickActionButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  listenButton: {
-    backgroundColor: '#10B981',
-  },
-  readButton: {
-    backgroundColor: DesignSystem.colors.primary,
-  },
-  onlineButton: {
-    backgroundColor: '#F59E0B',
-  },
-  quickActionButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  noStudyText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    paddingVertical: 20,
-  },
   practiceCard: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
@@ -1133,12 +752,6 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   noPracticeText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    paddingVertical: 20,
-  },
-  noStudyText: {
     fontSize: 16,
     color: Colors.textSecondary,
     textAlign: 'center',
