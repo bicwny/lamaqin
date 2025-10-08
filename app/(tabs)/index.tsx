@@ -500,9 +500,14 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>今日修行</Text>
-              <TouchableOpacity onPress={navigateToPractice}>
-                <Text style={styles.viewMoreText}>查看更多</Text>
-              </TouchableOpacity>
+              <View style={styles.headerActions}>
+                <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
+                  <Text style={styles.shareText}>分享</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={navigateToPractice}>
+                  <Text style={styles.viewMoreText}>查看更多</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Practice Cards */}
@@ -650,6 +655,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.3,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  shareText: {
+    fontSize: 14,
+    color: DesignSystem.colors.primary,
+    fontWeight: '600',
   },
   viewMoreText: {
     fontSize: 14,
