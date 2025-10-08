@@ -432,11 +432,11 @@ export default function EditProfileScreen() {
                             </View>
                           </TouchableOpacity>
 
-                          {/* Practice choices shown directly under enrolled class */}
-                          {isEnrolled && hasOptionalPractices && (
+                          {/* Practice choices shown for enrolled or newly selected classes */}
+                          {(isEnrolled || isSelected) && hasOptionalPractices && (
                             <View style={styles.practiceChoiceSection}>
                               <ThemedText style={styles.practiceChoiceTitle}>
-                                🧘 观修选择（可修改）
+                                🧘 观修选择{isEnrolled ? '（可修改）' : ''}
                               </ThemedText>
                               <ThemedText style={styles.practiceChoiceSubtitle}>
                                 至少选择一项，可选择多项
