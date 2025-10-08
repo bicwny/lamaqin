@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
@@ -446,7 +447,11 @@ export default function UnifiedAuthScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.logo}>🙏</Text>
+          <Image 
+            source={require('@/assets/images/praying-icon.jpg')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>三殊胜</Text>
           <Text style={styles.subtitle}>
             {step === 'email' ? '当知胜义俱生智，唯依积资净障力，乃与具证师加持，依止他法诚愚痴' : '请输入邮箱验证码'}
@@ -602,7 +607,8 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logo: {
-    fontSize: 48,
+    width: 100,
+    height: 100,
     marginBottom: 10,
   },
   title: {
