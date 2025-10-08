@@ -621,7 +621,6 @@ export default function PracticeDetailScreen() {
                     </Text>
                   </View>
                 )}
-                </View>
               </>
             ) : (
               renderProgressDetails()
