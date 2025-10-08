@@ -28,7 +28,7 @@ interface PracticeProject {
   id: string;
   user_id: string;
   practice_id: string;
-  total_target: number;
+  total_target?: number;  // 可选：持续修行时为null
   current_count: number;
   daily_target?: number;
   weekly_target?: number;
@@ -145,6 +145,16 @@ export default function PracticeScreen() {
   };
 
   const calculateProgress = (project: PracticeProject) => {
+    // 如果没有总目标，表示持续修行，只显示当前进度
+    if (!project.total_target) {
+      return {
+        current: project.current_count,
+        target: null,
+        percentage: 0,
+        isCompleted: false,
+      };
+    }
+
     if (project.practices.type === "count") {
       const percentage = Math.min(
         (project.current_count / project.total_target) * 100,
@@ -266,21 +276,25 @@ export default function PracticeScreen() {
         <View style={styles.progressContainer}>
           <View style={styles.progressInfo}>
             <Text style={styles.progressText}>
-              {(progress.current ?? 0).toLocaleString()}/
-              {(progress.target ?? 0).toLocaleString()} {item.practices.type === 'time' ? '座' : item.practices.unit}
+              {progress.target 
+                ? `${(progress.current ?? 0).toLocaleString()}/${progress.target.toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
+                : `已完成 ${(progress.current ?? 0).toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
+              }
             </Text>
           </View>
-          <View style={styles.progressBarContainer}>
-            <ProgressBar
-              progress={progress.percentage}
-              size="thick"
-              containerStyle={{ flex: 1 }}
-              fillColor={progress.isCompleted ? DesignSystem.colors.greenTara : DesignSystem.colors.redTara}
-            />
-            <Text style={styles.progressPercentage}>
-              {Math.round(progress.percentage)}%
-            </Text>
-          </View>
+          {progress.target && (
+            <View style={styles.progressBarContainer}>
+              <ProgressBar
+                progress={progress.percentage}
+                size="thick"
+                containerStyle={{ flex: 1 }}
+                fillColor={progress.isCompleted ? DesignSystem.colors.greenTara : DesignSystem.colors.redTara}
+              />
+              <Text style={styles.progressPercentage}>
+                {Math.round(progress.percentage)}%
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Divider */}

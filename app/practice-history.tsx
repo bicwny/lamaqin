@@ -230,11 +230,11 @@ export default function PracticeHistoryScreen() {
   };
 
   const calculateProgress = () => {
-    if (!projectInfo) return { percentage: 0, current: 0, target: 0 };
+    if (!projectInfo) return { percentage: 0, current: 0, target: null };
 
     const current = projectInfo.current_count || 0;
-    const target = projectInfo.total_target || 1;
-    const percentage = Math.min((current / target) * 100, 100);
+    const target = projectInfo.total_target || null;
+    const percentage = target ? Math.min((current / target) * 100, 100) : 0;
 
     return { percentage, current, target };
   };
@@ -284,21 +284,28 @@ export default function PracticeHistoryScreen() {
 
           <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
-              {progress.current.toLocaleString()}/{progress.target.toLocaleString()} {projectInfo?.practices?.unit || '次'}
+              {progress.target 
+                ? `${progress.current.toLocaleString()}/${progress.target.toLocaleString()} ${projectInfo?.practices?.unit || '次'}`
+                : `已完成 ${progress.current.toLocaleString()} ${projectInfo?.practices?.unit || '次'}`
+              }
             </Text>
-            <Text style={styles.progressPercentage}>
-              {progress.percentage.toFixed(1)}%
-            </Text>
+            {progress.target && (
+              <Text style={styles.progressPercentage}>
+                {progress.percentage.toFixed(1)}%
+              </Text>
+            )}
           </View>
 
-          <View style={styles.progressBarContainer}>
-            <ProgressBar 
-              progress={progress.percentage} 
-              size="thick" 
-              containerStyle={{ flex: 1 }}
-              color={DesignSystem.colors.greenTara} // Green Tara for practice progress and growth
-            />
-          </View>
+          {progress.target && (
+            <View style={styles.progressBarContainer}>
+              <ProgressBar 
+                progress={progress.percentage} 
+                size="thick" 
+                containerStyle={{ flex: 1 }}
+                color={DesignSystem.colors.greenTara} // Green Tara for practice progress and growth
+              />
+            </View>
+          )}
 
           {projectInfo?.daily_target && (
             <Text style={styles.dailyTarget}>

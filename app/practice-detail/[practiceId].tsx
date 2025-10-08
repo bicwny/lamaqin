@@ -29,7 +29,7 @@ interface PracticeProject {
   id: string;
   user_id: string;
   practice_id: string;
-  total_target: number;
+  total_target?: number;  // 可选：持续修行时为null
   current_count: number;
   daily_target?: number;
   weekly_target?: number;
@@ -244,7 +244,17 @@ export default function PracticeDetailScreen() {
 
   const calculateProgress = () => {
     if (!project)
-      return { percentage: 0, current: 0, target: 0, isCompleted: false };
+      return { percentage: 0, current: 0, target: null, isCompleted: false };
+
+    // 如果没有总目标，表示持续修行，只显示当前进度
+    if (!project.total_target) {
+      return {
+        current: project.current_count,
+        target: null,
+        percentage: 0,
+        isCompleted: false,
+      };
+    }
 
     if (project.practices.type === "count") {
       const percentage = Math.min(
@@ -455,7 +465,10 @@ export default function PracticeDetailScreen() {
         return (
           <View style={styles.progressDetails}>
             <Text style={styles.progressText}>
-              {totalDone}/{totalTarget}座
+              {totalTarget 
+                ? `${totalDone}/${totalTarget}座`
+                : `已完成 ${totalDone}座`
+              }
             </Text>
             <Text style={styles.dailyTargetText}>
               本周：{weeklyCount}/{weeklyTarget}座
@@ -595,16 +608,19 @@ export default function PracticeDetailScreen() {
                 </Text>
 
                 {/* Progress Bar */}
-                <View style={styles.progressBarContainer}>
-                  <ProgressBar
-                    progress={progress.percentage}
-                    size="thick"
-                    fillColor={DesignSystem.colors.redTara}
-                    containerStyle={{ flex: 1 }}
-                  />
-                  <Text style={styles.progressPercentage}>
-                    {Math.round(progress.percentage)}%
-                  </Text>
+                {progress.target && (
+                  <View style={styles.progressBarContainer}>
+                    <ProgressBar
+                      progress={progress.percentage}
+                      size="thick"
+                      fillColor={DesignSystem.colors.redTara}
+                      containerStyle={{ flex: 1 }}
+                    />
+                    <Text style={styles.progressPercentage}>
+                      {Math.round(progress.percentage)}%
+                    </Text>
+                  </View>
+                )}
                 </View>
               </>
             ) : (
