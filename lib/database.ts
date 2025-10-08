@@ -1359,7 +1359,7 @@ export const classCurriculumService = {
         const baseProject = {
           user_id: userId,
           practice_id: req.practice_id,
-          total_target: req.target_count,
+          total_target: req.total_target,
           daily_target: req.daily_target,
           current_count: 0,
           status: 'active' as const,
@@ -1368,8 +1368,8 @@ export const classCurriculumService = {
         };
 
         // Calculate end date for count-based practices with both total_target and daily_target
-        if (req.target_count && req.daily_target) {
-          const durationDays = Math.ceil(req.target_count / req.daily_target);
+        if (req.total_target && req.daily_target) {
+          const durationDays = Math.ceil(req.total_target / req.daily_target);
           const endDate = new Date(now);
           // Subtract 1 because start date is day 1 (inclusive)
           endDate.setDate(endDate.getDate() + durationDays - 1);
@@ -1662,7 +1662,7 @@ export const classCurriculumService = {
         const baseProject = {
           user_id: userId,
           practice_id: req.practice_id,
-          total_target: req.target_count,
+          total_target: req.total_target,
           daily_target: req.daily_target,
           current_count: 0,
           status: 'active' as const,
@@ -1671,8 +1671,8 @@ export const classCurriculumService = {
         };
 
         // Calculate end date for count-based practices with both total_target and daily_target
-        if (req.target_count && req.daily_target) {
-          const durationDays = Math.ceil(req.target_count / req.daily_target);
+        if (req.total_target && req.daily_target) {
+          const durationDays = Math.ceil(req.total_target / req.daily_target);
           const endDate = new Date(now);
           endDate.setDate(endDate.getDate() + durationDays - 1);
           return {
