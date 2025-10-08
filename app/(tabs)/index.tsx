@@ -504,9 +504,6 @@ export default function HomeScreen() {
                 <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
                   <Text style={styles.shareText}>分享</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={navigateToPractice}>
-                  <Text style={styles.viewMoreText}>查看更多</Text>
-                </TouchableOpacity>
               </View>
             </View>
 
