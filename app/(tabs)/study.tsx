@@ -129,28 +129,33 @@ export default function StudyScreen() {
     try {
       console.log('🔄 Loading study data for user:', user.id);
 
-      // Auto-sync courses for enrolled classes
+      // Auto-sync courses for enrolled classes (parallelized)
       try {
         const enrolledClasses = await classCurriculumService.getUserEnrolledClasses(user.id);
         console.log('📚 Enrolled classes:', enrolledClasses.map(c => c.class_curriculum.class_name));
         
-        for (const enrollment of enrolledClasses) {
-          if (enrollment.status === 'active') {
+        // Parallelize class syncing
+        const syncPromises = enrolledClasses
+          .filter(enrollment => enrollment.status === 'active')
+          .map(async (enrollment) => {
             console.log(`🔄 Syncing courses for ${enrollment.class_curriculum.class_name}...`);
             const count = await classCurriculumService.syncUserCoursesWithClassRequirements(user.id, enrollment.class_id);
             console.log(`✅ Synced ${count} courses for ${enrollment.class_curriculum.class_name}`);
-          }
-        }
+            return count;
+          });
+        
+        await Promise.all(syncPromises);
       } catch (err) {
         console.error('❌ Failed to sync class courses:', err);
       }
 
-      // Load user's courses
-      const userCoursesData = await getUserCourses(user.id);
+      // Load user's courses (freshly synced) and all courses in parallel
+      const [userCoursesData, allCoursesData] = await Promise.all([
+        getUserCourses(user.id),
+        studyService.getCourses()
+      ]);
+      
       setUserCourses(userCoursesData);
-
-      // Load all available courses
-      const allCoursesData = await studyService.getCourses();
       setAllCourses(allCoursesData);
 
       // Load progress data
@@ -158,9 +163,14 @@ export default function StudyScreen() {
       const organizedProgress = processProgressData(progressData, userCoursesData);
       setProgress(organizedProgress);
 
-      // Recalculate progress for all enrolled courses to ensure accuracy
+      // Recalculate progress for all enrolled courses sequentially to avoid race conditions
+      console.log('🔄 Calculating progress for', userCoursesData.length, 'courses...');
       for (const userCourse of userCoursesData) {
-        await studyService.calculateProgress(user.id, userCourse.course_id);
+        try {
+          await studyService.calculateProgress(user.id, userCourse.course_id);
+        } catch (error) {
+          console.error(`❌ Failed to calculate progress for ${userCourse.course.name}:`, error);
+        }
       }
 
       // Reload user courses to get updated progress percentages
@@ -172,12 +182,25 @@ export default function StudyScreen() {
         progress: uc.progress_percentage
       })));
 
-      // Load lessons for enrolled courses
+      // Load lessons for enrolled courses in parallel (with error handling)
+      console.log('🔄 Loading lessons for', updatedUserCoursesData.length, 'courses in parallel...');
+      const lessonsPromises = updatedUserCoursesData.map(async (userCourse) => {
+        try {
+          const lessons = await studyService.getCourseLessons(userCourse.course_id);
+          return { courseId: userCourse.course_id, lessons, success: true };
+        } catch (error) {
+          console.error(`❌ Failed to load lessons for ${userCourse.course.name}:`, error);
+          return { courseId: userCourse.course_id, lessons: [], success: false };
+        }
+      });
+      
+      const lessonsResults = await Promise.all(lessonsPromises);
       const lessonsData: Record<string, CourseLesson[]> = {};
-      for (const userCourse of userCoursesData) {
-        const lessons = await studyService.getCourseLessons(userCourse.course_id);
-        lessonsData[userCourse.course_id] = lessons;
-      }
+      lessonsResults.forEach(result => {
+        if (result.success || result.lessons.length > 0) {
+          lessonsData[result.courseId] = result.lessons;
+        }
+      });
       setCourseLessons(lessonsData);
 
       console.log('📚 Loaded user courses:', userCoursesData.length);
