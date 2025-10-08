@@ -471,8 +471,8 @@ export default function PracticeDetailScreen() {
               }
             </Text>
             <Text style={styles.dailyTargetText}>
-              本周：{weeklyCount}/{weeklyTarget}座
-              {weeklyCount >= weeklyTarget ? " ✅" : ""}
+              本周：{weeklyCount}{weeklyTarget ? `/${weeklyTarget}` : ''}座
+              {weeklyTarget && weeklyCount >= weeklyTarget ? " ✅" : ""}
             </Text>
           </View>
         );
