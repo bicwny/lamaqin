@@ -29,9 +29,10 @@ interface PracticeProject {
   id: string;
   user_id: string;
   practice_id: string;
-  target_count: number;
+  total_target: number;
   current_count: number;
-  daily_target: number;
+  daily_target?: number;
+  weekly_target?: number;
   target_period: string;
   start_date: string;
   target_end_date: string;
@@ -247,25 +248,25 @@ export default function PracticeDetailScreen() {
 
     if (project.practices.type === "count") {
       const percentage = Math.min(
-        (project.current_count / project.target_count) * 100,
+        (project.current_count / project.total_target) * 100,
         100,
       );
       return {
         current: project.current_count,
-        target: project.target_count,
+        target: project.total_target,
         percentage: percentage,
-        isCompleted: project.current_count >= project.target_count,
+        isCompleted: project.current_count >= project.total_target,
       };
     } else {
       // For time-based practices, calculate based on sessions
       return {
         current: project.current_count,
-        target: project.target_count,
+        target: project.total_target,
         percentage: Math.min(
-          (project.current_count / project.target_count) * 100,
+          (project.current_count / project.total_target) * 100,
           100,
         ),
-        isCompleted: project.current_count >= project.target_count,
+        isCompleted: project.current_count >= project.total_target,
       };
     }
   };
@@ -333,8 +334,9 @@ export default function PracticeDetailScreen() {
         practiceDescription: project.practices.description || "",
         editMode: "true",
         projectId: project.id,
-        currentTargetCount: project.target_count?.toString() || "",
+        currentTotalTarget: project.total_target?.toString() || "",
         currentDailyTarget: project.daily_target?.toString() || "",
+        currentWeeklyTarget: project.weekly_target?.toString() || "",
         currentStartDate: project.start_date,
         currentEndDate: project.target_end_date || "",
         currentTargetPeriod: project.target_period,
@@ -428,13 +430,13 @@ export default function PracticeDetailScreen() {
             {progress.target.toLocaleString()} {project.practices.unit}
           </Text>
           <Text style={styles.dailyTargetText}>
-            每日目标：{project.daily_target.toLocaleString()} {project.practices.unit}
+            每日目标：{project.daily_target?.toLocaleString()} {project.practices.unit}
           </Text>
         </View>
       );
     } else {
       const todayCount = todayRecords.length;
-      const target = project.daily_target;
+      const target = project.daily_target || project.weekly_target;
 
       // Format session details for today
       const todayDetails = todayRecords
@@ -445,10 +447,10 @@ export default function PracticeDetailScreen() {
 
       if (isTimeBasedWeekly) {
         const weeklyCount = weeklyRecords.length;
-        // For weekly practices, the weekly goal is stored in either daily_target or target_count
-        const weeklyTarget = project.daily_target || project.target_count;
+        // For weekly practices, the weekly goal is stored in weekly_target
+        const weeklyTarget = project.weekly_target;
         const totalDone = project.current_count;
-        const totalTarget = project.target_count;
+        const totalTarget = project.total_target;
 
         return (
           <View style={styles.progressDetails}>

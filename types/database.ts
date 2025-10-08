@@ -64,11 +64,13 @@ export interface UserPracticeProject {
   practice_id: string;
   project_name?: string;
   preset_project_id?: string;
-  target_count: number;
+  total_target: number;        // 总目标：计数类=总遍数，时间类=总座数
+  weekly_target?: number;       // 每周目标座数（仅时间类weekly使用）
   start_date?: string;
   target_end_date?: string;
   current_count: number;
-  daily_target: number;
+  daily_target?: number;        // 每日目标：计数类=每日遍数，时间类weekly时为null
+  target_period?: 'daily' | 'weekly';
   status: 'not_started' | 'active' | 'completed';
   created_at: string;
   updated_at: string;

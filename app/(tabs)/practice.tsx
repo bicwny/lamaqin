@@ -28,9 +28,10 @@ interface PracticeProject {
   id: string;
   user_id: string;
   practice_id: string;
-  target_count: number;
+  total_target: number;
   current_count: number;
-  daily_target: number;
+  daily_target?: number;
+  weekly_target?: number;
   target_period: string;
   start_date: string;
   target_end_date: string;
@@ -146,25 +147,25 @@ export default function PracticeScreen() {
   const calculateProgress = (project: PracticeProject) => {
     if (project.practices.type === "count") {
       const percentage = Math.min(
-        (project.current_count / project.target_count) * 100,
+        (project.current_count / project.total_target) * 100,
         100,
       );
       return {
         current: project.current_count,
-        target: project.target_count,
+        target: project.total_target,
         percentage: percentage,
-        isCompleted: project.current_count >= project.target_count,
+        isCompleted: project.current_count >= project.total_target,
       };
     } else {
       // For time-based practices, calculate based on sessions
       return {
         current: project.current_count,
-        target: project.target_count,
+        target: project.total_target,
         percentage: Math.min(
-          (project.current_count / project.target_count) * 100,
+          (project.current_count / project.total_target) * 100,
           100,
         ),
-        isCompleted: project.current_count >= project.target_count,
+        isCompleted: project.current_count >= project.total_target,
       };
     }
   };

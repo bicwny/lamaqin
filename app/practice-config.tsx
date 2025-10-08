@@ -46,8 +46,9 @@ export default function PracticeConfigScreen() {
     practiceDescription,
     editMode,
     projectId,
-    currentTargetCount,
+    currentTotalTarget,
     currentDailyTarget,
+    currentWeeklyTarget,
     currentStartDate,
     currentEndDate,
     currentTargetPeriod,
@@ -62,8 +63,9 @@ export default function PracticeConfigScreen() {
     practiceDescription: string;
     editMode?: string;
     projectId?: string;
-    currentTargetCount?: string;
+    currentTotalTarget?: string;
     currentDailyTarget?: string;
+    currentWeeklyTarget?: string;
     currentStartDate?: string;
     currentEndDate?: string;
     currentTargetPeriod?: string;
@@ -82,13 +84,13 @@ export default function PracticeConfigScreen() {
       "30"
   );
   const [totalTarget, setTotalTarget] = useState(
-    isEditMode && currentTargetCount ? currentTargetCount : ""
+    isEditMode && currentTotalTarget ? currentTotalTarget : ""
   );
   const [dailyTarget, setDailyTarget] = useState(
     isEditMode && currentDailyTarget ? currentDailyTarget : ""
   );
   const [sessionsTarget, setSessionsTarget] = useState(
-    isEditMode && currentDailyTarget ? currentDailyTarget : "1"
+    isEditMode && currentWeeklyTarget ? currentWeeklyTarget : "1"
   );
   const [loading, setLoading] = useState(false);
   const [showPresetModal, setShowPresetModal] = useState(false);
@@ -349,7 +351,7 @@ export default function PracticeConfigScreen() {
       const projectData = {
         user_id: user.id,
         practice_id: practiceId,
-        target_count: finalTotalTarget,
+        total_target: finalTotalTarget,
         daily_target: finalDailyTarget,
         target_period: targetPeriod,
         start_date: startDate.toISOString().split("T")[0],
@@ -913,10 +915,10 @@ export default function PracticeConfigScreen() {
           user_id: user.id,
           practice_id: practiceId,
           target_period: "weekly",
-          daily_target: parseInt(sessionsTarget),
+          weekly_target: parseInt(sessionsTarget),
+          total_target: targetCount,
           start_date: startDateObj.toISOString().split("T")[0],
           target_end_date: endDate.toISOString().split("T")[0],
-          target_count: targetCount,
           status: "active",
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
@@ -925,7 +927,7 @@ export default function PracticeConfigScreen() {
         
         // Preserve current_count when editing, set to 0 when creating new
         if (!isEditMode) {
-          projectData.current_count = 0;
+          (projectData as any).current_count = 0;
         }
       } else {
         // Count-based practice configuration
@@ -946,7 +948,7 @@ export default function PracticeConfigScreen() {
         projectData = {
           user_id: user.id,
           practice_id: practiceId,
-          target_count: finalTargetCount,
+          total_target: finalTargetCount,
           daily_target: finalDailyTarget,
           start_date: startDateObj.toISOString().split("T")[0],
           target_end_date: endDate.toISOString().split("T")[0],
@@ -959,7 +961,7 @@ export default function PracticeConfigScreen() {
         
         // Preserve current_count when editing, set to 0 when creating new
         if (!isEditMode) {
-          projectData.current_count = 0;
+          (projectData as any).current_count = 0;
         }
       }
 

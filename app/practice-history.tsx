@@ -233,7 +233,7 @@ export default function PracticeHistoryScreen() {
     if (!projectInfo) return { percentage: 0, current: 0, target: 0 };
 
     const current = projectInfo.current_count || 0;
-    const target = projectInfo.target_count || 1;
+    const target = projectInfo.total_target || 1;
     const percentage = Math.min((current / target) * 100, 100);
 
     return { percentage, current, target };
