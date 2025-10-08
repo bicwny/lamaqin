@@ -61,7 +61,7 @@ SELECT
 FROM practices 
 WHERE name IN (
   '《入行论广释》201观修',
-  '《前行实修法》第59-92修法'
+  '前行实修法'
 );
 
 -- 步骤2: 更新 class_required_practices，标记两个修法为可选择的

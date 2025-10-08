@@ -9,7 +9,7 @@
 INSERT INTO practices (id, name, type, unit, description)
 VALUES 
   (gen_random_uuid(), '《入行论广释》201观修', 'time', '座', '入行论观修 - 第1课至第201课的系统观修'),
-  (gen_random_uuid(), '《前行实修法》第59-92修法', 'time', '座', '前行实修 - 第59至92修法的系统观修')
+  ('432e30ee-f8e8-4569-8da3-86ff7b264f5e', '前行实修法', 'time', '座', '前行实修 - 第59至92修法的系统观修')
 ON CONFLICT (name) DO NOTHING;
 
 -- 步骤2: 获取班级ID和修法ID
@@ -31,7 +31,7 @@ SELECT
 FROM practices 
 WHERE name IN (
   '《入行论广释》201观修',
-  '《前行实修法》第59-92修法'
+  '前行实修法'
 );
 
 -- 步骤3: 将修法添加到班级必修列表并标记为可选
@@ -58,7 +58,7 @@ VALUES (
 )
 ON CONFLICT DO NOTHING;
 
--- 添加《前行实修法》第59-92修法为可选修法
+-- 添加前行实修法为可选修法
 INSERT INTO class_required_practices (
   id, class_id, practice_id, choice_group, is_optional,
   target_count, daily_target, practice_category

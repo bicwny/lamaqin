@@ -43,7 +43,7 @@ In Supabase SQL Editor, run the `docs/setup-meditation-choice-system.sql` file:
      
      观修选择:
      □ 《入行论广释》201观修
-     □ 《前行实修法》第59-92修法
+     □ 前行实修法
      ```
    - 尝试不选择任何观修，点击"完成设置" → 应该显示验证错误
    - 选择一项或两项观修
@@ -53,7 +53,7 @@ In Supabase SQL Editor, run the `docs/setup-meditation-choice-system.sql` file:
    - 进入"功课"页面
    - 确认只看到选择的观修对应的practice项目
    - 如果选择了《入行论广释》201观修，应该看到该修法的项目
-   - 如果选择了《前行实修法》第59-92修法，应该看到该修法的项目
+   - 如果选择了前行实修法，应该看到该修法的项目
    - 如果两个都选了，应该看到两个项目
 
 **Expected Results:**
@@ -81,7 +81,7 @@ In Supabase SQL Editor, run the `docs/setup-meditation-choice-system.sql` file:
    
    观修选择:
    ☑ 《入行论广释》201观修 [如果之前选了]
-   □ 《前行实修法》第59-92修法 [如果之前没选]
+   □ 前行实修法 [如果之前没选]
    ```
 
 4. 修改选择
@@ -151,7 +151,7 @@ JOIN practices p ON pp.practice_id = p.id
 WHERE pp.user_id = '<USER_ID>'
   AND p.name IN (
     '《入行论广释》201观修',
-    '《前行实修法》第59-92修法'
+    '前行实修法'
   )
 ORDER BY pp.created_at DESC;
 ```
