@@ -314,8 +314,9 @@ export default function PracticeConfigScreen() {
     setLoading(true);
 
     try {
-      let finalTotalTarget: number;
-      let finalDailyTarget: number;
+      let finalTotalTarget: number | null;
+      let finalDailyTarget: number | null = null;
+      let finalWeeklyTarget: number | null = null;
       let endDate: Date | null = null;
       let targetPeriod: string;
 
@@ -333,18 +334,18 @@ export default function PracticeConfigScreen() {
         }
       } else {
         // Time-based practices - unified approach
-        finalDailyTarget = parseInt(sessionsTarget); // User's weekly goal
+        finalWeeklyTarget = parseInt(sessionsTarget); // User's weekly goal
         targetPeriod = "weekly";
 
         if (durationMode === "持续进行") {
           // Ongoing practice - no end date
           endDate = null;
-          finalTotalTarget = 0; // 0 indicates ongoing
+          finalTotalTarget = null; // null indicates continuous practice
         } else {
           // Fixed duration practice
           const days = getDurationInDays();
           endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-          finalTotalTarget = finalDailyTarget * Math.ceil(days / 7);
+          finalTotalTarget = finalWeeklyTarget * Math.ceil(days / 7);
         }
       }
 
@@ -352,6 +353,7 @@ export default function PracticeConfigScreen() {
         user_id: user.id,
         practice_id: practiceId,
         total_target: finalTotalTarget,
+        weekly_target: finalWeeklyTarget,
         daily_target: finalDailyTarget,
         target_period: targetPeriod,
         start_date: startDate.toISOString().split("T")[0],
@@ -906,10 +908,20 @@ export default function PracticeConfigScreen() {
       if (practiceType === "time") {
         // Time-based practice configuration
         const startDateObj = new Date(startDate);
-        const weeks = calculateWeeks();
-        const endDate = new Date(startDateObj);
-        endDate.setDate(startDateObj.getDate() + weeks * 7);
-        const targetCount = parseInt(sessionsTarget) * weeks;
+        let endDateObj: Date | null;
+        let targetCount: number | null;
+        
+        if (durationMode === "持续进行") {
+          // Continuous practice - no end date, no total target
+          endDateObj = null;
+          targetCount = null;
+        } else {
+          // Fixed duration practice
+          const weeks = calculateWeeks();
+          endDateObj = new Date(startDateObj);
+          endDateObj.setDate(startDateObj.getDate() + weeks * 7);
+          targetCount = parseInt(sessionsTarget) * weeks;
+        }
 
         projectData = {
           user_id: user.id,
@@ -918,7 +930,7 @@ export default function PracticeConfigScreen() {
           weekly_target: parseInt(sessionsTarget),
           total_target: targetCount,
           start_date: startDateObj.toISOString().split("T")[0],
-          target_end_date: endDate.toISOString().split("T")[0],
+          target_end_date: endDateObj ? endDateObj.toISOString().split("T")[0] : null,
           status: "active",
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
