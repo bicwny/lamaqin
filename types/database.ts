@@ -64,7 +64,7 @@ export interface UserPracticeProject {
   practice_id: string;
   project_name?: string;
   preset_project_id?: string;
-  total_target: number;        // 总目标：计数类=总遍数，时间类=总座数
+  total_target?: number;        // 总目标：可选，为null时表示持续修行无期限
   weekly_target?: number;       // 每周目标座数（仅时间类weekly使用）
   start_date?: string;
   target_end_date?: string;
@@ -212,10 +212,9 @@ export interface ClassRequiredPractice {
   id: string;
   class_id: string;
   practice_id: string;
-  target_count?: number;
-  daily_target?: number;
-  total_sessions?: number;
-  weekly_sessions?: number;
+  total_target?: number;        // 总目标：可选，为null时表示持续修行无期限
+  weekly_target?: number;       // 每周目标座数
+  daily_target?: number;        // 每日目标
   min_duration_minutes?: number;
   practice_category: 'count' | 'session';
   is_required: boolean;
