@@ -214,29 +214,31 @@ export default function ProfileScreen() {
 
           </View>
 
-          {/* Profile Details */}
-          <View style={styles.profileDetails}>
-            {profile?.current_class && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>当前班级</Text>
-                <Text style={styles.detailValue}>{profile.current_class}</Text>
-              </View>
-            )}
+          {/* Profile Details - Only show if there are details to display */}
+          {(profile?.current_class || profile?.practice_years || profile?.bio) && (
+            <View style={styles.profileDetails}>
+              {profile?.current_class && (
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailLabel}>当前班级</Text>
+                  <Text style={styles.detailValue}>{profile.current_class}</Text>
+                </View>
+              )}
 
-            {profile?.practice_years && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>修行年限</Text>
-                <Text style={styles.detailValue}>{profile.practice_years} 年</Text>
-              </View>
-            )}
+              {profile?.practice_years && (
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailLabel}>修行年限</Text>
+                  <Text style={styles.detailValue}>{profile.practice_years} 年</Text>
+                </View>
+              )}
 
-            {profile?.bio && (
-              <View style={styles.detailItem}>
-                <Text style={styles.detailLabel}>个人简介</Text>
-                <Text style={styles.detailValue}>{profile.bio}</Text>
-              </View>
-            )}
-          </View>
+              {profile?.bio && (
+                <View style={styles.detailItem}>
+                  <Text style={styles.detailLabel}>个人简介</Text>
+                  <Text style={styles.detailValue}>{profile.bio}</Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Action Buttons */}
           <View style={styles.actionSection}>
