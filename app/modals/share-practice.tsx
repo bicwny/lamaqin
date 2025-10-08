@@ -4,21 +4,18 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { toastService } from '@/lib/toast';
 import * as Clipboard from 'expo-clipboard';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
+import ModalTemplate from '@/components/ModalTemplate';
 
 interface PracticeSummary {
   name: string;
@@ -182,106 +179,45 @@ export default function SharePracticeModal() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'top', 'bottom']}>
-      <Stack.Screen options={{ headerShown: false }} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={handleClose}
+    <ModalTemplate
+      title="分享修行"
+      onClose={handleClose}
+      scrollable={true}
+      backgroundColor={DesignSystem.colors.backgroundSecondary}
+    >
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <Text style={styles.loadingText}>正在生成总结...</Text>
+        </View>
+      ) : (
+        <View style={styles.content}>
+          <Text style={styles.sectionTitle}>今日修行总结</Text>
+          <Text style={styles.hint}>点击下方按钮复制，然后粘贴到WhatsApp分享</Text>
+
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryText}>{summary}</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.copyButton}
+            onPress={handleCopy}
           >
-            <Ionicons name="close" size={24} color={Colors.text} />
+            <Ionicons name="copy-outline" size={20} color="#fff" style={styles.copyIcon} />
+            <Text style={styles.copyButtonText}>复制到剪贴板</Text>
           </TouchableOpacity>
+
+          <Text style={styles.footerHint}>
+            💡 复制后，打开WhatsApp粘贴即可分享
+          </Text>
         </View>
-
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>分享修行</Text>
-        </View>
-
-        <View style={styles.headerRight} />
-      </View>
-
-      {/* Content */}
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
-            <Text style={styles.loadingText}>正在生成总结...</Text>
-          </View>
-        ) : (
-          <View style={styles.content}>
-            <Text style={styles.sectionTitle}>今日修行总结</Text>
-            <Text style={styles.hint}>点击下方按钮复制，然后粘贴到WhatsApp分享</Text>
-
-            <View style={styles.summaryCard}>
-              <Text style={styles.summaryText}>{summary}</Text>
-            </View>
-
-            <TouchableOpacity 
-              style={styles.copyButton}
-              onPress={handleCopy}
-            >
-              <Ionicons name="copy-outline" size={20} color="#fff" style={styles.copyIcon} />
-              <Text style={styles.copyButtonText}>复制到剪贴板</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.footerHint}>
-              💡 复制后，打开WhatsApp粘贴即可分享
-            </Text>
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+      )}
+    </ModalTemplate>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
-  },
-  headerLeft: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  headerCenter: {
-    flex: 2,
-    alignItems: 'center',
-  },
-  headerRight: {
-    flex: 1,
-  },
-  headerTitle: {
-    ...createStyles.heading('lg') as any,
-  },
-  closeButton: {
-    paddingVertical: DesignSystem.spacing.sm,
-    paddingHorizontal: DesignSystem.spacing.sm,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
   content: {
-    flex: 1,
     padding: DesignSystem.spacing.lg,
   },
   sectionTitle: {
