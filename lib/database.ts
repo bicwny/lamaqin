@@ -152,14 +152,14 @@ export const practiceService = {
   async createUserPracticeProject(
     userId: string,
     practiceId: string,
-    totalTarget: number,
-    dailyTarget: number,
+    totalTarget: number | null,
+    dailyTarget: number | null,
     startDate?: string,
-    targetEndDate?: string,
+    targetEndDate?: string | null,
     targetPeriod?: 'daily' | 'weekly',
     themeId?: string,
     goalType?: string,
-    weeklyTarget?: number
+    weeklyTarget?: number | null
   ) {
     const { data, error } = await supabase
       .from('user_practice_projects')

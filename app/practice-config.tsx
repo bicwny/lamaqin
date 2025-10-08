@@ -240,30 +240,25 @@ export default function PracticeConfigScreen() {
   };
 
   const getDurationInDays = () => {
+    // For continuous practice, return a default value
+    if (durationMode === "持续进行") {
+      return 365; // Default to 1 year for calculation purposes
+    }
+
+    // For fixed duration, use customDays if available, otherwise calculate from customEndDate
     const start = startDate;
     let end: Date;
 
-    switch (durationMode) {
-      case "30天":
-        end = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
-        break;
-      case "60天":
-        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
-        break;
-      case "100天":
-        end = new Date(start.getTime() + 100 * 24 * 60 * 60 * 1000);
-        break;
-      case "1年":
-        end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
-        break;
-      case "自定义":
-        end = customEndDate;
-        break;
-      default:
-        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
+    if (customDays && parseInt(customDays) > 0) {
+      // Use custom days input
+      return parseInt(customDays);
+    } else {
+      // Use custom end date
+      end = customEndDate;
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
     }
-
-    return Math.ceil((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
   };
 
   const calculateSuggestions = () => {
@@ -296,47 +291,105 @@ export default function PracticeConfigScreen() {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>目标设置</Text>
 
-      {/* Simple toggle for goal type */}
-      <View style={styles.goalTypeContainer}>
+      {/* Duration mode toggle */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>修行模式</Text>
         <View style={styles.segmentedControl}>
           <TouchableOpacity
             style={[
               styles.segmentButton,
-              configMode === "total" && styles.segmentButtonActive,
+              durationMode === "持续进行" && styles.segmentButtonActive,
             ]}
-            onPress={() => setConfigMode("total")}
+            onPress={() => {
+              setDurationMode("持续进行");
+              setConfigMode("daily"); // Force daily mode for continuous practice
+            }}
           >
             <Text
               style={[
                 styles.segmentButtonText,
-                configMode === "total" && styles.segmentButtonTextActive,
+                durationMode === "持续进行" && styles.segmentButtonTextActive,
               ]}
             >
-              总数目标
+              持续进行
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.segmentButton,
-              configMode === "daily" && styles.segmentButtonActive,
+              durationMode !== "持续进行" && styles.segmentButtonActive,
             ]}
-            onPress={() => setConfigMode("daily")}
+            onPress={() => setDurationMode("固定时长")}
           >
             <Text
               style={[
                 styles.segmentButtonText,
-                configMode === "daily" && styles.segmentButtonTextActive,
+                durationMode !== "持续进行" && styles.segmentButtonTextActive,
               ]}
             >
-              每日目标
+              固定时长
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
+      {/* Goal type toggle - only show for fixed duration */}
+      {durationMode !== "持续进行" && (
+        <View style={styles.goalTypeContainer}>
+          <View style={styles.segmentedControl}>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                configMode === "total" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setConfigMode("total")}
+            >
+              <Text
+                style={[
+                  styles.segmentButtonText,
+                  configMode === "total" && styles.segmentButtonTextActive,
+                ]}
+              >
+                总数目标
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                configMode === "daily" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setConfigMode("daily")}
+            >
+              <Text
+                style={[
+                  styles.segmentButtonText,
+                  configMode === "daily" && styles.segmentButtonTextActive,
+                ]}
+              >
+                每日目标
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       {/* Single input field for goal */}
       <View style={styles.goalInputContainer}>
-        {configMode === "total" ? (
+        {durationMode === "持续进行" ? (
+          <View>
+            <Text style={styles.goalInputLabel}>每日目标</Text>
+            <View style={styles.goalInputRow}>
+              <TextInput
+                style={styles.goalTextInput}
+                value={dailyTarget}
+                onChangeText={setDailyTarget}
+                placeholder="例如: 1000"
+                keyboardType="numeric"
+              />
+              <Text style={styles.goalInputUnit}>{practiceUnit}</Text>
+            </View>
+          </View>
+        ) : configMode === "total" ? (
           <View>
             <Text style={styles.goalInputLabel}>总目标数量</Text>
             <View style={styles.goalInputRow}>
@@ -495,8 +548,51 @@ export default function PracticeConfigScreen() {
         )}
       </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>项目时长</Text>
+      {/* Duration mode toggle - only for time-based practice */}
+      {practiceType === "time" && (
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>修行模式</Text>
+          <View style={styles.segmentedControl}>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                durationMode === "持续进行" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setDurationMode("持续进行")}
+            >
+              <Text
+                style={[
+                  styles.segmentButtonText,
+                  durationMode === "持续进行" && styles.segmentButtonTextActive,
+                ]}
+              >
+                持续进行
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.segmentButton,
+                durationMode !== "持续进行" && styles.segmentButtonActive,
+              ]}
+              onPress={() => setDurationMode("固定时长")}
+            >
+              <Text
+                style={[
+                  styles.segmentButtonText,
+                  durationMode !== "持续进行" && styles.segmentButtonTextActive,
+                ]}
+              >
+                固定时长
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Duration selection - only show if not continuous practice */}
+      {durationMode !== "持续进行" && (
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>项目时长</Text>
 
         <View style={styles.smartDurationContainer}>
           <View style={styles.daysInputContainer}>
@@ -577,6 +673,7 @@ export default function PracticeConfigScreen() {
           </View>
         )}
       </View>
+      )}
     </View>
   );
 
@@ -730,30 +827,21 @@ export default function PracticeConfigScreen() {
   };
 
   const calculateDays = () => {
-    const start = startDate;
-    let end: Date;
-
-    switch (durationMode) {
-      case "30天":
-        end = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
-        break;
-      case "60天":
-        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
-        break;
-      case "100天":
-        end = new Date(start.getTime() + 100 * 24 * 60 * 60 * 1000);
-        break;
-      case "1年":
-        end = new Date(start.getTime() + 365 * 24 * 60 * 60 * 1000);
-        break;
-      case "自定义":
-        end = customEndDate;
-        break;
-      default:
-        end = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
+    // For continuous practice, return a default value
+    if (durationMode === "持续进行") {
+      return 365; // Default to 1 year for calculation purposes
     }
 
-    return Math.ceil((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+    // For fixed duration, use customDays if available, otherwise calculate from customEndDate
+    const start = startDate;
+
+    if (customDays && parseInt(customDays) > 0) {
+      return parseInt(customDays);
+    } else {
+      const end = customEndDate;
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
   };
 
   const calculateWeeks = () => {
@@ -827,17 +915,26 @@ export default function PracticeConfigScreen() {
       } else {
         // Count-based practice configuration
         const startDateObj = new Date(startDate);
-        const days = calculateDays();
-        const endDate = new Date(startDateObj);
-        endDate.setDate(startDateObj.getDate() + days);
-        let finalTargetCount, finalDailyTarget;
+        let finalTargetCount, finalDailyTarget, endDate;
 
-        if (configMode === "total") {
-          finalTargetCount = parseInt(totalTarget);
-          finalDailyTarget = Math.ceil(finalTargetCount / days);
-        } else {
+        if (durationMode === "持续进行") {
+          // Continuous practice - no end date, no total target
+          finalTargetCount = null;
           finalDailyTarget = parseInt(dailyTarget);
-          finalTargetCount = finalDailyTarget * days;
+          endDate = null;
+        } else {
+          // Fixed duration practice
+          const days = calculateDays();
+          endDate = new Date(startDateObj);
+          endDate.setDate(startDateObj.getDate() + days);
+
+          if (configMode === "total") {
+            finalTargetCount = parseInt(totalTarget);
+            finalDailyTarget = Math.ceil(finalTargetCount / days);
+          } else {
+            finalDailyTarget = parseInt(dailyTarget);
+            finalTargetCount = finalDailyTarget * days;
+          }
         }
 
         projectData = {
@@ -846,10 +943,10 @@ export default function PracticeConfigScreen() {
           total_target: finalTargetCount,
           daily_target: finalDailyTarget,
           start_date: startDateObj.toISOString().split("T")[0],
-          target_end_date: endDate.toISOString().split("T")[0],
+          target_end_date: endDate ? endDate.toISOString().split("T")[0] : null,
           status: "active",
           target_period: "daily",
-          goal_type: configMode,
+          goal_type: durationMode === "持续进行" ? "continuous" : configMode,
           preset_project_id: selectedPresetId || null,
           project_name: selectedPresetId ? null : projectName || null,
         };
