@@ -28,6 +28,8 @@ export default function SharePracticeModal() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string>('');
+  const [dharmaName, setDharmaName] = useState<string>('');
+  const [dateTitle, setDateTitle] = useState<string>('');
   const { timezoneInfo } = useTimezone();
 
   useEffect(() => {
@@ -46,6 +48,24 @@ export default function SharePracticeModal() {
       const today = timezoneInfo 
         ? getCurrentDateInTimezone(timezoneInfo.timezone)
         : new Date().toISOString().split('T')[0];
+
+      // Get user's dharma name
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('dharma_name')
+        .eq('id', user.id)
+        .single();
+
+      if (userError) throw userError;
+      
+      const userDharmaName = userData?.dharma_name || '修行者';
+      setDharmaName(userDharmaName);
+
+      // Set date title
+      const date = new Date(today + 'T00:00:00');
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      setDateTitle(`${month}/${day}修行总结`);
 
       // Get all active practice projects
       const { data: projects, error: projectsError } = await supabase
@@ -116,7 +136,7 @@ export default function SharePracticeModal() {
       }
 
       // Format the summary
-      const formattedSummary = formatPracticeSummary(today, practiceList);
+      const formattedSummary = formatPracticeSummary(userDharmaName, practiceList);
       setSummary(formattedSummary);
     } catch (error) {
       console.error('❌ Error loading practice summary:', error);
@@ -129,29 +149,24 @@ export default function SharePracticeModal() {
     }
   };
 
-  const formatPracticeSummary = (dateStr: string, practices: PracticeSummary[]): string => {
-    // Format date as M/D (e.g., 10/7)
-    const date = new Date(dateStr + 'T00:00:00');
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    
+  const formatPracticeSummary = (dharmaName: string, practices: PracticeSummary[]): string => {
     // Build practice list
     const practiceStrings = practices.map(practice => {
       if (practice.count !== undefined) {
-        // Count-based practice
+        // Count-based practice - just name + number
         return `${practice.name}${practice.count}`;
       } else if (practice.sessions !== undefined) {
-        // Time-based practice
-        return `${practice.name} ${practice.sessions}座`;
+        // Time-based practice - just name + number (no "座")
+        return `${practice.name}${practice.sessions}`;
       }
       return '';
     }).filter(s => s.length > 0);
 
     if (practiceStrings.length === 0) {
-      return `${month}/${day}:\n当法：今日暂无修行记录`;
+      return `${dharmaName}：今日暂无修行记录`;
     }
 
-    return `${month}/${day}:\n当法：${practiceStrings.join('，')}`;
+    return `${dharmaName}：${practiceStrings.join('，')}`;
   };
 
   const handleCopy = async () => {
@@ -192,7 +207,7 @@ export default function SharePracticeModal() {
         </View>
       ) : (
         <View style={styles.content}>
-          <Text style={styles.sectionTitle}>今日修行总结</Text>
+          <Text style={styles.sectionTitle}>{dateTitle}</Text>
           <Text style={styles.hint}>点击下方按钮复制，然后粘贴到WhatsApp分享</Text>
 
           <View style={styles.summaryCard}>
