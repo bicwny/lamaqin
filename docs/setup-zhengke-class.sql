@@ -170,7 +170,7 @@ SELECT
   NULL,     -- 持续修行，无总座数限制
   7,        -- 每周7次（每天一座）
   NULL,     -- 时间不限
-  'time',
+  'session',
   TRUE,
   TRUE,     -- 可选（三选一）
   '观修选择'
@@ -204,7 +204,7 @@ SELECT
   NULL,     -- 持续修行，无总座数限制
   7,        -- 每周7次（每天一座）
   NULL,     -- 时间不限
-  'time',
+  'session',
   TRUE,
   TRUE,     -- 可选（三选一）
   '观修选择'
@@ -238,7 +238,7 @@ SELECT
   NULL,     -- 持续修行，无总座数限制
   7,        -- 每周7次（每天一座）
   NULL,     -- 时间不限
-  'time',
+  'session',
   TRUE,
   TRUE,     -- 可选（三选一）
   '观修选择'
