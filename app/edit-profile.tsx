@@ -395,78 +395,18 @@ export default function EditProfileScreen() {
                       const isEnrolled = enrolledClassIds.includes(classItem.id);
                       const isSelected = selectedClassIds.includes(classItem.id);
                       const enrollmentStatus = enrollmentStatuses[classItem.id];
+                      const hasOptionalPractices = optionalPracticeGroups.has(classItem.id);
                       
                       const statusLabel = enrollmentStatus === 'completed' ? '圆满' : '已加入';
                       
                       return (
-                        <TouchableOpacity
-                          key={classItem.id}
-                          style={styles.classCheckbox}
-                          onPress={() => toggleClassSelection(classItem.id)}
-                          disabled={isEnrolled}
-                        >
-                          {!isEnrolled && (
-                            <View style={[
-                              styles.checkbox,
-                              isSelected && styles.checkboxSelected
-                            ]}>
-                              {isSelected && (
-                                <ThemedText style={styles.checkmark}>✓</ThemedText>
-                              )}
-                            </View>
-                          )}
-                          <View style={styles.classInfo}>
-                            <ThemedText style={styles.className}>
-                              {classItem.class_name}
-                              {isEnrolled && ` (${statusLabel})`}
-                            </ThemedText>
-                            {classItem.description && (
-                              <ThemedText style={styles.classDescription}>
-                                {classItem.description}
-                              </ThemedText>
-                            )}
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })
-                  ) : (
-                    <ThemedText style={styles.noClassesText}>暂无可选班级</ThemedText>
-                  )}
-                </View>
-              )}
-            </View>
-
-            {/* Practice Choice UI - shown for enrolled classes with optional practices */}
-            {Array.from(optionalPracticeGroups.entries()).map(([classId, groups]) => {
-              const className = availableClasses.find(c => c.id === classId)?.class_name || '';
-              if (!enrolledClassIds.includes(classId)) return null;
-              
-              return (
-                <View key={classId} style={styles.practiceChoiceSection}>
-                  <ThemedText style={styles.practiceChoiceTitle}>
-                    🧘 {className} 观修选择（可修改）
-                  </ThemedText>
-                  <ThemedText style={styles.practiceChoiceSubtitle}>
-                    至少选择一项，可选择多项
-                  </ThemedText>
-                  {Array.from(groups.entries()).map(([groupName, practices]) => {
-                    const selectedForGroup = selectedPractices.get(classId)?.get(groupName) || [];
-                    
-                    return (
-                      <View key={groupName} style={styles.practiceGroupContainer}>
-                        <ThemedText style={styles.practiceGroupLabel}>{groupName}:</ThemedText>
-                        {practices.map((practice: any) => {
-                          const isSelected = selectedForGroup.includes(practice.practice_id);
-                          
-                          return (
-                            <TouchableOpacity
-                              key={practice.practice_id}
-                              style={[
-                                styles.practiceOption,
-                                isSelected && styles.practiceOptionSelected
-                              ]}
-                              onPress={() => togglePracticeSelection(classId, groupName, practice.practice_id)}
-                            >
+                        <View key={classItem.id}>
+                          <TouchableOpacity
+                            style={styles.classCheckbox}
+                            onPress={() => toggleClassSelection(classItem.id)}
+                            disabled={isEnrolled}
+                          >
+                            {!isEnrolled && (
                               <View style={[
                                 styles.checkbox,
                                 isSelected && styles.checkboxSelected
@@ -475,28 +415,85 @@ export default function EditProfileScreen() {
                                   <ThemedText style={styles.checkmark}>✓</ThemedText>
                                 )}
                               </View>
-                              <View style={styles.practiceOptionTextContainer}>
-                                <ThemedText style={[
-                                  styles.practiceOptionText,
-                                  isSelected && styles.practiceOptionTextSelected
-                                ]}>
-                                  {practice.practice?.name || '未知修法'}
+                            )}
+                            <View style={styles.classInfo}>
+                              <ThemedText style={styles.className}>
+                                {classItem.class_name}
+                                {isEnrolled && ` (${statusLabel})`}
+                              </ThemedText>
+                              {classItem.description && (
+                                <ThemedText style={styles.classDescription}>
+                                  {classItem.description}
                                 </ThemedText>
-                                {practice.practice?.description && (
-                                  <ThemedText style={styles.practiceOptionDescription}>
-                                    {practice.practice.description}
-                                  </ThemedText>
-                                )}
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        })}
-                      </View>
-                    );
-                  })}
+                              )}
+                            </View>
+                          </TouchableOpacity>
+
+                          {/* Practice choices shown directly under enrolled class */}
+                          {isEnrolled && hasOptionalPractices && (
+                            <View style={styles.practiceChoiceSection}>
+                              <ThemedText style={styles.practiceChoiceTitle}>
+                                🧘 观修选择（可修改）
+                              </ThemedText>
+                              <ThemedText style={styles.practiceChoiceSubtitle}>
+                                至少选择一项，可选择多项
+                              </ThemedText>
+                              {Array.from(optionalPracticeGroups.get(classItem.id)?.entries() || []).map(([groupName, practices]) => {
+                                const selectedForGroup = selectedPractices.get(classItem.id)?.get(groupName) || [];
+                                
+                                return (
+                                  <View key={groupName} style={styles.practiceGroupContainer}>
+                                    <ThemedText style={styles.practiceGroupLabel}>{groupName}:</ThemedText>
+                                    {practices.map((practice: any) => {
+                                      const isSelected = selectedForGroup.includes(practice.practice_id);
+                                      
+                                      return (
+                                        <TouchableOpacity
+                                          key={practice.practice_id}
+                                          style={[
+                                            styles.practiceOption,
+                                            isSelected && styles.practiceOptionSelected
+                                          ]}
+                                          onPress={() => togglePracticeSelection(classItem.id, groupName, practice.practice_id)}
+                                        >
+                                          <View style={[
+                                            styles.checkbox,
+                                            isSelected && styles.checkboxSelected
+                                          ]}>
+                                            {isSelected && (
+                                              <ThemedText style={styles.checkmark}>✓</ThemedText>
+                                            )}
+                                          </View>
+                                          <View style={styles.practiceOptionTextContainer}>
+                                            <ThemedText style={[
+                                              styles.practiceOptionText,
+                                              isSelected && styles.practiceOptionTextSelected
+                                            ]}>
+                                              {practice.practice?.name || '未知修法'}
+                                            </ThemedText>
+                                            {practice.practice?.description && (
+                                              <ThemedText style={styles.practiceOptionDescription}>
+                                                {practice.practice.description}
+                                              </ThemedText>
+                                            )}
+                                          </View>
+                                        </TouchableOpacity>
+                                      );
+                                    })}
+                                  </View>
+                                );
+                              })}
+                            </View>
+                          )}
+                        </View>
+                      );
+                    })
+                  ) : (
+                    <ThemedText style={styles.noClassesText}>暂无可选班级</ThemedText>
+                  )}
                 </View>
-              );
-            })}
+              )}
+            </View>
 
             <View style={styles.inputGroup}>
               <ThemedText style={styles.label}>常住地</ThemedText>
