@@ -1493,17 +1493,29 @@ export const classCurriculumService = {
 
   async syncUserCoursesWithClassRequirements(userId: string, classId: string): Promise<number> {
     const requiredCourses = await this.getClassRequiredCourses(classId);
+    
+    // Get all existing user courses to check for duplicates
+    const { data: existingCourses } = await supabase
+      .from('user_courses')
+      .select('course_id')
+      .eq('user_id', userId);
+    
+    const existingCourseIds = new Set(existingCourses?.map(c => c.course_id) || []);
     let enrolledCount = 0;
 
     for (const rc of requiredCourses) {
+      // Skip if user already has this course
+      if (existingCourseIds.has(rc.course_id)) {
+        console.log(`⏭️ Skipping course ${rc.course_id} - already enrolled`);
+        continue;
+      }
+
       try {
         await studyService.joinCourse(userId, rc.course_id);
         enrolledCount++;
+        console.log(`✅ Enrolled in new course ${rc.course_id}`);
       } catch (err) {
-        // Ignore if already enrolled (duplicate key error)
-        if ((err as any)?.code !== '23505') {
-          console.error(`Failed to enroll in course ${rc.course_id}:`, err);
-        }
+        console.error(`Failed to enroll in course ${rc.course_id}:`, err);
       }
     }
 

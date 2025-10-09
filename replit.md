@@ -41,6 +41,13 @@ Some classes offer optional practice choices where users must select at least on
 ### Course Display Ordering
 The `class_required_courses` table includes a `display_order` field allowing each class to define its own custom sequence for courses. This enables flexible learning paths where the same course can appear in different positions across classes (e.g., "大学演讲" might be first in one class but third in another). Courses are automatically displayed in ascending order based on this field, with any courses lacking a display_order value appearing last.
 
+### Shared Course Handling
+When the same course is required by multiple classes, students only need to enroll once. The `syncUserCoursesWithClassRequirements` function checks existing enrollments before adding courses. If a student already has a course from a previous class enrollment, it is automatically skipped when enrolling in new classes. This ensures:
+- No duplicate course entries in user_courses table
+- Students see each unique course only once on the study page
+- Progress on shared courses counts toward all classes requiring it
+- Example: If both "加行" and "预科：入行" require "大学演讲", the student is enrolled only when joining the first class, and the second class enrollment skips it
+
 # External Dependencies
 
 -   **Supabase**: Backend-as-a-service for authentication, database, and real-time features.
