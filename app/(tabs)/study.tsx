@@ -97,6 +97,7 @@ export default function StudyScreen() {
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [progress, setProgress] = useState<StudyProgress[]>([]);
   const [courseLessons, setCourseLessons] = useState<Record<string, CourseLesson[]>>({});
+  const [enrolledClasses, setEnrolledClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [selectedCourse, setSelectedCourse] = useState<UserCourse | null>(null);
@@ -130,12 +131,20 @@ export default function StudyScreen() {
       console.log('🔄 Loading study data for user:', user.id);
 
       // Auto-sync courses for enrolled classes (parallelized)
+      let enrolledClassesData: any[] = [];
       try {
-        const enrolledClasses = await classCurriculumService.getUserEnrolledClasses(user.id);
-        console.log('📚 Enrolled classes:', enrolledClasses.map(c => c.class_curriculum.class_name));
+        enrolledClassesData = await classCurriculumService.getUserEnrolledClasses(user.id);
+        console.log('📚 Enrolled classes:', enrolledClassesData.map(c => c.class_curriculum.class_name));
+        
+        // Sort enrolled classes by display_order
+        enrolledClassesData.sort((a, b) => 
+          (a.class_curriculum.display_order || 999) - (b.class_curriculum.display_order || 999)
+        );
+        
+        setEnrolledClasses(enrolledClassesData);
         
         // Parallelize class syncing
-        const syncPromises = enrolledClasses
+        const syncPromises = enrolledClassesData
           .filter(enrollment => enrollment.status === 'active')
           .map(async (enrollment) => {
             console.log(`🔄 Syncing courses for ${enrollment.class_curriculum.class_name}...`);
@@ -455,6 +464,59 @@ export default function StudyScreen() {
     !userCourses.some(uc => uc.course_id === course.id)
   );
 
+  // Group courses by class with proper ordering
+  const groupCoursesByClass = () => {
+    const grouped: Record<string, { class: any; courses: (UserCourse & { display_order?: number })[] }> = {};
+    const coursesInClasses = new Set<string>();
+    
+    // First, group courses by class
+    enrolledClasses.forEach(enrollment => {
+      const classCourses = enrollment.required_courses || [];
+      
+      // Get user's enrolled courses for this class (only active courses)
+      const coursesForClass = userCourses
+        .filter(uc => uc.status === 'active') // Only show active courses
+        .map(userCourse => {
+          // Find the display_order for this course in this class
+          const courseLink = classCourses.find((rc: any) => rc.course_id === userCourse.course_id);
+          return {
+            ...userCourse,
+            display_order: courseLink?.display_order || 999
+          };
+        })
+        .filter(uc => {
+          // Check if this course belongs to this class
+          const belongsToClass = classCourses.some((rc: any) => rc.course_id === uc.course_id);
+          if (belongsToClass) {
+            coursesInClasses.add(uc.course_id);
+          }
+          return belongsToClass;
+        })
+        .sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+      
+      if (coursesForClass.length > 0) {
+        grouped[enrollment.class_id] = {
+          class: enrollment,
+          courses: coursesForClass
+        };
+      }
+    });
+    
+    // Add a special group for courses not in any class (active only)
+    const orphanCourses = userCourses
+      .filter(uc => uc.status === 'active' && !coursesInClasses.has(uc.course_id))
+      .map(uc => ({ ...uc, display_order: 999 }));
+    
+    if (orphanCourses.length > 0) {
+      grouped['_orphan'] = {
+        class: { class_curriculum: { class_name: '其他课程' } },
+        courses: orphanCourses
+      };
+    }
+    
+    return grouped;
+  };
+
   if (loading) {
     return (
       <PageTemplate
@@ -519,64 +581,143 @@ export default function StudyScreen() {
         padding={0}
       >
         <ScrollView style={styles.scrollView}>
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>我的课程</Text>
-            </View>
+          {(() => {
+            const groupedCourses = groupCoursesByClass();
+            const classesToShow = enrolledClasses.filter(enrollment => 
+              enrollment.status === 'active' && groupedCourses[enrollment.class_id]
+            );
+            
+            return (
+              <>
+                {classesToShow.map(enrollment => {
+                  const classData = groupedCourses[enrollment.class_id];
 
-            {userCourses.filter(uc => uc.status === 'active').map(userCourse => {
-              const courseProgress = getCourseProgress(userCourse.course_id);
-              const currentLesson = courseProgress?.currentLesson || 1;
-              const progressPercentage = userCourse.progress_percentage || 0;
-
-              return (
-                <TouchableOpacity 
-                  key={userCourse.id} 
-                  style={styles.courseCard}
-                  onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
-                >
-                  <View style={styles.courseHeader}>
-                    <Text style={styles.courseName}>{userCourse.course.name}</Text>
-                    <Text style={styles.courseInfo}>
-                      {userCourse.course.teacher} • {userCourse.course.total_lessons}课
-                    </Text>
-                  </View>
-
-                  <View style={styles.progressContainer}>
-                    <View style={styles.progressTextRow}>
-                      <Text style={styles.progressText}>
-                        完成进度：{progressPercentage.toFixed(1)}%
-                      </Text>
-                      <Text style={styles.currentLessonText}>
-                        上次完成：第{currentLesson}课
-                      </Text>
-                    </View>
-
-                    <View style={styles.progressBarContainer}>
-                      <View style={styles.progressBarBg}>
-                        <View 
-                          style={[
-                            styles.progressBarFill, 
-                            { width: `${Math.min(progressPercentage, 100)}%` }
-                          ]} 
-                        />
+                  return (
+                    <View key={enrollment.class_id} style={styles.section}>
+                      <View style={styles.classHeader}>
+                        <Text style={styles.className}>【{enrollment.class_curriculum.class_name}】</Text>
                       </View>
-                    </View>
-                  </View>
 
-                  <TouchableOpacity 
-                    style={styles.continueButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      router.push(`/course-detail/${userCourse.course_id}`);
-                    }}
-                  >
-                    <Text style={styles.continueButtonText}>继续学习</Text>
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+                      {classData.courses.map(userCourse => {
+                        const courseProgress = getCourseProgress(userCourse.course_id);
+                        const currentLesson = courseProgress?.currentLesson || 1;
+                        const progressPercentage = userCourse.progress_percentage || 0;
+
+                        return (
+                          <TouchableOpacity 
+                            key={userCourse.id} 
+                            style={styles.courseCard}
+                            onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+                          >
+                            <View style={styles.courseHeader}>
+                              <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                              <Text style={styles.courseInfo}>
+                                {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+                              </Text>
+                            </View>
+
+                            <View style={styles.progressContainer}>
+                              <View style={styles.progressTextRow}>
+                                <Text style={styles.progressText}>
+                                  完成进度：{progressPercentage.toFixed(1)}%
+                                </Text>
+                                <Text style={styles.currentLessonText}>
+                                  上次完成：第{currentLesson}课
+                                </Text>
+                              </View>
+
+                              <View style={styles.progressBarContainer}>
+                                <View style={styles.progressBarBg}>
+                                  <View 
+                                    style={[
+                                      styles.progressBarFill, 
+                                      { width: `${Math.min(progressPercentage, 100)}%` }
+                                    ]} 
+                                  />
+                                </View>
+                              </View>
+                            </View>
+
+                            <TouchableOpacity 
+                              style={styles.continueButton}
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                router.push(`/course-detail/${userCourse.course_id}`);
+                              }}
+                            >
+                              <Text style={styles.continueButtonText}>继续学习</Text>
+                            </TouchableOpacity>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  );
+                })}
+                
+                {/* Show orphan courses at the end */}
+                {groupedCourses['_orphan'] && (
+                  <View key="_orphan" style={styles.section}>
+                    <View style={styles.classHeader}>
+                      <Text style={styles.className}>【{groupedCourses['_orphan'].class.class_curriculum.class_name}】</Text>
+                    </View>
+
+                    {groupedCourses['_orphan'].courses.map(userCourse => {
+                      const courseProgress = getCourseProgress(userCourse.course_id);
+                      const currentLesson = courseProgress?.currentLesson || 1;
+                      const progressPercentage = userCourse.progress_percentage || 0;
+
+                      return (
+                        <TouchableOpacity 
+                          key={userCourse.id} 
+                          style={styles.courseCard}
+                          onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+                        >
+                          <View style={styles.courseHeader}>
+                            <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                            <Text style={styles.courseInfo}>
+                              {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+                            </Text>
+                          </View>
+
+                          <View style={styles.progressContainer}>
+                            <View style={styles.progressTextRow}>
+                              <Text style={styles.progressText}>
+                                完成进度：{progressPercentage.toFixed(1)}%
+                              </Text>
+                              <Text style={styles.currentLessonText}>
+                                上次完成：第{currentLesson}课
+                              </Text>
+                            </View>
+
+                            <View style={styles.progressBarContainer}>
+                              <View style={styles.progressBarBg}>
+                                <View 
+                                  style={[
+                                    styles.progressBarFill, 
+                                    { width: `${Math.min(progressPercentage, 100)}%` }
+                                  ]} 
+                                />
+                              </View>
+                            </View>
+                          </View>
+
+                          <TouchableOpacity 
+                            style={styles.continueButton}
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              router.push(`/course-detail/${userCourse.course_id}`);
+                            }}
+                          >
+                            <Text style={styles.continueButtonText}>继续学习</Text>
+                          </TouchableOpacity>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </>
+            );
+          })()}
 
           {/* Course Summary Footer */}
           <View style={styles.courseSummary}>
@@ -838,6 +979,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#1a1a1a',
+    letterSpacing: -0.3,
+  },
+  classHeader: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    marginTop: 8,
+  },
+  className: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: DesignSystem.colors.yellowTara,
     letterSpacing: -0.3,
   },
   courseCard: {
