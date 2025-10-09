@@ -10,12 +10,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 
 // Component to display lesson progress with real-time counts
-const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, showOnlyIcon }: {
+const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, showOnlyIcon, optionalStatusFields }: {
   userId: string;
   courseId: string;
   lessonId: string;
   refreshTrigger?: number;
   showOnlyIcon?: boolean;
+  optionalStatusFields?: Set<'共修' | '讲考'>;
 }) => {
   const [summary, setSummary] = useState({ 
     听传承: 0, 
@@ -52,16 +53,19 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
     ) : null;
   }
 
+  const has共修 = optionalStatusFields?.has('共修') ?? false;
+  const has讲考 = optionalStatusFields?.has('讲考') ?? false;
+
   return (
     <View style={styles.lessonProgressContainer}>
       <Text style={styles.lessonProgress}>
         听传承: {summary.听传承}次 | 看法本: {summary.看法本}次
       </Text>
-      {(summary.共修 || summary.讲考) && (
+      {((has共修 && summary.共修) || (has讲考 && summary.讲考)) && (
         <Text style={[styles.lessonProgress, { fontSize: 12, color: '#666', marginTop: 2 }]}>
-          {summary.共修 && `共修: ${summary.共修}`}
-          {summary.共修 && summary.讲考 && ' | '}
-          {summary.讲考 && `讲考: ${summary.讲考}`}
+          {has共修 && summary.共修 && `共修: ${summary.共修}`}
+          {has共修 && summary.共修 && has讲考 && summary.讲考 && ' | '}
+          {has讲考 && summary.讲考 && `讲考: ${summary.讲考}`}
         </Text>
       )}
     </View>
@@ -273,6 +277,7 @@ export default function CourseDetailScreen() {
                   lessonId={lesson.id} 
                   refreshTrigger={refreshTrigger}
                   showOnlyIcon={true}
+                  optionalStatusFields={optionalStatusFields}
                 />
               </View>
               <LessonProgressDisplay 
@@ -280,6 +285,7 @@ export default function CourseDetailScreen() {
                 courseId={courseId}
                 lessonId={lesson.id}
                 refreshTrigger={refreshTrigger}
+                optionalStatusFields={optionalStatusFields}
               />
             </View>
 
