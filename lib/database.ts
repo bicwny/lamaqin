@@ -1062,6 +1062,54 @@ export const studyService = {
     });
 
     return summary;
+  },
+
+  async getCourseOptionalStatusFields(userId: string, courseId: string): Promise<Set<'共修' | '讲考'>> {
+    try {
+      // Get all classes the user is enrolled in
+      const { data: userClasses, error: classError } = await supabase
+        .from('user_enrolled_classes')
+        .select('class_id')
+        .eq('user_id', userId);
+
+      if (classError) {
+        console.error('Error fetching user classes:', classError);
+        return new Set();
+      }
+
+      if (!userClasses || userClasses.length === 0) {
+        return new Set();
+      }
+
+      const classIds = userClasses.map(uc => uc.class_id);
+
+      // Get optional_status_fields for this course from all enrolled classes
+      const { data: courseLinks, error: linkError } = await supabase
+        .from('class_required_courses')
+        .select('optional_status_fields')
+        .eq('course_id', courseId)
+        .in('class_id', classIds);
+
+      if (linkError) {
+        console.error('Error fetching course optional fields:', linkError);
+        return new Set();
+      }
+
+      // Union all optional_status_fields
+      const optionalFields = new Set<'共修' | '讲考'>();
+      courseLinks?.forEach(link => {
+        link.optional_status_fields?.forEach((field: string) => {
+          if (field === '共修' || field === '讲考') {
+            optionalFields.add(field);
+          }
+        });
+      });
+
+      return optionalFields;
+    } catch (error) {
+      console.error('Error in getCourseOptionalStatusFields:', error);
+      return new Set();
+    }
   }
 };
 
