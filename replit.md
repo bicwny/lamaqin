@@ -38,6 +38,9 @@ The application supports a class-based curriculum system, allowing users to enro
 ### Practice Choice System
 Some classes offer optional practice choices where users must select at least one practice from a choice group during enrollment. The system tracks selections using the `choice_group` field in `class_required_practices` table, with `is_optional=true` marking choices. User selections are stored in `user_practice_choices` table and automatically synced to create corresponding practice projects.
 
+### Course Display Ordering
+The `class_required_courses` table includes a `display_order` field allowing each class to define its own custom sequence for courses. This enables flexible learning paths where the same course can appear in different positions across classes (e.g., "大学演讲" might be first in one class but third in another). Courses are automatically displayed in ascending order based on this field, with any courses lacking a display_order value appearing last.
+
 # External Dependencies
 
 -   **Supabase**: Backend-as-a-service for authentication, database, and real-time features.
