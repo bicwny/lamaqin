@@ -323,19 +323,23 @@ export default function CourseDetailScreen() {
                   <Text style={styles.secondaryButtonText}>在线课程</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity 
-                  style={[styles.recordButton, styles.secondaryButton]}
-                  onPress={() => recordStudy(lesson.lesson_number, '共修')}
-                >
-                  <Text style={styles.secondaryButtonText}>共修</Text>
-                </TouchableOpacity>
+                {optionalStatusFields.has('共修') && (
+                  <TouchableOpacity 
+                    style={[styles.recordButton, styles.secondaryButton]}
+                    onPress={() => recordStudy(lesson.lesson_number, '共修')}
+                  >
+                    <Text style={styles.secondaryButtonText}>共修</Text>
+                  </TouchableOpacity>
+                )}
 
-                <TouchableOpacity 
-                  style={[styles.recordButton, styles.secondaryButton]}
-                  onPress={() => recordStudy(lesson.lesson_number, '讲考')}
-                >
-                  <Text style={styles.secondaryButtonText}>讲考</Text>
-                </TouchableOpacity>
+                {optionalStatusFields.has('讲考') && (
+                  <TouchableOpacity 
+                    style={[styles.recordButton, styles.secondaryButton]}
+                    onPress={() => recordStudy(lesson.lesson_number, '讲考')}
+                  >
+                    <Text style={styles.secondaryButtonText}>讲考</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </View>
