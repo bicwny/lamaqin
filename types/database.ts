@@ -205,6 +205,7 @@ export interface ClassRequiredCourse {
   course_id: string;
   required_study_types: string[];
   optional_status_fields: string[];
+  display_order?: number;
   created_at: string;
 }
 
