@@ -1353,7 +1353,8 @@ export const classCurriculumService = {
         *,
         course:courses(*)
       `)
-      .eq('class_id', classId);
+      .eq('class_id', classId)
+      .order('display_order', { ascending: true, nullsFirst: false });
 
     if (error) throw error;
     return data || [];
