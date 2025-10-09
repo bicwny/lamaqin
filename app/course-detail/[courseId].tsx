@@ -101,6 +101,7 @@ export default function CourseDetailScreen() {
   const [lessons, setLessons] = useState<CourseLesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [optionalStatusFields, setOptionalStatusFields] = useState<Set<'共修' | '讲考'>>(new Set());
 
   useEffect(() => {
     if (user && courseId) {
@@ -132,6 +133,11 @@ export default function CourseDetailScreen() {
       // Load lessons for this course
       const courseLessons = await studyService.getCourseLessons(courseId);
       setLessons(courseLessons);
+
+      // Load optional status fields for this course
+      const optionalFields = await studyService.getCourseOptionalStatusFields(user.id, courseId);
+      setOptionalStatusFields(optionalFields);
+      console.log('📋 Optional status fields:', Array.from(optionalFields));
 
       console.log('✅ Course detail data loaded successfully');
     } catch (error) {
