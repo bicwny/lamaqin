@@ -38,6 +38,13 @@ The application supports a class-based curriculum system, allowing users to enro
 ### Practice Choice System
 Some classes offer optional practice choices where users must select at least one practice from a choice group during enrollment. The system tracks selections using the `choice_group` field in `class_required_practices` table, with `is_optional=true` marking choices. User selections are stored in `user_practice_choices` table and automatically synced to create corresponding practice projects.
 
+### Entry Year / Cohort Tracking
+All class enrollments now track the user's entry year (cohort) to identify which study group they belong to. When enrolling in any class, users must select their entry year from available options (18入行, 20入行, 24入行). This information is stored in the `entry_year` field in the `user_enrolled_classes` table. The entry year identifies which cohort a user belongs to, though all practices and study materials remain the same across cohorts. Both profile setup and edit profile screens provide:
+- Radio button selection for entry year when enrolling in new classes
+- Display of entry year for already enrolled classes
+- Validation requiring entry year selection before enrollment
+- Migration: `docs/ADD_ENTRY_YEAR_MIGRATION.sql` adds the nullable `entry_year` TEXT column
+
 ### Course Display Ordering
 The `class_required_courses` table includes a `display_order` field allowing each class to define its own custom sequence for courses. This enables flexible learning paths where the same course can appear in different positions across classes (e.g., "大学演讲" might be first in one class but third in another). Courses are automatically displayed in ascending order based on this field, with any courses lacking a display_order value appearing last.
 
