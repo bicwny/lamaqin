@@ -38,6 +38,9 @@ export default function EditProfileScreen() {
   // Practice choice system states
   const [optionalPracticeGroups, setOptionalPracticeGroups] = useState<Map<string, Map<string, any[]>>>(new Map());
   const [selectedPractices, setSelectedPractices] = useState<Map<string, Map<string, string[]>>>(new Map());
+  
+  // Entry year tracking
+  const [entryYears, setEntryYears] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     loadUserProfile();
@@ -61,7 +64,7 @@ export default function EditProfileScreen() {
         classCurriculumService.getAllClassCurricula(),
         supabase
           .from('user_enrolled_classes')
-          .select('class_id, status')
+          .select('class_id, status, entry_year')
           .eq('user_id', user.id)
       ]);
 
@@ -74,14 +77,20 @@ export default function EditProfileScreen() {
       
       setAvailableClasses(classes);
       
-      // Build enrollment status map
+      // Build enrollment status map and entry years
       const statusMap: Record<string, 'active' | 'paused' | 'completed'> = {};
       const enrolledIds: string[] = [];
       const activeIds: string[] = [];
+      const entryYearMap = new Map<string, string>();
       
       (allEnrollments.data || []).forEach(enrollment => {
         enrolledIds.push(enrollment.class_id);
         statusMap[enrollment.class_id] = enrollment.status as 'active' | 'paused' | 'completed';
+        
+        // Store entry year if it exists
+        if (enrollment.entry_year) {
+          entryYearMap.set(enrollment.class_id, enrollment.entry_year);
+        }
         
         // Only active enrollments are selected
         if (enrollment.status === 'active') {
@@ -92,6 +101,7 @@ export default function EditProfileScreen() {
       setEnrolledClassIds(enrolledIds);
       setEnrollmentStatuses(statusMap);
       setSelectedClassIds(activeIds);
+      setEntryYears(entryYearMap);
     } catch (error) {
       console.error('❌ Error loading profile:', error);
     } finally {
@@ -170,6 +180,14 @@ export default function EditProfileScreen() {
     });
   };
 
+  const updateEntryYear = (classId: string, year: string) => {
+    setEntryYears(prev => {
+      const newMap = new Map(prev);
+      newMap.set(classId, year);
+      return newMap;
+    });
+  };
+
   const handleSaveProfile = async () => {
     if (!user) {
       toastService.error('用户信息未找到');
@@ -189,6 +207,20 @@ export default function EditProfileScreen() {
     if (selectedClassIds.length === 0) {
       toastService.error({ title: '验证失败', message: '请至少选择一个班级' });
       return;
+    }
+
+    // Validate entry year for newly selected classes
+    const newClassIds = selectedClassIds.filter(id => !enrolledClassIds.includes(id));
+    for (const classId of newClassIds) {
+      const entryYear = entryYears.get(classId);
+      if (!entryYear) {
+        const className = availableClasses.find(c => c.id === classId)?.class_name || '该班级';
+        toastService.error({ 
+          title: '验证失败', 
+          message: `请为 ${className} 选择入行年份` 
+        });
+        return;
+      }
     }
 
     // Validate practice choices for enrolled classes - ensure at least one practice is selected for each choice group
@@ -256,7 +288,8 @@ export default function EditProfileScreen() {
       // Enroll in newly selected classes
       for (const classId of classesToAdd) {
         try {
-          await classCurriculumService.enrollUserInClass(user.id, classId);
+          const entryYear = entryYears.get(classId);
+          await classCurriculumService.enrollUserInClass(user.id, classId, entryYear);
           await classCurriculumService.createPracticeProjectsForClass(user.id, classId);
           console.log(`✅ Enrolled in class ${classId}`);
         } catch (error) {
@@ -431,6 +464,53 @@ export default function EditProfileScreen() {
                               )}
                             </View>
                           </TouchableOpacity>
+
+                          {/* Entry Year Display/Selection */}
+                          {isEnrolled && entryYears.get(classItem.id) && (
+                            <View style={styles.entryYearDisplay}>
+                              <ThemedText style={styles.entryYearDisplayLabel}>
+                                📅 入行年份: <ThemedText style={styles.entryYearDisplayValue}>{entryYears.get(classItem.id)}</ThemedText>
+                              </ThemedText>
+                            </View>
+                          )}
+                          
+                          {/* Entry Year Selection for new classes */}
+                          {isSelected && !isEnrolled && (
+                            <View style={styles.entryYearSection}>
+                              <ThemedText style={styles.entryYearLabel}>📅 入行年份 *</ThemedText>
+                              <View style={styles.entryYearOptions}>
+                                {['18入行', '20入行', '24入行'].map((year) => {
+                                  const isYearSelected = entryYears.get(classItem.id) === year;
+                                  
+                                  return (
+                                    <TouchableOpacity
+                                      key={year}
+                                      style={[
+                                        styles.entryYearOption,
+                                        isYearSelected && styles.entryYearOptionSelected
+                                      ]}
+                                      onPress={() => updateEntryYear(classItem.id, year)}
+                                    >
+                                      <View style={[
+                                        styles.radioButton,
+                                        isYearSelected && styles.radioButtonSelected
+                                      ]}>
+                                        {isYearSelected && (
+                                          <View style={styles.radioButtonInner} />
+                                        )}
+                                      </View>
+                                      <ThemedText style={[
+                                        styles.entryYearOptionText,
+                                        isYearSelected && styles.entryYearOptionTextSelected
+                                      ]}>
+                                        {year}
+                                      </ThemedText>
+                                    </TouchableOpacity>
+                                  );
+                                })}
+                              </View>
+                            </View>
+                          )}
 
                           {/* Practice choices shown for enrolled or newly selected classes */}
                           {(isEnrolled || isSelected) && hasOptionalPractices && (
@@ -710,5 +790,85 @@ const styles = StyleSheet.create({
   practiceOptionDescription: {
     fontSize: 12,
     color: '#666',
+  },
+  // Entry year display styles
+  entryYearDisplay: {
+    padding: 12,
+    marginLeft: 16,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: DesignSystem.colors.primary,
+  },
+  entryYearDisplayLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  entryYearDisplayValue: {
+    fontWeight: '600',
+    color: DesignSystem.colors.primary,
+  },
+  // Entry year selection styles (for new classes)
+  entryYearSection: {
+    marginTop: 8,
+    marginLeft: 16,
+    paddingLeft: 12,
+    paddingVertical: 12,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: DesignSystem.colors.primary,
+  },
+  entryYearLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+  },
+  entryYearOptions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  entryYearOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e1e5e9',
+  },
+  entryYearOptionSelected: {
+    borderColor: DesignSystem.colors.primary,
+    backgroundColor: '#F0F4FF',
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#e1e5e9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  radioButtonSelected: {
+    borderColor: DesignSystem.colors.primary,
+  },
+  radioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: DesignSystem.colors.primary,
+  },
+  entryYearOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  entryYearOptionTextSelected: {
+    color: DesignSystem.colors.primary,
+    fontWeight: '600',
   },
 });

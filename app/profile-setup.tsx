@@ -21,6 +21,9 @@ import type { ClassCurriculum } from '@/types/database';
 import PageTemplate from '@/components/PageTemplate';
 import { toastService } from '@/lib/toast';
 
+// Entry year options
+const ENTRY_YEAR_OPTIONS = ['18入行', '20入行', '24入行'];
+
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
   const [dharmaName, setDharmaName] = useState('');
@@ -36,6 +39,9 @@ export default function ProfileSetupScreen() {
   // Practice choice system states
   const [optionalPracticeGroups, setOptionalPracticeGroups] = useState<Map<string, Map<string, any[]>>>(new Map());
   const [selectedPractices, setSelectedPractices] = useState<Map<string, Map<string, string[]>>>(new Map());
+  
+  // Entry year tracking
+  const [entryYears, setEntryYears] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     loadDataAndClasses();
@@ -53,7 +59,7 @@ export default function ProfileSetupScreen() {
         classCurriculumService.getAllClassCurricula(),
         supabase
           .from('user_enrolled_classes')
-          .select('class_id, status')
+          .select('class_id, status, entry_year')
           .eq('user_id', user.id),
         supabase
           .from('users')
@@ -64,14 +70,20 @@ export default function ProfileSetupScreen() {
       
       setAvailableClasses(classes);
       
-      // Build enrollment status map
+      // Build enrollment status map and entry years
       const statusMap: Record<string, 'active' | 'paused' | 'completed'> = {};
       const enrolledIds: string[] = [];
       const activeIds: string[] = [];
+      const entryYearMap = new Map<string, string>();
       
       (allEnrollments.data || []).forEach(enrollment => {
         enrolledIds.push(enrollment.class_id);
         statusMap[enrollment.class_id] = enrollment.status as 'active' | 'paused' | 'completed';
+        
+        // Store entry year if it exists
+        if (enrollment.entry_year) {
+          entryYearMap.set(enrollment.class_id, enrollment.entry_year);
+        }
         
         // Only active enrollments are selected
         if (enrollment.status === 'active') {
@@ -82,6 +94,7 @@ export default function ProfileSetupScreen() {
       setEnrolledClassIds(enrolledIds);
       setEnrollmentStatuses(statusMap);
       setSelectedClassIds(activeIds);
+      setEntryYears(entryYearMap);
       
       // Pre-fill existing user data
       if (userData.data) {
@@ -159,6 +172,14 @@ export default function ProfileSetupScreen() {
     });
   };
 
+  const updateEntryYear = (classId: string, year: string) => {
+    setEntryYears(prev => {
+      const newMap = new Map(prev);
+      newMap.set(classId, year);
+      return newMap;
+    });
+  };
+
   const handleSaveProfile = async () => {
     if (!user) {
       toastService.error({ title: '错误', message: '用户信息未找到' });
@@ -179,6 +200,22 @@ export default function ProfileSetupScreen() {
     if (selectedClassIds.length === 0) {
       toastService.error({ title: '验证失败', message: '请至少选择一个班级' });
       return;
+    }
+
+    // Validate entry year for each selected class
+    for (const classId of selectedClassIds) {
+      // Skip validation for already enrolled classes
+      if (!enrolledClassIds.includes(classId)) {
+        const entryYear = entryYears.get(classId);
+        if (!entryYear) {
+          const className = availableClasses.find(c => c.id === classId)?.class_name || '该班级';
+          toastService.error({ 
+            title: '验证失败', 
+            message: `请为 ${className} 选择入行年份` 
+          });
+          return;
+        }
+      }
     }
 
     // Validate practice choices - ensure at least one practice is selected for each choice group
@@ -264,7 +301,8 @@ export default function ProfileSetupScreen() {
       // Enroll in newly selected classes
       for (const classId of classesToAdd) {
         try {
-          await classCurriculumService.enrollUserInClass(user.id, classId);
+          const entryYear = entryYears.get(classId);
+          await classCurriculumService.enrollUserInClass(user.id, classId, entryYear);
           
           // Save practice choices if this class has optional practices
           const groups = optionalPracticeGroups.get(classId);
@@ -412,6 +450,44 @@ export default function ProfileSetupScreen() {
                           )}
                         </View>
                       </TouchableOpacity>
+
+                      {/* Entry Year Selection - shown for selected classes that are not yet enrolled */}
+                      {isSelected && !isEnrolled && (
+                        <View style={styles.entryYearSection}>
+                          <Text style={styles.entryYearLabel}>📅 入行年份 *</Text>
+                          <View style={styles.entryYearOptions}>
+                            {ENTRY_YEAR_OPTIONS.map((year) => {
+                              const isYearSelected = entryYears.get(classItem.id) === year;
+                              
+                              return (
+                                <TouchableOpacity
+                                  key={year}
+                                  style={[
+                                    styles.entryYearOption,
+                                    isYearSelected && styles.entryYearOptionSelected
+                                  ]}
+                                  onPress={() => updateEntryYear(classItem.id, year)}
+                                >
+                                  <View style={[
+                                    styles.radioButton,
+                                    isYearSelected && styles.radioButtonSelected
+                                  ]}>
+                                    {isYearSelected && (
+                                      <View style={styles.radioButtonInner} />
+                                    )}
+                                  </View>
+                                  <Text style={[
+                                    styles.entryYearOptionText,
+                                    isYearSelected && styles.entryYearOptionTextSelected
+                                  ]}>
+                                    {year}
+                                  </Text>
+                                </TouchableOpacity>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      )}
 
                       {/* Practice Choice UI - shown right below the class if it has optional practices and is selected */}
                       {isSelected && hasOptionalPractices && (
@@ -727,5 +803,67 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     marginTop: 4,
+  },
+  entryYearSection: {
+    marginTop: 8,
+    marginLeft: 36,
+    paddingLeft: 12,
+    paddingVertical: 12,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
+  },
+  entryYearLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 10,
+  },
+  entryYearOptions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  entryYearOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: Colors.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  entryYearOptionSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: '#F0F4FF',
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  radioButtonSelected: {
+    borderColor: Colors.primary,
+  },
+  radioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.primary,
+  },
+  entryYearOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  entryYearOptionTextSelected: {
+    color: Colors.primary,
+    fontWeight: '600',
   },
 });

@@ -1263,7 +1263,7 @@ export const classCurriculumService = {
     return data;
   },
 
-  async enrollUserInClass(userId: string, classId: string): Promise<UserEnrolledClass> {
+  async enrollUserInClass(userId: string, classId: string, entryYear?: string): Promise<UserEnrolledClass> {
     const { data: existingEnrollment } = await supabase
       .from('user_enrolled_classes')
       .select('*')
@@ -1280,7 +1280,8 @@ export const classCurriculumService = {
       .insert({
         user_id: userId,
         class_id: classId,
-        status: 'active'
+        status: 'active',
+        entry_year: entryYear
       })
       .select()
       .single();

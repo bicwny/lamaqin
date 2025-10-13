@@ -229,6 +229,7 @@ export interface UserEnrolledClass {
   user_id: string;
   class_id: string;
   status: 'active' | 'completed' | 'paused';
+  entry_year?: string;
   enrolled_at: string;
   completed_at?: string;
   created_at: string;
