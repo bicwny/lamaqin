@@ -202,6 +202,29 @@ export default function EditProfileScreen() {
     });
   };
 
+  const updateEntryYearForEnrolled = async (classId: string, year: string) => {
+    if (!user || !year) return;
+    
+    // Update local state first
+    updateEntryYear(classId, year);
+    
+    try {
+      // Update in database
+      const { error } = await supabase
+        .from('user_enrolled_classes')
+        .update({ entry_year: year })
+        .eq('user_id', user.id)
+        .eq('class_id', classId);
+      
+      if (error) throw error;
+      
+      toastService.success('年份已更新');
+    } catch (error: any) {
+      console.error('Error updating entry year:', error);
+      toastService.error('更新年份失败');
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!user) {
       toastService.error('用户信息未找到');
@@ -485,12 +508,22 @@ export default function EditProfileScreen() {
                             </View>
                           </TouchableOpacity>
 
-                          {/* Entry Year Display/Selection */}
-                          {isEnrolled && entryYears.get(classItem.id) && (
+                          {/* Entry Year Display/Selection - Editable for enrolled classes */}
+                          {isEnrolled && (
                             <View style={styles.entryYearDisplay}>
-                              <ThemedText style={styles.entryYearDisplayLabel}>
-                                📅 年份: <ThemedText style={styles.entryYearDisplayValue}>{entryYears.get(classItem.id)}</ThemedText>
-                              </ThemedText>
+                              <ThemedText style={styles.entryYearDisplayLabel}>📅 年份</ThemedText>
+                              <View style={styles.pickerContainer}>
+                                <Picker
+                                  selectedValue={entryYears.get(classItem.id) || ''}
+                                  onValueChange={(value) => updateEntryYearForEnrolled(classItem.id, value)}
+                                  style={styles.picker}
+                                >
+                                  <Picker.Item label="请选择年份" value="" />
+                                  {ENTRY_YEAR_OPTIONS.map((year) => (
+                                    <Picker.Item key={year} label={year} value={year} />
+                                  ))}
+                                </Picker>
+                              </View>
                             </View>
                           )}
                           
@@ -887,6 +920,7 @@ const styles = StyleSheet.create({
   entryYearDisplay: {
     padding: 12,
     marginLeft: 16,
+    marginTop: 8,
     backgroundColor: '#F5F7FA',
     borderRadius: 8,
     borderLeftWidth: 3,
@@ -895,10 +929,8 @@ const styles = StyleSheet.create({
   entryYearDisplayLabel: {
     fontSize: 14,
     color: Colors.textSecondary,
-  },
-  entryYearDisplayValue: {
+    marginBottom: 8,
     fontWeight: '600',
-    color: Colors.primary,
   },
   pickerContainer: {
     backgroundColor: Colors.surface,
