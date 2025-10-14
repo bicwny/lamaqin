@@ -452,7 +452,10 @@ export default function EditProfileScreen() {
                       return (
                         <View key={classItem.id}>
                           <TouchableOpacity
-                            style={styles.classCheckbox}
+                            style={[
+                              styles.classCheckbox,
+                              isSelected && styles.classCheckboxSelected
+                            ]}
                             onPress={() => toggleClassSelection(classItem.id)}
                             disabled={isEnrolled}
                           >
@@ -467,7 +470,10 @@ export default function EditProfileScreen() {
                               </View>
                             )}
                             <View style={styles.classInfo}>
-                              <ThemedText style={styles.className}>
+                              <ThemedText style={[
+                                styles.className,
+                                isSelected && styles.classNameSelected
+                              ]}>
                                 {classItem.class_name}
                                 {isEnrolled && ` (${statusLabel})`}
                               </ThemedText>
@@ -703,7 +709,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: Colors.cardShadow,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -743,6 +749,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.border,
   },
+  classCheckboxSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: '#F0F4FF',
+  },
   checkbox: {
     width: 24,
     height: 24,
@@ -769,6 +779,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
+  },
+  classNameSelected: {
+    color: Colors.primary,
   },
   classDescription: {
     fontSize: 13,
