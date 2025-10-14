@@ -182,9 +182,11 @@ export default function ProfileSetupScreen() {
   };
 
   const updateEntryYear = (classId: string, year: string) => {
+    console.log(`📅 Setting entry year for class ${classId}:`, year);
     setEntryYears(prev => {
       const newMap = new Map(prev);
       newMap.set(classId, year);
+      console.log('📅 Updated entryYears map:', Array.from(newMap.entries()));
       return newMap;
     });
   };
@@ -311,6 +313,7 @@ export default function ProfileSetupScreen() {
       for (const classId of classesToAdd) {
         try {
           const entryYear = entryYears.get(classId);
+          console.log(`✅ Enrolling in class ${classId} with entry year:`, entryYear);
           await classCurriculumService.enrollUserInClass(user.id, classId, entryYear);
           
           // Save practice choices if this class has optional practices

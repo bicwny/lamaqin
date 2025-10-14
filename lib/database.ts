@@ -1272,17 +1272,21 @@ export const classCurriculumService = {
       .single();
 
     if (existingEnrollment) {
+      console.log('📌 Class already enrolled, returning existing:', existingEnrollment);
       return existingEnrollment;
     }
 
+    const enrollmentData = {
+      user_id: userId,
+      class_id: classId,
+      status: 'active' as const,
+      entry_year: entryYear
+    };
+    console.log('💾 Inserting new enrollment to database:', enrollmentData);
+
     const { data, error } = await supabase
       .from('user_enrolled_classes')
-      .insert({
-        user_id: userId,
-        class_id: classId,
-        status: 'active',
-        entry_year: entryYear
-      })
+      .insert(enrollmentData)
       .select()
       .single();
 
