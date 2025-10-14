@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
@@ -20,6 +21,18 @@ import { ThemedText } from '@/components/ThemedText';
 import { toastService } from '@/lib/toast';
 import { classCurriculumService } from '@/lib/database';
 import type { ClassCurriculum } from '@/types/database';
+
+// Generate entry year options from 1984 to current year
+const generateEntryYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const years: string[] = [];
+  for (let year = 1984; year <= currentYear; year++) {
+    years.push(year.toString());
+  }
+  return years.reverse(); // Most recent first
+};
+
+const ENTRY_YEAR_OPTIONS = generateEntryYearOptions();
 
 export default function EditProfileScreen() {
   const { user } = useAuth();
@@ -478,36 +491,17 @@ export default function EditProfileScreen() {
                           {isSelected && !isEnrolled && (
                             <View style={styles.entryYearSection}>
                               <ThemedText style={styles.entryYearLabel}>📅 入行年份 *</ThemedText>
-                              <View style={styles.entryYearOptions}>
-                                {['18入行', '20入行', '24入行'].map((year) => {
-                                  const isYearSelected = entryYears.get(classItem.id) === year;
-                                  
-                                  return (
-                                    <TouchableOpacity
-                                      key={year}
-                                      style={[
-                                        styles.entryYearOption,
-                                        isYearSelected && styles.entryYearOptionSelected
-                                      ]}
-                                      onPress={() => updateEntryYear(classItem.id, year)}
-                                    >
-                                      <View style={[
-                                        styles.radioButton,
-                                        isYearSelected && styles.radioButtonSelected
-                                      ]}>
-                                        {isYearSelected && (
-                                          <View style={styles.radioButtonInner} />
-                                        )}
-                                      </View>
-                                      <ThemedText style={[
-                                        styles.entryYearOptionText,
-                                        isYearSelected && styles.entryYearOptionTextSelected
-                                      ]}>
-                                        {year}
-                                      </ThemedText>
-                                    </TouchableOpacity>
-                                  );
-                                })}
+                              <View style={styles.pickerContainer}>
+                                <Picker
+                                  selectedValue={entryYears.get(classItem.id) || ''}
+                                  onValueChange={(value) => updateEntryYear(classItem.id, value)}
+                                  style={styles.picker}
+                                >
+                                  <Picker.Item label="请选择年份" value="" />
+                                  {ENTRY_YEAR_OPTIONS.map((year) => (
+                                    <Picker.Item key={year} label={year} value={year} />
+                                  ))}
+                                </Picker>
                               </View>
                             </View>
                           )}
@@ -825,50 +819,14 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
   },
-  entryYearOptions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  entryYearOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  pickerContainer: {
     backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e1e5e9',
+    overflow: 'hidden',
   },
-  entryYearOptionSelected: {
-    borderColor: DesignSystem.colors.primary,
-    backgroundColor: '#F0F4FF',
-  },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#e1e5e9',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-  },
-  radioButtonSelected: {
-    borderColor: DesignSystem.colors.primary,
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: DesignSystem.colors.primary,
-  },
-  entryYearOptionText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-  },
-  entryYearOptionTextSelected: {
-    color: DesignSystem.colors.primary,
-    fontWeight: '600',
+  picker: {
+    height: 50,
   },
 });
