@@ -746,7 +746,6 @@ const styles = StyleSheet.create({
   // Practice choice styles
   combinedSelectionSection: {
     marginTop: 8,
-    marginLeft: 36,
     padding: 16,
     backgroundColor: '#F5F7FA',
     borderRadius: 8,

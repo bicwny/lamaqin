@@ -789,7 +789,6 @@ const styles = StyleSheet.create({
   // Combined selection section for new enrollments
   combinedSelectionSection: {
     marginTop: 8,
-    marginLeft: 16,
     padding: 16,
     backgroundColor: '#F5F7FA',
     borderRadius: 8,
