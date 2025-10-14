@@ -39,8 +39,8 @@ The application supports a class-based curriculum system, allowing users to enro
 Some classes offer optional practice choices where users must select at least one practice from a choice group during enrollment. The system tracks selections using the `choice_group` field in `class_required_practices` table, with `is_optional=true` marking choices. User selections are stored in `user_practice_choices` table and automatically synced to create corresponding practice projects.
 
 ### Entry Year / Cohort Tracking
-All class enrollments now track the user's entry year (cohort) to identify which study group they belong to. When enrolling in any class, users must select their entry year from available options (18入行, 20入行, 24入行). This information is stored in the `entry_year` field in the `user_enrolled_classes` table. The entry year identifies which cohort a user belongs to, though all practices and study materials remain the same across cohorts. Both profile setup and edit profile screens provide:
-- Radio button selection for entry year when enrolling in new classes
+All class enrollments now track the user's entry year (cohort) to identify which study group they belong to. When enrolling in any class, users must select their entry year from a dropdown menu showing years from 1984 to the current year. This information is stored in the `entry_year` field in the `user_enrolled_classes` table. The entry year identifies which cohort a user belongs to, though all practices and study materials remain the same across cohorts. Both profile setup and edit profile screens provide:
+- Dropdown selection for entry year when enrolling in new classes (dynamically generated from 1984 to current year)
 - Display of entry year for already enrolled classes
 - Validation requiring entry year selection before enrollment
 - Migration: `docs/ADD_ENTRY_YEAR_MIGRATION.sql` adds the nullable `entry_year` TEXT column
