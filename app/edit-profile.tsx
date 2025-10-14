@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { ComponentTokens } from '@/utils/componentTokens';
+import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
@@ -383,10 +384,10 @@ export default function EditProfileScreen() {
         showBackButton={true}
         onBackPress={goBack}
         scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
+        backgroundColor={Colors.background}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>加载中...</Text>
         </View>
       </PageTemplate>
@@ -400,7 +401,7 @@ export default function EditProfileScreen() {
       showBackButton={true}
       onBackPress={goBack}
       scrollable={true}
-      backgroundColor={DesignSystem.colors.background}
+      backgroundColor={Colors.background}
       padding={0}
     >
       <KeyboardAvoidingView 
@@ -416,7 +417,7 @@ export default function EditProfileScreen() {
                 value={dharmaName}
                 onChangeText={setDharmaName}
                 placeholder="请输入您的法名"
-                placeholderTextColor="#999"
+                placeholderTextColor={Colors.textSecondary}
                 autoCapitalize="none"
               />
             </View>
@@ -428,7 +429,7 @@ export default function EditProfileScreen() {
                 value={layName}
                 onChangeText={setLayName}
                 placeholder="请输入您的俗名"
-                placeholderTextColor="#999"
+                placeholderTextColor={Colors.textSecondary}
                 autoCapitalize="words"
               />
             </View>
@@ -436,7 +437,7 @@ export default function EditProfileScreen() {
             <View style={styles.inputGroup}>
               <ThemedText style={styles.label}>班级 *</ThemedText>
               {loadingClasses ? (
-                <ActivityIndicator size="small" color={DesignSystem.colors.primary} />
+                <ActivityIndicator size="small" color={Colors.primary} />
               ) : (
                 <View style={styles.classSelectionContainer}>
                   {availableClasses.length > 0 ? (
@@ -636,7 +637,7 @@ export default function EditProfileScreen() {
                 value={location}
                 onChangeText={setLocation}
                 placeholder="例如：纽约、北京等"
-                placeholderTextColor="#999"
+                placeholderTextColor={Colors.textSecondary}
               />
             </View>
 
@@ -646,7 +647,7 @@ export default function EditProfileScreen() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="white" />
+                <ActivityIndicator color={Colors.surface} />
               ) : (
                 <Text style={styles.saveButtonText}>保存更改</Text>
               )}
@@ -677,37 +678,44 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   loadingText: {
-    fontSize: 16,
-    color: '#666',
+    marginTop: 10,
+    fontSize: 14,
+    color: Colors.textSecondary,
   },
   formContainer: {
     padding: 20,
-    gap: 20,
   },
   inputGroup: {
-    gap: 8,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    color: Colors.text,
+    marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
     ...ComponentTokens.input.standard,
-    ...DesignSystem.shadow.sm,
   },
   saveButton: {
-    ...createStyles.primaryButton(),
-    marginTop: DesignSystem.spacing.xl,
+    backgroundColor: Colors.primary,
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: Colors.cardShadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   saveButtonDisabled: {
-    backgroundColor: '#9CA3AF',
+    opacity: 0.6,
   },
   saveButtonText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: '600',
+    color: Colors.surface,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   cancelButton: {
     backgroundColor: '#f8f9fa',
@@ -715,10 +723,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e1e5e9',
+    borderColor: '#e9ecef',
+    marginTop: 10,
   },
   cancelButtonText: {
-    color: '#666',
+    color: Colors.textSecondary,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -729,46 +738,46 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e1e5e9',
-    gap: 12,
+    borderWidth: 2,
+    borderColor: Colors.border,
   },
   checkbox: {
     width: 24,
     height: 24,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: '#d1d5db',
-    justifyContent: 'center',
+    borderColor: Colors.border,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   checkboxSelected: {
-    backgroundColor: DesignSystem.colors.primary,
-    borderColor: DesignSystem.colors.primary,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   checkmark: {
-    color: '#fff',
+    color: Colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },
   classInfo: {
     flex: 1,
-    gap: 4,
   },
   className: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.text,
   },
   classDescription: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginTop: 4,
   },
   noClassesText: {
     fontSize: 14,
-    color: '#999',
+    color: Colors.textSecondary,
     fontStyle: 'italic',
   },
   classCheckboxDisabled: {
@@ -776,24 +785,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   checkboxDisabled: {
-    backgroundColor: '#E0E0E0',
-    borderColor: '#BDBDBD',
+    backgroundColor: Colors.borderLight,
+    borderColor: Colors.borderDark,
   },
   classNameDisabled: {
-    color: '#9E9E9E',
+    color: Colors.textSecondary,
   },
   classDescriptionDisabled: {
-    color: '#BDBDBD',
+    color: Colors.borderDark,
   },
   // Practice choice styles
-  // Combined selection section for new enrollments
   combinedSelectionSection: {
     marginTop: 8,
     padding: 16,
     backgroundColor: '#F5F7FA',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.primary,
+    borderLeftColor: Colors.primary,
   },
   yearFieldContainer: {
     marginBottom: 16,
@@ -804,10 +812,9 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.text,
     marginBottom: 10,
   },
-  // Practice choice section for enrolled classes
   practiceChoiceSection: {
     padding: 16,
     backgroundColor: '#FFF8E1',
@@ -819,30 +826,30 @@ const styles = StyleSheet.create({
   practiceChoiceTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.text,
   },
   practiceChoiceSubtitle: {
     fontSize: 13,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   practiceGroupContainer: {
-    gap: 8,
+    marginTop: 12,
   },
   practiceGroupLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666',
-    marginBottom: 4,
+    color: Colors.textSecondary,
+    marginBottom: 8,
   },
   practiceOption: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e1e5e9',
-    gap: 12,
+    borderColor: Colors.border,
+    marginBottom: 8,
   },
   practiceOptionSelected: {
     borderColor: '#FF9800',
@@ -850,42 +857,41 @@ const styles = StyleSheet.create({
   },
   practiceOptionTextContainer: {
     flex: 1,
-    gap: 4,
   },
   practiceOptionText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#333',
+    color: Colors.text,
   },
   practiceOptionTextSelected: {
     color: '#FF9800',
   },
   practiceOptionDescription: {
     fontSize: 12,
-    color: '#666',
+    color: Colors.textSecondary,
+    marginTop: 4,
   },
-  // Entry year display styles
   entryYearDisplay: {
     padding: 12,
     marginLeft: 16,
     backgroundColor: '#F5F7FA',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.primary,
+    borderLeftColor: Colors.primary,
   },
   entryYearDisplayLabel: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
   },
   entryYearDisplayValue: {
     fontWeight: '600',
-    color: DesignSystem.colors.primary,
+    color: Colors.primary,
   },
   pickerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e1e5e9',
+    borderColor: Colors.border,
     overflow: 'hidden',
   },
   picker: {
