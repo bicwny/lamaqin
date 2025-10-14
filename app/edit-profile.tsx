@@ -863,6 +863,8 @@ const styles = StyleSheet.create({
   },
   practiceChoiceSection: {
     padding: 16,
+    marginLeft: 16,
+    marginTop: 8,
     backgroundColor: '#FFF8E1',
     borderRadius: 12,
     borderWidth: 1,
