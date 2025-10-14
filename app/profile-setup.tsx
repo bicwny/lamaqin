@@ -460,76 +460,79 @@ export default function ProfileSetupScreen() {
                         </View>
                       </TouchableOpacity>
 
-                      {/* Entry Year Selection - shown for selected classes that are not yet enrolled */}
+                      {/* Combined Year & Practice Selection - shown for selected classes that are not yet enrolled */}
                       {isSelected && !isEnrolled && (
-                        <View style={styles.entryYearSection}>
-                          <Text style={styles.entryYearLabel}>📅 入行年份 *</Text>
-                          <View style={styles.pickerContainer}>
-                            <Picker
-                              selectedValue={entryYears.get(classItem.id) || ''}
-                              onValueChange={(value) => updateEntryYear(classItem.id, value)}
-                              style={styles.picker}
-                            >
-                              <Picker.Item label="请选择年份" value="" />
-                              {ENTRY_YEAR_OPTIONS.map((year) => (
-                                <Picker.Item key={year} label={year} value={year} />
-                              ))}
-                            </Picker>
+                        <View style={styles.combinedSelectionSection}>
+                          {/* Year Selection */}
+                          <View style={styles.yearFieldContainer}>
+                            <Text style={styles.fieldLabel}>📅 年份 *</Text>
+                            <View style={styles.pickerContainer}>
+                              <Picker
+                                selectedValue={entryYears.get(classItem.id) || ''}
+                                onValueChange={(value) => updateEntryYear(classItem.id, value)}
+                                style={styles.picker}
+                              >
+                                <Picker.Item label="请选择年份" value="" />
+                                {ENTRY_YEAR_OPTIONS.map((year) => (
+                                  <Picker.Item key={year} label={year} value={year} />
+                                ))}
+                              </Picker>
+                            </View>
                           </View>
-                        </View>
-                      )}
 
-                      {/* Practice Choice UI - shown right below the class if it has optional practices and is selected */}
-                      {isSelected && hasOptionalPractices && (
-                        <View style={styles.practiceChoiceSection}>
-                          <Text style={styles.practiceChoiceTitle}>
-                            🧘 {classItem.class_name} 观修选择 *（至少选择一项）
-                          </Text>
-                          {Array.from(groups.entries()).map(([groupName, practices]) => {
-                            const selectedForGroup = selectedPractices.get(classItem.id)?.get(groupName) || [];
-                            
-                            return (
-                              <View key={groupName} style={styles.practiceGroupContainer}>
-                                <Text style={styles.practiceGroupLabel}>{groupName}:</Text>
-                                {practices.map((practice: any) => {
-                                  const isPracticeSelected = selectedForGroup.includes(practice.practice_id);
-                                  
-                                  return (
-                                    <TouchableOpacity
-                                      key={practice.practice_id}
-                                      style={[
-                                        styles.practiceOption,
-                                        isPracticeSelected && styles.practiceOptionSelected
-                                      ]}
-                                      onPress={() => togglePracticeSelection(classItem.id, groupName, practice.practice_id)}
-                                    >
-                                      <View style={[
-                                        styles.checkbox,
-                                        isPracticeSelected && styles.checkboxSelected
-                                      ]}>
-                                        {isPracticeSelected && (
-                                          <Text style={styles.checkmark}>✓</Text>
-                                        )}
-                                      </View>
-                                      <View style={styles.practiceOptionTextContainer}>
-                                        <Text style={[
-                                          styles.practiceOptionText,
-                                          isPracticeSelected && styles.practiceOptionTextSelected
-                                        ]}>
-                                          {practice.practice?.name || '未知修法'}
-                                        </Text>
-                                        {practice.practice?.description && (
-                                          <Text style={styles.practiceOptionDescription}>
-                                            {practice.practice.description}
-                                          </Text>
-                                        )}
-                                      </View>
-                                    </TouchableOpacity>
-                                  );
-                                })}
-                              </View>
-                            );
-                          })}
+                          {/* Practice Choice - shown if this class has optional practices */}
+                          {hasOptionalPractices && (
+                            <View style={styles.practiceFieldContainer}>
+                              <Text style={styles.fieldLabel}>
+                                🧘 观修选择 *（至少选择一项）
+                              </Text>
+                              {Array.from(groups.entries()).map(([groupName, practices]) => {
+                                const selectedForGroup = selectedPractices.get(classItem.id)?.get(groupName) || [];
+                                
+                                return (
+                                  <View key={groupName} style={styles.practiceGroupContainer}>
+                                    <Text style={styles.practiceGroupLabel}>{groupName}:</Text>
+                                    {practices.map((practice: any) => {
+                                      const isPracticeSelected = selectedForGroup.includes(practice.practice_id);
+                                      
+                                      return (
+                                        <TouchableOpacity
+                                          key={practice.practice_id}
+                                          style={[
+                                            styles.practiceOption,
+                                            isPracticeSelected && styles.practiceOptionSelected
+                                          ]}
+                                          onPress={() => togglePracticeSelection(classItem.id, groupName, practice.practice_id)}
+                                        >
+                                          <View style={[
+                                            styles.checkbox,
+                                            isPracticeSelected && styles.checkboxSelected
+                                          ]}>
+                                            {isPracticeSelected && (
+                                              <Text style={styles.checkmark}>✓</Text>
+                                            )}
+                                          </View>
+                                          <View style={styles.practiceOptionTextContainer}>
+                                            <Text style={[
+                                              styles.practiceOptionText,
+                                              isPracticeSelected && styles.practiceOptionTextSelected
+                                            ]}>
+                                              {practice.practice?.name || '未知修法'}
+                                            </Text>
+                                            {practice.practice?.description && (
+                                              <Text style={styles.practiceOptionDescription}>
+                                                {practice.practice.description}
+                                              </Text>
+                                            )}
+                                          </View>
+                                        </TouchableOpacity>
+                                      );
+                                    })}
+                                  </View>
+                                );
+                              })}
+                            </View>
+                          )}
                         </View>
                       )}
                     </React.Fragment>
@@ -741,19 +744,26 @@ const styles = StyleSheet.create({
     color: '#BDBDBD',
   },
   // Practice choice styles
-  practiceChoiceSection: {
-    marginBottom: 20,
+  combinedSelectionSection: {
+    marginTop: 8,
+    marginLeft: 36,
     padding: 16,
-    backgroundColor: '#FFF8E1',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFE082',
+    backgroundColor: '#F5F7FA',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
   },
-  practiceChoiceTitle: {
-    fontSize: 16,
+  yearFieldContainer: {
+    marginBottom: 16,
+  },
+  practiceFieldContainer: {
+    marginTop: 8,
+  },
+  fieldLabel: {
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.text,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   practiceGroupContainer: {
     marginTop: 12,
@@ -793,22 +803,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     marginTop: 4,
-  },
-  entryYearSection: {
-    marginTop: 8,
-    marginLeft: 36,
-    paddingLeft: 12,
-    paddingVertical: 12,
-    backgroundColor: '#F5F7FA',
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
-  },
-  entryYearLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 10,
   },
   pickerContainer: {
     backgroundColor: Colors.surface,
