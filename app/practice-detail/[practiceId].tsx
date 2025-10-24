@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Alert,
 } from "react-native";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +24,7 @@ import {
 import { Typography } from "@/utils/typography";
 import ProgressBar from "@/components/ProgressBar";
 import PracticeRecordCard from "@/components/PracticeRecordCard";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 interface PracticeProject {
   id: string;
@@ -87,6 +87,7 @@ export default function PracticeDetailScreen() {
   const [practiceRecords, setPracticeRecords] = useState<any[]>([]);
   const [hasMeditationTopics, setHasMeditationTopics] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (user && practiceId) {
@@ -362,49 +363,44 @@ export default function PracticeDetailScreen() {
 
   const handleDeletePractice = () => {
     if (!project || !user) return;
+    setShowDeleteDialog(true);
+  };
 
-    Alert.alert(
-      "确认删除",
-      `确定要删除 ${project.practices.name} 吗？\n\n所有相关的修行记录也会被永久删除。`,
-      [
-        {
-          text: "取消",
-          style: "cancel",
-        },
-        {
-          text: "删除",
-          style: "destructive",
-          onPress: async () => {
-            setIsDeleting(true);
-            try {
-              const { classCurriculumService } = await import("@/lib/database");
-              const result = await classCurriculumService.deletePracticeProject(user.id, project.id);
+  const handleConfirmDelete = async () => {
+    if (!project || !user) return;
 
-              if (result.success) {
-                toastService.success({
-                  title: "删除成功",
-                  message: `${project.practices.name} 已删除`,
-                });
-                router.back();
-              } else {
-                toastService.error({
-                  title: "删除失败",
-                  message: result.error || "请稍后重试",
-                });
-              }
-            } catch (error) {
-              console.error("Error deleting practice:", error);
-              toastService.error({
-                title: "删除失败",
-                message: "请稍后重试",
-              });
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ]
-    );
+    setShowDeleteDialog(false);
+    setIsDeleting(true);
+    
+    try {
+      const { classCurriculumService } = await import("@/lib/database");
+      const result = await classCurriculumService.deletePracticeProject(user.id, project.id);
+
+      if (result.success) {
+        toastService.success({
+          title: "删除成功",
+          message: `${project.practices.name} 已删除`,
+        });
+        router.back();
+      } else {
+        toastService.error({
+          title: "删除失败",
+          message: result.error || "请稍后重试",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting practice:", error);
+      toastService.error({
+        title: "删除失败",
+        message: "请稍后重试",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
   };
 
   const getDisplayProjectName = () => {
@@ -733,6 +729,17 @@ export default function PracticeDetailScreen() {
           <View style={styles.recordsList}>{renderRecentRecords()}</View>
         </View>
       </ScrollView>
+
+      <ConfirmationDialog
+        visible={showDeleteDialog}
+        title="确认删除"
+        message={`确定要删除 ${project.practices.name} 吗？\n\n所有相关的修行记录也会被永久删除。`}
+        confirmText="删除"
+        cancelText="取消"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        destructive={true}
+      />
     </PageTemplate>
   );
 }
