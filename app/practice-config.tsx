@@ -906,6 +906,7 @@ export default function PracticeConfigScreen() {
           goal_type: configMode,
           preset_project_id: selectedPresetId || null,
           project_name: selectedPresetId ? null : projectName || null,
+          source_type: "user_created",
         };
         
         // Preserve current_count when editing, set to 0 when creating new
@@ -949,6 +950,7 @@ export default function PracticeConfigScreen() {
           goal_type: durationMode === "持续进行" ? "continuous" : configMode,
           preset_project_id: selectedPresetId || null,
           project_name: selectedPresetId ? null : projectName || null,
+          source_type: "user_created",
         };
         
         // Preserve current_count when editing, set to 0 when creating new
