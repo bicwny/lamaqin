@@ -60,6 +60,7 @@ CREATE TABLE user_practice_projects (
     current_count INTEGER DEFAULT 0,
     daily_target INTEGER NOT NULL,
     status TEXT CHECK (status IN ('not_started', 'active', 'completed')) DEFAULT 'not_started',
+    source_type TEXT CHECK (source_type IN ('class_required', 'user_created')) DEFAULT 'class_required' NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -121,10 +122,20 @@ The migration adds:
 - Course and lesson tables with study type tracking
 - Pre-configured data for 加行 (146 lessons, 7 practices) and 净土 (161 lessons, 1 practice)
 
+## Practice Deletion Migration (2025-10-24)
+
+After completing the class curriculum migration, apply the source_type field migration:
+
+1. Open the file `docs/ADD_SOURCE_TYPE_MIGRATION.sql`
+2. Copy the entire SQL script
+3. Paste and run it in your Supabase SQL editor
+4. This adds tracking for user-created vs class-required practices, enabling safe deletion of user-created duplicates
+
 ## Next Steps
 1. Add your environment variables
 2. Run the SQL schema setup
 3. Run the class curriculum migration
-4. Restart your Expo development server
-5. Check the connection status in the app
-6. Start tracking your Buddhist practice!
+4. Run the practice deletion migration (ADD_SOURCE_TYPE_MIGRATION.sql)
+5. Restart your Expo development server
+6. Check the connection status in the app
+7. Start tracking your Buddhist practice!

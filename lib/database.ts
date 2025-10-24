@@ -174,7 +174,8 @@ export const practiceService = {
         target_end_date: targetEndDate || null,
         target_period: targetPeriod || 'daily',
         goal_type: goalType || 'fixed_duration',
-        status: 'active'
+        status: 'active',
+        source_type: 'user_created'
       })
       .select()
       .single();
@@ -1402,6 +1403,7 @@ export const classCurriculumService = {
             status: 'active' as const,
             start_date: now.toISOString().split('T')[0],
             target_period: 'weekly' as const,
+            source_type: 'class_required' as const,
           };
         }
 
@@ -1415,6 +1417,7 @@ export const classCurriculumService = {
           status: 'active' as const,
           start_date: now.toISOString().split('T')[0],
           target_period: 'daily' as const,
+          source_type: 'class_required' as const,
         };
 
         // Calculate end date for count-based practices with both total_target and daily_target
@@ -1619,6 +1622,44 @@ export const classCurriculumService = {
     return data || [];
   },
 
+  async deletePracticeProject(userId: string, projectId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { data: project, error: fetchError } = await supabase
+        .from('user_practice_projects')
+        .select('id, user_id, source_type, practice_id')
+        .eq('id', projectId)
+        .single();
+
+      if (fetchError || !project) {
+        return { success: false, error: '找不到该修法项目' };
+      }
+
+      if (project.user_id !== userId) {
+        return { success: false, error: '无权限删除此修法项目' };
+      }
+
+      if (project.source_type === 'class_required') {
+        return { success: false, error: '无法删除课程必修功课，如需调整请联系管理员' };
+      }
+
+      const { error: deleteError } = await supabase
+        .from('user_practice_projects')
+        .delete()
+        .eq('id', projectId)
+        .eq('user_id', userId);
+
+      if (deleteError) {
+        console.error('Delete error:', deleteError);
+        return { success: false, error: '删除失败，请稍后重试' };
+      }
+
+      return { success: true };
+    } catch (err) {
+      console.error('Unexpected error deleting practice project:', err);
+      return { success: false, error: '删除失败，请稍后重试' };
+    }
+  },
+
   async getOptionalPracticesByChoiceGroup(classId: string): Promise<Map<string, any[]>> {
     const { data, error } = await supabase
       .from('class_required_practices')
@@ -1717,6 +1758,7 @@ export const classCurriculumService = {
             status: 'active' as const,
             start_date: now.toISOString().split('T')[0],
             target_period: 'weekly' as const,
+            source_type: 'class_required' as const,
           };
         }
 
@@ -1730,6 +1772,7 @@ export const classCurriculumService = {
           status: 'active' as const,
           start_date: now.toISOString().split('T')[0],
           target_period: 'daily' as const,
+          source_type: 'class_required' as const,
         };
 
         // Calculate end date for count-based practices with both total_target and daily_target

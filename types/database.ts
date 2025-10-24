@@ -72,6 +72,7 @@ export interface UserPracticeProject {
   daily_target?: number;        // 每日目标：计数类=每日遍数，时间类weekly时为null
   target_period?: 'daily' | 'weekly';
   status: 'not_started' | 'active' | 'completed';
+  source_type: 'class_required' | 'user_created';  // Tracks practice origin for deletion control
   created_at: string;
   updated_at: string;
 }

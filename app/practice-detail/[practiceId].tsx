@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,6 +40,7 @@ interface PracticeProject {
   status: string;
   project_name: string;
   preset_project_id: string;
+  source_type: 'class_required' | 'user_created';
   practices: {
     id: string;
     name: string;
@@ -84,6 +86,7 @@ export default function PracticeDetailScreen() {
   const [weeklyRecords, setWeeklyRecords] = useState<MeditationRecord[]>([]);
   const [practiceRecords, setPracticeRecords] = useState<any[]>([]);
   const [hasMeditationTopics, setHasMeditationTopics] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (user && practiceId) {
@@ -355,6 +358,53 @@ export default function PracticeDetailScreen() {
         currentPresetId: project.preset_project_id || "",
       },
     });
+  };
+
+  const handleDeletePractice = () => {
+    if (!project || !user) return;
+
+    Alert.alert(
+      "确认删除",
+      `确定要删除 ${project.practices.name} 吗？\n\n所有相关的修行记录也会被永久删除。`,
+      [
+        {
+          text: "取消",
+          style: "cancel",
+        },
+        {
+          text: "删除",
+          style: "destructive",
+          onPress: async () => {
+            setIsDeleting(true);
+            try {
+              const { classCurriculumService } = await import("@/lib/database");
+              const result = await classCurriculumService.deletePracticeProject(user.id, project.id);
+
+              if (result.success) {
+                toastService.success({
+                  title: "删除成功",
+                  message: `${project.practices.name} 已删除`,
+                });
+                router.back();
+              } else {
+                toastService.error({
+                  title: "删除失败",
+                  message: result.error || "请稍后重试",
+                });
+              }
+            } catch (error) {
+              console.error("Error deleting practice:", error);
+              toastService.error({
+                title: "删除失败",
+                message: "请稍后重试",
+              });
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const getDisplayProjectName = () => {
@@ -635,6 +685,18 @@ export default function PracticeDetailScreen() {
 
           {/* Section 3: Action Buttons */}
           <View style={styles.section3}>
+            {project.source_type === 'user_created' && (
+              <TouchableOpacity
+                style={[styles.deleteButtonNew, isDeleting && styles.buttonDisabled]}
+                onPress={handleDeletePractice}
+                disabled={isDeleting}
+              >
+                <Text style={styles.deleteButtonTextNew}>
+                  {isDeleting ? '删除中...' : '删除'}
+                </Text>
+              </TouchableOpacity>
+            )}
+            
             <TouchableOpacity
               style={styles.secondaryButtonNew}
               onPress={handleEditPractice}
@@ -859,5 +921,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: DesignSystem.spacing.sm,
+  },
+  deleteButtonNew: {
+    ...componentHelpers.getButtonStyle("secondary", "small"),
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: DesignSystem.colors.error,
+  },
+  deleteButtonTextNew: {
+    ...componentHelpers.getButtonTextStyle("secondary", "small"),
+    color: DesignSystem.colors.error,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
 });

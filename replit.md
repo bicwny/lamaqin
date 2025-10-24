@@ -55,6 +55,15 @@ When the same course is required by multiple classes, students only need to enro
 - Progress on shared courses counts toward all classes requiring it
 - Example: If both "加行" and "预科：入行" require "大学演讲", the student is enrolled only when joining the first class, and the second class enrollment skips it
 
+### Practice Deletion System
+The `user_practice_projects` table includes a `source_type` field ('class_required' | 'user_created') that tracks the origin of each practice project. This enables safe deletion control:
+- **Class-required practices**: Created automatically during class enrollment, marked as `source_type='class_required'`, and cannot be deleted by users
+- **User-created practices**: Future support for manually created practices marked as `source_type='user_created'`, which can be deleted by users
+- **Delete validation**: The `deletePracticeProject` function in `classCurriculumService` validates both user ownership and source_type before allowing deletion
+- **UI controls**: Delete button appears in practice detail screen (`app/practice-detail/[practiceId].tsx`) only for user-created practices with confirmation dialog
+- **Migration**: `docs/ADD_SOURCE_TYPE_MIGRATION.sql` adds the source_type field with default 'class_required' for backward compatibility
+- **Note**: Currently all practices are class-required since there's no manual practice creation feature yet. The infrastructure is ready for future manual practice creation.
+
 # External Dependencies
 
 -   **Supabase**: Backend-as-a-service for authentication, database, and real-time features.
