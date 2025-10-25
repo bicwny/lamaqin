@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -11,6 +12,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   console.log("🏠 TabLayout rendering at:", new Date().toISOString());
 
@@ -32,8 +34,8 @@ export default function TabLayout() {
             shadowOpacity: DesignSystem.opacity[10],
             shadowRadius: DesignSystem.spacing.sm,
             paddingTop: DesignSystem.spacing.sm,
-            paddingBottom: DesignSystem.spacing.xs,
-            height: 88,
+            paddingBottom: Math.max(insets.bottom, DesignSystem.spacing.sm),
+            height: 60 + Math.max(insets.bottom, DesignSystem.spacing.sm),
           },
           default: {
             backgroundColor: DesignSystem.colors.backgroundSecondary,
