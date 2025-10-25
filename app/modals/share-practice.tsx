@@ -30,24 +30,26 @@ export default function SharePracticeModal() {
   const [summary, setSummary] = useState<string>('');
   const [dharmaName, setDharmaName] = useState<string>('');
   const [dateTitle, setDateTitle] = useState<string>('');
-  const { timezoneInfo } = useTimezone();
+  const { timezoneInfo, loading: timezoneLoading } = useTimezone();
 
   useEffect(() => {
-    if (user) {
+    // Wait for both user AND timezone to be ready
+    if (user && !timezoneLoading && timezoneInfo) {
       loadPracticeSummary();
     }
-  }, [user]);
+  }, [user, timezoneInfo, timezoneLoading]);
 
   const loadPracticeSummary = async () => {
-    if (!user) return;
+    if (!user || !timezoneInfo) return;
 
     try {
       setLoading(true);
 
-      // Use timezone-aware date
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
+      // Use timezone-aware date (guaranteed to work since we wait for timezoneInfo)
+      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+
+      console.log('📅 Share modal - User timezone:', timezoneInfo.timezone);
+      console.log('📅 Share modal - Today\'s date:', today);
 
       // Get user's dharma name
       const { data: userData, error: userError } = await supabase
@@ -61,8 +63,8 @@ export default function SharePracticeModal() {
       const userDharmaName = userData?.dharma_name || '修行者';
       setDharmaName(userDharmaName);
 
-      // Set date title
-      const date = new Date(today + 'T00:00:00');
+      // Set date title - parse the timezone-aware date
+      const date = new Date(today + 'T12:00:00'); // Use noon to avoid timezone edge cases
       const month = date.getMonth() + 1;
       const day = date.getDate();
       setDateTitle(`${month}/${day}修行总结`);
