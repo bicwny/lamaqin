@@ -31,7 +31,11 @@ SELECT
 FROM courses c
 CROSS JOIN generate_series(1, 22)
 WHERE c.name = '三戒要解(上)'
-ON CONFLICT (course_id, lesson_number) DO NOTHING;
+  AND NOT EXISTS (
+    SELECT 1 FROM course_lessons cl 
+    WHERE cl.course_id = c.id 
+    AND cl.lesson_number = generate_series
+  );
 
 -- 2. 缘起赞 - 8课
 INSERT INTO course_lessons (course_id, lesson_number, title)
@@ -42,7 +46,11 @@ SELECT
 FROM courses c
 CROSS JOIN generate_series(1, 8)
 WHERE c.name = '缘起赞'
-ON CONFLICT (course_id, lesson_number) DO NOTHING;
+  AND NOT EXISTS (
+    SELECT 1 FROM course_lessons cl 
+    WHERE cl.course_id = c.id 
+    AND cl.lesson_number = generate_series
+  );
 
 -- 3. 中观四百论 - 72课
 INSERT INTO course_lessons (course_id, lesson_number, title)
@@ -53,7 +61,11 @@ SELECT
 FROM courses c
 CROSS JOIN generate_series(1, 72)
 WHERE c.name = '中观四百论'
-ON CONFLICT (course_id, lesson_number) DO NOTHING;
+  AND NOT EXISTS (
+    SELECT 1 FROM course_lessons cl 
+    WHERE cl.course_id = c.id 
+    AND cl.lesson_number = generate_series
+  );
 
 -- 4. 中观根本慧论 - 114课
 INSERT INTO course_lessons (course_id, lesson_number, title)
@@ -64,7 +76,11 @@ SELECT
 FROM courses c
 CROSS JOIN generate_series(1, 114)
 WHERE c.name = '中观根本慧论'
-ON CONFLICT (course_id, lesson_number) DO NOTHING;
+  AND NOT EXISTS (
+    SELECT 1 FROM course_lessons cl 
+    WHERE cl.course_id = c.id 
+    AND cl.lesson_number = generate_series
+  );
 
 -- 5. 中观庄严论释 - 128课
 INSERT INTO course_lessons (course_id, lesson_number, title)
@@ -75,7 +91,11 @@ SELECT
 FROM courses c
 CROSS JOIN generate_series(1, 128)
 WHERE c.name = '中观庄严论释'
-ON CONFLICT (course_id, lesson_number) DO NOTHING;
+  AND NOT EXISTS (
+    SELECT 1 FROM course_lessons cl 
+    WHERE cl.course_id = c.id 
+    AND cl.lesson_number = generate_series
+  );
 
 -- ========================================
 -- 验证插入结果
