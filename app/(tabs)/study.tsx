@@ -11,6 +11,7 @@ import PageHeader from '@/components/PageHeader';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
+import { CourseSkeleton } from '@/components/SkeletonLoader';
 
 // Component to display lesson progress with real-time counts
 const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
@@ -528,11 +529,11 @@ export default function StudyScreen() {
         subtitle="好好闻思，别乱跑。"
         scrollable={false}
         backgroundColor={Colors.background}
+        padding={0}
       >
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
-          <Text style={styles.loadingText}>加载中...</Text>
-        </View>
+        <ScrollView style={styles.scrollView}>
+          <CourseSkeleton count={4} />
+        </ScrollView>
       </PageTemplate>
     );
   }

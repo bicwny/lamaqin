@@ -25,18 +25,18 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
     共修: null as '回顾' | '串讲' | '参加' | '缺席' | null, 
     讲考: null as '讲考' | '提问' | '参加' | '缺席' | null 
   });
-  const [loading, setLoading] = useState(!bulkData); // Skip loading if bulk data provided
+  const [loading, setLoading] = useState(!bulkData);
 
   useEffect(() => {
     if (bulkData) {
-      // Use pre-loaded bulk data (fast path)
+      // 🚀 Use pre-loaded bulk data (fast path - no DB query!)
       setSummary(bulkData);
       setLoading(false);
     } else {
-      // Fallback to individual query (legacy path)
+      // Fallback: load individual summary if bulk data missing (resilience for edge cases)
       loadCounts();
     }
-  }, [userId, courseId, lessonId, refreshTrigger, bulkData]);
+  }, [userId, courseId, lessonId, bulkData, refreshTrigger]);
 
   const loadCounts = async () => {
     try {
