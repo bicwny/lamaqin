@@ -50,6 +50,8 @@ All class enrollments now track the user's entry year (cohort) to identify which
 ### Course Display Ordering
 The `class_required_courses` table includes a `display_order` field allowing each class to define its own custom sequence for courses. This enables flexible learning paths where the same course can appear in different positions across classes (e.g., "大学演讲" might be first in one class but third in another). Courses are automatically displayed in ascending order based on this field, with any courses lacking a display_order value appearing last.
 
+**正科 Course Expansion (2025-10-24)**: SQL script `docs/add-zhengke-courses.sql` available to add 5 additional courses to 正科 class: 三戒要解(上) (22课), 缘起赞 (8课), 中观四百论 (72课), 中观根本慧论 (114课), 中观庄严论释 (128课). Script handles display_order column creation if missing and auto-assigns sequential ordering.
+
 ### Shared Course Handling
 When the same course is required by multiple classes, students only need to enroll once. The `syncUserCoursesWithClassRequirements` function checks existing enrollments before adding courses. If a student already has a course from a previous class enrollment, it is automatically skipped when enrolling in new classes. This ensures:
 - No duplicate course entries in user_courses table
