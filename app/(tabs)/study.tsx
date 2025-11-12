@@ -172,15 +172,19 @@ export default function StudyScreen() {
       const organizedProgress = processProgressData(progressData, userCoursesData);
       setProgress(organizedProgress);
 
-      // Recalculate progress for all enrolled courses sequentially to avoid race conditions
-      console.log('🔄 Calculating progress for', userCoursesData.length, 'courses...');
-      for (const userCourse of userCoursesData) {
+      // Recalculate progress for all enrolled courses in parallel (massive speed boost!)
+      console.log('🔄 Calculating progress for', userCoursesData.length, 'courses in parallel...');
+      const progressPromises = userCoursesData.map(async (userCourse) => {
         try {
           await studyService.calculateProgress(user.id, userCourse.course_id);
+          return { courseId: userCourse.course_id, success: true };
         } catch (error) {
           console.error(`❌ Failed to calculate progress for ${userCourse.course.name}:`, error);
+          return { courseId: userCourse.course_id, success: false };
         }
-      }
+      });
+      
+      await Promise.all(progressPromises);
 
       // Reload user courses to get updated progress percentages
       const updatedUserCoursesData = await getUserCourses(user.id);

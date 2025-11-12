@@ -10,13 +10,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 
 // Component to display lesson progress with real-time counts
-const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, showOnlyIcon, optionalStatusFields }: {
+const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, showOnlyIcon, optionalStatusFields, bulkData }: {
   userId: string;
   courseId: string;
   lessonId: string;
   refreshTrigger?: number;
   showOnlyIcon?: boolean;
   optionalStatusFields?: Set<'共修' | '讲考'>;
+  bulkData?: any; // 🚀 OPTIMIZATION: Pre-loaded data to avoid N queries
 }) => {
   const [summary, setSummary] = useState({ 
     听传承: 0, 
@@ -24,11 +25,18 @@ const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger, sho
     共修: null as '回顾' | '串讲' | '参加' | '缺席' | null, 
     讲考: null as '讲考' | '提问' | '参加' | '缺席' | null 
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!bulkData); // Skip loading if bulk data provided
 
   useEffect(() => {
-    loadCounts();
-  }, [userId, courseId, lessonId, refreshTrigger]);
+    if (bulkData) {
+      // Use pre-loaded bulk data (fast path)
+      setSummary(bulkData);
+      setLoading(false);
+    } else {
+      // Fallback to individual query (legacy path)
+      loadCounts();
+    }
+  }, [userId, courseId, lessonId, refreshTrigger, bulkData]);
 
   const loadCounts = async () => {
     try {
@@ -106,6 +114,7 @@ export default function CourseDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [optionalStatusFields, setOptionalStatusFields] = useState<Set<'共修' | '讲考'>>(new Set());
+  const [bulkLessonsSummary, setBulkLessonsSummary] = useState<Record<string, any>>({});
 
   useEffect(() => {
     if (user && courseId) {
@@ -134,15 +143,30 @@ export default function CourseDetailScreen() {
 
       setUserCourse(foundUserCourse);
 
-      // Load lessons for this course
-      const courseLessons = await studyService.getCourseLessons(courseId);
+      // Load lessons and bulk summaries in parallel
+      const [courseLessons, optionalFields, bulkSummary] = await Promise.all([
+        studyService.getCourseLessons(courseId),
+        studyService.getCourseOptionalStatusFields(user.id, courseId),
+        studyService.getBulkLessonsSummary(user.id, courseId)
+      ]);
+
       setLessons(courseLessons);
-
-      // Load optional status fields for this course
-      const optionalFields = await studyService.getCourseOptionalStatusFields(user.id, courseId);
       setOptionalStatusFields(optionalFields);
-      console.log('📋 Optional status fields:', Array.from(optionalFields));
 
+      // Fill in zero-value summaries for lessons without records
+      const completeSummary: Record<string, any> = {};
+      courseLessons.forEach(lesson => {
+        completeSummary[lesson.id] = bulkSummary[lesson.id] || {
+          听传承: 0,
+          看法本: 0,
+          共修: null,
+          讲考: null,
+          details: []
+        };
+      });
+      setBulkLessonsSummary(completeSummary);
+
+      console.log('📋 Optional status fields:', Array.from(optionalFields));
       console.log('✅ Course detail data loaded successfully');
     } catch (error) {
       console.error('❌ Error loading course detail:', error);
@@ -278,6 +302,7 @@ export default function CourseDetailScreen() {
                   refreshTrigger={refreshTrigger}
                   showOnlyIcon={true}
                   optionalStatusFields={optionalStatusFields}
+                  bulkData={bulkLessonsSummary[lesson.id]}
                 />
               </View>
               <LessonProgressDisplay 
@@ -286,6 +311,7 @@ export default function CourseDetailScreen() {
                 lessonId={lesson.id}
                 refreshTrigger={refreshTrigger}
                 optionalStatusFields={optionalStatusFields}
+                bulkData={bulkLessonsSummary[lesson.id]}
               />
             </View>
 

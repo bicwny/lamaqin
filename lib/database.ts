@@ -1065,6 +1065,72 @@ export const studyService = {
     return summary;
   },
 
+  // 🚀 OPTIMIZATION: Batch load all lessons' summaries for a course in one query
+  async getBulkLessonsSummary(userId: string, courseId: string): Promise<Record<string, any>> {
+    const { data, error } = await supabase
+      .from('study_records')
+      .select('lesson_id, study_type, study_count_for_lesson, study_date, status')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .order('study_date');
+
+    if (error) throw error;
+
+    const records = data || [];
+    const summaryMap: Record<string, any> = {};
+
+    // Group records by lesson_id
+    records.forEach(record => {
+      const lessonId = record.lesson_id;
+      
+      if (!summaryMap[lessonId]) {
+        summaryMap[lessonId] = {
+          听传承: 0,
+          看法本: 0,
+          共修: null as '参加' | '缺席' | null,
+          讲考: null as '参加' | '缺席' | null,
+          details: []
+        };
+      }
+
+      const summary = summaryMap[lessonId];
+      const studyType = record.study_type;
+      
+      if (studyType === '听传承') {
+        summary.听传承 += 1;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          count: 1
+        });
+      } else if (studyType === '看法本') {
+        summary.看法本 += 1;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          count: 1
+        });
+      } else if (studyType === '共修') {
+        summary.共修 = record.status as '参加' | '缺席' | null;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          status: record.status as '参加' | '缺席'
+        });
+      } else if (studyType === '讲考') {
+        summary.讲考 = record.status as '参加' | '缺席' | null;
+        summary.details.push({
+          date: record.study_date,
+          type: studyType,
+          status: record.status as '参加' | '缺席'
+        });
+      }
+    });
+
+    console.log(`📦 Bulk loaded summaries for ${Object.keys(summaryMap).length} lessons in course ${courseId}`);
+    return summaryMap;
+  },
+
   async getCourseOptionalStatusFields(userId: string, courseId: string): Promise<Set<'共修' | '讲考'>> {
     try {
       // Get all classes the user is enrolled in
