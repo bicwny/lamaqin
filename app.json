@@ -25,6 +25,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
+      "favicon": "./assets/icon.png",
       "fontDisplay": "swap",
       "display": "standalone",
       "name": "三殊胜",
