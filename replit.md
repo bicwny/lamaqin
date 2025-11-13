@@ -28,6 +28,13 @@ A complete authentication system is implemented using Supabase Auth, supporting 
 ## React Native Architecture Configuration
 The app uses React Native with a configurable architecture setting in `app.json`. Currently, `"newArchEnabled": false` is set for optimal compatibility with Expo Go during development and testing. For production deployments to app stores, `"newArchEnabled": true` can be enabled to leverage the performance benefits of React Native's New Architecture (Fabric + TurboModules), especially for features like React Native Reanimated 4.1+ on iOS.
 
+## App Branding Assets
+Custom app icon and splash screen are configured in `app.json`:
+- **App Icon**: `assets/icon.png` - Used for iOS, Android, and web app icon
+- **Splash Screen**: `assets/splash.png` - Loading screen displayed during app initialization
+- **Android Adaptive Icon**: Uses the same `assets/icon.png` with white background
+All branding assets are located in the `assets/` folder and can be replaced by uploading new files with the same names.
+
 ## System Design Choices
 The application supports a class-based curriculum system, allowing users to enroll in multiple Buddhist study classes concurrently. Upon enrollment, users automatically receive all required practices, courses, and study materials specific to their selected curricula. This system includes database schema for class curricula, required courses, and practices, alongside user enrollment and progress tracking. Required study types must be completed for lesson progress, while optional activities track attendance without affecting core progress.
 
