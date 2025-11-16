@@ -14,6 +14,7 @@ The application leverages Expo Router for file-based routing and a tab-based nav
 The bottom tab navigation (`app/(tabs)/_layout.tsx`) uses `useSafeAreaInsets` from `react-native-safe-area-context` to properly handle iOS devices with home indicators (iPhone X and later). The tab bar dynamically adjusts its bottom padding and height based on the device's safe area, ensuring navigation icons and labels never overlap with the iPhone's home indicator bar.
 
 ### Key Features
+- **Daily Practice Display**: The 当日 (Daily) tab displays ALL active practices with `target_period='daily'`, showing complete progress for all daily count-based and time-based practices. Previously limited to 3 practices, the limit was removed (2025-11-16) to ensure all daily practices are visible regardless of enrollment order.
 - **Practice Sharing**: Users can share their daily practice summary via the "分享" button on the daily view. The share modal (`app/modals/share-practice.tsx`) displays a date-based title (e.g., "10/8修行总结") and formats today's practice data using the user's dharma name without units (e.g., "圆青：莲师心咒1000，百字明100，三十五佛忏悔文1"). The modal includes Buddhist dedication prayers below the copy button and provides clipboard copy functionality using expo-clipboard for easy sharing to WhatsApp.
 
 ## Backend Architecture

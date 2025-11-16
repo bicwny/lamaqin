@@ -118,8 +118,7 @@ export default function HomeScreen() {
         .eq('user_id', user.id)
         .eq('status', 'active')
         .eq('target_period', 'daily')
-        .order('created_at', { ascending: true })
-        .limit(3);
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
 
@@ -179,8 +178,7 @@ export default function HomeScreen() {
         `)
         .eq('user_id', user.id)
         .eq('status', 'active')
-        .eq('target_period', 'weekly')
-        .limit(3);
+        .eq('target_period', 'weekly');
 
       if (error) throw error;
 
