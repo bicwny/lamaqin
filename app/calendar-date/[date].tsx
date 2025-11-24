@@ -389,12 +389,11 @@ const styles = StyleSheet.create({
   },
   recordItem: {
     ...ComponentTokens.card.variants.outlined,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    padding: ComponentTokens.card.padding.comfortable,
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
   recordText: {
@@ -404,13 +403,12 @@ const styles = StyleSheet.create({
   },
   projectItem: {
     ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.spacious,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
   },
   projectInfo: {
     flex: 1,
