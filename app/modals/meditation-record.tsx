@@ -150,6 +150,7 @@ export default function MeditationRecordScreen() {
 
       if (isEditing) {
         await meditationService.updateMeditationRecord(editRecordId, user.id, {
+          record_date: recordData.record_date,
           duration_minutes: recordData.duration_minutes,
           session_number: recordData.session_number,
           reflection: recordData.reflection

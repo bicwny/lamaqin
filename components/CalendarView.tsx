@@ -307,6 +307,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         practiceName: practiceName,
         practiceType: practiceType,
         editRecordId: recordId,
+        selectedDate: selectedDate,
       },
     });
   };
