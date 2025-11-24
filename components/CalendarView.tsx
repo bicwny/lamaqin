@@ -13,20 +13,37 @@ interface CalendarViewProps {
 }
 
 interface DailyRecord {
+  id: string;
   record_date: string;
   practice_project_id: string;
   count: number;
   practices: {
     name: string;
     unit: string;
+    type: string;
   };
 }
 
 interface MeditationRecord {
+  id: string;
   record_date: string;
   practice_id: string;
+  practice_project_id: string;
   duration_minutes: number;
   session_number?: number;
+}
+
+interface PracticeProject {
+  id: string;
+  practice_id: string;
+  project_name?: string;
+  preset_project_id?: string;
+  practices: {
+    id: string;
+    name: string;
+    type: string;
+    unit: string;
+  };
 }
 
 export default function CalendarView({ userId, onDateSelect }: CalendarViewProps) {
@@ -36,25 +53,75 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     daily: DailyRecord[];
     meditation: MeditationRecord[];
   }>({ daily: [], meditation: [] });
+  const [userProjects, setUserProjects] = useState<PracticeProject[]>([]);
   const [showDateModal, setShowDateModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     loadMarkedDates();
+    loadUserProjects();
   }, [userId]);
 
-  const loadMarkedDates = async () => {
+  const loadUserProjects = async () => {
+    try {
+      const { data: projects, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          id,
+          practice_id,
+          project_name,
+          preset_project_id,
+          practices!inner (
+            id,
+            name,
+            type,
+            unit
+          )
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform the data to match our interface
+      const formattedProjects = (projects || []).map((project: any) => ({
+        id: project.id,
+        practice_id: project.practice_id,
+        project_name: project.project_name,
+        preset_project_id: project.preset_project_id,
+        practices: project.practices, // This will be a single object due to the relationship
+      }));
+
+      setUserProjects(formattedProjects);
+    } catch (error) {
+      console.error('Error loading user projects:', error);
+    }
+  };
+
+  const loadMarkedDates = async (specificDate?: string) => {
     try {
       setLoading(true);
       
-      // Get current month's date range
+      // Get date range - either for a specific month or a broader range
       const today = new Date();
-      const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-      const lastDay = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+      let startDate: string;
+      let endDate: string;
       
-      const startDate = firstDay.toISOString().split('T')[0];
-      const endDate = lastDay.toISOString().split('T')[0];
+      if (specificDate) {
+        // Load one month before and after the specific date
+        const baseDate = new Date(specificDate);
+        const firstDay = new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, 1);
+        const lastDay = new Date(baseDate.getFullYear(), baseDate.getMonth() + 2, 0);
+        startDate = firstDay.toISOString().split('T')[0];
+        endDate = lastDay.toISOString().split('T')[0];
+      } else {
+        // Load 6 months range (3 months before and after today)
+        const firstDay = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 4, 0);
+        startDate = firstDay.toISOString().split('T')[0];
+        endDate = lastDay.toISOString().split('T')[0];
+      }
 
       // Load daily records
       const { data: dailyRecords, error: dailyError } = await supabase
@@ -124,11 +191,12 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       const { data: dailyRecords, error: dailyError } = await supabase
         .from('daily_records')
         .select(`
+          id,
           record_date,
           practice_project_id,
           count,
           user_practice_projects!inner(
-            practices(name, unit)
+            practices(name, unit, type)
           )
         `)
         .eq('user_id', userId)
@@ -139,7 +207,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       // Load meditation records for this date
       const { data: meditationRecords, error: meditationError } = await supabase
         .from('meditation_records')
-        .select('record_date, practice_id, duration_minutes, session_number')
+        .select('id, record_date, practice_id, practice_project_id, duration_minutes, session_number')
         .eq('user_id', userId)
         .eq('record_date', date);
 
@@ -147,12 +215,14 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
 
       // Format the data
       const formattedDaily = (dailyRecords || []).map((record: any) => ({
+        id: record.id,
         record_date: record.record_date,
         practice_project_id: record.practice_project_id,
         count: record.count,
         practices: {
           name: record.user_practice_projects.practices.name,
           unit: record.user_practice_projects.practices.unit,
+          type: record.user_practice_projects.practices.type,
         },
       }));
 
@@ -182,13 +252,41 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     }
   };
 
-  const handleAddRecord = () => {
+  const handleAddRecord = (project: PracticeProject) => {
     setShowDateModal(false);
-    // Navigate to add record modal with selected date
+    // Navigate to add record modal with selected date and project info
+    if (project.practices.type === 'time') {
+      router.push({
+        pathname: '/modals/meditation-record',
+        params: {
+          practiceId: project.practice_id,
+          practiceProjectId: project.id,
+          practiceName: project.practices.name,
+          selectedDate: selectedDate,
+        },
+      });
+    } else {
+      router.push({
+        pathname: '/modals/custom-record',
+        params: {
+          projectId: project.id,
+          practiceName: project.practices.name,
+          practiceType: project.practices.type,
+          selectedDate: selectedDate,
+        },
+      });
+    }
+  };
+
+  const handleEditRecord = (recordId: string, projectId: string, practiceName: string, practiceType: string) => {
+    setShowDateModal(false);
     router.push({
       pathname: '/modals/custom-record',
       params: {
-        selectedDate: selectedDate,
+        projectId: projectId,
+        practiceName: practiceName,
+        practiceType: practiceType,
+        editRecordId: recordId,
       },
     });
   };
@@ -215,6 +313,9 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       <Calendar
         markedDates={markedDates}
         onDayPress={handleDayPress}
+        onMonthChange={(month) => {
+          loadMarkedDates(month.dateString);
+        }}
         theme={{
           backgroundColor: '#ffffff',
           calendarBackground: '#ffffff',
@@ -258,24 +359,22 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
               </View>
             ) : (
               <ScrollView style={styles.modalScroll}>
-                {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 ? (
-                  <View style={styles.emptyContainer}>
-                    <Ionicons name="calendar-outline" size={48} color={DesignSystem.colors.textTertiary} />
-                    <Text style={styles.emptyText}>这天还没有修行记录</Text>
-                    <TouchableOpacity style={styles.addButton} onPress={handleAddRecord}>
-                      <Ionicons name="add" size={20} color="#ffffff" />
-                      <Text style={styles.addButtonText}>添加记录</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <>
+                {/* Existing Records */}
+                {(dateRecords.daily.length > 0 || dateRecords.meditation.length > 0) && (
+                  <View style={styles.section}>
+                    <Text style={styles.sectionLabel}>当日记录</Text>
                     {dateRecords.daily.map((record, index) => (
-                      <View key={`daily-${index}`} style={styles.recordItem}>
+                      <TouchableOpacity 
+                        key={`daily-${index}`} 
+                        style={styles.recordItem}
+                        onPress={() => handleEditRecord(record.id, record.practice_project_id, record.practices.name, record.practices.type)}
+                      >
                         <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
                         <Text style={styles.recordText}>
                           {record.practices.name}: {record.count} {record.practices.unit}
                         </Text>
-                      </View>
+                        <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
+                      </TouchableOpacity>
                     ))}
                     {dateRecords.meditation.map((record, index) => (
                       <View key={`meditation-${index}`} style={styles.recordItem}>
@@ -285,8 +384,38 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
                         </Text>
                       </View>
                     ))}
-                  </>
+                  </View>
                 )}
+
+                {/* Add New Record */}
+                <View style={styles.section}>
+                  <Text style={styles.sectionLabel}>
+                    {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 
+                      ? '选择项目添加记录' 
+                      : '添加更多记录'}
+                  </Text>
+                  {userProjects.length === 0 ? (
+                    <View style={styles.emptyProjectsContainer}>
+                      <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
+                    </View>
+                  ) : (
+                    userProjects.map((project) => (
+                      <TouchableOpacity
+                        key={project.id}
+                        style={styles.projectItem}
+                        onPress={() => handleAddRecord(project)}
+                      >
+                        <View style={styles.projectInfo}>
+                          <Text style={styles.projectName}>{project.practices.name}</Text>
+                          {project.project_name && (
+                            <Text style={styles.projectSubName}>{project.project_name}</Text>
+                          )}
+                        </View>
+                        <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </View>
               </ScrollView>
             )}
           </View>
@@ -378,13 +507,59 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border,
+    paddingHorizontal: 16,
+    backgroundColor: '#f9fafb',
+    borderRadius: 8,
+    marginBottom: 8,
     gap: 12,
   },
   recordText: {
     fontSize: 16,
     color: DesignSystem.colors.textPrimary,
     flex: 1,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  projectItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+  },
+  projectInfo: {
+    flex: 1,
+  },
+  projectName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: DesignSystem.colors.textPrimary,
+  },
+  projectSubName: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    marginTop: 4,
+  },
+  emptyProjectsContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyProjectsText: {
+    fontSize: 14,
+    color: DesignSystem.colors.textTertiary,
   },
 });

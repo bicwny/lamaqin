@@ -72,6 +72,7 @@ export default function CustomRecordScreen() {
       if (record) {
         setCount(record.count.toString());
         setNotes(record.notes || '');
+        setRecordDate(record.record_date);
       }
     } catch (error) {
       console.error('❌ Error loading existing record:', error);
@@ -166,7 +167,7 @@ export default function CustomRecordScreen() {
       .from('daily_records')
       .select('count')
       .eq('id', editRecordId)
-      .eq('user_id', user.id)
+      .eq('user_id', user!.id)
       .single();
 
     if (currentError) throw currentError;
@@ -176,10 +177,11 @@ export default function CustomRecordScreen() {
       .from('daily_records')
       .update({
         count: countNum,
-        notes: notes.trim() || null
+        notes: notes.trim() || null,
+        record_date: recordDate
       })
       .eq('id', editRecordId)
-      .eq('user_id', user.id);
+      .eq('user_id', user!.id);
 
     if (updateRecordError) throw updateRecordError;
 
