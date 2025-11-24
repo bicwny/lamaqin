@@ -454,6 +454,17 @@ export default function HomeScreen() {
     return '像最后一天那样去生活';
   };
 
+  const getTodayDateDisplay = () => {
+    const today = timezoneInfo 
+      ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
+      : new Date();
+    return today.toLocaleDateString('zh-CN', { 
+      month: 'long', 
+      day: 'numeric',
+      weekday: 'short'
+    });
+  };
+
   if (loading) {
     return (
       <PageTemplate
@@ -497,7 +508,7 @@ export default function HomeScreen() {
           {/* Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日修行</Text>
+              <Text style={styles.sectionTitle}>{getTodayDateDisplay()}</Text>
               <View style={styles.headerActions}>
                 <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
                   <Text style={styles.shareText}>分享</Text>
