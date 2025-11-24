@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens } from '@/utils/componentTokens';
+import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface DailyRecord {
@@ -329,9 +330,9 @@ export default function CalendarDatePage() {
                   // Format target display
                   let targetDisplay = '';
                   if (project.target_period === 'daily' && project.daily_target) {
-                    targetDisplay = ` (${project.daily_target}/天)`;
+                    targetDisplay = `${project.daily_target}${project.practices.unit}/天`;
                   } else if (project.target_period === 'weekly' && project.weekly_target) {
-                    targetDisplay = ` (${project.weekly_target}座/周)`;
+                    targetDisplay = `${project.weekly_target}座/周`;
                   }
                   
                   return (
@@ -340,15 +341,30 @@ export default function CalendarDatePage() {
                       style={styles.projectItem}
                       onPress={() => handleAddRecord(project)}
                     >
-                      <View style={styles.projectInfo}>
-                        <Text style={styles.projectName}>
-                          {project.practices.name}{targetDisplay}
-                        </Text>
-                        {project.project_name && (
-                          <Text style={styles.projectSubName}>{project.project_name}</Text>
-                        )}
+                      <View style={styles.cardContentRow}>
+                        <View style={styles.projectInfo}>
+                          <Text style={styles.projectName} numberOfLines={1}>
+                            {project.practices.name}
+                          </Text>
+                          {targetDisplay && (
+                            <Text style={styles.projectTarget}>{targetDisplay}</Text>
+                          )}
+                        </View>
+                        <View style={styles.projectActions}>
+                          <TouchableOpacity
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              handleAddRecord(project);
+                            }}
+                          >
+                            <Ionicons 
+                              name="add-circle-outline" 
+                              size={28} 
+                              color={DesignSystem.colors.primary} 
+                            />
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                      <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
                     </TouchableOpacity>
                   );
                 })
@@ -406,22 +422,30 @@ const styles = StyleSheet.create({
     padding: ComponentTokens.card.padding.comfortable,
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
+  },
+  cardContentRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   projectInfo: {
     flex: 1,
+    marginRight: 12,
   },
   projectName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: DesignSystem.colors.textPrimary,
+    color: Colors.text,
+    marginBottom: 4,
   },
-  projectSubName: {
-    fontSize: 14,
-    color: DesignSystem.colors.textSecondary,
-    marginTop: 4,
+  projectTarget: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+  },
+  projectActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   emptyProjectsContainer: {
     padding: 20,
