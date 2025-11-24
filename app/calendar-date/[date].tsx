@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { useLocalSearchParams, router, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { useAuth } from '@/contexts/AuthContext';
@@ -63,10 +64,14 @@ export default function CalendarDatePage() {
   }>({ daily: [], meditation: [] });
   const [userProjects, setUserProjects] = useState<PracticeProject[]>([]);
   const [practicesWithTargets, setPracticesWithTargets] = useState<PracticeWithTarget[]>([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     if (user && date) {
       loadUserProjects();
+      // Set the selected date based on URL parameter
+      setSelectedDate(new Date(date));
     }
   }, [user, date]);
 
@@ -255,6 +260,30 @@ export default function CalendarDatePage() {
     return `${year}年${month}月${day}日`;
   };
 
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    
+    if (selectedDate) {
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      
+      // Navigate to the new date
+      router.replace(`/calendar-date/${dateString}`);
+      
+      if (Platform.OS === 'ios') {
+        setShowDatePicker(false);
+      }
+    }
+  };
+
+  const handleDateHeaderPress = () => {
+    setShowDatePicker(true);
+  };
+
   const handleEditRecord = (recordId: string, practiceProjectId: string, practiceName: string, practiceType: string) => {
     router.push({
       pathname: '/modals/custom-record',
@@ -318,8 +347,15 @@ export default function CalendarDatePage() {
     <>
       <Stack.Screen 
         options={{
-          title: formatDate(date || ''),
           headerBackTitle: '回向',
+          headerTitle: () => (
+            <TouchableOpacity onPress={handleDateHeaderPress}>
+              <View style={styles.headerTitleContainer}>
+                <Text style={styles.headerTitle}>{formatDate(date || '')}</Text>
+                <Ionicons name="chevron-down" size={16} color="#007AFF" style={styles.headerIcon} />
+              </View>
+            </TouchableOpacity>
+          ),
         }} 
       />
       <ScrollView style={styles.container}>
@@ -487,11 +523,35 @@ export default function CalendarDatePage() {
           </>
         )}
       </ScrollView>
+      
+      {/* Date Picker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          maximumDate={new Date()}
+        />
+      )}
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#000',
+  },
+  headerIcon: {
+    marginLeft: 2,
+  },
   container: {
     flex: 1,
     backgroundColor: DesignSystem.colors.background,
