@@ -276,10 +276,13 @@ export default function CalendarDatePage() {
                       {record.practices.name}
                     </Text>
                     <Text style={styles.practiceCount}>
-                      {record.count}{record.practices.unit}
+                      {record.count}/{record.count}{record.practices.unit}
                     </Text>
                   </View>
-                  <Ionicons name="create-outline" size={24} color={DesignSystem.colors.primary} />
+                  <View style={styles.practiceActions}>
+                    <Ionicons name="checkmark-circle-outline" size={28} color="#10B981" />
+                    <Ionicons name="add-circle-outline" size={28} color={DesignSystem.colors.primary} />
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}
@@ -305,10 +308,13 @@ export default function CalendarDatePage() {
                         {practiceName}
                       </Text>
                       <Text style={styles.practiceCount}>
-                        第{record.session_number || 1}座 · {record.duration_minutes}分钟
+                        本周 {record.session_number || 1}/{record.session_number || 1}座
                       </Text>
                     </View>
-                    <Ionicons name="create-outline" size={24} color={DesignSystem.colors.primary} />
+                    <View style={styles.practiceActions}>
+                      <Ionicons name="checkmark-circle-outline" size={28} color="#10B981" />
+                      <Ionicons name="add-circle-outline" size={28} color={DesignSystem.colors.primary} />
+                    </View>
                   </View>
                 </TouchableOpacity>
               );
@@ -335,7 +341,9 @@ export default function CalendarDatePage() {
                         <Text style={styles.practiceCount}>{project.project_name}</Text>
                       )}
                     </View>
-                    <Ionicons name="add-circle-outline" size={28} color={DesignSystem.colors.primary} />
+                    <View style={styles.practiceActions}>
+                      <Ionicons name="add-circle-outline" size={28} color={DesignSystem.colors.primary} />
+                    </View>
                   </View>
                 </TouchableOpacity>
               ))
@@ -389,6 +397,11 @@ const styles = StyleSheet.create({
   practiceCount: {
     fontSize: 15,
     color: DesignSystem.colors.textSecondary,
+  },
+  practiceActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   emptyProjectsContainer: {
     padding: 20,
