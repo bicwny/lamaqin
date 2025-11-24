@@ -325,21 +325,33 @@ export default function CalendarDatePage() {
                   <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
                 </View>
               ) : (
-                userProjects.map((project) => (
-                  <TouchableOpacity
-                    key={project.id}
-                    style={styles.projectItem}
-                    onPress={() => handleAddRecord(project)}
-                  >
-                    <View style={styles.projectInfo}>
-                      <Text style={styles.projectName}>{project.practices.name}</Text>
-                      {project.project_name && (
-                        <Text style={styles.projectSubName}>{project.project_name}</Text>
-                      )}
-                    </View>
-                    <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
-                  </TouchableOpacity>
-                ))
+                userProjects.map((project) => {
+                  // Format target display
+                  let targetDisplay = '';
+                  if (project.target_period === 'daily' && project.daily_target) {
+                    targetDisplay = ` (${project.daily_target}/天)`;
+                  } else if (project.target_period === 'weekly' && project.weekly_target) {
+                    targetDisplay = ` (${project.weekly_target}座/周)`;
+                  }
+                  
+                  return (
+                    <TouchableOpacity
+                      key={project.id}
+                      style={styles.projectItem}
+                      onPress={() => handleAddRecord(project)}
+                    >
+                      <View style={styles.projectInfo}>
+                        <Text style={styles.projectName}>
+                          {project.practices.name}{targetDisplay}
+                        </Text>
+                        {project.project_name && (
+                          <Text style={styles.projectSubName}>{project.project_name}</Text>
+                        )}
+                      </View>
+                      <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
+                    </TouchableOpacity>
+                  );
+                })
               )}
             </View>
           </>
