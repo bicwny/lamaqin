@@ -275,7 +275,17 @@ export default function CalendarDatePage() {
           <>
             {(dateRecords.daily.length > 0 || dateRecords.meditation.length > 0) && (
               <View style={styles.section}>
-                <Text style={styles.sectionLabel}>当日记录</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionLabel}>当日记录</Text>
+                  <TouchableOpacity
+                    onPress={() => router.push({
+                      pathname: '/modals/share-practice',
+                      params: { date }
+                    })}
+                  >
+                    <Text style={styles.shareButton}>分享</Text>
+                  </TouchableOpacity>
+                </View>
                 {dateRecords.daily.map((record, index) => (
                   <TouchableOpacity 
                     key={`daily-${index}`} 
@@ -395,14 +405,24 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: 12,
+  },
   sectionLabel: {
     fontSize: 14,
     fontWeight: '600',
     color: DesignSystem.colors.textSecondary,
-    marginBottom: 12,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  shareButton: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: DesignSystem.colors.primary,
   },
   recordItem: {
     ...ComponentTokens.card.variants.outlined,
