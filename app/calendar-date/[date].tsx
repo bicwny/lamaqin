@@ -348,10 +348,9 @@ export default function CalendarDatePage() {
                   }
                   
                   return (
-                    <TouchableOpacity
+                    <View
                       key={project.id}
                       style={styles.projectItem}
-                      onPress={() => handleAddRecord(project)}
                     >
                       <View style={styles.cardContentRow}>
                         <View style={styles.projectInfo}>
@@ -364,10 +363,7 @@ export default function CalendarDatePage() {
                         </View>
                         <View style={styles.projectActions}>
                           <TouchableOpacity
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              handleAddRecord(project);
-                            }}
+                            onPress={() => handleAddRecord(project)}
                           >
                             <Ionicons 
                               name="add-circle-outline" 
@@ -377,7 +373,7 @@ export default function CalendarDatePage() {
                           </TouchableOpacity>
                         </View>
                       </View>
-                    </TouchableOpacity>
+                    </View>
                   );
                 })
               )}
