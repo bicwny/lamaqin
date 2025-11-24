@@ -48,6 +48,7 @@ interface PracticeProject {
 
 export default function CalendarView({ userId, onDateSelect }: CalendarViewProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [currentMonth, setCurrentMonth] = useState<string>('');
   const [markedDates, setMarkedDates] = useState<any>({});
   const [dateRecords, setDateRecords] = useState<{
     daily: DailyRecord[];
@@ -353,11 +354,13 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
   return (
     <View style={styles.container}>
       <Calendar
+        current={currentMonth || undefined}
         markedDates={markedDates}
         onDayPress={handleDayPress}
         enableSwipeMonths={true}
         onMonthChange={(month) => {
           console.log('📅 Month changed to:', month.dateString);
+          setCurrentMonth(month.dateString);
           loadMarkedDates(month.dateString);
           loadUserProjects();
         }}
