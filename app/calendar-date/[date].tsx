@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: ComponentTokens.card.margin.spacious,
+    paddingHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: 12,
   },
   sectionLabel: {
