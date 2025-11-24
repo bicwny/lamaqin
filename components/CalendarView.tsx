@@ -514,14 +514,14 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
     backgroundColor: '#ffffff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    width: '100%',
+    height: '100%',
     paddingBottom: 40,
-    maxHeight: '70%',
   },
   modalHeader: {
     flexDirection: 'row',
