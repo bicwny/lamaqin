@@ -4,6 +4,7 @@ import { useLocalSearchParams, router, Stack, useFocusEffect } from 'expo-router
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens } from '@/utils/componentTokens';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface DailyRecord {
@@ -343,7 +344,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: DesignSystem.colors.background,
-    padding: 20,
   },
   loadingContainer: {
     padding: 40,
@@ -367,19 +367,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   recordItem: {
+    ...ComponentTokens.card.variants.outlined,
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 8,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.spacious,
     gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   recordText: {
     fontSize: 16,
@@ -387,16 +382,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   projectItem: {
+    ...ComponentTokens.card.variants.outlined,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
   projectInfo: {
     flex: 1,
