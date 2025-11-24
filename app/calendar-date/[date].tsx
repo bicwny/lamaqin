@@ -326,11 +326,13 @@ export default function CalendarDatePage() {
             )}
 
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>
-                {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 
-                  ? '选择项目添加记录' 
-                  : '添加更多记录'}
-              </Text>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionLabel}>
+                  {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 
+                    ? '选择项目添加记录' 
+                    : '添加更多记录'}
+                </Text>
+              </View>
               {userProjects.length === 0 ? (
                 <View style={styles.emptyProjectsContainer}>
                   <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
