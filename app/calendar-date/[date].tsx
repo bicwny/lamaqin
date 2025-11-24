@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
+import { useLocalSearchParams, router, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
@@ -54,10 +54,18 @@ export default function CalendarDatePage() {
 
   useEffect(() => {
     if (user && date) {
-      loadDateRecords();
       loadUserProjects();
     }
   }, [user, date]);
+
+  // Reload data when page comes into focus (e.g., after adding a record)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user && date) {
+        loadDateRecords();
+      }
+    }, [user, date])
+  );
 
   const loadUserProjects = async () => {
     if (!user) return;

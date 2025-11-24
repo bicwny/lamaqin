@@ -114,11 +114,7 @@ export default function CustomRecordScreen() {
         title: isEditing ? '✅ 记录已更新' : `✅ 已记录 ${countNum} 次`,
         message: isEditing ? undefined : '继续加油！'
       });
-      if (returnTo) {
-        router.replace(returnTo);
-      } else {
-        router.back();
-      }
+      router.back();
     } catch (error) {
       console.error('❌ Error saving count record:', error);
       toastService.error({ title: '❌ 保存失败', message: '记录保存失败，请检查网络后重试' });
@@ -218,9 +214,7 @@ export default function CustomRecordScreen() {
   };
 
   const handleClose = () => {
-    if (returnTo) {
-      router.replace(returnTo);
-    } else if (router.canGoBack()) {
+    if (router.canGoBack()) {
       router.back();
     } else {
       router.replace('/(tabs)/practice');

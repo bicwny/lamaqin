@@ -162,11 +162,7 @@ export default function MeditationRecordScreen() {
           title: '✅ 更新成功', 
           message: `观修记录已更新：${recordData.duration_minutes}分钟` 
         });
-        if (returnTo) {
-          router.replace(returnTo);
-        } else {
-          router.back();
-        }
+        router.back();
       } else {
         const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
         console.log('✅ Record saved successfully');
@@ -178,11 +174,7 @@ export default function MeditationRecordScreen() {
         });
 
         // Navigate back to practice page
-        if (returnTo) {
-          router.replace(returnTo);
-        } else {
-          router.back();
-        }
+        router.back();
       }
     } catch (error) {
       console.error('❌ Error saving meditation record:', error);
@@ -198,9 +190,7 @@ export default function MeditationRecordScreen() {
   };
 
   const handleClose = () => {
-    if (returnTo) {
-      router.replace(returnTo);
-    } else if (router.canGoBack()) {
+    if (router.canGoBack()) {
       router.back();
     } else {
       router.replace('/(tabs)/practice');
