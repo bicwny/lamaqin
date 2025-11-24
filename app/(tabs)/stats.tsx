@@ -2,11 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
+import CalendarView from '@/components/CalendarView';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function StatsScreen() {
+  const { user } = useAuth();
+
   return (
     <PageTemplate title="回向" subtitle="诸佛菩萨如何回向 我亦如是回向" scrollable={false} padding={0}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {user && (
+          <View style={styles.calendarSection}>
+            <Text style={styles.sectionTitle}>修行日历</Text>
+            <CalendarView userId={user.id} />
+          </View>
+        )}
+        
         <View style={styles.dedicationContainer}>
           <Text style={styles.dedicationText}>
             所南德义檀嘉热巴涅    此福已得一切智{'\n'}
@@ -35,14 +46,23 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     paddingHorizontal: DesignSystem.spacing.xl,
-    paddingVertical: DesignSystem.spacing['4xl'],
+    paddingVertical: DesignSystem.spacing.xl,
+  },
+  calendarSection: {
+    marginBottom: DesignSystem.spacing['2xl'],
+  },
+  sectionTitle: {
+    fontSize: DesignSystem.typography.fontSize.xl,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   dedicationContainer: {
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.xl,
+    alignItems: 'center',
   },
   dedicationText: {
     fontSize: DesignSystem.typography.fontSize.lg,

@@ -15,7 +15,6 @@ import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import PageTemplate from "@/components/PageTemplate";
 import ProgressBar from "@/components/ProgressBar";
-import CalendarView from "@/components/CalendarView";
 import { DesignSystem } from "@/constants/DesignSystem";
 import {
   ComponentTokens,
@@ -374,15 +373,6 @@ export default function PracticeScreen() {
     );
   }
 
-  const renderCalendarHeader = () => {
-    if (!user) return null;
-    return (
-      <View style={styles.calendarSection}>
-        <Text style={styles.sectionTitle}>修行日历</Text>
-        <CalendarView userId={user.id} />
-      </View>
-    );
-  };
 
   return (
     <PageTemplate
@@ -400,7 +390,6 @@ export default function PracticeScreen() {
         data={projects}
         renderItem={renderPracticeItem}
         keyExtractor={(item) => item.id}
-        ListHeaderComponent={renderCalendarHeader}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         refreshControl={
