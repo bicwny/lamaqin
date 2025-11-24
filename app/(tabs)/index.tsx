@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toastService } from '@/lib/toast';
@@ -49,8 +48,6 @@ export default function HomeScreen() {
   const [userDharmaName, setUserDharmaName] = useState('圆青'); // Default dharma name
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Track when user is returning from recording to avoid unnecessary refresh
   const [lastRecordTime, setLastRecordTime] = useState<number>(0);
@@ -457,30 +454,6 @@ export default function HomeScreen() {
     return '像最后一天那样去生活';
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowDatePicker(false);
-    }
-    
-    if (selectedDate) {
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      const dateString = `${year}-${month}-${day}`;
-      
-      // Navigate to the calendar date page
-      router.push(`/calendar-date/${dateString}`);
-      
-      if (Platform.OS === 'ios') {
-        setShowDatePicker(false);
-      }
-    }
-  };
-
-  const handleDatePickerPress = () => {
-    setShowDatePicker(true);
-  };
-
   if (loading) {
     return (
       <PageTemplate
@@ -526,10 +499,6 @@ export default function HomeScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>今日修行</Text>
               <View style={styles.headerActions}>
-                <TouchableOpacity onPress={handleDatePickerPress} style={styles.datePickerButton}>
-                  <Ionicons name="calendar-outline" size={18} color={DesignSystem.colors.primary} />
-                  <Text style={styles.datePickerText}>选择日期</Text>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
                   <Text style={styles.shareText}>分享</Text>
                 </TouchableOpacity>
@@ -643,48 +612,6 @@ export default function HomeScreen() {
             )}
           </View>
         </ScrollView>
-        
-        {/* Date Picker Modal */}
-        {showDatePicker && Platform.OS !== 'web' && (
-          <DateTimePicker
-            value={selectedDate}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleDateChange}
-            maximumDate={new Date()}
-          />
-        )}
-        
-        {/* Web Date Picker */}
-        {showDatePicker && Platform.OS === 'web' && (
-          <View style={styles.webDatePickerModal}>
-            <View style={styles.webDatePickerContainer}>
-              <Text style={styles.webDatePickerTitle}>选择日期</Text>
-              <input
-                type="date"
-                max={new Date().toISOString().split('T')[0]}
-                onChange={(e) => {
-                  const newDate = new Date(e.target.value);
-                  handleDateChange(null, newDate);
-                }}
-                style={{
-                  padding: '12px',
-                  fontSize: '16px',
-                  border: '1px solid #ccc',
-                  borderRadius: '8px',
-                  width: '100%',
-                  marginBottom: '16px',
-                }}
-              />
-              <TouchableOpacity
-                style={styles.webDatePickerCloseButton}
-                onPress={() => setShowDatePicker(false)}
-              >
-                <Text style={styles.webDatePickerCloseText}>取消</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
     </PageTemplate>
   );
 }
@@ -728,16 +655,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-  },
-  datePickerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  datePickerText: {
-    fontSize: 14,
-    color: DesignSystem.colors.primary,
-    fontWeight: '600',
   },
   shareText: {
     fontSize: 14,
@@ -817,40 +734,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
-  },
-  webDatePickerModal: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  webDatePickerContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    width: '90%',
-    maxWidth: 400,
-  },
-  webDatePickerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
-    color: '#000',
-  },
-  webDatePickerCloseButton: {
-    backgroundColor: DesignSystem.colors.primary,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  webDatePickerCloseText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
