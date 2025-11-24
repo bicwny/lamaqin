@@ -32,7 +32,8 @@ export default function MeditationRecordScreen() {
     practiceName,
     editRecordId,
     preselectedTopicNumber,
-    selectedDate 
+    selectedDate,
+    returnTo
   } = useLocalSearchParams<{
     practiceId: string;
     practiceProjectId: string;
@@ -40,6 +41,7 @@ export default function MeditationRecordScreen() {
     editRecordId?: string;
     preselectedTopicNumber?: string;
     selectedDate?: string;
+    returnTo?: string;
   }>();
 
   const [duration, setDuration] = useState('');
@@ -160,7 +162,11 @@ export default function MeditationRecordScreen() {
           title: '✅ 更新成功', 
           message: `观修记录已更新：${recordData.duration_minutes}分钟` 
         });
-        router.back();
+        if (returnTo) {
+          router.replace(returnTo);
+        } else {
+          router.back();
+        }
       } else {
         const savedRecord = await meditationService.recordMeditationWithReflection(recordData);
         console.log('✅ Record saved successfully');
@@ -172,7 +178,11 @@ export default function MeditationRecordScreen() {
         });
 
         // Navigate back to practice page
-        router.back();
+        if (returnTo) {
+          router.replace(returnTo);
+        } else {
+          router.back();
+        }
       }
     } catch (error) {
       console.error('❌ Error saving meditation record:', error);
@@ -188,7 +198,9 @@ export default function MeditationRecordScreen() {
   };
 
   const handleClose = () => {
-    if (router.canGoBack()) {
+    if (returnTo) {
+      router.replace(returnTo);
+    } else if (router.canGoBack()) {
       router.back();
     } else {
       router.replace('/(tabs)/practice');
