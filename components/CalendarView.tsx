@@ -355,7 +355,9 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       <Calendar
         markedDates={markedDates}
         onDayPress={handleDayPress}
+        enableSwipeMonths={true}
         onMonthChange={(month) => {
+          console.log('📅 Month changed to:', month.dateString);
           loadMarkedDates(month.dateString);
           loadUserProjects();
         }}
