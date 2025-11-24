@@ -205,10 +205,17 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
 
       if (dailyError) throw dailyError;
 
-      // Load meditation records for this date
+      // Load meditation records for this date with practice info
       const { data: meditationRecords, error: meditationError } = await supabase
         .from('meditation_records')
-        .select('id, record_date, practice_id, practice_project_id, duration_minutes, session_number')
+        .select(`
+          id,
+          record_date,
+          practice_id,
+          duration_minutes,
+          session_number,
+          practices!inner(name)
+        `)
         .eq('user_id', userId)
         .eq('record_date', date);
 
@@ -412,19 +419,30 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
                         <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
                       </TouchableOpacity>
                     ))}
-                    {dateRecords.meditation.map((record, index) => (
-                      <TouchableOpacity 
-                        key={`meditation-${index}`} 
-                        style={styles.recordItem}
-                        onPress={() => handleEditMeditationRecord(record.id, record.practice_id, record.practice_project_id, '观修')}
-                      >
-                        <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
-                        <Text style={styles.recordText}>
-                          观修第{record.session_number || 1}座: {record.duration_minutes} 分钟
-                        </Text>
-                        <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
-                      </TouchableOpacity>
-                    ))}
+                    {dateRecords.meditation.map((record: any, index) => {
+                      // Find matching practice project
+                      const matchingProject = userProjects.find(p => p.practice_id === record.practice_id);
+                      const practiceName = record.practices?.name || '观修';
+                      
+                      return (
+                        <TouchableOpacity 
+                          key={`meditation-${index}`} 
+                          style={styles.recordItem}
+                          onPress={() => handleEditMeditationRecord(
+                            record.id, 
+                            record.practice_id, 
+                            matchingProject?.id || '', 
+                            practiceName
+                          )}
+                        >
+                          <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
+                          <Text style={styles.recordText}>
+                            {practiceName} 第{record.session_number || 1}座: {record.duration_minutes} 分钟
+                          </Text>
+                          <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 )}
 
