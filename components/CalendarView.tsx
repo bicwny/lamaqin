@@ -351,10 +351,14 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     );
   }
 
+  const today = new Date();
+  const maxDate = today.toISOString().split('T')[0];
+
   return (
     <View style={styles.container}>
       <Calendar
         current={currentMonth || undefined}
+        maxDate={maxDate}
         markedDates={markedDates}
         onDayPress={handleDayPress}
         enableSwipeMonths={true}
