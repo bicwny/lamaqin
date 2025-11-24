@@ -35,6 +35,9 @@ interface PracticeProject {
   practice_id: string;
   project_name?: string;
   preset_project_id?: string;
+  daily_target?: number;
+  weekly_target?: number;
+  target_period?: string;
   practices: {
     id: string;
     name: string;
@@ -79,6 +82,9 @@ export default function CalendarDatePage() {
           practice_id,
           project_name,
           preset_project_id,
+          daily_target,
+          weekly_target,
+          target_period,
           practices!inner (
             id,
             name,
@@ -96,6 +102,9 @@ export default function CalendarDatePage() {
         practice_id: project.practice_id,
         project_name: project.project_name,
         preset_project_id: project.preset_project_id,
+        daily_target: project.daily_target,
+        weekly_target: project.weekly_target,
+        target_period: project.target_period,
         practices: project.practices,
       }));
 
