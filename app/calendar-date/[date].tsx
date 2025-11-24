@@ -400,6 +400,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: DesignSystem.colors.textSecondary,
     marginBottom: 12,
+    marginHorizontal: ComponentTokens.card.margin.spacious,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
