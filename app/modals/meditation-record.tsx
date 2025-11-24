@@ -31,13 +31,15 @@ export default function MeditationRecordScreen() {
     practiceProjectId, 
     practiceName,
     editRecordId,
-    preselectedTopicNumber 
+    preselectedTopicNumber,
+    selectedDate 
   } = useLocalSearchParams<{
     practiceId: string;
     practiceProjectId: string;
     practiceName: string;
     editRecordId?: string;
     preselectedTopicNumber?: string;
+    selectedDate?: string;
   }>();
 
   const [duration, setDuration] = useState('');
@@ -140,7 +142,7 @@ export default function MeditationRecordScreen() {
       const recordData = {
         user_id: user.id,
         practice_id: practiceId,
-        record_date: new Date().toISOString().split('T')[0],
+        record_date: selectedDate || new Date().toISOString().split('T')[0],
         duration_minutes: parseInt(duration),
         session_number: parseInt(sessionNumber),
         reflection: reflection.trim() || undefined

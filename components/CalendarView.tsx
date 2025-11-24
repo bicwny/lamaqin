@@ -156,16 +156,17 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         };
       });
 
-      // Mark today
+      // Mark today or preserve selected date
       const todayStr = today.toISOString().split('T')[0];
-      if (marked[todayStr]) {
-        marked[todayStr] = {
-          ...marked[todayStr],
+      const dateToMark = selectedDate || todayStr;
+      if (marked[dateToMark]) {
+        marked[dateToMark] = {
+          ...marked[dateToMark],
           selected: true,
           selectedColor: DesignSystem.colors.blueTara,
         };
       } else {
-        marked[todayStr] = {
+        marked[dateToMark] = {
           selected: true,
           selectedColor: DesignSystem.colors.blueTara,
         };
@@ -244,6 +245,25 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
   const handleDayPress = async (day: DateData) => {
     const dateStr = day.dateString;
     setSelectedDate(dateStr);
+    
+    // Mark the selected date
+    setMarkedDates(prev => {
+      const updated = { ...prev };
+      // Remove selected marking from all dates
+      Object.keys(updated).forEach(key => {
+        if (updated[key].selected) {
+          updated[key] = { ...updated[key], selected: false };
+        }
+      });
+      // Add selected marking to the current date
+      updated[dateStr] = {
+        ...updated[dateStr],
+        selected: true,
+        selectedColor: DesignSystem.colors.blueTara,
+      };
+      return updated;
+    });
+    
     await loadDateRecords(dateStr);
     setShowDateModal(true);
 
@@ -291,6 +311,20 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     });
   };
 
+  const handleEditMeditationRecord = (recordId: string, practiceId: string, practiceProjectId: string, practiceName: string) => {
+    setShowDateModal(false);
+    router.push({
+      pathname: '/modals/meditation-record',
+      params: {
+        editRecordId: recordId,
+        practiceId,
+        practiceProjectId,
+        practiceName,
+        selectedDate: selectedDate,
+      },
+    });
+  };
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const year = date.getFullYear();
@@ -315,6 +349,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         onDayPress={handleDayPress}
         onMonthChange={(month) => {
           loadMarkedDates(month.dateString);
+          loadUserProjects();
         }}
         theme={{
           backgroundColor: '#ffffff',
@@ -377,12 +412,17 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
                       </TouchableOpacity>
                     ))}
                     {dateRecords.meditation.map((record, index) => (
-                      <View key={`meditation-${index}`} style={styles.recordItem}>
+                      <TouchableOpacity 
+                        key={`meditation-${index}`} 
+                        style={styles.recordItem}
+                        onPress={() => handleEditMeditationRecord(record.id, record.practice_id, record.practice_project_id, '观修')}
+                      >
                         <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
                         <Text style={styles.recordText}>
                           观修第{record.session_number || 1}座: {record.duration_minutes} 分钟
                         </Text>
-                      </View>
+                        <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
+                      </TouchableOpacity>
                     ))}
                   </View>
                 )}
