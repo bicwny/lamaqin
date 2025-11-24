@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { useAuth } from '@/contexts/AuthContext';
+import { ComponentTokens } from '@/utils/componentTokens';
 
 interface DailyRecord {
   id: string;
@@ -261,78 +262,85 @@ export default function CalendarDatePage() {
             <Text style={styles.loadingText}>加载中...</Text>
           </View>
         ) : (
-          <>
-            {(dateRecords.daily.length > 0 || dateRecords.meditation.length > 0) && (
-              <View style={styles.section}>
-                <Text style={styles.sectionLabel}>当日记录</Text>
-                {dateRecords.daily.map((record, index) => (
-                  <TouchableOpacity 
-                    key={`daily-${index}`} 
-                    style={styles.recordItem}
-                    onPress={() => handleEditRecord(record.id, record.practice_project_id, record.practices.name, record.practices.type)}
-                  >
-                    <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
-                    <Text style={styles.recordText}>
-                      {record.practices.name}: {record.count} {record.practices.unit}
+          <View style={styles.section}>
+            {/* Existing Records */}
+            {dateRecords.daily.map((record, index) => (
+              <TouchableOpacity 
+                key={`daily-${index}`} 
+                style={styles.practiceCard}
+                onPress={() => handleEditRecord(record.id, record.practice_project_id, record.practices.name, record.practices.type)}
+              >
+                <View style={styles.cardContentRow}>
+                  <View style={styles.practiceInfo}>
+                    <Text style={styles.practiceName} numberOfLines={1}>
+                      {record.practices.name}
                     </Text>
-                    <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
-                  </TouchableOpacity>
-                ))}
-                {dateRecords.meditation.map((record: any, index) => {
-                  const matchingProject = userProjects.find(p => p.practice_id === record.practice_id);
-                  const practiceName = record.practices?.name || '观修';
-                  
-                  return (
-                    <TouchableOpacity 
-                      key={`meditation-${index}`} 
-                      style={styles.recordItem}
-                      onPress={() => handleEditMeditationRecord(
-                        record.id, 
-                        record.practice_id, 
-                        matchingProject?.id || '', 
-                        practiceName
-                      )}
-                    >
-                      <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
-                      <Text style={styles.recordText}>
-                        {practiceName} 第{record.session_number || 1}座: {record.duration_minutes} 分钟
-                      </Text>
-                      <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>
-                {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 
-                  ? '选择项目添加记录' 
-                  : '添加更多记录'}
-              </Text>
-              {userProjects.length === 0 ? (
-                <View style={styles.emptyProjectsContainer}>
-                  <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
+                    <Text style={styles.practiceCount}>
+                      {record.count}{record.practices.unit}
+                    </Text>
+                  </View>
+                  <Ionicons name="create-outline" size={24} color={DesignSystem.colors.primary} />
                 </View>
-              ) : (
-                userProjects.map((project) => (
-                  <TouchableOpacity
-                    key={project.id}
-                    style={styles.projectItem}
-                    onPress={() => handleAddRecord(project)}
-                  >
-                    <View style={styles.projectInfo}>
-                      <Text style={styles.projectName}>{project.practices.name}</Text>
+              </TouchableOpacity>
+            ))}
+
+            {dateRecords.meditation.map((record: any, index) => {
+              const matchingProject = userProjects.find(p => p.practice_id === record.practice_id);
+              const practiceName = record.practices?.name || '观修';
+              
+              return (
+                <TouchableOpacity 
+                  key={`meditation-${index}`} 
+                  style={styles.practiceCard}
+                  onPress={() => handleEditMeditationRecord(
+                    record.id, 
+                    record.practice_id, 
+                    matchingProject?.id || '', 
+                    practiceName
+                  )}
+                >
+                  <View style={styles.cardContentRow}>
+                    <View style={styles.practiceInfo}>
+                      <Text style={styles.practiceName} numberOfLines={1}>
+                        {practiceName}
+                      </Text>
+                      <Text style={styles.practiceCount}>
+                        第{record.session_number || 1}座 · {record.duration_minutes}分钟
+                      </Text>
+                    </View>
+                    <Ionicons name="create-outline" size={24} color={DesignSystem.colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+
+            {/* Add More Projects */}
+            {userProjects.length === 0 ? (
+              <View style={styles.emptyProjectsContainer}>
+                <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
+              </View>
+            ) : (
+              userProjects.map((project) => (
+                <TouchableOpacity
+                  key={project.id}
+                  style={styles.practiceCard}
+                  onPress={() => handleAddRecord(project)}
+                >
+                  <View style={styles.cardContentRow}>
+                    <View style={styles.practiceInfo}>
+                      <Text style={styles.practiceName} numberOfLines={1}>
+                        {project.practices.name}
+                      </Text>
                       {project.project_name && (
-                        <Text style={styles.projectSubName}>{project.project_name}</Text>
+                        <Text style={styles.practiceCount}>{project.project_name}</Text>
                       )}
                     </View>
-                    <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
-                  </TouchableOpacity>
-                ))
-              )}
-            </View>
-          </>
+                    <Ionicons name="add-circle-outline" size={28} color={DesignSystem.colors.primary} />
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
         )}
       </ScrollView>
     </>
@@ -343,7 +351,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: DesignSystem.colors.background,
-    padding: 20,
+    paddingVertical: DesignSystem.spacing.lg,
   },
   loadingContainer: {
     padding: 40,
@@ -356,60 +364,31 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
   },
   section: {
-    marginBottom: 24,
+    paddingHorizontal: ComponentTokens.card.margin.spacious,
   },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  practiceCard: {
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginBottom: ComponentTokens.card.margin.spacious,
   },
-  recordItem: {
+  cardContentRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 8,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  recordText: {
-    fontSize: 16,
-    color: DesignSystem.colors.textPrimary,
-    flex: 1,
-  },
-  projectItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border,
+    alignItems: 'center',
   },
-  projectInfo: {
+  practiceInfo: {
     flex: 1,
+    marginRight: 12,
   },
-  projectName: {
-    fontSize: 16,
+  practiceName: {
+    fontSize: 17,
     fontWeight: '600',
     color: DesignSystem.colors.textPrimary,
+    marginBottom: 4,
   },
-  projectSubName: {
-    fontSize: 14,
+  practiceCount: {
+    fontSize: 15,
     color: DesignSystem.colors.textSecondary,
-    marginTop: 4,
   },
   emptyProjectsContainer: {
     padding: 20,
