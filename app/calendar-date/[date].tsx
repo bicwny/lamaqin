@@ -103,16 +103,18 @@ export default function CalendarDatePage() {
       setLoading(true);
 
       const { data: dailyRecords, error: dailyError } = await supabase
-        .from('daily_practice_records')
+        .from('daily_records')
         .select(`
           id,
           record_date,
           practice_project_id,
           count,
-          practices!inner (
-            name,
-            unit,
-            type
+          user_practice_projects!inner (
+            practices (
+              name,
+              unit,
+              type
+            )
           )
         `)
         .eq('user_id', user.id)
@@ -142,7 +144,11 @@ export default function CalendarDatePage() {
         record_date: record.record_date,
         practice_project_id: record.practice_project_id,
         count: record.count,
-        practices: record.practices,
+        practices: {
+          name: record.user_practice_projects.practices.name,
+          unit: record.user_practice_projects.practices.unit,
+          type: record.user_practice_projects.practices.type,
+        },
       }));
 
       const formattedMeditation = (meditationRecords || []).map((record: any) => ({
