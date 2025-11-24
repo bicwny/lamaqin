@@ -17,6 +17,7 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
@@ -29,16 +30,20 @@ export default function CustomRecordScreen() {
     projectId, 
     practiceName,
     practiceType,
-    editRecordId 
+    editRecordId,
+    selectedDate
   } = useLocalSearchParams<{
     projectId: string;
     practiceName: string;
     practiceType: string;
     editRecordId?: string;
+    selectedDate?: string;
   }>();
 
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
+  const [recordDate, setRecordDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingRecord, setLoadingRecord] = useState(false);
   const isEditing = !!editRecordId;
@@ -130,9 +135,9 @@ export default function CustomRecordScreen() {
     const { data: record, error: recordError } = await supabase
       .from('daily_records')
       .insert({
-        user_id: user.id,
+        user_id: user!.id,
         practice_project_id: projectId,
-        record_date: new Date().toISOString().split('T')[0],
+        record_date: recordDate,
         count: countNum,
         notes: notes.trim() || null
       })
@@ -268,6 +273,40 @@ export default function CustomRecordScreen() {
           ) : (
             <View style={styles.content}>
               <Text style={styles.practiceTitle}>📿 {practiceName}</Text>
+
+              {/* Date Selector */}
+              <View style={styles.inputSection}>
+                <Text style={styles.inputLabel}>记录日期</Text>
+                <TouchableOpacity 
+                  style={styles.dateSelector}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+                  <Text style={styles.dateSelectorText}>
+                    {new Date(recordDate).toLocaleDateString('zh-CN', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={new Date(recordDate)}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selectedDate) => {
+                    setShowDatePicker(Platform.OS === 'ios');
+                    if (selectedDate) {
+                      setRecordDate(selectedDate.toISOString().split('T')[0]);
+                    }
+                  }}
+                  maximumDate={new Date()}
+                />
+              )}
 
               {/* Count Input */}
               <View style={styles.inputSection}>
@@ -416,5 +455,20 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textInverse,
     fontSize: DesignSystem.typography.fontSize.base,
     fontWeight: DesignSystem.typography.fontWeight.semibold,
+  },
+  dateSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+    gap: DesignSystem.spacing.sm,
+  },
+  dateSelectorText: {
+    flex: 1,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
   },
 });
