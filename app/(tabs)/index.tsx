@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator, Platform, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toastService } from '@/lib/toast';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { Calendar } from 'react-native-calendars';
 
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Colors } from '@/constants/Colors';
@@ -485,12 +485,9 @@ export default function HomeScreen() {
     return selectedDate === today;
   };
 
-  const handleDateChange = (event: any, date?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (date) {
-      const dateString = date.toISOString().split('T')[0];
-      setSelectedDate(dateString);
-    }
+  const handleDateChange = (dateString: string) => {
+    setSelectedDate(dateString);
+    setShowDatePicker(false);
   };
 
   const handleReturnToToday = () => {
@@ -653,16 +650,52 @@ export default function HomeScreen() {
           </View>
         </ScrollView>
 
-        {/* Date Picker Modal */}
-        {showDatePicker && (
-          <DateTimePicker
-            value={new Date(selectedDate + 'T00:00:00')}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleDateChange}
-            maximumDate={new Date()}
-          />
-        )}
+        {/* Calendar Modal */}
+        <Modal
+          visible={showDatePicker}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowDatePicker(false)}
+        >
+          <View style={styles.calendarOverlay}>
+            <View style={styles.calendarContainer}>
+              <View style={styles.calendarHeader}>
+                <Text style={styles.calendarHeaderText}>选择日期</Text>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.calendarCloseButton}>✕</Text>
+                </TouchableOpacity>
+              </View>
+              <Calendar
+                current={selectedDate}
+                minDate="2020-01-01"
+                maxDate={new Date().toISOString().split('T')[0]}
+                onDayPress={(day: any) => handleDateChange(day.dateString)}
+                monthFormat={'yyyy年MM月'}
+                theme={{
+                  backgroundColor: '#ffffff',
+                  calendarBackground: '#ffffff',
+                  textSectionTitleColor: '#1a1a1a',
+                  textSectionTitleDisabledColor: '#d9d9d9',
+                  selectedDayBackgroundColor: DesignSystem.colors.primary,
+                  selectedDayTextColor: '#ffffff',
+                  todayTextColor: DesignSystem.colors.primary,
+                  dayTextColor: '#1a1a1a',
+                  textDisabledColor: '#d9d9d9',
+                  dotColor: DesignSystem.colors.primary,
+                  selectedDotColor: '#ffffff',
+                  arrowColor: DesignSystem.colors.primary,
+                  monthTextColor: '#1a1a1a',
+                  textDayFontFamily: 'System',
+                  textMonthFontFamily: 'System',
+                  textDayHeaderFontFamily: 'System',
+                  textDayFontSize: 16,
+                  textMonthFontSize: 16,
+                  textDayHeaderFontSize: 14,
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
     </PageTemplate>
   );
 }
@@ -761,5 +794,33 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  calendarOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    width: '85%',
+    maxWidth: 400,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  calendarHeaderText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  calendarCloseButton: {
+    fontSize: 24,
+    color: '#999',
   },
 });
