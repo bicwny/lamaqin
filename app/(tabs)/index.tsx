@@ -63,6 +63,7 @@ export default function HomeScreen() {
       : new Date().toISOString().split('T')[0];
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [markedDates, setMarkedDates] = useState<any>({});
 
   // Update selected date to today when timezone info changes or on mount
   useEffect(() => {
@@ -505,6 +506,57 @@ export default function HomeScreen() {
     setShowDatePicker(false);
   };
 
+  // Load marked dates when calendar opens
+  const loadMarkedDates = async () => {
+    if (!user?.id) return;
+
+    try {
+      const [dailyResult, meditationResult] = await Promise.all([
+        supabase
+          .from('daily_records')
+          .select('record_date')
+          .eq('user_id', user.id),
+        supabase
+          .from('meditation_records')
+          .select('record_date')
+          .eq('user_id', user.id)
+      ]);
+
+      const datesWithPractices = new Set<string>();
+      
+      if (dailyResult.data) {
+        dailyResult.data.forEach(record => {
+          datesWithPractices.add(record.record_date);
+        });
+      }
+      
+      if (meditationResult.data) {
+        meditationResult.data.forEach(record => {
+          datesWithPractices.add(record.record_date);
+        });
+      }
+
+      const marked: any = {};
+      datesWithPractices.forEach(date => {
+        marked[date] = {
+          marked: true,
+          dotColor: DesignSystem.colors.primary
+        };
+      });
+
+      setMarkedDates(marked);
+    } catch (error) {
+      console.error('❌ Error loading marked dates:', error);
+    }
+  };
+
+  // Load marked dates when calendar opens
+  useEffect(() => {
+    if (showDatePicker) {
+      loadMarkedDates();
+    }
+  }, [showDatePicker]);
+
   const handleReturnToToday = () => {
     const today = timezoneInfo 
       ? getCurrentDateInTimezone(timezoneInfo.timezone)
@@ -688,6 +740,7 @@ export default function HomeScreen() {
                 minDate="2020-01-01"
                 maxDate={new Date().toISOString().split('T')[0]}
                 onDayPress={(day: any) => handleDateChange(day.dateString)}
+                markedDates={markedDates}
                 monthFormat={'yyyy年MM月'}
                 theme={{
                   backgroundColor: '#ffffff',
