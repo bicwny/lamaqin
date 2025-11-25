@@ -16,6 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { useTimezone } from '@/hooks/useTimezone';
+import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors } from '@/constants/Colors';
@@ -26,6 +28,7 @@ import { toastService } from '@/lib/toast';
 
 export default function CustomRecordScreen() {
   const { user } = useAuth();
+  const { timezoneInfo } = useTimezone();
   const { 
     projectId, 
     practiceName,
@@ -44,7 +47,7 @@ export default function CustomRecordScreen() {
 
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
-  const [recordDate, setRecordDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
+  const [recordDate, setRecordDate] = useState(selectedDate || (timezoneInfo ? getCurrentDateInTimezone(timezoneInfo.timezone) : new Date().toISOString().split('T')[0]));
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingRecord, setLoadingRecord] = useState(false);

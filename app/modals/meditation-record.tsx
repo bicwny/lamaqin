@@ -16,6 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
+import { useTimezone } from '@/hooks/useTimezone';
+import { getCurrentDateInTimezone } from '@/lib/timezone';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
@@ -26,6 +28,7 @@ import TopicSelectionModal from '@/components/TopicSelectionModal';
 
 export default function MeditationRecordScreen() {
   const { user } = useAuth();
+  const { timezoneInfo } = useTimezone();
   const { 
     practiceId, 
     practiceProjectId, 
@@ -144,7 +147,7 @@ export default function MeditationRecordScreen() {
       const recordData = {
         user_id: user.id,
         practice_id: practiceId,
-        record_date: selectedDate || new Date().toISOString().split('T')[0],
+        record_date: selectedDate || (timezoneInfo ? getCurrentDateInTimezone(timezoneInfo.timezone) : new Date().toISOString().split('T')[0]),
         duration_minutes: parseInt(duration),
         session_number: parseInt(sessionNumber),
         reflection: reflection.trim() || undefined
@@ -152,7 +155,6 @@ export default function MeditationRecordScreen() {
 
       if (isEditing) {
         await meditationService.updateMeditationRecord(editRecordId, user.id, {
-          record_date: recordData.record_date,
           duration_minutes: recordData.duration_minutes,
           session_number: recordData.session_number,
           reflection: recordData.reflection
