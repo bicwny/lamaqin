@@ -232,7 +232,7 @@ export default function CalendarDatePage() {
     const practiceName = project.practices.name;
     const practiceId = project.practice_id;
 
-    if (practiceType === 'meditation') {
+    if (practiceType === 'time') {
       router.push({
         pathname: '/modals/meditation-record',
         params: {
