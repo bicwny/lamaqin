@@ -376,6 +376,7 @@ export default function HomeScreen() {
           practiceProjectId: practice.id,
           practiceId: practice.practiceId || practice.id,
           practiceName: practice.name,
+          selectedDate: selectedDate,
         },
       });
     } else {
@@ -386,6 +387,7 @@ export default function HomeScreen() {
           projectId: practice.id,
           practiceName: practice.name,
           practiceType: practice.type,
+          selectedDate: selectedDate,
         },
       });
     }
