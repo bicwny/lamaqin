@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toastService } from '@/lib/toast';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Colors } from '@/constants/Colors';
@@ -55,6 +56,32 @@ export default function HomeScreen() {
   // Add timezone support for daily reset
   const { timezoneInfo, handleDailyResetCheck } = useTimezone();
 
+  // Date selection state
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    return timezoneInfo 
+      ? getCurrentDateInTimezone(timezoneInfo.timezone)
+      : new Date().toISOString().split('T')[0];
+  });
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Update selected date to today when timezone info changes or on mount
+  useEffect(() => {
+    if (timezoneInfo) {
+      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+      // Only update if selectedDate is not already set to today
+      if (!selectedDate || selectedDate !== today) {
+        setSelectedDate(today);
+      }
+    }
+  }, [timezoneInfo]);
+
+  // Reload data when selected date changes
+  useEffect(() => {
+    if (user?.id && selectedDate) {
+      loadDashboardData();
+    }
+  }, [selectedDate]);
+
   useFocusEffect(
     React.useCallback(() => {
       if (user?.id) {
@@ -62,15 +89,9 @@ export default function HomeScreen() {
         if (timezoneInfo) {
           handleDailyResetCheck(() => {
             console.log('🌅 Daily reset triggered for count-based practices - resetting displays');
-            // Reset daily practices display to show 0 counts
-            setDailyPractices(prev => prev.map(practice => ({
-              ...practice,
-              current: 0,
-              progressPercent: 0,
-              status: 'pending' as const
-            })));
-            // Reload data from database (should be empty for new day)
-            loadDashboardData();
+            // Reset to today when daily reset triggers
+            const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+            setSelectedDate(today);
           });
         }
 
@@ -122,10 +143,8 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      // Use timezone-aware date for count-based practices
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
+      // Use selected date instead of always today
+      const targetDate = selectedDate;
 
       const practicesData: DailyPractice[] = [];
 
@@ -137,7 +156,7 @@ export default function HomeScreen() {
             .select('count')
             .eq('user_id', user.id)
             .eq('practice_project_id', project.id)
-            .eq('record_date', today);
+            .eq('record_date', targetDate);
 
           if (recordsError) throw recordsError;
 
@@ -182,16 +201,12 @@ export default function HomeScreen() {
 
       if (error) throw error;
 
-      // Use timezone-aware date for weekly practices
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
+      // Use selected date instead of always today
+      const targetDate = selectedDate;
 
       // Use Monday as week start for consistency with getCurrentWeekStart()
-      // Calculate week start based on timezone-aware today
-      const todayDate = timezoneInfo 
-        ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
-        : new Date();
+      // Calculate week start based on selected date
+      const todayDate = new Date(selectedDate + 'T00:00:00');
 
       const dayOfWeek = todayDate.getDay();
       const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
@@ -209,12 +224,12 @@ export default function HomeScreen() {
             .eq('user_id', user.id)
             .eq('practice_id', project.practice_id)
             .gte('record_date', weekStart)
-            .lte('record_date', today);
+            .lte('record_date', targetDate);
 
           if (weekError) throw weekError;
 
           const weekSessions = weekRecords?.length || 0;
-          const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
+          const todayRecords = weekRecords?.filter(r => r.record_date === targetDate) || [];
           const todaySessions = todayRecords.length;
 
           let status: 'completed' | 'in_progress' | 'pending' = 'pending';
@@ -454,15 +469,35 @@ export default function HomeScreen() {
     return '像最后一天那样去生活';
   };
 
-  const getTodayDateDisplay = () => {
-    const today = timezoneInfo 
-      ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
-      : new Date();
-    return today.toLocaleDateString('zh-CN', { 
+  const getDateDisplay = () => {
+    const dateObj = new Date(selectedDate + 'T00:00:00');
+    return dateObj.toLocaleDateString('zh-CN', { 
       month: 'long', 
       day: 'numeric',
       weekday: 'short'
     });
+  };
+
+  const isToday = () => {
+    const today = timezoneInfo 
+      ? getCurrentDateInTimezone(timezoneInfo.timezone)
+      : new Date().toISOString().split('T')[0];
+    return selectedDate === today;
+  };
+
+  const handleDateChange = (event: any, date?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (date) {
+      const dateString = date.toISOString().split('T')[0];
+      setSelectedDate(dateString);
+    }
+  };
+
+  const handleReturnToToday = () => {
+    const today = timezoneInfo 
+      ? getCurrentDateInTimezone(timezoneInfo.timezone)
+      : new Date().toISOString().split('T')[0];
+    setSelectedDate(today);
   };
 
   if (loading) {
@@ -508,8 +543,19 @@ export default function HomeScreen() {
           {/* Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{getTodayDateDisplay()}</Text>
+              <TouchableOpacity 
+                onPress={() => setShowDatePicker(true)}
+                style={styles.dateButton}
+              >
+                <Text style={styles.sectionTitle}>{getDateDisplay()}</Text>
+                <Ionicons name="calendar-outline" size={18} color="#666" style={{ marginLeft: 6 }} />
+              </TouchableOpacity>
               <View style={styles.headerActions}>
+                {!isToday() && (
+                  <TouchableOpacity onPress={handleReturnToToday} style={{ marginRight: 16 }}>
+                    <Text style={styles.returnTodayText}>返回今日</Text>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
                   <Text style={styles.shareText}>分享</Text>
                 </TouchableOpacity>
@@ -606,6 +652,17 @@ export default function HomeScreen() {
             )}
           </View>
         </ScrollView>
+
+        {/* Date Picker Modal */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={new Date(selectedDate + 'T00:00:00')}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleDateChange}
+            maximumDate={new Date()}
+          />
+        )}
     </PageTemplate>
   );
 }
@@ -645,10 +702,19 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     letterSpacing: -0.3,
   },
+  dateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
+  },
+  returnTodayText: {
+    fontSize: 14,
+    color: DesignSystem.colors.primary,
+    fontWeight: '600',
   },
   shareText: {
     fontSize: 14,
