@@ -553,7 +553,10 @@ export default function HomeScreen() {
                     <Text style={styles.returnTodayText}>返回今日</Text>
                   </TouchableOpacity>
                 )}
-                <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
+                <TouchableOpacity onPress={() => router.push({
+                  pathname: '/modals/share-practice',
+                  params: { date: selectedDate }
+                })}>
                   <Text style={styles.shareText}>分享</Text>
                 </TouchableOpacity>
               </View>
