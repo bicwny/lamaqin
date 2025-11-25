@@ -511,15 +511,22 @@ export default function HomeScreen() {
     if (!user?.id) return;
 
     try {
+      // Get today's date in the user's timezone to filter out future dates
+      const today = timezoneInfo 
+        ? getCurrentDateInTimezone(timezoneInfo.timezone)
+        : new Date().toISOString().split('T')[0];
+
       const [dailyResult, meditationResult] = await Promise.all([
         supabase
           .from('daily_records')
           .select('record_date')
-          .eq('user_id', user.id),
+          .eq('user_id', user.id)
+          .lte('record_date', today),
         supabase
           .from('meditation_records')
           .select('record_date')
           .eq('user_id', user.id)
+          .lte('record_date', today)
       ]);
 
       const datesWithPractices = new Set<string>();
