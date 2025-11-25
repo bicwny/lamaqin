@@ -13,9 +13,9 @@ export default function MindfulnessScreen() {
       backgroundColor={Colors.background}
       padding={0}
     >
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scrollView}>
         
-        {/* Thangka Image */}
+        {/* Thangka Image - Full Width */}
         <View style={styles.thangkaContainer}>
           <Image
             source={require('@/assets/images/fawang-thangka.png')}
@@ -23,6 +23,8 @@ export default function MindfulnessScreen() {
             resizeMode="contain"
           />
         </View>
+
+        <View style={styles.scrollContent}>
 
         {/* Prayer Title */}
         <Text style={styles.prayerTitleTibetan}>
@@ -115,6 +117,7 @@ export default function MindfulnessScreen() {
             索达吉堪布 译
           </Text>
         </View>
+        </View>
 
       </ScrollView>
     </PageTemplate>
@@ -132,12 +135,14 @@ const styles = StyleSheet.create({
   },
   thangkaContainer: {
     alignItems: 'center',
-    marginBottom: DesignSystem.spacing.xl,
+    justifyContent: 'center',
+    width: '100%',
+    marginBottom: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.lg,
   },
   thangkaImage: {
     width: '100%',
-    height: 400,
+    height: 500,
   },
   prayerTitleTibetan: {
     fontSize: 16,
