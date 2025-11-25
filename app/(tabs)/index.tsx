@@ -745,7 +745,7 @@ export default function HomeScreen() {
               <Calendar
                 current={selectedDate}
                 minDate="2020-01-01"
-                maxDate={new Date().toISOString().split('T')[0]}
+                maxDate={timezoneInfo ? getCurrentDateInTimezone(timezoneInfo.timezone) : new Date().toISOString().split('T')[0]}
                 onDayPress={(day: any) => handleDateChange(day.dateString)}
                 markedDates={markedDates}
                 monthFormat={'yyyy年MM月'}
