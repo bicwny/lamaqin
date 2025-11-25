@@ -299,7 +299,7 @@ export default function CustomRecordScreen() {
                 >
                   <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
                   <Text style={styles.dateSelectorText}>
-                    {new Date(recordDate).toLocaleDateString('zh-CN', { 
+                    {new Date(recordDate + 'T12:00:00Z').toLocaleDateString('zh-CN', { 
                       year: 'numeric', 
                       month: 'long', 
                       day: 'numeric' 
@@ -311,7 +311,7 @@ export default function CustomRecordScreen() {
 
               {showDatePicker && (
                 <DateTimePicker
-                  value={new Date(recordDate)}
+                  value={new Date(recordDate + 'T12:00:00Z')}
                   mode="date"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={(event, selectedDate) => {
