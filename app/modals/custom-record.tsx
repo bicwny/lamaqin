@@ -53,6 +53,15 @@ export default function CustomRecordScreen() {
   const [loadingRecord, setLoadingRecord] = useState(false);
   const isEditing = !!editRecordId;
 
+  // Update recordDate when timezoneInfo loads and no selectedDate was passed
+  useEffect(() => {
+    if (timezoneInfo && !selectedDate && !isEditing) {
+      const tzDate = getCurrentDateInTimezone(timezoneInfo.timezone);
+      console.log('🕒 Custom-record: Updated date from timezone:', tzDate);
+      setRecordDate(tzDate);
+    }
+  }, [timezoneInfo, selectedDate, isEditing]);
+
   // Load existing record data when editing
   useEffect(() => {
     if (isEditing && editRecordId && user) {
