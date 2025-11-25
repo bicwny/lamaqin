@@ -339,7 +339,7 @@ export default function HomeScreen() {
       router.push({
         pathname: '/modals/meditation-record',
         params: {
-          projectId: practice.id,
+          practiceProjectId: practice.id,
           practiceId: practice.practiceId || practice.id,
           practiceName: practice.name,
         },
