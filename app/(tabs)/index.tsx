@@ -347,7 +347,7 @@ export default function HomeScreen() {
 
     // Record in background
     try {
-      await recordQuickCompleteBackground(practice, remaining);
+      await recordQuickCompleteBackground(practice, remaining, selectedDate);
     } catch (error) {
       // Revert optimistic update on error
       console.error('❌ Error recording practice:', error);
@@ -434,13 +434,11 @@ export default function HomeScreen() {
   };
 
   // Background recording function (no UI updates)
-  const recordQuickCompleteBackground = async (practice: any, amount: number) => {
+  const recordQuickCompleteBackground = async (practice: any, amount: number, recordDateParam: string) => {
     if (!user) return;
 
-    // Use timezone-aware date for recording
-    const recordDate = timezoneInfo 
-      ? getCurrentDateInTimezone(timezoneInfo.timezone)
-      : new Date().toISOString().split('T')[0];
+    // Use the provided selected date (or today if not provided)
+    const recordDate = recordDateParam || selectedDate;
 
     if (practice.type === 'time') {
       // For time-based practices, create a meditation record with target duration
