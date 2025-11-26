@@ -694,7 +694,7 @@ export default function PracticeDetailScreen() {
                     {progress.current.toLocaleString()}
                   </Text>
                   <Text style={styles.totalCountAndDays}>
-                    {progress.target ? `${progress.target.toLocaleString()} ${project.practices.unit}` : `${project.practices.unit}`}
+                    {progress.target ? `/${progress.target.toLocaleString()} ${project.practices.unit}` : `${project.practices.unit}`}
                   </Text>
                 </View>
 
