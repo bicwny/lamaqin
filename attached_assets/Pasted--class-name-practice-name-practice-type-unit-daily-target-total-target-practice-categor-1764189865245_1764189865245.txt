@@ -1,0 +1,19 @@
+| class_name | practice_name | practice_type | unit | daily_target | total_target | practice_category | is_optional |
+| ---------- | ------------- | ------------- | ---- | ------------ | ------------ | ----------------- | ----------- |
+| 预科：入行      | 入行论广释观修       | time          | 座    | null         | null         | session           | true        |
+| 预科：入行      | 前行实修法         | time          | 座    | null         | null         | session           | true        |
+| 预科：入行      | 观音心咒          | count         | 遍    | 1000         | 1274000      | count             | false       |
+| 预科：加行      | 供曼茶           | count         | 遍    | 500          | 100000       | count             | false       |
+| 预科：加行      | 前行实修法         | time          | 座    | null         | 368          | session           | false       |
+| 预科：加行      | 发心            | count         | 座    | 500          | 100000       | count             | false       |
+| 预科：加行      | 百字明           | count         | 遍    | 300          | 100000       | count             | false       |
+| 预科：加行      | 皈依            | count         | 遍
+   | 500          | 100000       | count             | false       |
+| 预科：加行      | 莲师上师瑜伽        | count         | 遍    | 1000         | 100000       | count             | false       |
+| 预科：加行      | 顶礼            | count         | 遍    | 200          | 100000       | count             | false       |
+| 正科         | 上师瑜伽速赐加持      | time          | 座    | null         | null         | session           | true        |
+| 正科         | 前行实修法         | time          | 座    | null         | null         | session           | true        |
+| 正科         | 密法班实修法        | time          | 座    | null         | null         | session           | true        |
+| 正科         | 百字明           | count         | 遍    | 100          | null         | count             | false       |
+| 正科         | 莲师心咒          | count         | 遍    | 1000         | null         | count             | false       |
+| 正科         | 阿弥陀佛名号（汉）     | count         | 遍    | 5000         | 6000000      | count             | false       |

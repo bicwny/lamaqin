@@ -1,0 +1,162 @@
+[
+  {
+    "class_name": "预科：入行",
+    "practice_name": "入行论广释观修",
+    "practice_type": "time",
+    "unit": "座",
+    "daily_target": null,
+    "total_target": null,
+    "practice_category": "session",
+    "is_optional": true
+  },
+  {
+    "class_name": "预科：入行",
+    "practice_name": "前行实修法",
+    "practice_type": "time",
+    "unit": "座",
+    "daily_target": null,
+    "total_target": null,
+    "practice_category": "session",
+    "is_optional": true
+  },
+  {
+    "class_name": "预科：入行",
+    "practice_name": "观音心咒",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 1000,
+    "total_target": 1274000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "供曼茶",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 500,
+    "total_target": 100000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "前行实修法",
+    "practice_type": "time",
+    "unit": "座",
+    "daily_target": null,
+    "total_target": 368,
+    "practice_category": "session",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "发心",
+    "practice_type": "count",
+    "unit": "座",
+    "daily_target": 500,
+    "total_target": 100000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "百字明",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 300,
+    "total_target": 100000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "皈依",
+    "practice_type": "count",
+    "unit": "遍\n",
+    "daily_target": 500,
+    "total_target": 100000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "莲师上师瑜伽",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 1000,
+    "total_target": 100000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "预科：加行",
+    "practice_name": "顶礼",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 200,
+    "total_target": 100000,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "正科",
+    "practice_name": "上师瑜伽速赐加持",
+    "practice_type": "time",
+    "unit": "座",
+    "daily_target": null,
+    "total_target": null,
+    "practice_category": "session",
+    "is_optional": true
+  },
+  {
+    "class_name": "正科",
+    "practice_name": "前行实修法",
+    "practice_type": "time",
+    "unit": "座",
+    "daily_target": null,
+    "total_target": null,
+    "practice_category": "session",
+    "is_optional": true
+  },
+  {
+    "class_name": "正科",
+    "practice_name": "密法班实修法",
+    "practice_type": "time",
+    "unit": "座",
+    "daily_target": null,
+    "total_target": null,
+    "practice_category": "session",
+    "is_optional": true
+  },
+  {
+    "class_name": "正科",
+    "practice_name": "百字明",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 100,
+    "total_target": null,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "正科",
+    "practice_name": "莲师心咒",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 1000,
+    "total_target": null,
+    "practice_category": "count",
+    "is_optional": false
+  },
+  {
+    "class_name": "正科",
+    "practice_name": "阿弥陀佛名号（汉）",
+    "practice_type": "count",
+    "unit": "遍",
+    "daily_target": 5000,
+    "total_target": 6000000,
+    "practice_category": "count",
+    "is_optional": false
+  }
+]

@@ -1,0 +1,176 @@
+[
+  {
+    "class_name": "预科：基础",
+    "course_name": "离幸福很近",
+    "total_lessons": 23,
+    "display_order": 1
+  },
+  {
+    "class_name": "预科：基础",
+    "course_name": "二规教言论",
+    "total_lessons": 12,
+    "display_order": 21
+  },
+  {
+    "class_name": "预科：基础",
+    "course_name": "佛子行",
+    "total_lessons": 8,
+    "display_order": 22
+  },
+  {
+    "class_name": "预科：基础",
+    "course_name": "胜利道歌",
+    "total_lessons": 2,
+    "display_order": 23
+  },
+  {
+    "class_name": "预科：基础",
+    "course_name": "大学演讲",
+    "total_lessons": 87,
+    "display_order": 91
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "入行论广解",
+    "total_lessons": 201,
+    "display_order": 1
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "修心八颂讲解",
+    "total_lessons": 1,
+    "display_order": 2
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "吸烟之过患",
+    "total_lessons": 1,
+    "display_order": 3
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "饮酒之过患",
+    "total_lessons": 1,
+    "display_order": 4
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "吃肉之过患",
+    "total_lessons": 1,
+    "display_order": 5
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "费闲歌释",
+    "total_lessons": 1,
+    "display_order": 6
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "释尊仪轨讲记",
+    "total_lessons": 1,
+    "display_order": 7
+  },
+  {
+    "class_name": "预科：入行",
+    "course_name": "大学演讲",
+    "total_lessons": 87,
+    "display_order": 91
+  },
+  {
+    "class_name": "预科：加行",
+    "course_name": "前行广释",
+    "total_lessons": 146,
+    "display_order": 1
+  },
+  {
+    "class_name": "预科：加行",
+    "course_name": "莲师金刚七句略讲",
+    "total_lessons": 8,
+    "display_order": 2
+  },
+  {
+    "class_name": "预科：加行",
+    "course_name": "二十一度母赞释",
+    "total_lessons": 6,
+    "display_order": 3
+  },
+  {
+    "class_name": "预科：加行",
+    "course_name": "大学演讲",
+    "total_lessons": 87,
+    "display_order": 91
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "佛说阿弥陀经释",
+    "total_lessons": 4,
+    "display_order": 1
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "普贤行愿品释",
+    "total_lessons": 12,
+    "display_order": 2
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "亲友书讲记",
+    "total_lessons": 20,
+    "display_order": 3
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "藏传净土法",
+    "total_lessons": 104,
+    "display_order": 4
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "修心利刃轮释",
+    "total_lessons": 20,
+    "display_order": 5
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "愿海精髓讲记",
+    "total_lessons": 1,
+    "display_order": 6
+  },
+  {
+    "class_name": "预科：净土",
+    "course_name": "大学演讲",
+    "total_lessons": 87,
+    "display_order": 91
+  },
+  {
+    "class_name": "正科",
+    "course_name": "三戒要解(上)",
+    "total_lessons": 22,
+    "display_order": 1
+  },
+  {
+    "class_name": "正科",
+    "course_name": "缘起赞",
+    "total_lessons": 8,
+    "display_order": 2
+  },
+  {
+    "class_name": "正科",
+    "course_name": "中观四百论",
+    "total_lessons": 72,
+    "display_order": 3
+  },
+  {
+    "class_name": "正科",
+    "course_name": "中观根本慧论",
+    "total_lessons": 114,
+    "display_order": 4
+  },
+  {
+    "class_name": "正科",
+    "course_name": "中观庄严论释",
+    "total_lessons": 128,
+    "display_order": 5
+  }
+]
