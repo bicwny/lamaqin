@@ -606,6 +606,7 @@ export default function StudyScreen() {
                       {classData.courses.map(userCourse => {
                         const courseProgress = getCourseProgress(userCourse.course_id);
                         const currentLesson = courseProgress?.currentLesson || 1;
+                        const totalLessonsStudied = courseProgress?.totalLessonsStudied || 0;
                         const progressPercentage = userCourse.progress_percentage || 0;
 
                         return (
@@ -627,7 +628,7 @@ export default function StudyScreen() {
                                   完成进度：{progressPercentage.toFixed(1)}%
                                 </Text>
                                 <Text style={styles.currentLessonText}>
-                                  上次完成：第{currentLesson}课
+                                  {totalLessonsStudied === 0 ? '尚未开始' : `上次完成：第${currentLesson}课`}
                                 </Text>
                               </View>
 
@@ -669,6 +670,7 @@ export default function StudyScreen() {
                     {groupedCourses['_orphan'].courses.map(userCourse => {
                       const courseProgress = getCourseProgress(userCourse.course_id);
                       const currentLesson = courseProgress?.currentLesson || 1;
+                      const totalLessonsStudied = courseProgress?.totalLessonsStudied || 0;
                       const progressPercentage = userCourse.progress_percentage || 0;
 
                       return (
@@ -690,7 +692,7 @@ export default function StudyScreen() {
                                 完成进度：{progressPercentage.toFixed(1)}%
                               </Text>
                               <Text style={styles.currentLessonText}>
-                                上次完成：第{currentLesson}课
+                                {totalLessonsStudied === 0 ? '尚未开始' : `上次完成：第${currentLesson}课`}
                               </Text>
                             </View>
 
