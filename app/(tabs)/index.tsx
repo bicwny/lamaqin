@@ -539,55 +539,39 @@ export default function HomeScreen() {
                   onPress={() => handlePracticeCardTap(practice)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceName} numberOfLines={1}>
-                      {practice.name}
-                    </Text>
-                  </View>
-
-                  <View style={styles.countPercentageRow}>
-                    <Text style={styles.practiceCount}>
-                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
-                    </Text>
-                    <Text style={styles.progressPercent}>
-                      {Math.round(practice.progressPercent)}%
-                    </Text>
-                  </View>
-
-                  <View style={styles.progressBarContainer}>
-                    <View style={styles.progressBarBg}>
-                      <View 
-                        style={[
-                          styles.progressBarFill, 
-                          { width: `${Math.min(practice.progressPercent, 100)}%` }
-                        ]} 
-                      />
+                  <View style={styles.practiceCardContent}>
+                    <View style={styles.practiceInfo}>
+                      <Text style={styles.practiceName} numberOfLines={1}>
+                        {practice.name}
+                      </Text>
+                      <Text style={styles.practiceCount}>
+                        {practice.current.toLocaleString()}/{practice.target.toLocaleString()}{practice.unit}
+                      </Text>
                     </View>
-                  </View>
 
-                  {/* Action Buttons */}
-                  <View style={styles.practiceActions}>
-                    <TouchableOpacity
-                      onPress={(e) => handleQuickComplete(e, practice)}
-                    >
-                      <Ionicons 
-                        name="checkmark-circle-outline" 
-                        size={24} 
-                        color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
-                      />
-                    </TouchableOpacity>
+                    {/* Action Buttons */}
+                    <View style={styles.practiceActions}>
+                      <TouchableOpacity
+                        onPress={(e) => handleQuickComplete(e, practice)}
+                      >
+                        <Ionicons 
+                          name="checkmark-circle-outline" 
+                          size={24} 
+                          color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
+                        />
+                      </TouchableOpacity>
 
-                    <View style={styles.actionButtonSpacer} />
-
-                    <TouchableOpacity
-                      onPress={(e) => handleAddRecord(e, practice)}
-                    >
-                      <Ionicons 
-                        name="add-circle-outline" 
-                        size={24} 
-                        color={DesignSystem.colors.primary} 
-                      />
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={(e) => handleAddRecord(e, practice)}
+                        style={styles.actionButton}
+                      >
+                        <Ionicons 
+                          name="add-circle-outline" 
+                          size={24} 
+                          color={DesignSystem.colors.primary} 
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -600,28 +584,28 @@ export default function HomeScreen() {
                   onPress={() => handlePracticeCardTap(practice)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.practiceHeader}>
-                    <Text style={styles.practiceName} numberOfLines={1}>
-                      {practice.name}
-                    </Text>
-                  </View>
-                  <Text style={styles.weeklyProgress}>
-                    本周 {practice.weekSessions}/{practice.weekTarget}座
-                    {practice.status === 'completed' && ' 已完成'}
-                  </Text>
+                  <View style={styles.practiceCardContent}>
+                    <View style={styles.practiceInfo}>
+                      <Text style={styles.practiceName} numberOfLines={1}>
+                        {practice.name}
+                      </Text>
+                      <Text style={styles.practiceCount}>
+                        本周 {practice.weekSessions}/{practice.weekTarget}座
+                      </Text>
+                    </View>
 
-                  {/* Action Button for Weekly Practices */}
-                  <View style={styles.practiceActions}>
-                    <View style={styles.actionButtonSpacer} />
-                    <TouchableOpacity
-                      onPress={(e) => handleAddRecord(e, practice)}
-                    >
-                      <Ionicons 
-                        name="add-circle-outline" 
-                        size={24} 
-                        color={DesignSystem.colors.primary} 
-                      />
-                    </TouchableOpacity>
+                    {/* Action Button for Weekly Practices */}
+                    <View style={styles.practiceActions}>
+                      <TouchableOpacity
+                        onPress={(e) => handleAddRecord(e, practice)}
+                      >
+                        <Ionicons 
+                          name="add-circle-outline" 
+                          size={24} 
+                          color={DesignSystem.colors.primary} 
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -696,62 +680,32 @@ const styles = StyleSheet.create({
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-  practiceHeader: {
-    marginBottom: 6,
-  },
-  practiceNameRow: {
+  practiceCardContent: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
   },
-  practiceStatusIcon: {
-    fontSize: 16,
-    marginRight: 8,
+  practiceInfo: {
+    flex: 1,
   },
   practiceName: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
-    flex: 1,
+    marginBottom: 4,
   },
   practiceCount: {
     fontSize: 14,
     color: Colors.textSecondary,
   },
-  countPercentageRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-        marginBottom: 6,
-  },
-  progressBarContainer: {
-    marginBottom: 8,
-  },
-  progressBarBg: {
-    height: 6,backgroundColor: '#f0f0f0',
-    borderRadius: 3,
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: DesignSystem.colors.primary,
-    borderRadius: 3,
-  },
-  progressPercent: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
   practiceActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
+    marginLeft: 12,
   },
-  actionButtonSpacer: {
-    width: 28,
-  },
-  weeklyProgress: {
-    fontSize: 14,
-    color: Colors.text,
-    marginBottom: 4,
+  actionButton: {
+    marginLeft: 4,
   },
   noPracticeText: {
     fontSize: 16,
