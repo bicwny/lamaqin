@@ -129,36 +129,75 @@ export default function CustomRecordScreen() {
       .from('user_practice_projects')
       .select('practice_id, current_count')
       .eq('id', projectId)
-      .eq('user_id', user.id)
+      .eq('user_id', user!.id)
       .single();
 
     if (projectError) throw projectError;
 
-    // Insert new record
-    const { data: record, error: recordError } = await supabase
+    // Get all existing records for this date (may be multiple due to legacy data)
+    const { data: existingRecords, error: existingError } = await supabase
       .from('daily_records')
-      .insert({
-        user_id: user!.id,
-        practice_project_id: projectId,
-        record_date: recordDate,
-        count: countNum,
-        notes: notes.trim() || null
-      })
-      .select()
-      .single();
+      .select('id, count')
+      .eq('user_id', user!.id)
+      .eq('practice_project_id', projectId)
+      .eq('record_date', recordDate)
+      .order('created_at', { ascending: false });
 
-    if (recordError) throw recordError;
+    if (existingError) throw existingError;
 
-    // Update project's current count
-    const newCurrentCount = project.current_count + countNum;
+    // Calculate existing total for this date
+    const existingTotal = (existingRecords || []).reduce((sum, r) => sum + r.count, 0);
+    const countDifference = countNum - existingTotal;
+
+    if (existingRecords && existingRecords.length > 0) {
+      // Update the most recent record with new total
+      const mostRecentId = existingRecords[0].id;
+      
+      const { error: updateRecordError } = await supabase
+        .from('daily_records')
+        .update({
+          count: countNum,
+          notes: notes.trim() || null
+        })
+        .eq('id', mostRecentId)
+        .eq('user_id', user!.id);
+
+      if (updateRecordError) throw updateRecordError;
+
+      // Delete older duplicate records for this date to consolidate
+      if (existingRecords.length > 1) {
+        const oldRecordIds = existingRecords.slice(1).map(r => r.id);
+        await supabase
+          .from('daily_records')
+          .delete()
+          .in('id', oldRecordIds)
+          .eq('user_id', user!.id);
+      }
+    } else {
+      // Insert new record
+      const { error: recordError } = await supabase
+        .from('daily_records')
+        .insert({
+          user_id: user!.id,
+          practice_project_id: projectId,
+          record_date: recordDate,
+          count: countNum,
+          notes: notes.trim() || null
+        });
+
+      if (recordError) throw recordError;
+    }
+
+    // Update project's current count based on difference
+    const newCurrentCount = project.current_count + countDifference;
     const { error: updateError } = await supabase
       .from('user_practice_projects')
       .update({ 
-        current_count: newCurrentCount,
+        current_count: Math.max(0, newCurrentCount),
         updated_at: new Date().toISOString()
       })
       .eq('id', projectId)
-      .eq('user_id', user.id);
+      .eq('user_id', user!.id);
 
     if (updateError) throw updateError;
   };
@@ -337,8 +376,8 @@ export default function CustomRecordScreen() {
 
               {/* Count Input */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>本次修行数量</Text>
-                <Text style={styles.inputHint}>请输入本次修行的数量，如：108</Text>
+                <Text style={styles.inputLabel}>今日修行总数</Text>
+                <Text style={styles.inputHint}>请输入今日完成的总数量，如：1000</Text>
                 <TextInput
                   style={styles.textInput}
                   value={count}

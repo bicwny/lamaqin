@@ -434,19 +434,58 @@ export default function HomeScreen() {
 
       if (error) throw error;
     } else {
-      // For count-based practices, create a daily record
-      const { error: recordError } = await supabase
+      // For count-based practices, get all existing records for today (may be multiple)
+      const { data: existingRecords, error: existingError } = await supabase
         .from('daily_records')
-        .insert({
-          user_id: user.id,
-          practice_project_id: practice.id,
-          record_date: recordDate,
-          count: amount
-        });
+        .select('id, count')
+        .eq('user_id', user.id)
+        .eq('practice_project_id', practice.id)
+        .eq('record_date', recordDate)
+        .order('created_at', { ascending: false });
 
-      if (recordError) throw recordError;
+      if (existingError) throw existingError;
 
-      // Update project's current count
+      // Calculate existing total for today
+      const existingTotal = (existingRecords || []).reduce((sum, r) => sum + r.count, 0);
+      const newTotalForDay = existingTotal + amount;
+
+      if (existingRecords && existingRecords.length > 0) {
+        // Update the most recent record with new total, delete others
+        const mostRecentId = existingRecords[0].id;
+        
+        // Update most recent record to hold the new total
+        const { error: updateRecordError } = await supabase
+          .from('daily_records')
+          .update({ count: newTotalForDay })
+          .eq('id', mostRecentId)
+          .eq('user_id', user.id);
+
+        if (updateRecordError) throw updateRecordError;
+
+        // Delete older duplicate records for this date
+        if (existingRecords.length > 1) {
+          const oldRecordIds = existingRecords.slice(1).map(r => r.id);
+          await supabase
+            .from('daily_records')
+            .delete()
+            .in('id', oldRecordIds)
+            .eq('user_id', user.id);
+        }
+      } else {
+        // Create new record
+        const { error: recordError } = await supabase
+          .from('daily_records')
+          .insert({
+            user_id: user.id,
+            practice_project_id: practice.id,
+            record_date: recordDate,
+            count: amount
+          });
+
+        if (recordError) throw recordError;
+      }
+
+      // Update project's current count (add the amount)
       const { error: updateError } = await supabase
         .from('user_practice_projects')
         .update({ 
@@ -551,15 +590,17 @@ export default function HomeScreen() {
 
                     {/* Action Buttons */}
                     <View style={styles.practiceActions}>
-                      <TouchableOpacity
-                        onPress={(e) => handleQuickComplete(e, practice)}
-                      >
-                        <Ionicons 
-                          name="checkmark-circle-outline" 
-                          size={24} 
-                          color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
-                        />
-                      </TouchableOpacity>
+                      {practice.current < practice.target && (
+                        <TouchableOpacity
+                          onPress={(e) => handleQuickComplete(e, practice)}
+                        >
+                          <Ionicons 
+                            name="checkmark-circle-outline" 
+                            size={24} 
+                            color="#6B7280" 
+                          />
+                        </TouchableOpacity>
+                      )}
 
                       <TouchableOpacity
                         onPress={(e) => handleAddRecord(e, practice)}
