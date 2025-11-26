@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     lineHeight: 24,
     marginBottom: 16,
+    textAlign: 'center',
   },
   prayerChinese: {
     fontSize: 14,
@@ -176,6 +177,7 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     lineHeight: 24,
     marginBottom: 16,
+    textAlign: 'center',
   },
   sectionTitle: {
     fontSize: 16,
@@ -183,6 +185,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.primary,
     marginTop: 20,
     marginBottom: 12,
+    textAlign: 'center',
   },
   colophon: {
     fontSize: 12,
@@ -191,11 +194,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 20,
     marginBottom: 12,
+    textAlign: 'center',
   },
   colophonChinese: {
     fontSize: 12,
     fontWeight: '400',
     color: Colors.textSecondary,
     lineHeight: 20,
+    textAlign: 'center',
   },
 });
