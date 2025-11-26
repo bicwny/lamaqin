@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal, TextInput, Pressable } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
@@ -449,21 +449,17 @@ export default function CourseDetailScreen() {
             setJumpInput('');
           }}
         >
-          <TouchableOpacity 
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => {
-              setJumpModalVisible(false);
-              setJumpInput('');
-            }}
-          >
-            <View 
-              style={styles.jumpModalContent}
-              onStartShouldSetResponder={() => true}
-              onTouchEnd={(e) => {
-                e.stopPropagation();
+          <View style={styles.modalOverlay}>
+            {/* Background dismiss layer - sibling, not parent */}
+            <Pressable 
+              style={StyleSheet.absoluteFill}
+              onPress={() => {
+                setJumpModalVisible(false);
+                setJumpInput('');
               }}
-            >
+            />
+            {/* Content layer - sits on top */}
+            <View style={styles.jumpModalContent}>
               <Text style={styles.jumpModalTitle}>跳转到课程</Text>
               <Text style={styles.jumpModalSubtitle}>请输入课程号（1-{lessons.length}）</Text>
               <TextInput
@@ -474,6 +470,9 @@ export default function CourseDetailScreen() {
                 value={jumpInput}
                 onChangeText={setJumpInput}
                 maxLength={4}
+                autoFocus={true}
+                onSubmitEditing={handleJump}
+                returnKeyType="go"
               />
               <View style={styles.jumpButtonsRow}>
                 <TouchableOpacity
@@ -493,7 +492,7 @@ export default function CourseDetailScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </TouchableOpacity>
+          </View>
         </Modal>
 
         {/* Status Picker Modal for 共修/讲考 */}
