@@ -366,7 +366,7 @@ export default function PracticeHistoryScreen() {
             style={[styles.actionButton, styles.actionButtonPrimary]}
             onPress={handleAddRecord}
           >
-            <Ionicons name="add-circle-outline" size={20} color={DesignSystem.colors.white} />
+            <Ionicons name="add-circle-outline" size={20} color={DesignSystem.colors.whiteTara} />
             <Text style={[styles.actionButtonText, styles.actionButtonTextPrimary]}>记录</Text>
           </TouchableOpacity>
         </View>
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
     paddingHorizontal: DesignSystem.spacing.xl,
     borderRadius: DesignSystem.borderRadius.lg,
-    backgroundColor: DesignSystem.colors.surface,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
     borderWidth: 1,
     borderColor: DesignSystem.colors.border,
     flex: 1,
@@ -504,6 +504,6 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
   },
   actionButtonTextPrimary: {
-    color: DesignSystem.colors.white,
+    color: DesignSystem.colors.whiteTara,
   },
 });
