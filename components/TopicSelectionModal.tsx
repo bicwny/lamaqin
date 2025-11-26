@@ -146,9 +146,12 @@ export default function TopicSelectionModal({
         ) : (
           <ScrollView 
             style={styles.topicsList}
+            contentContainerStyle={styles.topicsListContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
+            nestedScrollEnabled={true}
+            scrollEnabled={true}
           >
             {filteredTopics.map((item, index) => (
               <View key={item.topic_number.toString()}>
