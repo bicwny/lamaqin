@@ -236,8 +236,60 @@ export default function PracticeDetailScreen() {
 
       if (error) throw error;
       setPracticeRecords(data || []);
+
+      // Recalculate and sync current_count from actual daily records
+      await syncCurrentCountFromRecords(projectId);
     } catch (error) {
       console.error("Error loading practice records:", error);
+    }
+  };
+
+  const syncCurrentCountFromRecords = async (projectId: string) => {
+    if (!user?.id) return;
+
+    try {
+      // Get all daily records for this practice project
+      const { data: allRecords, error: recordsError } = await supabase
+        .from("daily_records")
+        .select("count")
+        .eq("user_id", user.id)
+        .eq("practice_project_id", projectId);
+
+      if (recordsError) throw recordsError;
+
+      // Calculate total from all records
+      const totalFromRecords = (allRecords || []).reduce((sum, r) => sum + (r.count || 0), 0);
+
+      // Get current stored count
+      const { data: projectData, error: projectError } = await supabase
+        .from("user_practice_projects")
+        .select("current_count")
+        .eq("id", projectId)
+        .eq("user_id", user.id)
+        .single();
+
+      if (projectError) throw projectError;
+
+      // If there's a mismatch, update the database
+      if (projectData.current_count !== totalFromRecords) {
+        console.log(`Syncing current_count: stored=${projectData.current_count}, calculated=${totalFromRecords}`);
+        
+        const { error: updateError } = await supabase
+          .from("user_practice_projects")
+          .update({ 
+            current_count: totalFromRecords,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", projectId)
+          .eq("user_id", user.id);
+
+        if (updateError) throw updateError;
+
+        // Update local state to reflect the corrected count
+        setProject(prev => prev ? { ...prev, current_count: totalFromRecords } : null);
+      }
+    } catch (error) {
+      console.error("Error syncing current count:", error);
     }
   };
 
