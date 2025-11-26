@@ -17,6 +17,7 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors } from '@/constants/Colors';
 import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
@@ -47,8 +48,10 @@ export default function MeditationRecordScreen() {
   const [duration, setDuration] = useState('');
   const [sessionNumber, setSessionNumber] = useState('1');
   const [reflection, setReflection] = useState('');
+  const [recordDate, setRecordDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(false);
   const [loadingTopics, setLoadingTopics] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [meditationTopics, setMeditationTopics] = useState<Array<{
     topic_number: number;
     title: string;
@@ -104,6 +107,7 @@ export default function MeditationRecordScreen() {
         setDuration(record.duration_minutes.toString());
         setSessionNumber(record.session_number?.toString() || '1');
         setReflection(record.reflection || '');
+        setRecordDate(record.record_date);
         
         // Set selected topic after topics are loaded
         if (meditationTopics.length > 0) {
@@ -144,7 +148,7 @@ export default function MeditationRecordScreen() {
       const recordData = {
         user_id: user.id,
         practice_id: practiceId,
-        record_date: selectedDate || new Date().toISOString().split('T')[0],
+        record_date: recordDate,
         duration_minutes: parseInt(duration),
         session_number: parseInt(sessionNumber),
         reflection: reflection.trim() || undefined
@@ -247,6 +251,40 @@ export default function MeditationRecordScreen() {
         >
           <View style={styles.content}>
             <Text style={styles.practiceTitle}>{practiceName}</Text>
+
+            {/* Date Selector */}
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>记录日期</Text>
+              <TouchableOpacity 
+                style={styles.dateSelector}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+                <Text style={styles.dateSelectorText}>
+                  {new Date(recordDate + 'T12:00:00').toLocaleDateString('zh-CN', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+              </TouchableOpacity>
+            </View>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={new Date(recordDate + 'T12:00:00')}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(Platform.OS === 'ios');
+                  if (selectedDate) {
+                    setRecordDate(selectedDate.toISOString().split('T')[0]);
+                  }
+                }}
+                maximumDate={new Date()}
+              />
+            )}
 
             {/* Duration Input */}
             <View style={styles.inputSection}>
@@ -415,6 +453,18 @@ const styles = StyleSheet.create({
   },
   loadingIndicator: {
     padding: DesignSystem.spacing.xl,
+  },
+  dateSelector: {
+    ...ComponentTokens.input.standard,
+    paddingVertical: DesignSystem.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dateSelectorText: {
+    ...createStyles.body('base'),
+    flex: 1,
+    marginLeft: DesignSystem.spacing.md,
   },
   saveHeaderButton: {
     paddingVertical: DesignSystem.spacing.sm,
