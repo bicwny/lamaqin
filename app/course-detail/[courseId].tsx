@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal, TextInput } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
@@ -115,6 +115,7 @@ export default function CourseDetailScreen() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [optionalStatusFields, setOptionalStatusFields] = useState<Set<'共修' | '讲考'>>(new Set());
   const [bulkLessonsSummary, setBulkLessonsSummary] = useState<Record<string, any>>({});
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (user && courseId) {
@@ -236,6 +237,17 @@ export default function CourseDetailScreen() {
     setStatusPickerVisible(false);
   };
 
+  const filteredLessons = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return lessons;
+    }
+    const query = searchQuery.trim();
+    return lessons.filter(lesson => {
+      const lessonNumStr = lesson.lesson_number.toString();
+      return lessonNumStr.includes(query) || lesson.title.includes(query);
+    });
+  }, [lessons, searchQuery]);
+
   if (loading) {
     return (
       <PageTemplate
@@ -288,7 +300,32 @@ export default function CourseDetailScreen() {
 
         <Text style={styles.sectionTitle}>课程内容：</Text>
 
-        {lessons.map((lesson, index) => (
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInputWrapper}>
+            <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="输入课号快速定位..."
+              placeholderTextColor="#9CA3AF"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              keyboardType="default"
+              returnKeyType="search"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+                <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+              </TouchableOpacity>
+            )}
+          </View>
+          {searchQuery.length > 0 && (
+            <Text style={styles.searchResultText}>
+              找到 {filteredLessons.length} 课
+            </Text>
+          )}
+        </View>
+
+        {filteredLessons.map((lesson, index) => (
           <View key={lesson.id} style={[styles.lessonItem, index > 0 && styles.lessonItemSpacing]}>
             <View style={styles.lessonHeader}>
               <View style={styles.lessonTitleRow}>
@@ -492,6 +529,37 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  searchContainer: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: 12,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 44,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1a1a1a',
+    paddingVertical: 0,
+  },
+  clearButton: {
+    padding: 4,
+    marginLeft: 4,
+  },
+  searchResultText: {
+    fontSize: 13,
+    color: DesignSystem.colors.textSecondary,
+    marginTop: 8,
+    fontWeight: '500',
   },
   courseInfoCard: {
     ...ComponentTokens.card.variants.outlined,
