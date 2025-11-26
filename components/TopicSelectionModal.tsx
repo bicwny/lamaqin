@@ -225,6 +225,9 @@ const styles = StyleSheet.create({
   webModalContent: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+    display: 'flex' as any,
+    flexDirection: 'column' as any,
+    overflow: 'hidden' as any,
   },
   container: {
     flex: 1,
@@ -293,6 +296,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     zIndex: 1,
+    ...(Platform.OS === 'web' && {
+      overflow: 'auto' as any,
+      WebkitOverflowScrolling: 'touch' as any,
+    }),
+  },
+  topicsListContent: {
+    flexGrow: 1,
   },
   topicItem: {
     flexDirection: 'row',
