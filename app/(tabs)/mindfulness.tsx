@@ -18,15 +18,13 @@ export default function MindfulnessScreen() {
       padding={0}
     >
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.imageContainer}>
-          <Image 
-            source={fawangImage}
-            style={styles.thangkaImage}
-            resizeMode="contain"
-          />
-        </View>
+        <Image 
+          source={fawangImage}
+          style={styles.thangkaImage}
+          resizeMode="contain"
+        />
 
-        <View style={styles.prayerCard}>
+        <View style={styles.prayerHeader}>
           <Text style={styles.tibetanTitle}>༄༅། །བླ་མའི་རྣལ་འབྱོར་བྱིན་རླབས་མྱུར་སྩོལ་བཞུགས་སོ། །</Text>
           <Text style={styles.chineseTitle}>上师瑜伽·速赐加持</Text>
         </View>
@@ -119,22 +117,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.lg,
+    paddingTop: 0,
     paddingBottom: DesignSystem.spacing.xl,
-  },
-  imageContainer: {
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.xl,
   },
   thangkaImage: {
     width: '100%',
     height: 300,
+    marginBottom: DesignSystem.spacing.xl,
   },
-  prayerCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
+  prayerHeader: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
     alignItems: 'center',
   },
   tibetanTitle: {
@@ -152,9 +145,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   mantraSection: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
     alignItems: 'center',
   },
   mantra: {
@@ -169,8 +161,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   prayerContent: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   prayerTibetan: {
     fontSize: 14,
