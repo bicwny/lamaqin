@@ -294,6 +294,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     zIndex: 1,
   },
+  topicsListContent: {
+    flexGrow: 1,
+  },
   topicItem: {
     flexDirection: 'row',
     alignItems: 'center',
