@@ -617,7 +617,7 @@ export default function StudyScreen() {
                             <View style={styles.courseHeader}>
                               <Text style={styles.courseName}>{userCourse.course.name}</Text>
                               <Text style={styles.courseInfo}>
-                                {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+                                {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课
                               </Text>
                             </View>
 
@@ -680,7 +680,7 @@ export default function StudyScreen() {
                           <View style={styles.courseHeader}>
                             <Text style={styles.courseName}>{userCourse.course.name}</Text>
                             <Text style={styles.courseInfo}>
-                              {userCourse.course.teacher} • {userCourse.course.total_lessons}课
+                              {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课
                             </Text>
                           </View>
 
@@ -768,7 +768,7 @@ export default function StudyScreen() {
                         {userCourse.course.name}
                       </Text>
                       <Text style={styles.courseDetails}>
-                        {userCourse.course.teacher} • {userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
+                        {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
                       </Text>
                       <Text style={styles.statusText}>
                         状态：{getStatusText(userCourse.status)}
