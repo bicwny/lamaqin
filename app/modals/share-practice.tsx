@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +26,7 @@ interface PracticeSummary {
 
 export default function SharePracticeModal() {
   const { user } = useAuth();
+  const { shareDate } = useLocalSearchParams<{ shareDate?: string }>();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string>('');
   const [dharmaName, setDharmaName] = useState<string>('');
@@ -45,11 +46,11 @@ export default function SharePracticeModal() {
     try {
       setLoading(true);
 
-      // Use timezone-aware date (guaranteed to work since we wait for timezoneInfo)
-      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
+      // Use provided date or timezone-aware today's date
+      const targetDate = shareDate || getCurrentDateInTimezone(timezoneInfo.timezone);
 
       console.log('📅 Share modal - User timezone:', timezoneInfo.timezone);
-      console.log('📅 Share modal - Today\'s date:', today);
+      console.log('📅 Share modal - Target date:', targetDate);
 
       // Get user's dharma name
       const { data: userData, error: userError } = await supabase
@@ -63,8 +64,8 @@ export default function SharePracticeModal() {
       const userDharmaName = userData?.dharma_name || '修行者';
       setDharmaName(userDharmaName);
 
-      // Set date title - parse the timezone-aware date
-      const date = new Date(today + 'T12:00:00'); // Use noon to avoid timezone edge cases
+      // Set date title - parse the target date
+      const date = new Date(targetDate + 'T12:00:00'); // Use noon to avoid timezone edge cases
       const month = date.getMonth() + 1;
       const day = date.getDate();
       setDateTitle(`${month}/${day}修行总结`);
@@ -92,7 +93,7 @@ export default function SharePracticeModal() {
             .select('count')
             .eq('user_id', user.id)
             .eq('practice_project_id', project.id)
-            .eq('record_date', today);
+            .eq('record_date', targetDate);
 
           if (recordsError) throw recordsError;
 
@@ -108,13 +109,7 @@ export default function SharePracticeModal() {
         }
       }
 
-      // Collect time-based practices (weekly)
-      const dayOfWeek = new Date(today + 'T00:00:00').getDay();
-      const todayDate = new Date(today + 'T00:00:00');
-      const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-      const monday = new Date(todayDate.setDate(diff));
-      const weekStart = monday.toISOString().split('T')[0];
-
+      // Collect time-based practices
       for (const project of projects || []) {
         if (project.practices.type === 'time') {
           const { data: todayRecords, error: recordsError } = await supabase
@@ -122,7 +117,7 @@ export default function SharePracticeModal() {
             .select('*')
             .eq('user_id', user.id)
             .eq('practice_id', project.practice_id)
-            .eq('record_date', today);
+            .eq('record_date', targetDate);
 
           if (recordsError) throw recordsError;
 

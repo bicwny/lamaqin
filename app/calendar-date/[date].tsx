@@ -246,12 +246,24 @@ export default function CalendarDatePage() {
     }
   };
 
+  const handleShare = () => {
+    router.push({
+      pathname: '/modals/share-practice',
+      params: { shareDate: date },
+    });
+  };
+
   return (
     <>
       <Stack.Screen 
         options={{
           title: formatDate(date || ''),
           headerBackTitle: '回向',
+          headerRight: () => (
+            <TouchableOpacity onPress={handleShare} style={{ marginRight: 16 }}>
+              <Ionicons name="share-social" size={24} color={DesignSystem.colors.blueTara} />
+            </TouchableOpacity>
+          ),
         }} 
       />
       <ScrollView style={styles.container}>
