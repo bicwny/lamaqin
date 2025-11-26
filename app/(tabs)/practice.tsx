@@ -230,11 +230,12 @@ export default function PracticeScreen() {
       return;
     }
 
-    // Use unified practice detail page for both count and time-based practices
+    // Navigate to practice-history page (deprecated practice-detail)
     router.push({
-      pathname: "/practice-detail/[practiceId]",
+      pathname: "/practice-history",
       params: {
-        practiceId: projectId,
+        projectId: projectId,
+        practiceName: practiceName,
       },
     });
   };

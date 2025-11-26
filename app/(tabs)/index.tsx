@@ -291,11 +291,12 @@ export default function HomeScreen() {
 
   // Handle tapping the whole practice card to view history
   const handlePracticeCardTap = (practice: any) => {
-    // Navigate directly to practice detail screen
+    // Navigate to practice-history page (deprecated practice-detail)
     router.push({
-      pathname: '/practice-detail/[practiceId]',
+      pathname: '/practice-history',
       params: {
-        practiceId: practice.id,
+        projectId: practice.id,
+        practiceName: practice.name,
       },
     });
   };
