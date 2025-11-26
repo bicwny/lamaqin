@@ -387,7 +387,7 @@ export default function ProfileSetupScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>👤 法名 *</Text>
             <TextInput
-              style={styles.input}
+              style={styles.input as any}
               placeholder="如：多吉、白玛等"
               value={dharmaName}
               onChangeText={setDharmaName}
@@ -398,7 +398,7 @@ export default function ProfileSetupScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>🏷️ 俗名 *</Text>
             <TextInput
-              style={styles.input}
+              style={styles.input as any}
               placeholder="您的姓名"
               value={layName}
               onChangeText={setLayName}
@@ -545,7 +545,7 @@ export default function ProfileSetupScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
             <TextInput
-              style={styles.input}
+              style={styles.input as any}
               placeholder="如：北京、上海等"
               value={location}
               onChangeText={setLocation}

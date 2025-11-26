@@ -45,8 +45,7 @@ export default function ProfileScreen() {
         .from('users')
         .select('*')
         .eq('id', user.id)
-        .single()
-        .abortSignal(controller.signal);
+        .single();
 
       clearTimeout(timeoutId);
 
@@ -67,14 +66,14 @@ export default function ProfileScreen() {
         }
 
         // Use fallback data from user auth context
-        const fallbackProfile = {
+        const fallbackProfile: UserProfile = {
           id: user.id,
           email: user.email,
           dharma_name: user.dharma_name || '未设置法名',
-          location: null,
-          current_class: null,
-          practice_years: null,
-          bio: null,
+          location: undefined,
+          current_class: undefined,
+          practice_years: undefined,
+          bio: undefined,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
@@ -100,14 +99,14 @@ export default function ProfileScreen() {
       setError(errorMessage);
 
       // Use fallback data from user auth context
-      const fallbackProfile = {
+      const fallbackProfile: UserProfile = {
         id: user.id,
         email: user.email,
         dharma_name: user.dharma_name || '未设置法名',
-        location: null,
-        current_class: null,
-        practice_years: null,
-        bio: null,
+        location: undefined,
+        current_class: undefined,
+        practice_years: undefined,
+        bio: undefined,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -180,7 +179,7 @@ export default function ProfileScreen() {
       onBackPress={() => router.back()}
       scrollable={true}
       backgroundColor={DesignSystem.colors.background}
-      padding={0}
+      padding="none"
     >
           {/* Network Error Banner */}
           {error && (
@@ -195,7 +194,7 @@ export default function ProfileScreen() {
           {/* Profile Header */}
           <View style={styles.profileHeader}>
             <Avatar 
-              dharmaName={profile?.dharma_name} 
+              dharmaName={profile?.dharma_name || undefined} 
               size={80} 
             />
             <View style={styles.profileInfo}>
@@ -286,7 +285,7 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: DesignSystem.colors.textInverse,
     fontSize: DesignSystem.typography.fontSize.base,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
   },
   profileHeader: {
     flexDirection: 'row',
@@ -301,7 +300,7 @@ const styles = StyleSheet.create({
   },
   dharmaName: {
     fontSize: DesignSystem.typography.fontSize.xl,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
     marginBottom: DesignSystem.spacing.xs,
     color: DesignSystem.colors.textPrimary,
   },
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontSize: DesignSystem.typography.fontSize.base,
     color: DesignSystem.colors.textPrimary,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontWeight: DesignSystem.typography.fontWeight.medium as any,
   },
   detailValue: {
     fontSize: DesignSystem.typography.fontSize.base,
@@ -358,7 +357,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
     marginLeft: DesignSystem.spacing.md,
     flex: 1,
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontWeight: DesignSystem.typography.fontWeight.medium as any,
   },
   signOutButton: {
     borderBottomWidth: 0,
@@ -393,6 +392,6 @@ const styles = StyleSheet.create({
   retryButtonSmallText: {
     color: DesignSystem.colors.textInverse,
     fontSize: DesignSystem.typography.fontSize.xs,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
   },
 });
