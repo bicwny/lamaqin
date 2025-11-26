@@ -468,10 +468,20 @@ export default function HomeScreen() {
     return '像最后一天那样去生活';
   };
 
+  const getLocalDateDisplay = () => {
+    const localDate = timezoneInfo 
+      ? getCurrentDateInTimezone(timezoneInfo.timezone)
+      : new Date().toISOString().split('T')[0];
+    
+    // Format: "2025年11月26日"
+    const date = new Date(localDate + 'T12:00:00');
+    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
   if (loading) {
     return (
       <PageTemplate
-        title="当日"
+        title={getLocalDateDisplay()}
         subtitle={getGreeting()}
         rightAction={{
           component: <Avatar dharmaName={userDharmaName} size={32} />,
@@ -491,7 +501,7 @@ export default function HomeScreen() {
 
   return (
     <PageTemplate
-      title="当日"
+      title={getLocalDateDisplay()}
       subtitle={getGreeting()}
       rightAction={{
         component: <Avatar dharmaName={userDharmaName} size={32} />,
@@ -511,7 +521,7 @@ export default function HomeScreen() {
           {/* Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>今日修行</Text>
+              <Text style={styles.sectionTitle}>{getLocalDateDisplay()}</Text>
               <View style={styles.headerActions}>
                 <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
                   <Text style={styles.shareText}>分享</Text>
