@@ -34,7 +34,7 @@ const generateEntryYearOptions = () => {
 const ENTRY_YEAR_OPTIONS = generateEntryYearOptions();
 
 export default function ProfileSetupScreen() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
@@ -187,6 +187,16 @@ export default function ProfileSetupScreen() {
       newMap.set(classId, year);
       return newMap;
     });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.replace('/auth/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toastService.error({ title: '退出失败', message: '退出登录失败，请稍后重试' });
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -374,7 +384,12 @@ export default function ProfileSetupScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <Text style={styles.logo}>🌸</Text>
+          <View style={styles.headerTop}>
+            <Text style={styles.logo}>🌸</Text>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+              <Text style={styles.logoutButtonText}>退出</Text>
+            </TouchableOpacity>
+          </View>
           {user?.email && (
             <View style={styles.emailContainer}>
               <Text style={styles.emailLabel}>正在为以下账号完善资料：</Text>
@@ -588,9 +603,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
+  headerTop: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   logo: {
     fontSize: 48,
-    marginBottom: 10,
+  },
+  logoutButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: Colors.error + '20',
+  },
+  logoutButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.error,
   },
   emailContainer: {
     alignItems: 'center',
