@@ -673,10 +673,11 @@ export default function PracticeDetailScreen() {
 
             {/* Practice name */}
             <Text style={styles.practiceTitle}>{project.practices.name}</Text>
-            {/* Timeline */}
+            {/* Timeline with total days */}
             <Text style={styles.timelineText}>
               发愿：{project.start_date} • 圆满：
               {project.target_end_date || "持续进行"}
+              {project.target_end_date && ` • ${Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天`}
             </Text>
           </View>
 
@@ -693,10 +694,7 @@ export default function PracticeDetailScreen() {
                     {progress.current.toLocaleString()}
                   </Text>
                   <Text style={styles.totalCountAndDays}>
-                    {progress.target ? `${progress.target.toLocaleString()} ${project.practices.unit} • ` : `${project.practices.unit} • `}
-                    {project.target_end_date
-                      ? `${Math.ceil((new Date(project.target_end_date).getTime() - new Date(project.start_date).getTime()) / (24 * 60 * 60 * 1000))}天`
-                      : "持续进行"}
+                    {progress.target ? `${progress.target.toLocaleString()} ${project.practices.unit}` : `${project.practices.unit}`}
                   </Text>
                 </View>
 
