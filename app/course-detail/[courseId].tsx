@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Modal, TextInput } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService } from '@/lib/database';
 import { Ionicons } from '@expo/vector-icons';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens } from '@/utils/componentTokens';
+import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
@@ -115,12 +115,63 @@ export default function CourseDetailScreen() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [optionalStatusFields, setOptionalStatusFields] = useState<Set<'共修' | '讲考'>>(new Set());
   const [bulkLessonsSummary, setBulkLessonsSummary] = useState<Record<string, any>>({});
+  const scrollViewRef = useRef<ScrollView>(null);
+  const lessonRefs = useRef<{ [key: number]: View | null }>({});
+  const [jumpModalVisible, setJumpModalVisible] = useState(false);
+  const [jumpInput, setJumpInput] = useState('');
+
+  const findFirstUncompletedLesson = () => {
+    for (const lesson of lessons) {
+      const summary = bulkLessonsSummary[lesson.id];
+      const isCompleted = summary && summary.听传承 > 0 && summary.看法本 > 0;
+      if (!isCompleted) {
+        return lesson.lesson_number;
+      }
+    }
+    return 1;
+  };
+
+  const scrollToLesson = (lessonNumber: number) => {
+    const targetLesson = lessons.find(l => l.lesson_number === lessonNumber);
+    if (targetLesson && scrollViewRef.current && lessonRefs.current[lessonNumber]) {
+      scrollViewRef.current.scrollResponder?.scrollResponderScrollNativeHandleToKeyboard?.(
+        lessonRefs.current[lessonNumber],
+        150,
+        true
+      );
+    }
+  };
+
+  const handleJump = () => {
+    const lessonNum = parseInt(jumpInput, 10);
+    if (!lessonNum || lessonNum < 1 || lessonNum > lessons.length) {
+      toastService.error({
+        title: '输入错误',
+        message: `请输入1至${lessons.length}之间的课程号`
+      });
+      return;
+    }
+    setJumpModalVisible(false);
+    setJumpInput('');
+    scrollToLesson(lessonNum);
+  };
 
   useEffect(() => {
     if (user && courseId) {
       loadCourseData();
     }
   }, [user, courseId]);
+
+  useEffect(() => {
+    if (lessons.length > 0 && bulkLessonsSummary && Object.keys(bulkLessonsSummary).length > 0) {
+      setTimeout(() => {
+        const nextLessonNumber = findFirstUncompletedLesson();
+        if (nextLessonNumber > 1) {
+          scrollToLesson(nextLessonNumber);
+        }
+      }, 300);
+    }
+  }, [lessons, bulkLessonsSummary]);
 
   const loadCourseData = async () => {
     if (!user || !courseId) return;
@@ -277,19 +328,29 @@ export default function CourseDetailScreen() {
       onBackPress={() => router.back()}
       backgroundColor={DesignSystem.colors.background}
       padding={0}
+      rightAction={{
+        text: '跳转',
+        onPress: () => setJumpModalVisible(true)
+      }}
     >
 
-        <View style={styles.courseInfoCard}>
-          <Text style={styles.courseInfoTitle}>课程信息：</Text>
-          <Text style={styles.courseInfoText}>
-            讲解：{userCourse.course.teacher} • 完成：{Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课（{(userCourse.progress_percentage || 0).toFixed(1)}%）
-          </Text>
-        </View>
+        <ScrollView ref={scrollViewRef} style={{ flex: 1 }}>
+          <View style={styles.courseInfoCard}>
+            <Text style={styles.courseInfoTitle}>课程信息：</Text>
+            <Text style={styles.courseInfoText}>
+              讲解：{userCourse.course.teacher} • 完成：{Math.round((userCourse.progress_percentage || 0) * userCourse.course.total_lessons / 100)}/{userCourse.course.total_lessons}课（{(userCourse.progress_percentage || 0).toFixed(1)}%）
+            </Text>
+          </View>
 
-        <Text style={styles.sectionTitle}>课程内容：</Text>
+          <Text style={styles.sectionTitle}>课程内容：</Text>
 
-        {lessons.map((lesson, index) => (
-          <View key={lesson.id} style={[styles.lessonItem, index > 0 && styles.lessonItemSpacing]}>
+          {lessons.map((lesson, index) => (
+            <View 
+              ref={(ref) => {
+                if (ref) lessonRefs.current[lesson.lesson_number] = ref;
+              }}
+              key={lesson.id} 
+              style={[styles.lessonItem, index > 0 && styles.lessonItemSpacing]}>
             <View style={styles.lessonHeader}>
               <View style={styles.lessonTitleRow}>
                 <Text style={styles.lessonTitle}>
@@ -374,8 +435,60 @@ export default function CourseDetailScreen() {
                 )}
               </View>
             </View>
-          </View>
-        ))}
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Jump Lesson Modal */}
+        <Modal
+          visible={jumpModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => {
+            setJumpModalVisible(false);
+            setJumpInput('');
+          }}
+        >
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => {
+              setJumpModalVisible(false);
+              setJumpInput('');
+            }}
+          >
+            <View style={styles.jumpModalContent}>
+              <Text style={styles.jumpModalTitle}>跳转到课程</Text>
+              <Text style={styles.jumpModalSubtitle}>请输入课程号（1-{lessons.length}）</Text>
+              <TextInput
+                style={styles.jumpInput}
+                placeholder="输入课程号"
+                placeholderTextColor="#999"
+                keyboardType="number-pad"
+                value={jumpInput}
+                onChangeText={setJumpInput}
+                maxLength={4}
+              />
+              <View style={styles.jumpButtonsRow}>
+                <TouchableOpacity
+                  style={[styles.jumpButton, styles.jumpCancelButton]}
+                  onPress={() => {
+                    setJumpModalVisible(false);
+                    setJumpInput('');
+                  }}
+                >
+                  <Text style={styles.jumpCancelButtonText}>取消</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.jumpButton, styles.jumpConfirmButton]}
+                  onPress={handleJump}
+                >
+                  <Text style={styles.jumpConfirmButtonText}>跳转</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Modal>
 
         {/* Status Picker Modal for 共修/讲考 */}
         <Modal
@@ -650,5 +763,60 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 15,
     fontWeight: '500',
+  },
+  jumpModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    marginHorizontal: 20,
+  },
+  jumpModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: 8,
+  },
+  jumpModalSubtitle: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: 16,
+  },
+  jumpInput: {
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.divider,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: 20,
+  },
+  jumpButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  jumpButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  jumpCancelButton: {
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.divider,
+  },
+  jumpCancelButtonText: {
+    color: DesignSystem.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  jumpConfirmButton: {
+    backgroundColor: DesignSystem.colors.redTara,
+  },
+  jumpConfirmButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
