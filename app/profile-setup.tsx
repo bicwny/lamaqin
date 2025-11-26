@@ -394,6 +394,9 @@ export default function ProfileSetupScreen() {
             <View style={styles.emailContainer}>
               <Text style={styles.emailLabel}>正在为以下账号完善资料：</Text>
               <Text style={styles.emailText}>{user.email}</Text>
+              <TouchableOpacity onPress={handleLogout} style={styles.logoutLink}>
+                <Text style={styles.logoutLinkText}>切换账号 / 退出登录</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -621,6 +624,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: Colors.error,
+  },
+  logoutLink: {
+    marginTop: 12,
+    paddingVertical: 8,
+  },
+  logoutLinkText: {
+    fontSize: 14,
+    color: Colors.error,
+    textDecorationLine: 'underline',
   },
   emailContainer: {
     alignItems: 'center',
