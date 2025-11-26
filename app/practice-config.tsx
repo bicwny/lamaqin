@@ -25,7 +25,7 @@ import PageTemplate from "@/components/PageTemplate";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getCurrentWeekStart } from "@/lib/topic-progress";
 import { practiceService, presetProjectNameService } from "@/lib/database";
-import ModalDatetimePicker from "react-native-modal-datetime-picker";
+import { Ionicons } from "@expo/vector-icons";
 import { toastService } from "@/lib/toast";
 
 interface Practice {
@@ -150,10 +150,6 @@ export default function PracticeConfigScreen() {
     "fixed_duration",
   );
   const [weeklyTopicTarget, setWeeklyTopicTarget] = useState(2);
-  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
-    useState(false);
-  const [isCustomDatePickerVisible, setCustomDatePickerVisibility] =
-    useState(false);
 
   useEffect(() => {
     calculateSuggestions();
@@ -442,45 +438,19 @@ export default function PracticeConfigScreen() {
   );
 
   const showStartDatepicker = () => {
-    if (Platform.OS === "web") {
-      setShowStartDatePicker(true);
-    } else {
-      setStartDatePickerVisibility(true);
-    }
+    setShowStartDatePicker(true);
   };
 
   const hideStartDatePicker = () => {
-    setStartDatePickerVisibility(false);
     setShowStartDatePicker(false);
   };
 
   const showCustomDatepicker = () => {
-    if (Platform.OS === "web") {
-      setShowCustomDatePicker(true);
-    } else {
-      setCustomDatePickerVisibility(true);
-    }
+    setShowCustomDatePicker(true);
   };
 
   const hideCustomDatePicker = () => {
-    setCustomDatePickerVisibility(false);
     setShowCustomDatePicker(false);
-  };
-
-  const handleStartDateConfirm = (date: Date) => {
-    setStartDate(date);
-    hideStartDatePicker();
-  };
-
-  const handleCustomDateConfirm = (date: Date) => {
-    // Ensure end date is not before start date
-    const minDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
-    if (date < minDate) {
-      toastService.error("结束日期不能早于开始日期");
-      return;
-    }
-    setCustomEndDate(date);
-    hideCustomDatePicker();
   };
 
   const renderTimePlanning = () => (
@@ -490,61 +460,55 @@ export default function PracticeConfigScreen() {
       {/* Start date - always defaults to today, but editable */}
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>开始日期</Text>
-        <TouchableOpacity
-          style={styles.simpleDateButton}
-          onPress={showStartDatepicker}
-        >
-          <Text style={styles.simpleDateButtonText}>
-            {formatDate(startDate)}
-          </Text>
-          <Text style={styles.dateButtonIcon}>📅</Text>
-        </TouchableOpacity>
-
-        {/* DateTimePicker Modal */}
-        {Platform.OS !== "web" && (
-          <ModalDatetimePicker
-            isVisible={isStartDatePickerVisible}
-            mode="date"
-            onConfirm={handleStartDateConfirm}
-            onCancel={hideStartDatePicker}
-            date={startDate}
-          />
-        )}
-
-        {showStartDatePicker && Platform.OS !== "web" && (
-          <DateTimePicker
-            value={startDate}
-            mode="date"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={(event, selectedDate) => {
-              setShowStartDatePicker(Platform.OS === "ios");
-              if (selectedDate) {
-                setStartDate(selectedDate);
-              }
-            }}
-          />
-        )}
-
-        {showStartDatePicker && Platform.OS === "web" && (
-          <View style={styles.webDatePicker}>
+        {Platform.OS === 'web' ? (
+          <View style={styles.dateSelector}>
+            <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
             <input
-              style={{
-                ...styles.webDateInput,
-                border: '1px solid #ccc',
-                borderRadius: 8,
-                padding: 12,
-                fontSize: 16,
-                width: '100%'
-              } as any}
               type="date"
-              value={startDate.toISOString().split("T")[0]}
-              onChange={(event: any) => {
-                const newDate = new Date(event.target.value);
-                setStartDate(newDate);
-                setShowStartDatePicker(false);
-              }}
+              value={startDate.toISOString().split('T')[0]}
+              onChange={(e: any) => setStartDate(new Date(e.target.value + 'T12:00:00'))}
+              style={{
+                flex: 1,
+                border: 'none',
+                background: 'transparent',
+                fontSize: 16,
+                color: DesignSystem.colors.textPrimary,
+                marginLeft: 12,
+                outline: 'none',
+                cursor: 'pointer',
+              } as any}
             />
           </View>
+        ) : (
+          <>
+            <TouchableOpacity 
+              style={styles.dateSelector}
+              onPress={() => setShowStartDatePicker(true)}
+            >
+              <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+              <Text style={styles.dateSelectorText}>
+                {startDate.toLocaleDateString('zh-CN', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+            </TouchableOpacity>
+            {showStartDatePicker && (
+              <DateTimePicker
+                value={startDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={(event, selectedDate) => {
+                  setShowStartDatePicker(Platform.OS === 'ios');
+                  if (selectedDate) {
+                    setStartDate(selectedDate);
+                  }
+                }}
+              />
+            )}
+          </>
         )}
       </View>
 
@@ -594,85 +558,74 @@ export default function PracticeConfigScreen() {
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>项目时长</Text>
 
-        <View style={styles.smartDurationContainer}>
-          <View style={styles.daysInputContainer}>
-            <TextInput
-              style={styles.daysInput}
-              value={customDays}
-              onChangeText={handleDaysInputChange}
-              keyboardType="numeric"
-              placeholder="60"
-            />
-            <Text style={styles.daysInputLabel}>天</Text>
+          <View style={styles.smartDurationContainer}>
+            <View style={styles.daysInputContainer}>
+              <TextInput
+                style={styles.daysInput}
+                value={customDays}
+                onChangeText={handleDaysInputChange}
+                keyboardType="numeric"
+                placeholder="60"
+              />
+              <Text style={styles.daysInputLabel}>天</Text>
+            </View>
+            <View style={styles.orSeparatorRow}>
+              <Text style={styles.orSeparatorText}>或</Text>
+            </View>
+            {Platform.OS === 'web' ? (
+              <View style={styles.dateSelector}>
+                <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+                <input
+                  type="date"
+                  value={customEndDate.toISOString().split('T')[0]}
+                  min={new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                  onChange={(e: any) => handleEndDateChange(new Date(e.target.value + 'T12:00:00'))}
+                  style={{
+                    flex: 1,
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: 16,
+                    color: DesignSystem.colors.textPrimary,
+                    marginLeft: 12,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  } as any}
+                />
+              </View>
+            ) : (
+              <>
+                <TouchableOpacity 
+                  style={styles.dateSelector}
+                  onPress={() => setShowCustomDatePicker(true)}
+                >
+                  <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+                  <Text style={styles.dateSelectorText}>
+                    {customEndDate.toLocaleDateString('zh-CN', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+                </TouchableOpacity>
+                {showCustomDatePicker && (
+                  <DateTimePicker
+                    value={customEndDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
+                    onChange={(event, selectedDate) => {
+                      setShowCustomDatePicker(Platform.OS === 'ios');
+                      if (selectedDate) {
+                        handleEndDateChange(selectedDate);
+                      }
+                    }}
+                  />
+                )}
+              </>
+            )}
           </View>
-          <View style={styles.orSeparatorRow}>
-            <Text style={styles.orSeparatorText}>或</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.endDatePickerButton}
-            onPress={showCustomDatepicker}
-          >
-            <Text style={styles.endDatePickerButtonText}>
-              {customEndDate.toLocaleDateString('zh-CN')}
-            </Text>
-            <Text style={styles.dateButtonIcon}>📅</Text>
-          </TouchableOpacity>
         </View>
-
-        {/* DateTimePicker Modal */}
-        {Platform.OS !== "web" && (
-          <ModalDatetimePicker
-            isVisible={isCustomDatePickerVisible}
-            mode="date"
-            onConfirm={handleCustomDateConfirm}
-            onCancel={hideCustomDatePicker}
-            date={customEndDate}
-            minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
-          />
-        )}
-
-        {showCustomDatePicker && Platform.OS !== "web" && (
-          <DateTimePicker
-            value={customEndDate}
-            mode="date"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            minimumDate={new Date(startDate.getTime() + 24 * 60 * 60 * 1000)}
-            onChange={(event, selectedDate) => {
-              setShowCustomDatePicker(Platform.OS === "ios");
-              if (selectedDate) {
-                handleEndDateChange(selectedDate);
-              }
-            }}
-          />
-        )}
-
-        {showCustomDatePicker && Platform.OS === "web" && (
-          <View style={styles.webDatePicker}>
-            <input
-              style={{
-                ...styles.webDateInput,
-                border: '1px solid #ccc',
-                borderRadius: 8,
-                padding: 12,
-                fontSize: 16,
-                width: '100%'
-              } as any}
-              type="date"
-              value={customEndDate.toISOString().split("T")[0]}
-              min={
-                new Date(startDate.getTime() + 24 * 60 * 60 * 1000)
-                  .toISOString()
-                  .split("T")[0]
-              }
-              onChange={(event: any) => {
-                const newDate = new Date(event.target.value);
-                handleEndDateChange(newDate);
-                setShowCustomDatePicker(false);
-              }}
-            />
-          </View>
-        )}
-      </View>
       )}
     </View>
   );
@@ -1266,25 +1219,20 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.primary,
     fontWeight: '500' as any,
   },
-  simpleDateButton: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: DesignSystem.colors.backgroundSecondary,
-    borderRadius: DesignSystem.borderRadius.lg,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.lg,
-    borderWidth: 1.5,
+  dateSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.background,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
     borderColor: DesignSystem.colors.border,
-    minHeight: 52,
-    ...DesignSystem.shadow.sm,
+    gap: DesignSystem.spacing.sm,
   },
-  simpleDateButtonText: {
-    ...ComponentTextStyles.body,
-    fontWeight: '400' as any,
-  },
-  dateButtonIcon: {
-    ...ComponentTextStyles.body,
+  dateSelectorText: {
+    flex: 1,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textPrimary,
   },
   smartDurationContainer: {
     flexDirection: "column",
