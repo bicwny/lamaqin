@@ -289,6 +289,7 @@ export default function CustomRecordScreen() {
                       value={recordDate}
                       max={new Date().toISOString().split('T')[0]}
                       onChange={(e: any) => setRecordDate(e.target.value)}
+                      readOnly={true}
                       style={{
                         flex: 1,
                         border: 'none',
