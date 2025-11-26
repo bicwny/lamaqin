@@ -180,10 +180,8 @@ export default function CalendarDatePage() {
   };
 
   const formatDate = (dateStr: string) => {
-    const dateObj = new Date(dateStr);
-    const year = dateObj.getFullYear();
-    const month = dateObj.getMonth() + 1;
-    const day = dateObj.getDate();
+    // Parse date string directly to avoid timezone issues
+    const [year, month, day] = dateStr.split('-').map(Number);
     return `${year}年${month}月${day}日`;
   };
 
