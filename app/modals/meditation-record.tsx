@@ -255,36 +255,59 @@ export default function MeditationRecordScreen() {
             {/* Date Selector */}
             <View style={styles.inputSection}>
               <Text style={styles.inputLabel}>记录日期</Text>
-              <TouchableOpacity 
-                style={styles.dateSelector}
-                onPress={() => setShowDatePicker(true)}
-              >
-                <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
-                <Text style={styles.dateSelectorText}>
-                  {new Date(recordDate + 'T12:00:00').toLocaleDateString('zh-CN', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </Text>
-                <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
-              </TouchableOpacity>
+              {Platform.OS === 'web' ? (
+                <View style={styles.dateSelector}>
+                  <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+                  <input
+                    type="date"
+                    value={recordDate}
+                    max={new Date().toISOString().split('T')[0]}
+                    onChange={(e: any) => setRecordDate(e.target.value)}
+                    style={{
+                      flex: 1,
+                      border: 'none',
+                      background: 'transparent',
+                      fontSize: 16,
+                      color: DesignSystem.colors.textPrimary,
+                      marginLeft: 12,
+                      outline: 'none',
+                      cursor: 'pointer',
+                    } as any}
+                  />
+                </View>
+              ) : (
+                <>
+                  <TouchableOpacity 
+                    style={styles.dateSelector}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.textSecondary} />
+                    <Text style={styles.dateSelectorText}>
+                      {new Date(recordDate + 'T12:00:00').toLocaleDateString('zh-CN', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </Text>
+                    <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={new Date(recordDate + 'T12:00:00')}
+                      mode="date"
+                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                      onChange={(event, selectedDate) => {
+                        setShowDatePicker(Platform.OS === 'ios');
+                        if (selectedDate) {
+                          setRecordDate(selectedDate.toISOString().split('T')[0]);
+                        }
+                      }}
+                      maximumDate={new Date()}
+                    />
+                  )}
+                </>
+              )}
             </View>
-
-            {showDatePicker && (
-              <DateTimePicker
-                value={new Date(recordDate + 'T12:00:00')}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(event, selectedDate) => {
-                  setShowDatePicker(Platform.OS === 'ios');
-                  if (selectedDate) {
-                    setRecordDate(selectedDate.toISOString().split('T')[0]);
-                  }
-                }}
-                maximumDate={new Date()}
-              />
-            )}
 
             {/* Duration Input */}
             <View style={styles.inputSection}>
