@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { presetProjectNameService } from '@/lib/database';
+import { toastService } from '@/lib/toast';
 import PageTemplate from '@/components/PageTemplate';
 import ProgressBar from '@/components/ProgressBar';
 import PracticeRecordCard from '@/components/PracticeRecordCard';
@@ -49,6 +50,8 @@ export default function PracticeHistoryScreen() {
   const [deletingRecords, setDeletingRecords] = useState<Set<string>>(new Set());
   const [projectInfo, setProjectInfo] = useState<any>(null);
   const [presetProjectName, setPresetProjectName] = useState<string>('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeletingProject, setIsDeletingProject] = useState(false);
 
   useEffect(() => {
     if (user && projectId) {
@@ -177,6 +180,54 @@ export default function PracticeHistoryScreen() {
         practiceType: projectInfo?.practices?.type || 'count'
       }
     });
+  };
+
+  const handleDeleteProject = () => {
+    if (!projectInfo) return;
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDeleteProject = async () => {
+    if (!projectInfo || !user) return;
+
+    setShowDeleteDialog(false);
+    setIsDeletingProject(true);
+    
+    try {
+      // Only user_created practices can be deleted
+      if (projectInfo.source_type === 'class_required') {
+        toastService.error({
+          title: '无法删除',
+          message: '系统必修项目不能删除'
+        });
+        setIsDeletingProject(false);
+        return;
+      }
+
+      const { classCurriculumService } = await import('@/lib/database');
+      const result = await classCurriculumService.deletePracticeProject(user.id, projectId);
+
+      if (result.success) {
+        toastService.success({
+          title: '删除成功',
+          message: `${projectInfo.practices?.name} 已删除`
+        });
+        router.back();
+      } else {
+        toastService.error({
+          title: '删除失败',
+          message: result.error || '请稍后重试'
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting practice:', error);
+      toastService.error({
+        title: '删除失败',
+        message: '请稍后重试'
+      });
+    } finally {
+      setIsDeletingProject(false);
+    }
   };
 
   const handleDelete = async (record: DailyRecord) => {
@@ -354,6 +405,19 @@ export default function PracticeHistoryScreen() {
 
         {/* Action Buttons */}
         <View style={styles.actionButtonsContainer}>
+          {projectInfo?.source_type === 'user_created' && (
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.actionButtonDanger]}
+              onPress={handleDeleteProject}
+              disabled={isDeletingProject}
+            >
+              <Ionicons name="trash-outline" size={20} color={DesignSystem.colors.error} />
+              <Text style={[styles.actionButtonText, styles.actionButtonTextDanger]}>
+                {isDeletingProject ? '删除中...' : '删除'}
+              </Text>
+            </TouchableOpacity>
+          )}
+          
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={handleEditProject}
@@ -370,6 +434,35 @@ export default function PracticeHistoryScreen() {
             <Text style={[styles.actionButtonText, styles.actionButtonTextPrimary]}>记录</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Delete Confirmation Dialog */}
+        {showDeleteDialog && (
+          <View style={styles.alertOverlay}>
+            <View style={styles.alertBox}>
+              <Text style={styles.alertTitle}>确认删除？</Text>
+              <Text style={styles.alertMessage}>
+                确定要删除"{projectInfo?.practices?.name}"项目吗？此操作无法撤销。
+              </Text>
+              <View style={styles.alertButtonContainer}>
+                <TouchableOpacity 
+                  style={styles.alertButtonCancel}
+                  onPress={() => setShowDeleteDialog(false)}
+                >
+                  <Text style={styles.alertButtonCancelText}>取消</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.alertButtonConfirm}
+                  onPress={handleConfirmDeleteProject}
+                  disabled={isDeletingProject}
+                >
+                  <Text style={styles.alertButtonConfirmText}>
+                    {isDeletingProject ? '删除中...' : '删除'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Records List */}
         <View style={styles.recordsSection}>
@@ -504,6 +597,71 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textPrimary,
   },
   actionButtonTextPrimary: {
+    color: DesignSystem.colors.whiteTara,
+  },
+  actionButtonDanger: {
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderColor: DesignSystem.colors.error,
+  },
+  actionButtonTextDanger: {
+    color: DesignSystem.colors.error,
+  },
+  alertOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  alertBox: {
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.lg,
+    marginHorizontal: DesignSystem.spacing.lg,
+    maxWidth: 300,
+  },
+  alertTitle: {
+    ...ComponentTextStyles.subheading,
+    marginBottom: DesignSystem.spacing.md,
+    color: DesignSystem.colors.textPrimary,
+  },
+  alertMessage: {
+    ...ComponentTextStyles.body,
+    marginBottom: DesignSystem.spacing.lg,
+    color: DesignSystem.colors.textSecondary,
+  },
+  alertButtonContainer: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
+  },
+  alertButtonCancel: {
+    flex: 1,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    backgroundColor: DesignSystem.colors.backgroundTertiary,
+    alignItems: 'center',
+  },
+  alertButtonCancelText: {
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textPrimary,
+  },
+  alertButtonConfirm: {
+    flex: 1,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    backgroundColor: DesignSystem.colors.error,
+    alignItems: 'center',
+  },
+  alertButtonConfirmText: {
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
     color: DesignSystem.colors.whiteTara,
   },
 });
