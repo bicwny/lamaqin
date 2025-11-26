@@ -74,9 +74,16 @@ The `user_practice_projects` table includes a `source_type` field ('class_requir
 - **Class-required practices**: Created automatically during class enrollment, marked as `source_type='class_required'`, and cannot be deleted by users
 - **User-created practices**: Future support for manually created practices marked as `source_type='user_created'`, which can be deleted by users
 - **Delete validation**: The `deletePracticeProject` function in `classCurriculumService` validates both user ownership and source_type before allowing deletion
-- **UI controls**: Delete button appears in practice detail screen (`app/practice-detail/[practiceId].tsx`) only for user-created practices with confirmation dialog
+- **UI controls**: Delete button appears in practice-history screen (`app/practice-history.tsx`) only for user-created practices with confirmation dialog
 - **Migration**: `docs/ADD_SOURCE_TYPE_MIGRATION.sql` adds the source_type field with default 'class_required' for backward compatibility
 - **Note**: Currently all practices are class-required since there's no manual practice creation feature yet. The infrastructure is ready for future manual practice creation.
+
+### Practice Detail Deprecation (2025-11-26)
+The `practice-detail/[practiceId].tsx` page has been deprecated and replaced with a redirect to `practice-history.tsx`. All "详情" button clicks now navigate directly to practice-history, which provides the same functionality:
+- Progress summary with daily/total targets
+- Action buttons: 删除 (for user_created only), 编辑, 记录
+- Complete practice record history with edit/delete capabilities
+- The old practice-detail page now auto-redirects to practice-history for backward compatibility
 
 # External Dependencies
 
