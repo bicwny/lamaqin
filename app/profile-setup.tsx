@@ -35,6 +35,7 @@ const ENTRY_YEAR_OPTIONS = generateEntryYearOptions();
 
 export default function ProfileSetupScreen() {
   const { user } = useAuth();
+  const [email, setEmail] = useState('');
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
@@ -110,6 +111,11 @@ export default function ProfileSetupScreen() {
         setDharmaName(userData.data.dharma_name || '');
         setLayName(userData.data.lay_name || '');
         setLocation(userData.data.location || '');
+      }
+      
+      // Pre-fill email
+      if (user.email) {
+        setEmail(user.email);
       }
     } catch (error) {
       console.error('Error loading classes:', error);
@@ -192,6 +198,18 @@ export default function ProfileSetupScreen() {
   const handleSaveProfile = async () => {
     if (!user) {
       toastService.error({ title: '错误', message: '用户信息未找到' });
+      return;
+    }
+
+    // Email validation
+    if (!email.trim()) {
+      toastService.error({ title: '验证失败', message: '请输入邮箱地址' });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toastService.error({ title: '验证失败', message: '请输入有效的邮箱地址' });
       return;
     }
 
@@ -375,12 +393,19 @@ export default function ProfileSetupScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.logo}>🌸</Text>
-          {user?.email && (
-            <View style={styles.emailContainer}>
-              <Text style={styles.emailLabel}>正在为以下账号完善资料：</Text>
-              <Text style={styles.emailText}>{user.email}</Text>
-            </View>
-          )}
+          <View style={styles.emailContainer}>
+            <Text style={styles.emailLabel}>账号邮箱 *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="your@email.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              editable={true}
+            />
+            <Text style={styles.emailHint}>如果输入的邮箱与之前不同，需要验证新邮箱</Text>
+          </View>
         </View>
 
         <View style={styles.form}>
