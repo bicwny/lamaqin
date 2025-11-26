@@ -457,7 +457,13 @@ export default function CourseDetailScreen() {
               setJumpInput('');
             }}
           >
-            <View style={styles.jumpModalContent}>
+            <View 
+              style={styles.jumpModalContent}
+              onStartShouldSetResponder={() => true}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+              }}
+            >
               <Text style={styles.jumpModalTitle}>跳转到课程</Text>
               <Text style={styles.jumpModalSubtitle}>请输入课程号（1-{lessons.length}）</Text>
               <TextInput
