@@ -281,15 +281,6 @@ export default function PracticeScreen() {
                 : `已完成 ${(progress.current ?? 0).toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
               }
             </Text>
-            {/* Show daily/weekly goal for ongoing practices */}
-            {!progress.target && (item.daily_target || item.weekly_target) && (
-              <Text style={styles.goalText}>
-                {item.daily_target 
-                  ? `每天 ${item.daily_target.toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
-                  : `每周 ${item.weekly_target?.toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
-                }
-              </Text>
-            )}
           </View>
           {progress.target && (
             <View style={styles.progressBarContainer}>
@@ -497,10 +488,6 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     color: DesignSystem.colors.textPrimary,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-  },
-  goalText: {
-    ...ComponentTextStyles.caption,
-    color: DesignSystem.colors.textSecondary,
   },
   progressPercentage: {
     ...ComponentTextStyles.body,

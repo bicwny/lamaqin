@@ -4,8 +4,6 @@ import { useLocalSearchParams, router, Stack, useFocusEffect } from 'expo-router
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { ComponentTokens } from '@/utils/componentTokens';
-import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface DailyRecord {
@@ -36,9 +34,6 @@ interface PracticeProject {
   practice_id: string;
   project_name?: string;
   preset_project_id?: string;
-  daily_target?: number;
-  weekly_target?: number;
-  target_period?: string;
   practices: {
     id: string;
     name: string;
@@ -83,9 +78,6 @@ export default function CalendarDatePage() {
           practice_id,
           project_name,
           preset_project_id,
-          daily_target,
-          weekly_target,
-          target_period,
           practices!inner (
             id,
             name,
@@ -103,9 +95,6 @@ export default function CalendarDatePage() {
         practice_id: project.practice_id,
         project_name: project.project_name,
         preset_project_id: project.preset_project_id,
-        daily_target: project.daily_target,
-        weekly_target: project.weekly_target,
-        target_period: project.target_period,
         practices: project.practices,
       }));
 
@@ -232,7 +221,7 @@ export default function CalendarDatePage() {
     const practiceName = project.practices.name;
     const practiceId = project.practice_id;
 
-    if (practiceType === 'time') {
+    if (practiceType === 'meditation') {
       router.push({
         pathname: '/modals/meditation-record',
         params: {
@@ -275,17 +264,7 @@ export default function CalendarDatePage() {
           <>
             {(dateRecords.daily.length > 0 || dateRecords.meditation.length > 0) && (
               <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionLabel}>当日记录</Text>
-                  <TouchableOpacity
-                    onPress={() => router.push({
-                      pathname: '/modals/share-practice',
-                      params: { date }
-                    })}
-                  >
-                    <Text style={styles.shareButton}>分享</Text>
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.sectionLabel}>当日记录</Text>
                 {dateRecords.daily.map((record, index) => (
                   <TouchableOpacity 
                     key={`daily-${index}`} 
@@ -326,56 +305,31 @@ export default function CalendarDatePage() {
             )}
 
             <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionLabel}>
-                  {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 
-                    ? '选择项目添加记录' 
-                    : '添加更多记录'}
-                </Text>
-              </View>
+              <Text style={styles.sectionLabel}>
+                {dateRecords.daily.length === 0 && dateRecords.meditation.length === 0 
+                  ? '选择项目添加记录' 
+                  : '添加更多记录'}
+              </Text>
               {userProjects.length === 0 ? (
                 <View style={styles.emptyProjectsContainer}>
                   <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
                 </View>
               ) : (
-                userProjects.map((project) => {
-                  // Format target display
-                  let targetDisplay = '';
-                  if (project.target_period === 'daily' && project.daily_target) {
-                    targetDisplay = `${project.daily_target}${project.practices.unit}/天`;
-                  } else if (project.target_period === 'weekly' && project.weekly_target) {
-                    targetDisplay = `${project.weekly_target}座/周`;
-                  }
-                  
-                  return (
-                    <View
-                      key={project.id}
-                      style={styles.projectItem}
-                    >
-                      <View style={styles.cardContentRow}>
-                        <View style={styles.projectInfo}>
-                          <Text style={styles.projectName} numberOfLines={1}>
-                            {project.practices.name}
-                          </Text>
-                          {targetDisplay && (
-                            <Text style={styles.projectTarget}>{targetDisplay}</Text>
-                          )}
-                        </View>
-                        <View style={styles.projectActions}>
-                          <TouchableOpacity
-                            onPress={() => handleAddRecord(project)}
-                          >
-                            <Ionicons 
-                              name="add-circle-outline" 
-                              size={28} 
-                              color={DesignSystem.colors.primary} 
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
+                userProjects.map((project) => (
+                  <TouchableOpacity
+                    key={project.id}
+                    style={styles.projectItem}
+                    onPress={() => handleAddRecord(project)}
+                  >
+                    <View style={styles.projectInfo}>
+                      <Text style={styles.projectName}>{project.practices.name}</Text>
+                      {project.project_name && (
+                        <Text style={styles.projectSubName}>{project.project_name}</Text>
+                      )}
                     </View>
-                  );
-                })
+                    <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
+                  </TouchableOpacity>
+                ))
               )}
             </View>
           </>
@@ -389,6 +343,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: DesignSystem.colors.background,
+    padding: 20,
   },
   loadingContainer: {
     padding: 40,
@@ -403,33 +358,28 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 12,
-    paddingTop: 4,
-  },
   sectionLabel: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-  },
-  shareButton: {
     fontSize: 14,
     fontWeight: '600',
-    color: DesignSystem.colors.primary,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   recordItem: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    marginBottom: 8,
     gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   recordText: {
     fontSize: 16,
@@ -437,34 +387,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   projectItem: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
-  },
-  cardContentRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
   },
   projectInfo: {
     flex: 1,
-    marginRight: 12,
   },
   projectName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 4,
+    color: DesignSystem.colors.textPrimary,
   },
-  projectTarget: {
-    fontSize: 15,
-    color: Colors.textSecondary,
-  },
-  projectActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  projectSubName: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    marginTop: 4,
   },
   emptyProjectsContainer: {
     padding: 20,

@@ -565,7 +565,7 @@ export default function StudyScreen() {
                 onPress={() => setViewMode('manage')}
               >
                 <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-                <Text style={styles.browseButtonText}>管理</Text>
+                <Text style={styles.browseButtonText}>管理课程</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -578,7 +578,7 @@ export default function StudyScreen() {
         title="闻思"
         subtitle="好好闻思，别乱跑。"
         rightAction={{
-          text: "管理",
+          text: "管理课程",
           onPress: () => setViewMode('manage')
         }}
         scrollable={false}
@@ -987,17 +987,14 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   classHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginHorizontal: 16,
     marginBottom: 12,
-    paddingTop: 4,
+    marginTop: 8,
   },
   className: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: DesignSystem.colors.yellowTara,
     letterSpacing: -0.3,
   },
   courseCard: {

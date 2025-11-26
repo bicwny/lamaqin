@@ -16,7 +16,6 @@ The bottom tab navigation (`app/(tabs)/_layout.tsx`) uses `useSafeAreaInsets` fr
 ### Key Features
 - **Daily Practice Display**: The 当日 (Daily) tab displays ALL active practices with `target_period='daily'`, showing complete progress for all daily count-based and time-based practices. Previously limited to 3 practices, the limit was removed (2025-11-16) to ensure all daily practices are visible regardless of enrollment order.
 - **Practice Sharing**: Users can share their daily practice summary via the "分享" button on the daily view. The share modal (`app/modals/share-practice.tsx`) displays a date-based title (e.g., "10/8修行总结") and formats today's practice data using the user's dharma name without units (e.g., "圆青：莲师心咒1000，百字明100，三十五佛忏悔文1"). The modal includes Buddhist dedication prayers below the copy button and provides clipboard copy functionality using expo-clipboard for easy sharing to WhatsApp.
-- **Date Selection & Historical Practice Logging** (2025-11-25): Users can tap the date on the 当日 tab to open a calendar modal and select any past date. When logging practices from a historical date, both the custom-record modal and meditation-record modal now correctly receive and use the selectedDate parameter, ensuring practices are logged to the correct date instead of defaulting to today.
 
 ## Backend Architecture
 Supabase serves as the backend-as-a-service, providing authentication, a real-time database, and API functionality. The database schema includes tables for users, practices, courses, practice records, and progress tracking. All data operations are managed through the Supabase JavaScript client, which supports automatic session management and offline synchronization. The authentication system features a complete email-based flow with registration, verification, password reset, and session persistence, maintaining user profiles with Buddhist-specific information.
@@ -78,17 +77,6 @@ The `user_practice_projects` table includes a `source_type` field ('class_requir
 - **UI controls**: Delete button appears in practice detail screen (`app/practice-detail/[practiceId].tsx`) only for user-created practices with confirmation dialog
 - **Migration**: `docs/ADD_SOURCE_TYPE_MIGRATION.sql` adds the source_type field with default 'class_required' for backward compatibility
 - **Note**: Currently all practices are class-required since there's no manual practice creation feature yet. The infrastructure is ready for future manual practice creation.
-
-## Recent Bug Fixes
-
-### Date Switching Bug (2025-11-25)
-**Issue**: When logging practices on a historical date (e.g., 11/12) and then switching to today and back to 11/12, the practices would not appear.
-
-**Root Cause**: The `selectedDate` parameter was not being passed to the custom-record and meditation-record modals when opening them from the 当日 tab. Both modals would then default to today's date instead of the selected historical date, causing practices to be logged to the wrong date.
-
-**Fix Applied**: Added `selectedDate: selectedDate` to both router.push() calls in `app/(tabs)/index.tsx` (lines 382 and 393). Both modals already had support for the selectedDate parameter, they just weren't receiving it from the parent component.
-
-**Impact**: Users can now reliably log practices to any historical date and the practices will appear correctly when switching back to view that date.
 
 # External Dependencies
 

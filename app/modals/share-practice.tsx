@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,7 +26,6 @@ interface PracticeSummary {
 
 export default function SharePracticeModal() {
   const { user } = useAuth();
-  const { date: dateParam } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<string>('');
   const [dharmaName, setDharmaName] = useState<string>('');
@@ -38,7 +37,7 @@ export default function SharePracticeModal() {
     if (user && !timezoneLoading && timezoneInfo) {
       loadPracticeSummary();
     }
-  }, [user, timezoneInfo, timezoneLoading, dateParam]);
+  }, [user, timezoneInfo, timezoneLoading]);
 
   const loadPracticeSummary = async () => {
     if (!user || !timezoneInfo) return;
@@ -46,11 +45,11 @@ export default function SharePracticeModal() {
     try {
       setLoading(true);
 
-      // Use provided date or default to today
-      const targetDate = dateParam ? String(dateParam) : getCurrentDateInTimezone(timezoneInfo.timezone);
+      // Use timezone-aware date (guaranteed to work since we wait for timezoneInfo)
+      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
 
       console.log('📅 Share modal - User timezone:', timezoneInfo.timezone);
-      console.log('📅 Share modal - Target date:', targetDate);
+      console.log('📅 Share modal - Today\'s date:', today);
 
       // Get user's dharma name
       const { data: userData, error: userError } = await supabase
@@ -64,8 +63,8 @@ export default function SharePracticeModal() {
       const userDharmaName = userData?.dharma_name || '修行者';
       setDharmaName(userDharmaName);
 
-      // Set date title - parse the date
-      const date = new Date(targetDate + 'T12:00:00'); // Use noon to avoid timezone edge cases
+      // Set date title - parse the timezone-aware date
+      const date = new Date(today + 'T12:00:00'); // Use noon to avoid timezone edge cases
       const month = date.getMonth() + 1;
       const day = date.getDate();
       setDateTitle(`${month}/${day}修行总结`);
@@ -83,9 +82,7 @@ export default function SharePracticeModal() {
 
       if (projectsError) throw projectsError;
 
-      // Use Maps to group practices by name and combine counts
-      const countPracticesMap = new Map<string, { count: number; unit: string }>();
-      const timePracticesMap = new Map<string, number>();
+      const practiceList: PracticeSummary[] = [];
 
       // Collect count-based practices
       for (const project of projects || []) {
@@ -95,34 +92,25 @@ export default function SharePracticeModal() {
             .select('count')
             .eq('user_id', user.id)
             .eq('practice_project_id', project.id)
-            .eq('record_date', targetDate);
+            .eq('record_date', today);
 
           if (recordsError) throw recordsError;
 
           const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
           
           if (todayCount > 0) {
-            const practiceName = project.practices.name;
-            // If practice already exists, add to its count
-            if (countPracticesMap.has(practiceName)) {
-              const existing = countPracticesMap.get(practiceName)!;
-              countPracticesMap.set(practiceName, {
-                count: existing.count + todayCount,
-                unit: existing.unit
-              });
-            } else {
-              countPracticesMap.set(practiceName, {
-                count: todayCount,
-                unit: project.practices.unit
-              });
-            }
+            practiceList.push({
+              name: project.practices.name,
+              count: todayCount,
+              unit: project.practices.unit
+            });
           }
         }
       }
 
       // Collect time-based practices (weekly)
-      const dayOfWeek = new Date(targetDate + 'T00:00:00').getDay();
-      const todayDate = new Date(targetDate + 'T00:00:00');
+      const dayOfWeek = new Date(today + 'T00:00:00').getDay();
+      const todayDate = new Date(today + 'T00:00:00');
       const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
       const monday = new Date(todayDate.setDate(diff));
       const weekStart = monday.toISOString().split('T')[0];
@@ -134,43 +122,20 @@ export default function SharePracticeModal() {
             .select('*')
             .eq('user_id', user.id)
             .eq('practice_id', project.practice_id)
-            .eq('record_date', targetDate);
+            .eq('record_date', today);
 
           if (recordsError) throw recordsError;
 
           const todaySessions = todayRecords?.length || 0;
 
           if (todaySessions > 0) {
-            const practiceName = project.practices.name;
-            // If practice already exists, add to its sessions
-            if (timePracticesMap.has(practiceName)) {
-              timePracticesMap.set(practiceName, timePracticesMap.get(practiceName)! + todaySessions);
-            } else {
-              timePracticesMap.set(practiceName, todaySessions);
-            }
+            practiceList.push({
+              name: project.practices.name,
+              sessions: todaySessions
+            });
           }
         }
       }
-
-      // Convert maps back to practice list (maintaining order: count-based first, then time-based)
-      const practiceList: PracticeSummary[] = [];
-      
-      // Add count-based practices in map order
-      countPracticesMap.forEach((value, name) => {
-        practiceList.push({
-          name,
-          count: value.count,
-          unit: value.unit
-        });
-      });
-      
-      // Add time-based practices in map order
-      timePracticesMap.forEach((sessions, name) => {
-        practiceList.push({
-          name,
-          sessions
-        });
-      });
 
       // Format the summary
       const formattedSummary = formatPracticeSummary(userDharmaName, practiceList);

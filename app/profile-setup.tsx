@@ -34,7 +34,7 @@ const generateEntryYearOptions = () => {
 const ENTRY_YEAR_OPTIONS = generateEntryYearOptions();
 
 export default function ProfileSetupScreen() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [dharmaName, setDharmaName] = useState('');
   const [layName, setLayName] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
@@ -187,16 +187,6 @@ export default function ProfileSetupScreen() {
       newMap.set(classId, year);
       return newMap;
     });
-  };
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      router.replace('/auth/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toastService.error({ title: '退出失败', message: '退出登录失败，请稍后重试' });
-    }
   };
 
   const handleSaveProfile = async () => {
@@ -384,19 +374,11 @@ export default function ProfileSetupScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <Text style={styles.logo}>🌸</Text>
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-              <Text style={styles.logoutButtonText}>退出</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.logo}>🌸</Text>
           {user?.email && (
             <View style={styles.emailContainer}>
               <Text style={styles.emailLabel}>正在为以下账号完善资料：</Text>
               <Text style={styles.emailText}>{user.email}</Text>
-              <TouchableOpacity onPress={handleLogout} style={styles.logoutLink}>
-                <Text style={styles.logoutLinkText}>切换账号 / 退出登录</Text>
-              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -405,7 +387,7 @@ export default function ProfileSetupScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>👤 法名 *</Text>
             <TextInput
-              style={styles.input as any}
+              style={styles.input}
               placeholder="如：多吉、白玛等"
               value={dharmaName}
               onChangeText={setDharmaName}
@@ -416,7 +398,7 @@ export default function ProfileSetupScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>🏷️ 俗名 *</Text>
             <TextInput
-              style={styles.input as any}
+              style={styles.input}
               placeholder="您的姓名"
               value={layName}
               onChangeText={setLayName}
@@ -563,7 +545,7 @@ export default function ProfileSetupScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>📍 所在地区（可选）</Text>
             <TextInput
-              style={styles.input as any}
+              style={styles.input}
               placeholder="如：北京、上海等"
               value={location}
               onChangeText={setLocation}
@@ -603,40 +585,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    marginBottom: 40,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 40,
   },
   logo: {
     fontSize: 48,
-  },
-  logoutButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: Colors.error + '20',
-  },
-  logoutButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.error,
-  },
-  logoutLink: {
-    marginTop: 12,
-    paddingVertical: 8,
-  },
-  logoutLinkText: {
-    fontSize: 14,
-    color: Colors.error,
-    textDecorationLine: 'underline',
+    marginBottom: 10,
   },
   emailContainer: {
     alignItems: 'center',
-    alignSelf: 'center',
     marginTop: 16,
     padding: 12,
     backgroundColor: '#F0F4FF',

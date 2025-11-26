@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toastService } from '@/lib/toast';
 import { useTimezone } from '@/hooks/useTimezone';
 import { getCurrentDateInTimezone } from '@/lib/timezone';
-import { Calendar } from 'react-native-calendars';
 
 import { DesignSystem } from '@/constants/DesignSystem';
 import { Colors } from '@/constants/Colors';
@@ -56,33 +55,6 @@ export default function HomeScreen() {
   // Add timezone support for daily reset
   const { timezoneInfo, handleDailyResetCheck } = useTimezone();
 
-  // Date selection state
-  const [selectedDate, setSelectedDate] = useState<string>(() => {
-    return timezoneInfo 
-      ? getCurrentDateInTimezone(timezoneInfo.timezone)
-      : new Date().toISOString().split('T')[0];
-  });
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [markedDates, setMarkedDates] = useState<any>({});
-
-  // Update selected date to today when timezone info changes or on mount
-  useEffect(() => {
-    if (timezoneInfo) {
-      const today = getCurrentDateInTimezone(timezoneInfo.timezone);
-      // Only update if selectedDate is not already set to today
-      if (!selectedDate || selectedDate !== today) {
-        setSelectedDate(today);
-      }
-    }
-  }, [timezoneInfo]);
-
-  // Reload data when selected date changes
-  useEffect(() => {
-    if (user?.id && selectedDate) {
-      loadDashboardData();
-    }
-  }, [selectedDate]);
-
   useFocusEffect(
     React.useCallback(() => {
       if (user?.id) {
@@ -90,9 +62,15 @@ export default function HomeScreen() {
         if (timezoneInfo) {
           handleDailyResetCheck(() => {
             console.log('🌅 Daily reset triggered for count-based practices - resetting displays');
-            // Reset to today when daily reset triggers
-            const today = getCurrentDateInTimezone(timezoneInfo.timezone);
-            setSelectedDate(today);
+            // Reset daily practices display to show 0 counts
+            setDailyPractices(prev => prev.map(practice => ({
+              ...practice,
+              current: 0,
+              progressPercent: 0,
+              status: 'pending' as const
+            })));
+            // Reload data from database (should be empty for new day)
+            loadDashboardData();
           });
         }
 
@@ -131,52 +109,46 @@ export default function HomeScreen() {
 
   const loadDailyPractices = async () => {
     try {
-      const targetDate = selectedDate;
+      const { data: projects, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          *,
+          practices(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .eq('target_period', 'daily')
+        .order('created_at', { ascending: true });
 
-      // Fetch all projects and all records for the date in parallel
-      const [projectsResult, recordsResult] = await Promise.all([
-        supabase
-          .from('user_practice_projects')
-          .select(`
-            *,
-            practices(*)
-          `)
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .eq('target_period', 'daily')
-          .order('created_at', { ascending: true }),
-        supabase
-          .from('daily_records')
-          .select('practice_project_id, count')
-          .eq('user_id', user.id)
-          .eq('record_date', targetDate)
-      ]);
+      if (error) throw error;
 
-      if (projectsResult.error) throw projectsResult.error;
-      if (recordsResult.error) throw recordsResult.error;
+      // Use timezone-aware date for count-based practices
+      const today = timezoneInfo 
+        ? getCurrentDateInTimezone(timezoneInfo.timezone)
+        : new Date().toISOString().split('T')[0];
 
-      const projects = projectsResult.data || [];
-      const records = recordsResult.data || [];
+      const practicesData: DailyPractice[] = [];
 
-      // Group records by practice_project_id for fast lookup
-      const recordsMap = new Map<string, number>();
-      records.forEach(record => {
-        const currentCount = recordsMap.get(record.practice_project_id) || 0;
-        recordsMap.set(record.practice_project_id, currentCount + record.count);
-      });
+      for (const project of projects || []) {
+        if (project.practices.type === 'count') {
+          // Get today's records for count-based practices
+          const { data: todayRecords, error: recordsError } = await supabase
+            .from('daily_records')
+            .select('count')
+            .eq('user_id', user.id)
+            .eq('practice_project_id', project.id)
+            .eq('record_date', today);
 
-      // Build practices data using the records map
-      const practicesData: DailyPractice[] = projects
-        .filter(project => project.practices.type === 'count')
-        .map(project => {
-          const todayCount = recordsMap.get(project.id) || 0;
+          if (recordsError) throw recordsError;
+
+          const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
           const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
 
           let status: 'completed' | 'in_progress' | 'pending' = 'pending';
           if (todayCount >= project.daily_target) status = 'completed';
           else if (todayCount > 0) status = 'in_progress';
 
-          return {
+          practicesData.push({
             id: project.id,
             name: project.practices.name,
             current: todayCount,
@@ -185,8 +157,9 @@ export default function HomeScreen() {
             status,
             progressPercent,
             type: 'count'
-          };
-        });
+          });
+        }
+      }
 
       setDailyPractices(practicesData);
     } catch (error) {
@@ -197,64 +170,55 @@ export default function HomeScreen() {
 
   const loadWeeklyPractices = async () => {
     try {
-      const targetDate = selectedDate;
+      const { data: projects, error } = await supabase
+        .from('user_practice_projects')
+        .select(`
+          *,
+          practices(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .eq('target_period', 'weekly');
 
-      // Calculate week start based on selected date
-      const todayDate = new Date(selectedDate + 'T00:00:00');
+      if (error) throw error;
+
+      // Use timezone-aware date for weekly practices
+      const today = timezoneInfo 
+        ? getCurrentDateInTimezone(timezoneInfo.timezone)
+        : new Date().toISOString().split('T')[0];
+
+      // Use Monday as week start for consistency with getCurrentWeekStart()
+      // Calculate week start based on timezone-aware today
+      const todayDate = timezoneInfo 
+        ? new Date(getCurrentDateInTimezone(timezoneInfo.timezone) + 'T00:00:00')
+        : new Date();
+
       const dayOfWeek = todayDate.getDay();
       const diff = todayDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
       const monday = new Date(todayDate.setDate(diff));
       const weekStart = monday.toISOString().split('T')[0];
 
-      // Fetch all weekly projects and all meditation records for the week in parallel
-      const [projectsResult, recordsResult] = await Promise.all([
-        supabase
-          .from('user_practice_projects')
-          .select(`
-            *,
-            practices(*)
-          `)
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .eq('target_period', 'weekly'),
-        supabase
-          .from('meditation_records')
-          .select('practice_id, duration_minutes, record_date')
-          .eq('user_id', user.id)
-          .gte('record_date', weekStart)
-          .lte('record_date', targetDate)
-      ]);
+      const practicesData: WeeklyPractice[] = [];
 
-      if (projectsResult.error) throw projectsResult.error;
-      if (recordsResult.error) throw recordsResult.error;
+      for (const project of projects || []) {
+        if (project.practices.type === 'time') {
+          // Get this week's meditation records
+          const { data: weekRecords, error: weekError } = await supabase
+            .from('meditation_records')
+            .select('duration_minutes, record_date')
+            .eq('user_id', user.id)
+            .eq('practice_id', project.practice_id)
+            .gte('record_date', weekStart)
+            .lte('record_date', today);
 
-      const projects = projectsResult.data || [];
-      const allRecords = recordsResult.data || [];
+          if (weekError) throw weekError;
 
-      // Group records by practice_id for fast lookup
-      const recordsMap = new Map<string, { week: any[], today: any[] }>();
-      allRecords.forEach(record => {
-        if (!recordsMap.has(record.practice_id)) {
-          recordsMap.set(record.practice_id, { week: [], today: [] });
-        }
-        const practiceRecords = recordsMap.get(record.practice_id)!;
-        practiceRecords.week.push(record);
-        if (record.record_date === targetDate) {
-          practiceRecords.today.push(record);
-        }
-      });
-
-      // Build practices data using the records map
-      const practicesData: WeeklyPractice[] = projects
-        .filter(project => project.practices.type === 'time')
-        .map(project => {
-          const records = recordsMap.get(project.practice_id) || { week: [], today: [] };
-          const weekSessions = records.week.length;
-          const todayRecords = records.today;
+          const weekSessions = weekRecords?.length || 0;
+          const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
           const todaySessions = todayRecords.length;
 
-          const weekTarget = project.weekly_target || 7;
           let status: 'completed' | 'in_progress' | 'pending' = 'pending';
+          const weekTarget = project.weekly_target || 7; // Default to 7 if not set
           if (weekSessions >= weekTarget) status = 'completed';
           else if (weekSessions > 0) status = 'in_progress';
 
@@ -262,18 +226,19 @@ export default function HomeScreen() {
             ? todayRecords.map((record, index) => `第${index + 1}座${record.duration_minutes}分钟`).join('；')
             : undefined;
 
-          return {
+          practicesData.push({
             id: project.id,
             name: project.practices.name,
             weekSessions,
-            weekTarget,
+            weekTarget: weekTarget,
             todaySessions,
             status,
             todayDetails,
             practiceId: project.practice_id,
             type: 'time'
-          };
-        });
+          });
+        }
+      }
 
       setWeeklyPractices(practicesData);
     } catch (error) {
@@ -348,7 +313,7 @@ export default function HomeScreen() {
 
     // Record in background
     try {
-      await recordQuickCompleteBackground(practice, remaining, selectedDate);
+      await recordQuickCompleteBackground(practice, remaining);
     } catch (error) {
       // Revert optimistic update on error
       console.error('❌ Error recording practice:', error);
@@ -374,10 +339,9 @@ export default function HomeScreen() {
       router.push({
         pathname: '/modals/meditation-record',
         params: {
-          practiceProjectId: practice.id,
+          projectId: practice.id,
           practiceId: practice.practiceId || practice.id,
           practiceName: practice.name,
-          selectedDate: selectedDate,
         },
       });
     } else {
@@ -388,7 +352,6 @@ export default function HomeScreen() {
           projectId: practice.id,
           practiceName: practice.name,
           practiceType: practice.type,
-          selectedDate: selectedDate,
         },
       });
     }
@@ -435,11 +398,13 @@ export default function HomeScreen() {
   };
 
   // Background recording function (no UI updates)
-  const recordQuickCompleteBackground = async (practice: any, amount: number, recordDateParam: string) => {
+  const recordQuickCompleteBackground = async (practice: any, amount: number) => {
     if (!user) return;
 
-    // Use the provided selected date (or today if not provided)
-    const recordDate = recordDateParam || selectedDate;
+    // Use timezone-aware date for recording
+    const recordDate = timezoneInfo 
+      ? getCurrentDateInTimezone(timezoneInfo.timezone)
+      : new Date().toISOString().split('T')[0];
 
     if (practice.type === 'time') {
       // For time-based practices, create a meditation record with target duration
@@ -482,93 +447,11 @@ export default function HomeScreen() {
   };
 
   const getGreeting = () => {
-    return '世间唯一不变的，就是无常';
-  };
-
-  const getDateDisplay = () => {
-    const dateObj = new Date(selectedDate + 'T00:00:00');
-    return dateObj.toLocaleDateString('zh-CN', { 
-      month: 'long', 
-      day: 'numeric',
-      weekday: 'short'
-    });
-  };
-
-  const isToday = () => {
-    const today = timezoneInfo 
-      ? getCurrentDateInTimezone(timezoneInfo.timezone)
-      : new Date().toISOString().split('T')[0];
-    return selectedDate === today;
-  };
-
-  const handleDateChange = (dateString: string) => {
-    setSelectedDate(dateString);
-    setShowDatePicker(false);
-  };
-
-  // Load marked dates when calendar opens
-  const loadMarkedDates = async () => {
-    if (!user?.id) return;
-
-    try {
-      // Get today's date in the user's timezone to filter out future dates
-      const today = timezoneInfo 
-        ? getCurrentDateInTimezone(timezoneInfo.timezone)
-        : new Date().toISOString().split('T')[0];
-
-      const [dailyResult, meditationResult] = await Promise.all([
-        supabase
-          .from('daily_records')
-          .select('record_date')
-          .eq('user_id', user.id)
-          .lte('record_date', today),
-        supabase
-          .from('meditation_records')
-          .select('record_date')
-          .eq('user_id', user.id)
-          .lte('record_date', today)
-      ]);
-
-      const datesWithPractices = new Set<string>();
-      
-      if (dailyResult.data) {
-        dailyResult.data.forEach(record => {
-          datesWithPractices.add(record.record_date);
-        });
-      }
-      
-      if (meditationResult.data) {
-        meditationResult.data.forEach(record => {
-          datesWithPractices.add(record.record_date);
-        });
-      }
-
-      const marked: any = {};
-      datesWithPractices.forEach(date => {
-        marked[date] = {
-          marked: true,
-          dotColor: DesignSystem.colors.primary
-        };
-      });
-
-      setMarkedDates(marked);
-    } catch (error) {
-      console.error('❌ Error loading marked dates:', error);
-    }
-  };
-
-  // Load marked dates when calendar opens
-  useEffect(() => {
-    if (showDatePicker) {
-      loadMarkedDates();
-    }
-  }, [showDatePicker]);
-
-  const handleReturnToToday = () => {
-    const today = timezoneInfo 
-      ? getCurrentDateInTimezone(timezoneInfo.timezone)
-      : new Date().toISOString().split('T')[0];
-    setSelectedDate(today);
+    const hour = new Date().getHours();
+    if (hour < 6) return '夜深了，早点休息';
+    if (hour < 12) return '早上好，开始今日修行';
+    if (hour < 18) return '下午好，精进不懈';
+    return '像最后一天那样去生活';
   };
 
   if (loading) {
@@ -614,23 +497,9 @@ export default function HomeScreen() {
           {/* Practice Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <TouchableOpacity 
-                onPress={() => setShowDatePicker(true)}
-                style={styles.dateButton}
-              >
-                <Text style={styles.sectionTitle}>{getDateDisplay()}</Text>
-                <Ionicons name="calendar-outline" size={18} color="#666" style={{ marginLeft: 6 }} />
-              </TouchableOpacity>
+              <Text style={styles.sectionTitle}>今日修行</Text>
               <View style={styles.headerActions}>
-                {!isToday() && (
-                  <TouchableOpacity onPress={handleReturnToToday} style={{ marginRight: 16 }}>
-                    <Text style={styles.returnTodayText}>返回今日</Text>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity onPress={() => router.push({
-                  pathname: '/modals/share-practice',
-                  params: { date: selectedDate }
-                })}>
+                <TouchableOpacity onPress={() => router.push('/modals/share-practice')}>
                   <Text style={styles.shareText}>分享</Text>
                 </TouchableOpacity>
               </View>
@@ -646,38 +515,55 @@ export default function HomeScreen() {
                   onPress={() => handlePracticeCardTap(practice)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.cardContentRow}>
-                    <View style={styles.practiceInfo}>
-                      <Text style={styles.practiceName} numberOfLines={1}>
-                        {practice.name}
-                      </Text>
-                      <Text style={styles.practiceCount}>
-                        {practice.current.toLocaleString()}/{practice.target.toLocaleString()}{practice.unit}
-                      </Text>
-                    </View>
+                  <View style={styles.practiceHeader}>
+                    <Text style={styles.practiceName} numberOfLines={1}>
+                      {practice.name}
+                    </Text>
+                  </View>
 
-                    {/* Action Buttons */}
-                    <View style={styles.practiceActions}>
-                      <TouchableOpacity
-                        onPress={(e) => handleQuickComplete(e, practice)}
-                      >
-                        <Ionicons 
-                          name="checkmark-circle-outline" 
-                          size={28} 
-                          color={practice.status === 'completed' ? '#10B981' : '#9CA3AF'} 
-                        />
-                      </TouchableOpacity>
+                  <View style={styles.countPercentageRow}>
+                    <Text style={styles.practiceCount}>
+                      {practice.current.toLocaleString()}/{practice.target.toLocaleString()} {practice.unit}
+                    </Text>
+                    <Text style={styles.progressPercent}>
+                      {Math.round(practice.progressPercent)}%
+                    </Text>
+                  </View>
 
-                      <TouchableOpacity
-                        onPress={(e) => handleAddRecord(e, practice)}
-                      >
-                        <Ionicons 
-                          name="add-circle-outline" 
-                          size={28} 
-                          color={DesignSystem.colors.primary} 
-                        />
-                      </TouchableOpacity>
+                  <View style={styles.progressBarContainer}>
+                    <View style={styles.progressBarBg}>
+                      <View 
+                        style={[
+                          styles.progressBarFill, 
+                          { width: `${Math.min(practice.progressPercent, 100)}%` }
+                        ]} 
+                      />
                     </View>
+                  </View>
+
+                  {/* Action Buttons */}
+                  <View style={styles.practiceActions}>
+                    <TouchableOpacity
+                      onPress={(e) => handleQuickComplete(e, practice)}
+                    >
+                      <Ionicons 
+                        name="checkmark-circle-outline" 
+                        size={24} 
+                        color={practice.status === 'completed' ? '#10B981' : '#6B7280'} 
+                      />
+                    </TouchableOpacity>
+
+                    <View style={styles.actionButtonSpacer} />
+
+                    <TouchableOpacity
+                      onPress={(e) => handleAddRecord(e, practice)}
+                    >
+                      <Ionicons 
+                        name="add-circle-outline" 
+                        size={24} 
+                        color={DesignSystem.colors.primary} 
+                      />
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -690,28 +576,28 @@ export default function HomeScreen() {
                   onPress={() => handlePracticeCardTap(practice)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.cardContentRow}>
-                    <View style={styles.practiceInfo}>
-                      <Text style={styles.practiceName} numberOfLines={1}>
-                        {practice.name}
-                      </Text>
-                      <Text style={styles.practiceCount}>
-                        本周 {practice.weekSessions}/{practice.weekTarget}座
-                      </Text>
-                    </View>
+                  <View style={styles.practiceHeader}>
+                    <Text style={styles.practiceName} numberOfLines={1}>
+                      {practice.name}
+                    </Text>
+                  </View>
+                  <Text style={styles.weeklyProgress}>
+                    本周 {practice.weekSessions}/{practice.weekTarget}座
+                    {practice.status === 'completed' && ' 已完成'}
+                  </Text>
 
-                    {/* Action Button for Weekly Practices */}
-                    <View style={styles.practiceActions}>
-                      <TouchableOpacity
-                        onPress={(e) => handleAddRecord(e, practice)}
-                      >
-                        <Ionicons 
-                          name="add-circle-outline" 
-                          size={28} 
-                          color={DesignSystem.colors.primary} 
-                        />
-                      </TouchableOpacity>
-                    </View>
+                  {/* Action Button for Weekly Practices */}
+                  <View style={styles.practiceActions}>
+                    <View style={styles.actionButtonSpacer} />
+                    <TouchableOpacity
+                      onPress={(e) => handleAddRecord(e, practice)}
+                    >
+                      <Ionicons 
+                        name="add-circle-outline" 
+                        size={24} 
+                        color={DesignSystem.colors.primary} 
+                      />
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -726,54 +612,6 @@ export default function HomeScreen() {
             )}
           </View>
         </ScrollView>
-
-        {/* Calendar Modal */}
-        <Modal
-          visible={showDatePicker}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setShowDatePicker(false)}
-        >
-          <View style={styles.calendarOverlay}>
-            <View style={styles.calendarContainer}>
-              <View style={styles.calendarHeader}>
-                <Text style={styles.calendarHeaderText}>选择日期</Text>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text style={styles.calendarCloseButton}>✕</Text>
-                </TouchableOpacity>
-              </View>
-              <Calendar
-                current={selectedDate}
-                minDate="2020-01-01"
-                maxDate={timezoneInfo ? getCurrentDateInTimezone(timezoneInfo.timezone) : new Date().toISOString().split('T')[0]}
-                onDayPress={(day: any) => handleDateChange(day.dateString)}
-                markedDates={markedDates}
-                monthFormat={'yyyy年MM月'}
-                theme={{
-                  backgroundColor: '#ffffff',
-                  calendarBackground: '#ffffff',
-                  textSectionTitleColor: '#1a1a1a',
-                  textSectionTitleDisabledColor: '#d9d9d9',
-                  selectedDayBackgroundColor: DesignSystem.colors.primary,
-                  selectedDayTextColor: '#ffffff',
-                  todayTextColor: DesignSystem.colors.primary,
-                  dayTextColor: '#1a1a1a',
-                  textDisabledColor: '#d9d9d9',
-                  dotColor: DesignSystem.colors.primary,
-                  selectedDotColor: '#ffffff',
-                  arrowColor: DesignSystem.colors.primary,
-                  monthTextColor: '#1a1a1a',
-                  textDayFontFamily: 'System',
-                  textMonthFontFamily: 'System',
-                  textDayHeaderFontFamily: 'System',
-                  textDayFontSize: 16,
-                  textMonthFontSize: 16,
-                  textDayHeaderFontSize: 14,
-                }}
-              />
-            </View>
-          </View>
-        </Modal>
     </PageTemplate>
   );
 }
@@ -813,19 +651,10 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     letterSpacing: -0.3,
   },
-  dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-  },
-  returnTodayText: {
-    fontSize: 14,
-    color: DesignSystem.colors.primary,
-    fontWeight: '600',
   },
   shareText: {
     fontSize: 14,
@@ -843,62 +672,67 @@ const styles = StyleSheet.create({
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-  cardContentRow: {
+  practiceHeader: {
+    marginBottom: 6,
+  },
+  practiceNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  practiceStatusIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  practiceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    flex: 1,
+  },
+  practiceCount: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  countPercentageRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+        marginBottom: 6,
   },
-  practiceInfo: {
-    flex: 1,
-    marginRight: 12,
+  progressBarContainer: {
+    marginBottom: 8,
   },
-  practiceName: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 4,
+  progressBarBg: {
+    height: 6,backgroundColor: '#f0f0f0',
+    borderRadius: 3,
   },
-  practiceCount: {
-    fontSize: 15,
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: DesignSystem.colors.primary,
+    borderRadius: 3,
+  },
+  progressPercent: {
+    fontSize: 12,
     color: Colors.textSecondary,
   },
   practiceActions: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 12,
+  },
+  actionButtonSpacer: {
+    width: 28,
+  },
+  weeklyProgress: {
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 4,
   },
   noPracticeText: {
     fontSize: 16,
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingVertical: 20,
-  },
-  calendarOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  calendarContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    width: '85%',
-    maxWidth: 400,
-  },
-  calendarHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  calendarHeaderText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-  },
-  calendarCloseButton: {
-    fontSize: 24,
-    color: '#999',
   },
 });
