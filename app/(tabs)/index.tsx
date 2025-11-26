@@ -583,7 +583,10 @@ export default function HomeScreen() {
                       <Text style={styles.practiceName} numberOfLines={1}>
                         {practice.name}
                       </Text>
-                      <Text style={styles.practiceCount}>
+                      <Text style={[
+                        styles.practiceCount,
+                        practice.status === 'completed' && styles.practiceCountCompleted
+                      ]}>
                         {practice.current.toLocaleString()}/{practice.target.toLocaleString()}{practice.unit}
                       </Text>
                     </View>
@@ -630,7 +633,10 @@ export default function HomeScreen() {
                       <Text style={styles.practiceName} numberOfLines={1}>
                         {practice.name}
                       </Text>
-                      <Text style={styles.practiceCount}>
+                      <Text style={[
+                        styles.practiceCount,
+                        practice.status === 'completed' && styles.practiceCountCompleted
+                      ]}>
                         本周 {practice.weekSessions}/{practice.weekTarget}座
                       </Text>
                     </View>
@@ -738,6 +744,9 @@ const styles = StyleSheet.create({
   practiceCount: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  practiceCountCompleted: {
+    color: '#EF4444', // Red color for completed
   },
   practiceActions: {
     flexDirection: 'row',
