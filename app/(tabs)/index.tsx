@@ -127,21 +127,27 @@ export default function HomeScreen() {
         ? getCurrentDateInTimezone(timezoneInfo.timezone)
         : new Date().toISOString().split('T')[0];
 
+      // Get all daily records for today in ONE query (avoid N+1)
+      const { data: allTodayRecords, error: allRecordsError } = await supabase
+        .from('daily_records')
+        .select('practice_project_id, count')
+        .eq('user_id', user.id)
+        .eq('record_date', today);
+
+      if (allRecordsError) throw allRecordsError;
+
+      // Group records by project_id for fast lookup
+      const recordsByProjectId = new Map<string, number>();
+      (allTodayRecords || []).forEach(record => {
+        const current = recordsByProjectId.get(record.practice_project_id) || 0;
+        recordsByProjectId.set(record.practice_project_id, current + record.count);
+      });
+
       const practicesData: DailyPractice[] = [];
 
       for (const project of projects || []) {
         if (project.practices.type === 'count') {
-          // Get today's records for count-based practices
-          const { data: todayRecords, error: recordsError } = await supabase
-            .from('daily_records')
-            .select('count')
-            .eq('user_id', user.id)
-            .eq('practice_project_id', project.id)
-            .eq('record_date', today);
-
-          if (recordsError) throw recordsError;
-
-          const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
+          const todayCount = recordsByProjectId.get(project.id) || 0;
           const progressPercent = Math.min((todayCount / project.daily_target) * 100, 100);
 
           let status: 'completed' | 'in_progress' | 'pending' = 'pending';
@@ -198,23 +204,31 @@ export default function HomeScreen() {
       const monday = new Date(todayDate.setDate(diff));
       const weekStart = monday.toISOString().split('T')[0];
 
+      // Get all meditation records for all practices this week in ONE query (avoid N+1)
+      const { data: allWeekRecords, error: allRecordsError } = await supabase
+        .from('meditation_records')
+        .select('practice_id, duration_minutes, record_date')
+        .eq('user_id', user.id)
+        .gte('record_date', weekStart)
+        .lte('record_date', today);
+
+      if (allRecordsError) throw allRecordsError;
+
+      // Group records by practice_id for fast lookup
+      const recordsByPracticeId = new Map<string, any[]>();
+      (allWeekRecords || []).forEach(record => {
+        const current = recordsByPracticeId.get(record.practice_id) || [];
+        current.push(record);
+        recordsByPracticeId.set(record.practice_id, current);
+      });
+
       const practicesData: WeeklyPractice[] = [];
 
       for (const project of projects || []) {
         if (project.practices.type === 'time') {
-          // Get this week's meditation records
-          const { data: weekRecords, error: weekError } = await supabase
-            .from('meditation_records')
-            .select('duration_minutes, record_date')
-            .eq('user_id', user.id)
-            .eq('practice_id', project.practice_id)
-            .gte('record_date', weekStart)
-            .lte('record_date', today);
-
-          if (weekError) throw weekError;
-
-          const weekSessions = weekRecords?.length || 0;
-          const todayRecords = weekRecords?.filter(r => r.record_date === today) || [];
+          const weekRecords = recordsByPracticeId.get(project.practice_id) || [];
+          const weekSessions = weekRecords.length;
+          const todayRecords = weekRecords.filter(r => r.record_date === today);
           const todaySessions = todayRecords.length;
 
           let status: 'completed' | 'in_progress' | 'pending' = 'pending';
