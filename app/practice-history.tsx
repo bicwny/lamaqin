@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { presetProjectNameService } from '@/lib/database';
@@ -129,7 +130,7 @@ export default function PracticeHistoryScreen() {
     loadData();
   };
 
-  const handleEdit = (record: DailyRecord) => {
+  const handleEditRecord = (record: DailyRecord) => {
     router.push({
       pathname: '/modals/custom-record',
       params: {
@@ -137,6 +138,43 @@ export default function PracticeHistoryScreen() {
         practiceName,
         practiceType: projectInfo?.practices?.type || 'count',
         editRecordId: record.id
+      }
+    });
+  };
+
+  const handleEditProject = () => {
+    if (!projectInfo) return;
+    
+    router.push({
+      pathname: '/practice-config',
+      params: {
+        practiceId: projectInfo.practice_id,
+        practiceName: projectInfo.practices?.name || practiceName,
+        practiceType: projectInfo.practices?.type || 'count',
+        practiceUnit: projectInfo.practices?.unit || '次',
+        practiceDescription: projectInfo.practices?.description || '',
+        editMode: 'true',
+        projectId: projectId,
+        currentTotalTarget: projectInfo.total_target?.toString() || '',
+        currentDailyTarget: projectInfo.daily_target?.toString() || '',
+        currentWeeklyTarget: projectInfo.weekly_target?.toString() || '',
+        currentStartDate: projectInfo.start_date || '',
+        currentEndDate: projectInfo.end_date || '',
+        currentTargetPeriod: projectInfo.target_period || 'daily',
+        currentGoalType: projectInfo.goal_type || 'total',
+        currentProjectName: projectInfo.project_name || '',
+        currentPresetId: projectInfo.preset_project_id || ''
+      }
+    });
+  };
+
+  const handleAddRecord = () => {
+    router.push({
+      pathname: '/modals/custom-record',
+      params: {
+        projectId,
+        practiceName,
+        practiceType: projectInfo?.practices?.type || 'count'
       }
     });
   };
@@ -314,6 +352,25 @@ export default function PracticeHistoryScreen() {
           )}
         </View>
 
+        {/* Action Buttons */}
+        <View style={styles.actionButtonsContainer}>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={handleEditProject}
+          >
+            <Ionicons name="settings-outline" size={20} color={DesignSystem.colors.textPrimary} />
+            <Text style={styles.actionButtonText}>编辑</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.actionButtonPrimary]}
+            onPress={handleAddRecord}
+          >
+            <Ionicons name="add-circle-outline" size={20} color={DesignSystem.colors.white} />
+            <Text style={[styles.actionButtonText, styles.actionButtonTextPrimary]}>记录</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Records List */}
         <View style={styles.recordsSection}>
           <Text style={styles.sectionTitle}>修行记录</Text>
@@ -335,7 +392,7 @@ export default function PracticeHistoryScreen() {
                     practiceUnit={projectInfo?.practices?.unit || '次'}
                     isDeleting={isDeleting}
                     showActions={true}
-                    onEdit={() => handleEdit(record)}
+                    onEdit={() => handleEditRecord(record)}
                     onDelete={() => handleDelete(record)}
                   />
                 );
@@ -416,5 +473,37 @@ const styles = StyleSheet.create({
   recordsList: {
     gap: DesignSystem.spacing.md,
   },
-
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    borderRadius: DesignSystem.borderRadius.lg,
+    backgroundColor: DesignSystem.colors.surface,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+    flex: 1,
+  },
+  actionButtonPrimary: {
+    backgroundColor: DesignSystem.colors.primary,
+    borderColor: DesignSystem.colors.primary,
+  },
+  actionButtonText: {
+    fontSize: DesignSystem.typography.fontSize.base,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    color: DesignSystem.colors.textPrimary,
+  },
+  actionButtonTextPrimary: {
+    color: DesignSystem.colors.white,
+  },
 });
