@@ -74,7 +74,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       allDates.forEach(date => {
         marked[date] = {
           marked: true,
-          dotColor: DesignSystem.colors.greenTara,
+          dotColor: DesignSystem.colors.redTara,
         };
       });
 
@@ -152,7 +152,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
           todayTextColor: DesignSystem.colors.redTara,
           dayTextColor: DesignSystem.colors.textPrimary,
           textDisabledColor: DesignSystem.colors.textTertiary,
-          dotColor: DesignSystem.colors.greenTara,
+          dotColor: DesignSystem.colors.redTara,
           selectedDotColor: '#ffffff',
           arrowColor: DesignSystem.colors.blueTara,
           monthTextColor: DesignSystem.colors.textPrimary,
