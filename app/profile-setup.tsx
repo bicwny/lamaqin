@@ -600,11 +600,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    alignItems: 'center',
     marginBottom: 40,
   },
   headerTop: {
-    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -614,18 +612,19 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   logoutButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 6,
     backgroundColor: Colors.error + '20',
   },
   logoutButtonText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: Colors.error,
   },
   emailContainer: {
     alignItems: 'center',
+    alignSelf: 'center',
     marginTop: 16,
     padding: 12,
     backgroundColor: '#F0F4FF',
