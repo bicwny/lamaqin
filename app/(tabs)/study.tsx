@@ -422,7 +422,7 @@ export default function StudyScreen() {
                 onPress={() => router.push('/course-management')}
               >
                 <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-                <Text style={styles.browseButtonText}>管理课程</Text>
+                <Text style={styles.browseButtonText}>设置</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -435,7 +435,7 @@ export default function StudyScreen() {
         title="闻思"
         subtitle="好好闻思，别乱跑。"
         rightAction={{
-          text: "管理课程",
+          text: "设置",
           onPress: () => router.push('/course-management')
         }}
         scrollable={false}
