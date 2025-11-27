@@ -35,65 +35,108 @@ export default function MindfulnessScreen() {
         </View>
 
         <View style={styles.prayerContent}>
-          <Text style={styles.prayerTibetan}>
-            འཁོར་འདས་ཆོས་ཀུན་ཀ་དག་རིག་པའི་ངང༌། །{'\n'}
-            རང་གདངས་མ་འགགས་ཡེ་ཤེས་འོད་ལྔའི་ཀློང༌། །{'\n'}
-            ངོ་བོ་དཔལ་ལྡན་འཇམ་པའི་རྡོ་རྗེ་ལ། །{'\n'}
-            རྣམ་པ་སྐྱབས་གཅིག་ཡིད་བཞིན་ནོར་བུ་ཉིད། །{'\n'}
-            དཀར་གསལ་མཛེས་འཛུམ་པཎྜི་ཏ་ཡི་ཆས། །{'\n'}
-            ཆོས་འཆད་ཕྱག་རྒྱས་རལ་གྲི་གླེགས་བམ་བསྣམས། །{'\n'}
-            ཞབས་གཉིས་སྐྱིལ་ཀྲུང་འོད་ཟེར་མུ་མེད་འཕྲོ། །{'\n'}
-            རང་སྣང་དག་པའི་རྒྱན་དུ་ལམ་མེར་གསལ། །
-          </Text>
-          
-          <Text style={styles.prayerChinese}>
-            轮涅诸法本净觉性中{'\n'}
-            自性不灭智慧五光界{'\n'}
-            本体具德文殊金刚尊{'\n'}
-            形相唯一怙主如意宝{'\n'}
-            白明美颜班智达之饰{'\n'}
-            说法手印持执宝剑函{'\n'}
-            二足跏趺照射无边光{'\n'}
-            一切自现观为净明然
-          </Text>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>འཁོར་འདས་ཆོས་ཀུན་ཀ་དག་རིག་པའི་ངང༌། །</Text>
+            <Text style={styles.phonetic}>科德曲更甲达如毕昂</Text>
+            <Text style={styles.prayerChinese}>轮涅诸法本净觉性中</Text>
+          </View>
 
-          <Text style={styles.sectionTitle}>祈祷者：</Text>
-          
-          <Text style={styles.prayerTibetan}>
-            གསོལ་བ་གདབ་པ་ནི།{'\n'}
-            {'\n'}
-            གནས་ཆེན་རི་བོ་རྩེ་ལྔའི་ཞིང་ཁམས་སུ། །{'\n'}
-            འཇམ་དཔལ་ཐུགས་ཀྱི་བྱིན་རླབས་ཡིད་ལ་སྨིན། །{'\n'}
-            འཇིགས་མེད་ཕུན་ཚོགས་ཞབས་ལ་གསོལ་བ་འདེབས། །{'\n'}
-            དགོངས་བརྒྱུད་རྟོགས་པ་འཕོ་བར་བྱིན་གྱིས་རློབས། །
-          </Text>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>རང་གདངས་མ་འགགས་ཡེ་ཤེས་འོད་ལྔའི་ཀློང༌། །</Text>
+            <Text style={styles.phonetic}>让当玛甲意西俄爱龙</Text>
+            <Text style={styles.prayerChinese}>自性不灭智慧五光界</Text>
+          </View>
 
-          <Text style={styles.prayerChinese}>
-            祈祷词：{'\n'}
-            {'\n'}
-            自大圣境五台山{'\n'}
-            文殊加持入心者{'\n'}
-            祈祷晋美彭措足{'\n'}
-            证悟意传求加持
-          </Text>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>ངོ་བོ་དཔལ་ལྡན་འཇམ་པའི་རྡོ་རྗེ་ལ། །</Text>
+            <Text style={styles.phonetic}>俄吾华单加毕多吉啦</Text>
+            <Text style={styles.prayerChinese}>本体具德文殊金刚尊</Text>
+          </View>
 
-          <Text style={styles.sectionTitle}>（随力念诵）</Text>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>རྣམ་པ་སྐྱབས་གཅིག་ཡིད་བཞིན་ནོར་བུ་ཉིད། །</Text>
+            <Text style={styles.phonetic}>南巴加吉意斯洛布尼</Text>
+            <Text style={styles.prayerChinese}>形相唯一怙主如意宝</Text>
+          </View>
 
-          <Text style={styles.prayerTibetan}>
-            མཐར་ནི་བླ་མ་འོད་ལྔའི་ཐིག་ལེར་གྱུར།{'\n'}
-            རང་གི་སྤྱི་བོ་ནས་ཞུགས་སྙིང་དབུས་ཐིམ། །{'\n'}
-            རྒྱལ་ཀུན་ཡེ་ཤེས་གཅིག་འདུས་བླ་མ་དང༌། །{'\n'}
-            སྐལ་བ་མཉམ་པའི་བྱིན་རླབས་ཐོབ་པར་བསམ། །
-          </Text>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>དཀར་གསལ་མཛེས་འཛུམ་པཎྜི་ཏ་ཡི་ཆས། །</Text>
+            <Text style={styles.phonetic}>呷萨则争班智达义其</Text>
+            <Text style={styles.prayerChinese}>白明美颜班智达之饰</Text>
+          </View>
 
-          <Text style={styles.prayerChinese}>
-            后师已成五光之明点{'\n'}
-            由从自顶渗入于心间{'\n'}
-            当思诸佛智慧总集师{'\n'}
-            获得于彼同份之加持
-          </Text>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>ཆོས་འཆད་ཕྱག་རྒྱས་རལ་གྲི་གླེགས་བམ་བསྣམས། །</Text>
+            <Text style={styles.phonetic}>曲恰夏杰Ra支拿瓦南</Text>
+            <Text style={styles.prayerChinese}>说法手印持执宝剑函</Text>
+          </View>
 
-          <Text style={styles.prayerChinese} style={{ marginTop: 20, fontStyle: 'italic' }}>
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>ཞབས་གཉིས་སྐྱིལ་ཀྲུང་འོད་ཟེར་མུ་མེད་འཕྲོ། །</Text>
+            <Text style={styles.phonetic}>夏尼吉中俄热木美卓</Text>
+            <Text style={styles.prayerChinese}>二足跏趺照射无边光</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>རང་སྣང་དག་པའི་རྒྱན་དུ་ལམ་མེར་གསལ། །</Text>
+            <Text style={styles.phonetic}>让郎达毕坚得拉美萨</Text>
+            <Text style={styles.prayerChinese}>一切自现观为净明然</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>གསོལ་བ་གདབ་པ་ནི།{'\n'}祈祷者：</Text>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>གནས་ཆེན་རི་བོ་རྩེ་ལྔའི་ཞིང་ཁམས་སུ། །</Text>
+            <Text style={styles.phonetic}>涅庆日俄再爱香克思</Text>
+            <Text style={styles.prayerChinese}>自大圣境五台山</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>འཇམ་དཔལ་ཐུགས་ཀྱི་བྱིན་རླབས་ཡིད་ལ་སྨིན། །</Text>
+            <Text style={styles.phonetic}>加华头吉新拉意拉闷</Text>
+            <Text style={styles.prayerChinese}>文殊加持入心者</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>འཇིགས་མེད་ཕུན་ཚོགས་ཞབས་ལ་གསོལ་བ་འདེབས། །</Text>
+            <Text style={styles.phonetic}>晋美彭措夏拉所瓦得</Text>
+            <Text style={styles.prayerChinese}>祈祷晋美彭措足</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>དགོངས་བརྒྱུད་རྟོགས་པ་འཕོ་བར་བྱིན་གྱིས་རློབས། །</Text>
+            <Text style={styles.phonetic}>共机多巴破瓦新吉罗</Text>
+            <Text style={styles.prayerChinese}>证悟意传求加持</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>ཅི་ནུས་བསགས།{'\n'}（随力念诵）</Text>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>མཐར་ནི་བླ་མ་འོད་ལྔའི་ཐིག་ལེར་གྱུར།</Text>
+            <Text style={styles.phonetic}>蹋尼喇嘛俄爱头耐吉</Text>
+            <Text style={styles.prayerChinese}>后师已成五光之明点</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>རང་གི་སྤྱི་བོ་ནས་ཞུགས་སྙིང་དབུས་ཐིམ། །</Text>
+            <Text style={styles.phonetic}>让革即俄涅修娘为腾</Text>
+            <Text style={styles.prayerChinese}>由从自顶渗入于心间</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>རྒྱལ་ཀུན་ཡེ་ཤེས་གཅིག་འདུས་བླ་མ་དང༌། །</Text>
+            <Text style={styles.phonetic}>嘉更意西旧第喇嘛当</Text>
+            <Text style={styles.prayerChinese}>当思诸佛智慧总集师</Text>
+          </View>
+
+          <View style={styles.verseBlock}>
+            <Text style={styles.prayerTibetan}>སྐལ་བ་མཉམ་པའི་བྱིན་རླབས་ཐོབ་པར་བསམ། །</Text>
+            <Text style={styles.phonetic}>嘎瓦南毕新拉托巴萨</Text>
+            <Text style={styles.prayerChinese}>获得于彼同份之加持</Text>
+          </View>
+
+          <Text style={styles.instructionText}>
+            ཞེས་བློ་འདས་ཆོས་སྐུའི་ངང་དུ་མཉམ་པར་བཞག དེ་ལས་ལྡང་བ་ན་སྣང་སྲིད་བླ་མའི་ངོ་བོར་བལྟས་ཏེ་རྒྱུན་གྱི་སྤྱོད་ལམ་ལ་འཇུག་པར་བྱའོ། །{'\n'}
             如是离意法身中入定，彼中起座时观诸现有即师本性，而行平常威仪也。
           </Text>
 
@@ -103,7 +146,6 @@ export default function MindfulnessScreen() {
 
           <Text style={styles.colophonChinese}>
             此文于十七胜生闰年木猪年六月二十五日，由雪域语自在化身丹增降措乞求曰：为利我等诸徒众之需，请造如是瑜伽。 如此劝求{'\n'}
-            {'\n'}
             索达吉堪布 译
           </Text>
         </View>
@@ -163,21 +205,32 @@ const styles = StyleSheet.create({
   prayerContent: {
     paddingHorizontal: DesignSystem.spacing.lg,
   },
+  verseBlock: {
+    marginBottom: 16,
+    alignItems: 'center',
+  },
   prayerTibetan: {
     fontSize: 14,
     fontWeight: '500',
     color: '#1a1a1a',
     lineHeight: 24,
-    marginBottom: 16,
     textAlign: 'center',
+  },
+  phonetic: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#6B7280',
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: 2,
   },
   prayerChinese: {
     fontSize: 14,
     fontWeight: '500',
     color: '#1a1a1a',
     lineHeight: 24,
-    marginBottom: 16,
     textAlign: 'center',
+    marginTop: 2,
   },
   sectionTitle: {
     fontSize: 16,
@@ -186,6 +239,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 12,
     textAlign: 'center',
+  },
+  instructionText: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#374151',
+    lineHeight: 22,
+    marginTop: 24,
+    marginBottom: 20,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   colophon: {
     fontSize: 12,
