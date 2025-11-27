@@ -383,8 +383,26 @@ export default function PracticeHistoryScreen() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'journal':
+        const isTimeBased = projectInfo?.practices?.type === 'time';
+        const unit = isTimeBased ? '分钟' : (projectInfo?.practices?.unit || '次');
+        const progressText = progress.target
+          ? `${progress.current.toLocaleString()}/${progress.target.toLocaleString()}${unit} · ${Math.round(progress.percentage)}%`
+          : `已完成 ${progress.current.toLocaleString()}${unit}`;
+        
         return (
           <View style={styles.tabContent}>
+            {/* Progress Overview */}
+            <View style={styles.progressOverview}>
+              <Text style={styles.progressOverviewText}>{progressText}</Text>
+              {progress.target && (
+                <ProgressBar 
+                  progress={progress.percentage} 
+                  size="medium"
+                  fillColor={DesignSystem.colors.greenTara}
+                />
+              )}
+            </View>
+
             {/* Add Record Button for Journal Tab */}
             <View style={styles.addRecordContainer}>
               <TouchableOpacity 
@@ -706,9 +724,19 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
-  addRecordContainer: {
+  progressOverview: {
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.sm,
+  },
+  progressOverviewText: {
+    fontSize: DesignSystem.typography.fontSize.lg,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    color: DesignSystem.colors.textPrimary,
+  },
+  addRecordContainer: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.md,
     paddingBottom: DesignSystem.spacing.md,
   },
   addRecordButton: {
