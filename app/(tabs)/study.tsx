@@ -89,20 +89,18 @@ interface CourseLesson {
   url?: string;
 }
 
-type ViewMode = 'home' | 'manage' | 'courseDetail';
+type ViewMode = 'home' | 'courseDetail';
 
 export default function StudyScreen() {
   const { user } = useAuth();
   const params = useLocalSearchParams();
   const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
-  const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [progress, setProgress] = useState<StudyProgress[]>([]);
   const [courseLessons, setCourseLessons] = useState<Record<string, CourseLesson[]>>({});
   const [enrolledClasses, setEnrolledClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [selectedCourse, setSelectedCourse] = useState<UserCourse | null>(null);
-  const [joiningCourse, setJoiningCourse] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -159,14 +157,9 @@ export default function StudyScreen() {
         console.error('❌ Failed to sync class courses:', err);
       }
 
-      // Load user's courses (freshly synced) and all courses in parallel
-      const [userCoursesData, allCoursesData] = await Promise.all([
-        getUserCourses(user.id),
-        studyService.getCourses()
-      ]);
-      
+      // Load user's courses (freshly synced)
+      const userCoursesData = await getUserCourses(user.id);
       setUserCourses(userCoursesData);
-      setAllCourses(allCoursesData);
 
       // Load progress data
       const progressData = await studyService.getUserStudyProgress(user.id);
@@ -222,7 +215,6 @@ export default function StudyScreen() {
     } catch (error) {
       console.error('❌ Error loading study data:', error);
       setUserCourses([]);
-      setAllCourses([]);
       setProgress([]);
     } finally {
       setLoading(false);
@@ -319,157 +311,9 @@ export default function StudyScreen() {
     }
   };
 
-  const joinCourse = async (courseId: string) => {
-    if (!user) return;
-
-    try {
-      console.log('🔄 加入课程:', courseId);
-      setJoiningCourse(courseId);
-
-      // Check if user is already enrolled (both in state and database)
-      const isAlreadyEnrolledInState = userCourses.some(uc => uc.course_id === courseId);
-      if (isAlreadyEnrolledInState) {
-        toastService.info({
-        title: '已加入课程',
-        message: '您已经在学习这门课程了'
-      });
-        setViewMode('home');
-        return;
-      }
-
-      // Double-check against database to catch sync issues
-      try {
-        const dbUserCourses = await studyService.getUserCourses(user.id);
-        const isAlreadyEnrolledInDb = dbUserCourses.some(uc => uc.course_id === courseId);
-        if (isAlreadyEnrolledInDb) {
-          console.log('⚠️ Course enrollment found in DB but not in state - syncing...');
-          setUserCourses(dbUserCourses);
-          toastService.info({
-        title: '已加入课程',
-        message: '您已经在学习这门课程了'
-      });
-          setViewMode('home');
-          return;
-        }
-      } catch (dbError) {
-        console.error('❌ Error checking database for existing enrollment:', dbError);
-      }
-
-      const userCourse = await studyService.joinCourse(user.id, courseId);
-
-      setUserCourses(prev => [...prev, userCourse]);
-
-      const newProgress: StudyProgress = {
-        courseId: courseId,
-        currentLesson: 1,
-        listenCount: {},
-        totalLessonsStudied: 0,
-        progressPercentage: 0,
-        lastStudiedLesson: 1
-      };
-      setProgress(prev => [...prev, newProgress]);
-
-      toastService.success({ 
-        title: '课程加入成功', 
-        message: '开始您的学习之旅吧！' 
-      });
-      setViewMode('home');
-
-      console.log('✅ 课程加入成功');
-    } catch (error) {
-      console.error('❌ Error joining course:', error);
-      // Handle duplicate key error specifically
-      if (error?.code === '23505') {
-        toastService.info({
-        title: '已加入课程',
-        message: '课程数据已同步'
-      });
-        // Reload data to sync state
-        loadStudyData();
-      } else {
-        toastService.error({ 
-          title: '加入失败', 
-          message: '网络异常，请稍后重试' 
-        });
-      }
-    } finally {
-      setJoiningCourse(null);
-    }
-  };
-
-  const pauseCourse = async (courseId: string) => {
-    if (!user) return;
-
-    console.log('🔄 pauseCourse called for:', courseId);
-    try {
-      const result = await studyService.updateCourseStatus(user.id, courseId, 'paused');
-      console.log('✅ pauseCourse result:', result);
-      setUserCourses(prev => 
-        prev.map(uc => 
-          uc.course_id === courseId ? { ...uc, status: 'paused' } : uc
-        )
-      );
-      toastService.info({
-        title: '课程已暂停',
-        message: '可在课程管理中恢复学习'
-      });
-    } catch (error) {
-      console.error('❌ Error pausing course:', error);
-      toastService.error({ 
-        title: '暂停失败', 
-        message: '请稍后重试' 
-      });
-    }
-  };
-
-  const resumeCourse = async (courseId: string) => {
-    if (!user) return;
-
-    try {
-      await studyService.updateCourseStatus(user.id, courseId, 'active');
-      setUserCourses(prev => 
-        prev.map(uc => 
-          uc.course_id === courseId ? { ...uc, status: 'active' } : uc
-        )
-      );
-      toastService.success({ 
-        title: '课程已恢复', 
-        message: '继续您的学习进度' 
-      });
-    } catch (error) {
-      console.error('Error resuming course:', error);
-      toastService.error({ 
-        title: '恢复失败', 
-        message: '请稍后重试' 
-      });
-    }
-  };
-
   const getCourseProgress = (courseId: string) => {
     return progress.find(p => p.courseId === courseId);
   };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active': return '';
-      case 'paused': return '';
-      case 'completed': return '';
-      default: return '';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active': return '学习中';
-      case 'paused': return '已暂停';
-      case 'completed': return '已完成';
-      default: return '未开始';
-    }
-  };
-
-  const availableCourses = allCourses.filter(course => 
-    !userCourses.some(uc => uc.course_id === course.id)
-  );
 
   // Group courses by class with proper ordering
   const groupCoursesByClass = () => {
@@ -564,7 +408,7 @@ export default function StudyScreen() {
 
               <TouchableOpacity 
                 style={styles.browseButton} 
-                onPress={() => setViewMode('manage')}
+                onPress={() => router.push('/course-management')}
               >
                 <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
                 <Text style={styles.browseButtonText}>管理课程</Text>
@@ -581,7 +425,7 @@ export default function StudyScreen() {
         subtitle="好好闻思，别乱跑。"
         rightAction={{
           text: "管理课程",
-          onPress: () => setViewMode('manage')
+          onPress: () => router.push('/course-management')
         }}
         scrollable={false}
         backgroundColor={Colors.background}
@@ -737,113 +581,6 @@ export default function StudyScreen() {
               }
             </Text>
           </View>
-        </ScrollView>
-      </PageTemplate>
-    );
-  }
-
-  // Course Management View
-  if (viewMode === 'manage') {
-    return (
-      <PageTemplate
-        title="课程管理"
-        subtitle="管理您的学习课程"
-        showBackButton={true}
-        onBackPress={() => setViewMode('home')}
-        scrollable={false}
-        backgroundColor={Colors.background}
-        padding={0}
-      >
-        <ScrollView style={styles.scrollView}>
-          {userCourses.length > 0 && (
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>我的课程</Text>
-              </View>
-
-              {userCourses.map(userCourse => {
-                const courseProgress = getCourseProgress(userCourse.course_id);
-                const progressPercentage = userCourse.progress_percentage || 0;
-
-                return (
-                  <View key={userCourse.id} style={styles.manageCourseCard}>
-                    <View style={styles.courseHeader}>
-                      <Text style={styles.courseName}>
-                        {userCourse.course.name}
-                      </Text>
-                      <Text style={styles.courseDetails}>
-                        {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
-                      </Text>
-                      <Text style={styles.statusText}>
-                        状态：{getStatusText(userCourse.status)}
-                      </Text>
-                    </View>
-
-                    <View style={styles.buttonRow}>
-                      {userCourse.status === 'active' ? (
-                        <>
-                          <TouchableOpacity 
-                            style={styles.primaryButton}
-                            onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
-                          >
-                            <Text style={styles.buttonText}>继续学习</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity 
-                            style={styles.secondaryButton}
-                            onPress={() => pauseCourse(userCourse.course_id)}
-                          >
-                            <Text style={styles.secondaryButtonText}>暂停</Text>
-                          </TouchableOpacity>
-                        </>
-                      ) : userCourse.status === 'paused' ? (
-                        <TouchableOpacity 
-                          style={styles.primaryButton}
-                          onPress={() => resumeCourse(userCourse.course_id)}
-                        >
-                          <Text style={styles.buttonText}>恢复学习</Text>
-                        </TouchableOpacity>
-                      ) : null}
-                    </View>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-
-          {availableCourses.length > 0 && (
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>可加入课程</Text>
-              </View>
-
-              {availableCourses.map(course => (
-                <View key={course.id} style={styles.availableCourseCard}>
-                  <View style={styles.courseHeader}>
-                    <Text style={styles.courseName}>{course.name}</Text>
-                    <Text style={styles.courseDetails}>
-                      {course.teacher} • {course.total_lessons}课
-                    </Text>
-                    {course.description && (
-                      <Text style={styles.courseDescription}>{course.description}</Text>
-                    )}
-                  </View>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.joinButton,
-                      joiningCourse === course.id && styles.joinButtonLoading
-                    ]}
-                    onPress={() => joinCourse(course.id)}
-                    disabled={joiningCourse === course.id}
-                  >
-                    <Text style={styles.joinButtonText}>
-                      {joiningCourse === course.id ? '加入中...' : '加入学习'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-          )}
         </ScrollView>
       </PageTemplate>
     );
