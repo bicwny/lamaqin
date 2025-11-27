@@ -704,7 +704,7 @@ export const studyService = {
     study_date: string;
     study_type: '听传承' | '看法本' | '共修' | '讲考';
     study_count_for_lesson: number;
-    status?: '参加' | '缺席';  // Only used for 共修/讲考
+    status?: '参加' | '请假';  // Only used for 共修/讲考
   }) {
     try {
       // First, get the lesson record - handle potential duplicates by taking the first one
@@ -1062,9 +1062,9 @@ export const studyService = {
     const summary = {
       听传承: 0,
       看法本: 0,
-      共修: null as '参加' | '缺席' | null,
-      讲考: null as '参加' | '缺席' | null,
-      details: [] as Array<{ date: string; type: string; count?: number; status?: '参加' | '缺席' }>
+      共修: null as '参加' | '请假' | null,
+      讲考: null as '参加' | '请假' | null,
+      details: [] as Array<{ date: string; type: string; count?: number; status?: '参加' | '请假' }>
     };
 
     records.forEach(record => {
@@ -1085,18 +1085,18 @@ export const studyService = {
           count: 1
         });
       } else if (studyType === '共修') {
-        summary.共修 = record.status as '参加' | '缺席' | null;
+        summary.共修 = record.status as '参加' | '请假' | null;
         summary.details.push({
           date: record.study_date,
           type: studyType,
-          status: record.status as '参加' | '缺席'
+          status: record.status as '参加' | '请假'
         });
       } else if (studyType === '讲考') {
-        summary.讲考 = record.status as '参加' | '缺席' | null;
+        summary.讲考 = record.status as '参加' | '请假' | null;
         summary.details.push({
           date: record.study_date,
           type: studyType,
-          status: record.status as '参加' | '缺席'
+          status: record.status as '参加' | '请假'
         });
       }
     });
@@ -1152,8 +1152,8 @@ export const studyService = {
         summaryMap[lessonId] = {
           听传承: 0,
           看法本: 0,
-          共修: null as '参加' | '缺席' | null,
-          讲考: null as '参加' | '缺席' | null,
+          共修: null as '参加' | '请假' | null,
+          讲考: null as '参加' | '请假' | null,
           details: []
         };
       }
@@ -1176,18 +1176,18 @@ export const studyService = {
           count: 1
         });
       } else if (studyType === '共修') {
-        summary.共修 = record.status as '参加' | '缺席' | null;
+        summary.共修 = record.status as '参加' | '请假' | null;
         summary.details.push({
           date: record.study_date,
           type: studyType,
-          status: record.status as '参加' | '缺席'
+          status: record.status as '参加' | '请假'
         });
       } else if (studyType === '讲考') {
-        summary.讲考 = record.status as '参加' | '缺席' | null;
+        summary.讲考 = record.status as '参加' | '请假' | null;
         summary.details.push({
           date: record.study_date,
           type: studyType,
-          status: record.status as '参加' | '缺席'
+          status: record.status as '参加' | '请假'
         });
       }
     });
