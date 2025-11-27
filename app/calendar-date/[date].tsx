@@ -11,6 +11,8 @@ interface DailyRecord {
   record_date: string;
   practice_project_id: string;
   count: number;
+  target_count?: number;
+  target_period?: string;
   practices: {
     name: string;
     unit: string;
@@ -24,6 +26,8 @@ interface MeditationRecord {
   practice_id: string;
   duration_minutes: number;
   session_number?: number;
+  target_count?: number;
+  target_period?: string;
   practices?: {
     name: string;
   };
@@ -118,6 +122,8 @@ export default function CalendarDatePage() {
           practice_project_id,
           count,
           user_practice_projects!inner (
+            target_count,
+            target_period,
             practices (
               name,
               unit,
