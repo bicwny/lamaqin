@@ -521,7 +521,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <PageTemplate
-        title={getLocalDateDisplay()}
+        title="当日"
         subtitle={getGreeting()}
         rightAction={{
           component: <Avatar dharmaName={userDharmaName} size={32} />,
@@ -541,7 +541,7 @@ export default function HomeScreen() {
 
   return (
     <PageTemplate
-      title={getLocalDateDisplay()}
+      title="当日"
       subtitle={getGreeting()}
       rightAction={{
         component: <Avatar dharmaName={userDharmaName} size={32} />,
