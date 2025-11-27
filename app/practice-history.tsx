@@ -354,7 +354,7 @@ export default function PracticeHistoryScreen() {
 
   return (
     <PageTemplate
-      title={`${practiceName} - 详情`}
+      title={practiceName}
       subtitle={undefined}
       showBackButton={true}
       onBackPress={() => router.back()}
@@ -369,7 +369,7 @@ export default function PracticeHistoryScreen() {
     >
         {/* Progress Summary */}
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>总体进度</Text>
+          <Text style={styles.summaryTitle}>{getDisplayProjectName(projectInfo)}</Text>
 
           <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
@@ -395,6 +395,30 @@ export default function PracticeHistoryScreen() {
               />
             </View>
           )}
+
+          <View style={styles.dateTimeContainer}>
+            {projectInfo?.start_date && (
+              <Text style={styles.dateTimeText}>
+                {formatDate(projectInfo.start_date)}
+              </Text>
+            )}
+            {projectInfo?.target_end_date && (
+              <>
+                <Text style={styles.dateTimeText}>•</Text>
+                <Text style={styles.dateTimeText}>
+                  {formatDate(projectInfo.target_end_date)}
+                </Text>
+              </>
+            )}
+            {projectInfo?.start_date && projectInfo?.target_end_date && (
+              <>
+                <Text style={styles.dateTimeText}>•</Text>
+                <Text style={styles.dateTimeText}>
+                  {Math.ceil((new Date(projectInfo.target_end_date).getTime() - new Date(projectInfo.start_date).getTime()) / (1000 * 60 * 60 * 24))}天
+                </Text>
+              </>
+            )}
+          </View>
 
           {projectInfo?.daily_target && (
             <Text style={styles.dailyTarget}>
@@ -423,7 +447,7 @@ export default function PracticeHistoryScreen() {
             onPress={handleEditProject}
           >
             <Ionicons name="settings-outline" size={20} color={DesignSystem.colors.textPrimary} />
-            <Text style={styles.actionButtonText}>编辑</Text>
+            <Text style={styles.actionButtonText}>设置</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -540,6 +564,17 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.label,
     color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
+  },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.md,
+  },
+  dateTimeText: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
   },
   recordsSection: {
     marginTop: DesignSystem.spacing.xl,
