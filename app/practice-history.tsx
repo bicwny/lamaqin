@@ -370,7 +370,69 @@ export default function PracticeHistoryScreen() {
         {/* Progress Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>{getDisplayProjectName(projectInfo)}</Text>
+          
+          {projectInfo?.practices?.description && (
+            <Text style={styles.practiceDescription}>{projectInfo.practices.description}</Text>
+          )}
 
+          <View style={styles.divider} />
+
+          {/* Stats Grid */}
+          <View style={styles.statsGrid}>
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>开始日期</Text>
+                <Text style={styles.statValue}>
+                  {projectInfo?.start_date ? formatDate(projectInfo.start_date) : '未设置'}
+                </Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>状态</Text>
+                <Text style={[styles.statValue, styles.statusText]}>
+                  {projectInfo?.status === 'active' ? '进行中' : 
+                   projectInfo?.status === 'completed' ? '已完成' : '未开始'}
+                </Text>
+              </View>
+            </View>
+            
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>结束日期</Text>
+                <Text style={styles.statValue}>
+                  {projectInfo?.target_end_date ? formatDate(projectInfo.target_end_date) : '持续修行'}
+                </Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>类型</Text>
+                <Text style={styles.statValue}>
+                  {projectInfo?.source_type === 'class_required' ? '班级必修' : '自建项目'}
+                </Text>
+              </View>
+            </View>
+            
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>已修行</Text>
+                <Text style={styles.statValue}>
+                  {projectInfo?.start_date 
+                    ? `${Math.max(0, Math.ceil((new Date().getTime() - new Date(projectInfo.start_date).getTime()) / (1000 * 60 * 60 * 24)))}天`
+                    : '0天'}
+                </Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>剩余</Text>
+                <Text style={styles.statValue}>
+                  {projectInfo?.target_end_date 
+                    ? `${Math.max(0, Math.ceil((new Date(projectInfo.target_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))}天`
+                    : '无期限'}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          {/* Progress Section */}
           <View style={styles.progressContainer}>
             <Text style={styles.progressText}>
               {progress.target 
@@ -391,34 +453,10 @@ export default function PracticeHistoryScreen() {
                 progress={progress.percentage} 
                 size="thick" 
                 containerStyle={{ flex: 1 }}
-                color={DesignSystem.colors.greenTara} // Green Tara for practice progress and growth
+                color={DesignSystem.colors.greenTara}
               />
             </View>
           )}
-
-          <View style={styles.dateTimeContainer}>
-            {projectInfo?.start_date && (
-              <Text style={styles.dateTimeText}>
-                {formatDate(projectInfo.start_date)}
-              </Text>
-            )}
-            {projectInfo?.target_end_date && (
-              <>
-                <Text style={styles.dateTimeText}>•</Text>
-                <Text style={styles.dateTimeText}>
-                  {formatDate(projectInfo.target_end_date)}
-                </Text>
-              </>
-            )}
-            {projectInfo?.start_date && projectInfo?.target_end_date && (
-              <>
-                <Text style={styles.dateTimeText}>•</Text>
-                <Text style={styles.dateTimeText}>
-                  {Math.ceil((new Date(projectInfo.target_end_date).getTime() - new Date(projectInfo.start_date).getTime()) / (1000 * 60 * 60 * 24))}天
-                </Text>
-              </>
-            )}
-          </View>
 
           {projectInfo?.daily_target && (
             <Text style={styles.dailyTarget}>
@@ -540,7 +578,41 @@ const styles = StyleSheet.create({
   summaryTitle: {
     ...ComponentTextStyles.subheading,
     textAlign: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  practiceDescription: {
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: DesignSystem.colors.border,
+    marginVertical: DesignSystem.spacing.md,
+  },
+  statsGrid: {
+    gap: DesignSystem.spacing.sm,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statItem: {
+    flex: 1,
+    paddingVertical: DesignSystem.spacing.xs,
+  },
+  statLabel: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  statValue: {
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium as any,
+  },
+  statusText: {
+    color: DesignSystem.colors.greenTara,
   },
   progressContainer: {
     flexDirection: 'row',
