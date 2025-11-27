@@ -105,8 +105,36 @@ export default function PracticeRecordCard({
       )}
 
       <View style={[styles.header, isDeleting && styles.disabledContent]}>
-        <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
-        <Text style={styles.recordTime}>{formatTime(record.created_at)}</Text>
+        <View style={styles.headerLeft}>
+          <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
+          <Text style={styles.recordTime}>· {formatTime(record.created_at)}</Text>
+        </View>
+        {showActions && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={[styles.iconButton, styles.editIconButton, isDeleting && styles.disabledButton]}
+              onPress={onEdit}
+              disabled={isDeleting}
+            >
+              <Ionicons
+                name="create-outline"
+                size={18}
+                color={DesignSystem.colors.textSecondary}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.iconButton, styles.deleteIconButton, isDeleting && styles.disabledButton]}
+              onPress={onDelete}
+              disabled={isDeleting}
+            >
+              <Ionicons
+                name="trash-outline"
+                size={18}
+                color={DesignSystem.colors.error}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       <View style={[styles.content, isDeleting && styles.disabledContent]}>
@@ -121,33 +149,6 @@ export default function PracticeRecordCard({
           </View>
         )}
       </View>
-
-      {showActions && (
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.iconButton, styles.editIconButton, isDeleting && styles.disabledButton]}
-            onPress={onEdit}
-            disabled={isDeleting}
-          >
-            <Ionicons
-              name="create-outline"
-              size={18}
-              color={DesignSystem.colors.textSecondary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.iconButton, styles.deleteIconButton, isDeleting && styles.disabledButton]}
-            onPress={onDelete}
-            disabled={isDeleting}
-          >
-            <Ionicons
-              name="trash-outline"
-              size={18}
-              color={DesignSystem.colors.error}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
     </>
   );
 
@@ -201,24 +202,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: DesignSystem.spacing.md,
+  },
+  headerLeft: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: DesignSystem.spacing.sm,
+    gap: DesignSystem.spacing.xs,
   },
   recordDate: {
     ...ComponentTextStyles.label,
     fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textSecondary,
   },
   recordTime: {
     ...ComponentTextStyles.label,
     fontWeight: DesignSystem.typography.fontWeight.normal,
+    color: DesignSystem.colors.textSecondary,
   },
   content: {
     // marginBottom: DesignSystem.spacing.md,
   },
   recordCount: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textPrimary, // Clear text for practice count display
-    fontWeight: DesignSystem.typography.fontWeight.medium,
+    fontSize: DesignSystem.typography.fontSize.lg,
+    color: DesignSystem.colors.textPrimary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
   notesContainer: {
     marginTop: DesignSystem.spacing.sm,
@@ -244,8 +252,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   iconButton: {
     width: 40,
