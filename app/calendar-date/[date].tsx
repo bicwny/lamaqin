@@ -278,39 +278,62 @@ export default function CalendarDatePage() {
                 {dateRecords.daily.map((record, index) => (
                   <TouchableOpacity 
                     key={`daily-${index}`} 
-                    style={styles.recordItem}
+                    style={styles.recordCard}
                     onPress={() => handleEditRecord(record.id, record.practice_project_id, record.practices.name, record.practices.type)}
                   >
-                    <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
-                    <Text style={styles.recordText}>
-                      {record.practices.name}: {record.count} {record.practices.unit}
-                    </Text>
-                    <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
+                    <View style={styles.recordCardContent}>
+                      <Text style={styles.recordCardTitle}>{record.practices.name}</Text>
+                      <Text style={styles.recordCardValue}>+{record.count}{record.practices.unit}</Text>
+                    </View>
+                    <View style={styles.editButton}>
+                      <Ionicons name="create-outline" size={20} color={DesignSystem.colors.textTertiary} />
+                    </View>
                   </TouchableOpacity>
                 ))}
-                {dateRecords.meditation.map((record: any, index) => {
-                  const matchingProject = userProjects.find(p => p.practice_id === record.practice_id);
-                  const practiceName = record.practices?.name || '观修';
-                  
-                  return (
-                    <TouchableOpacity 
-                      key={`meditation-${index}`} 
-                      style={styles.recordItem}
-                      onPress={() => handleEditMeditationRecord(
-                        record.id, 
-                        record.practice_id, 
-                        matchingProject?.id || '', 
-                        practiceName
-                      )}
-                    >
-                      <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
-                      <Text style={styles.recordText}>
-                        {practiceName} 第{record.session_number || 1}座: {record.duration_minutes} 分钟
-                      </Text>
-                      <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
-                    </TouchableOpacity>
-                  );
-                })}
+                {(() => {
+                  const groupedMeditation = dateRecords.meditation.reduce((acc: { [key: string]: { practiceId: string; practiceName: string; totalMinutes: number; records: MeditationRecord[] } }, record) => {
+                    const practiceName = record.practices?.name || '观修';
+                    if (!acc[practiceName]) {
+                      acc[practiceName] = {
+                        practiceId: record.practice_id,
+                        practiceName,
+                        totalMinutes: 0,
+                        records: [],
+                      };
+                    }
+                    acc[practiceName].totalMinutes += record.duration_minutes;
+                    acc[practiceName].records.push(record);
+                    return acc;
+                  }, {});
+
+                  return Object.values(groupedMeditation).map((group, index) => {
+                    const matchingProject = userProjects.find(p => p.practice_id === group.practiceId);
+                    
+                    return (
+                      <TouchableOpacity 
+                        key={`meditation-group-${index}`} 
+                        style={styles.recordCard}
+                        onPress={() => {
+                          const firstRecord = group.records[0];
+                          handleEditMeditationRecord(
+                            firstRecord.id, 
+                            group.practiceId, 
+                            matchingProject?.id || '', 
+                            group.practiceName
+                          );
+                        }}
+                      >
+                        <View style={styles.recordCardContent}>
+                          <Text style={styles.recordCardTitle}>{group.practiceName}</Text>
+                          <Text style={styles.recordCardValue}>+{group.totalMinutes}分钟</Text>
+                        </View>
+                        <View style={styles.editButton}>
+                          <Ionicons name="create-outline" size={20} color={DesignSystem.colors.textTertiary} />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  });
+                })()}
               </View>
             )}
 
@@ -400,25 +423,42 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  recordItem: {
+  recordCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    justifyContent: 'space-between',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 8,
-    gap: 12,
+    borderRadius: 16,
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  recordText: {
-    fontSize: 16,
-    color: DesignSystem.colors.textPrimary,
+  recordCardContent: {
     flex: 1,
+  },
+  recordCardTitle: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: 4,
+  },
+  recordCardValue: {
+    fontSize: 16,
+    color: DesignSystem.colors.textSecondary,
+  },
+  editButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: DesignSystem.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   projectItem: {
     flexDirection: 'row',
