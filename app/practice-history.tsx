@@ -24,6 +24,8 @@ import { DesignSystem } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 
+type TabType = 'journal' | 'practice' | 'completion';
+
 interface DailyRecord {
   id: string;
   user_id: string;
@@ -44,6 +46,7 @@ export default function PracticeHistoryScreen() {
     practiceName: string;
   }>();
 
+  const [activeTab, setActiveTab] = useState<TabType>('journal');
   const [records, setRecords] = useState<DailyRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -371,6 +374,213 @@ export default function PracticeHistoryScreen() {
 
   const progress = calculateProgress();
 
+  const tabs: { key: TabType; label: string; icon: string }[] = [
+    { key: 'journal', label: '日志', icon: 'book-outline' },
+    { key: 'practice', label: '功课', icon: 'settings-outline' },
+    { key: 'completion', label: '圆满', icon: 'stats-chart-outline' },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'journal':
+        return (
+          <View style={styles.tabContent}>
+            {/* Add Record Button for Journal Tab */}
+            <View style={styles.addRecordContainer}>
+              <TouchableOpacity 
+                style={styles.addRecordButton}
+                onPress={handleAddRecord}
+              >
+                <Ionicons name="add-circle" size={24} color={DesignSystem.colors.whiteTara} />
+                <Text style={styles.addRecordButtonText}>添加记录</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Records List */}
+            <View style={styles.recordsSection}>
+              {records.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="document-text-outline" size={48} color={DesignSystem.colors.textTertiary} />
+                  <Text style={styles.emptyText}>暂无修行记录</Text>
+                  <Text style={styles.emptySubtext}>点击上方按钮开始记录</Text>
+                </View>
+              ) : (
+                <View style={styles.recordsList}>
+                  {records.map((record) => {
+                    const isDeleting = deletingRecords.has(record.id);
+                    return (
+                      <PracticeRecordCard
+                        key={record.id}
+                        record={record}
+                        practiceType="count"
+                        practiceUnit={projectInfo?.practices?.unit || '次'}
+                        isDeleting={isDeleting}
+                        showActions={true}
+                        onEdit={() => handleEditRecord(record)}
+                        onDelete={() => handleDelete(record)}
+                      />
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+          </View>
+        );
+
+      case 'practice':
+        return (
+          <View style={styles.tabContent}>
+            {/* Project Info Card */}
+            <View style={styles.practiceInfoCard}>
+              <Text style={styles.practiceInfoTitle}>{getDisplayProjectName(projectInfo)}</Text>
+              
+              {projectInfo?.practices?.description && (
+                <Text style={styles.practiceInfoDescription}>{projectInfo.practices.description}</Text>
+              )}
+
+              <View style={styles.divider} />
+
+              {/* Stats Grid */}
+              <View style={styles.statsGrid}>
+                <View style={styles.statsRow}>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>开始日期</Text>
+                    <Text style={styles.statValue}>
+                      {projectInfo?.start_date ? formatDate(projectInfo.start_date) : '未设置'}
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>状态</Text>
+                    <Text style={[styles.statValue, styles.statusText]}>
+                      {projectInfo?.status === 'active' ? '进行中' : 
+                       projectInfo?.status === 'completed' ? '已完成' : '未开始'}
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={styles.statsRow}>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>结束日期</Text>
+                    <Text style={styles.statValue}>
+                      {projectInfo?.target_end_date ? formatDate(projectInfo.target_end_date) : '持续修行'}
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>类型</Text>
+                    <Text style={styles.statValue}>
+                      {projectInfo?.source_type === 'class_required' ? '班级必修' : '自建项目'}
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={styles.statsRow}>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>已修行</Text>
+                    <Text style={styles.statValue}>
+                      {projectInfo?.start_date 
+                        ? `${Math.max(0, Math.ceil((new Date().getTime() - new Date(projectInfo.start_date).getTime()) / (1000 * 60 * 60 * 24)))}天`
+                        : '0天'}
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={styles.statLabel}>剩余</Text>
+                    <Text style={styles.statValue}>
+                      {projectInfo?.target_end_date 
+                        ? `${Math.max(0, Math.ceil((new Date(projectInfo.target_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))}天`
+                        : '无期限'}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.divider} />
+
+              {/* Progress Section */}
+              <View style={styles.progressContainer}>
+                <Text style={styles.progressText}>
+                  {progress.target 
+                    ? `${progress.current.toLocaleString()}/${progress.target.toLocaleString()} ${projectInfo?.practices?.unit || '次'}`
+                    : `已完成 ${progress.current.toLocaleString()} ${projectInfo?.practices?.unit || '次'}`
+                  }
+                </Text>
+                {progress.target && (
+                  <Text style={styles.progressPercentage}>
+                    {progress.percentage.toFixed(1)}%
+                  </Text>
+                )}
+              </View>
+
+              {progress.target && (
+                <View style={styles.progressBarContainer}>
+                  <ProgressBar 
+                    progress={progress.percentage} 
+                    size="thick" 
+                    containerStyle={{ flex: 1 }}
+                    fillColor={DesignSystem.colors.greenTara}
+                  />
+                </View>
+              )}
+
+              {projectInfo?.daily_target && (
+                <Text style={styles.dailyTarget}>
+                  每日目标：{projectInfo.daily_target.toLocaleString()} {projectInfo?.practices?.unit || '次'}
+                </Text>
+              )}
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.practiceActionsContainer}>
+              <TouchableOpacity 
+                style={styles.practiceActionButton}
+                onPress={handleEditProject}
+              >
+                <View style={styles.practiceActionIcon}>
+                  <Ionicons name="create-outline" size={24} color={DesignSystem.colors.primary} />
+                </View>
+                <View style={styles.practiceActionContent}>
+                  <Text style={styles.practiceActionTitle}>编辑设置</Text>
+                  <Text style={styles.practiceActionSubtitle}>修改目标、日期等配置</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+              </TouchableOpacity>
+
+              {projectInfo?.source_type === 'user_created' && (
+                <TouchableOpacity 
+                  style={[styles.practiceActionButton, styles.practiceActionButtonDanger]}
+                  onPress={handleDeleteProject}
+                  disabled={isDeletingProject}
+                >
+                  <View style={[styles.practiceActionIcon, styles.practiceActionIconDanger]}>
+                    <Ionicons name="trash-outline" size={24} color={DesignSystem.colors.error} />
+                  </View>
+                  <View style={styles.practiceActionContent}>
+                    <Text style={[styles.practiceActionTitle, styles.practiceActionTitleDanger]}>
+                      {isDeletingProject ? '删除中...' : '删除项目'}
+                    </Text>
+                    <Text style={styles.practiceActionSubtitle}>此操作无法撤销</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color={DesignSystem.colors.textTertiary} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        );
+
+      case 'completion':
+        return (
+          <View style={styles.tabContent}>
+            <View style={styles.completionPlaceholder}>
+              <Ionicons name="stats-chart-outline" size={64} color={DesignSystem.colors.textTertiary} />
+              <Text style={styles.completionPlaceholderTitle}>报告功能开发中</Text>
+              <Text style={styles.completionPlaceholderText}>
+                此功能将为您提供详细的修行统计和进度报告
+              </Text>
+            </View>
+          </View>
+        );
+    }
+  };
+
   return (
     <PageTemplate
       title={practiceName}
@@ -386,194 +596,63 @@ export default function PracticeHistoryScreen() {
         )
       }}
     >
-        {/* Progress Summary */}
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>{getDisplayProjectName(projectInfo)}</Text>
-          
-          {projectInfo?.practices?.description && (
-            <Text style={styles.practiceDescription}>{projectInfo.practices.description}</Text>
-          )}
-
-          <View style={styles.divider} />
-
-          {/* Stats Grid */}
-          <View style={styles.statsGrid}>
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>开始日期</Text>
-                <Text style={styles.statValue}>
-                  {projectInfo?.start_date ? formatDate(projectInfo.start_date) : '未设置'}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>状态</Text>
-                <Text style={[styles.statValue, styles.statusText]}>
-                  {projectInfo?.status === 'active' ? '进行中' : 
-                   projectInfo?.status === 'completed' ? '已完成' : '未开始'}
-                </Text>
-              </View>
-            </View>
-            
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>结束日期</Text>
-                <Text style={styles.statValue}>
-                  {projectInfo?.target_end_date ? formatDate(projectInfo.target_end_date) : '持续修行'}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>类型</Text>
-                <Text style={styles.statValue}>
-                  {projectInfo?.source_type === 'class_required' ? '班级必修' : '自建项目'}
-                </Text>
-              </View>
-            </View>
-            
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>已修行</Text>
-                <Text style={styles.statValue}>
-                  {projectInfo?.start_date 
-                    ? `${Math.max(0, Math.ceil((new Date().getTime() - new Date(projectInfo.start_date).getTime()) / (1000 * 60 * 60 * 24)))}天`
-                    : '0天'}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>剩余</Text>
-                <Text style={styles.statValue}>
-                  {projectInfo?.target_end_date 
-                    ? `${Math.max(0, Math.ceil((new Date(projectInfo.target_end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))}天`
-                    : '无期限'}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          {/* Progress Section */}
-          <View style={styles.progressContainer}>
-            <Text style={styles.progressText}>
-              {progress.target 
-                ? `${progress.current.toLocaleString()}/${progress.target.toLocaleString()} ${projectInfo?.practices?.unit || '次'}`
-                : `已完成 ${progress.current.toLocaleString()} ${projectInfo?.practices?.unit || '次'}`
-              }
-            </Text>
-            {progress.target && (
-              <Text style={styles.progressPercentage}>
-                {progress.percentage.toFixed(1)}%
-              </Text>
-            )}
-          </View>
-
-          {progress.target && (
-            <View style={styles.progressBarContainer}>
-              <ProgressBar 
-                progress={progress.percentage} 
-                size="thick" 
-                containerStyle={{ flex: 1 }}
-                color={DesignSystem.colors.greenTara}
-              />
-            </View>
-          )}
-
-          {projectInfo?.daily_target && (
-            <Text style={styles.dailyTarget}>
-              每日目标：{projectInfo.daily_target.toLocaleString()} {projectInfo?.practices?.unit || '次'}
-            </Text>
-          )}
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actionButtonsContainer}>
-          {projectInfo?.source_type === 'user_created' && (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.actionButtonDanger]}
-              onPress={handleDeleteProject}
-              disabled={isDeletingProject}
-            >
-              <Ionicons name="trash-outline" size={20} color={DesignSystem.colors.error} />
-              <Text style={[styles.actionButtonText, styles.actionButtonTextDanger]}>
-                {isDeletingProject ? '删除中...' : '删除'}
-              </Text>
-            </TouchableOpacity>
-          )}
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={handleEditProject}
+      {/* Tab Bar */}
+      <View style={styles.tabBar}>
+        {tabs.map((tab) => (
+          <TouchableOpacity
+            key={tab.key}
+            style={[
+              styles.tabItem,
+              activeTab === tab.key && styles.tabItemActive
+            ]}
+            onPress={() => setActiveTab(tab.key)}
           >
-            <Ionicons name="settings-outline" size={20} color={DesignSystem.colors.textPrimary} />
-            <Text style={styles.actionButtonText}>设置</Text>
+            <Ionicons 
+              name={tab.icon as any} 
+              size={20} 
+              color={activeTab === tab.key ? DesignSystem.colors.primary : DesignSystem.colors.textTertiary} 
+            />
+            <Text style={[
+              styles.tabLabel,
+              activeTab === tab.key && styles.tabLabelActive
+            ]}>
+              {tab.label}
+            </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.actionButtonPrimary]}
-            onPress={handleAddRecord}
-          >
-            <Ionicons name="add-circle-outline" size={20} color={DesignSystem.colors.whiteTara} />
-            <Text style={[styles.actionButtonText, styles.actionButtonTextPrimary]}>记录</Text>
-          </TouchableOpacity>
-        </View>
+        ))}
+      </View>
 
-        {/* Delete Confirmation Dialog */}
-        {showDeleteDialog && (
-          <View style={styles.alertOverlay}>
-            <View style={styles.alertBox}>
-              <Text style={styles.alertTitle}>确认删除？</Text>
-              <Text style={styles.alertMessage}>
-                确定要删除"{projectInfo?.practices?.name}"项目吗？此操作无法撤销。
-              </Text>
-              <View style={styles.alertButtonContainer}>
-                <TouchableOpacity 
-                  style={styles.alertButtonCancel}
-                  onPress={() => setShowDeleteDialog(false)}
-                >
-                  <Text style={styles.alertButtonCancelText}>取消</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.alertButtonConfirm}
-                  onPress={handleConfirmDeleteProject}
-                  disabled={isDeletingProject}
-                >
-                  <Text style={styles.alertButtonConfirmText}>
-                    {isDeletingProject ? '删除中...' : '删除'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+      {/* Tab Content */}
+      {renderTabContent()}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteDialog && (
+        <View style={styles.alertOverlay}>
+          <View style={styles.alertBox}>
+            <Text style={styles.alertTitle}>确认删除？</Text>
+            <Text style={styles.alertMessage}>
+              确定要删除"{projectInfo?.practices?.name}"项目吗？此操作无法撤销。
+            </Text>
+            <View style={styles.alertButtonContainer}>
+              <TouchableOpacity 
+                style={styles.alertButtonCancel}
+                onPress={() => setShowDeleteDialog(false)}
+              >
+                <Text style={styles.alertButtonCancelText}>取消</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.alertButtonConfirm}
+                onPress={handleConfirmDeleteProject}
+                disabled={isDeletingProject}
+              >
+                <Text style={styles.alertButtonConfirmText}>
+                  {isDeletingProject ? '删除中...' : '删除'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
-        )}
-
-        {/* Records List */}
-        <View style={styles.recordsSection}>
-          <Text style={styles.sectionTitle}>修行记录</Text>
-
-          {records.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>📭 暂无记录</Text>
-              <Text style={styles.emptySubtext}>开始您的第一次记录吧！</Text>
-            </View>
-          ) : (
-            <View style={styles.recordsList}>
-              {records.map((record) => {
-                const isDeleting = deletingRecords.has(record.id);
-                return (
-                  <PracticeRecordCard
-                    key={record.id}
-                    record={record}
-                    practiceType="count"
-                    practiceUnit={projectInfo?.practices?.unit || '次'}
-                    isDeleting={isDeleting}
-                    showActions={true}
-                    onEdit={() => handleEditRecord(record)}
-                    onDelete={() => handleDelete(record)}
-                  />
-                );
-              })}
-            </View>
-          )}
         </View>
+      )}
     </PageTemplate>
   );
 }
@@ -588,7 +667,145 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     marginTop: DesignSystem.spacing.md,
     fontWeight: DesignSystem.typography.fontWeight.medium,
-    color: DesignSystem.colors.textSecondary, // Clear loading text color
+    color: DesignSystem.colors.textSecondary,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.xs,
+  },
+  tabItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+  },
+  tabItemActive: {
+    backgroundColor: DesignSystem.colors.background,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabLabel: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textTertiary,
+  },
+  tabLabelActive: {
+    color: DesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
+  },
+  tabContent: {
+    flex: 1,
+  },
+  addRecordContainer: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.md,
+  },
+  addRecordButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.sm,
+    backgroundColor: DesignSystem.colors.primary,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.lg,
+  },
+  addRecordButtonText: {
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.whiteTara,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
+  },
+  practiceInfoCard: {
+    ...ComponentTokens.card.variants.outlined,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.lg,
+    paddingTop: ComponentTokens.card.padding.spacious,
+    paddingLeft: ComponentTokens.card.padding.spacious,
+    paddingRight: ComponentTokens.card.padding.spacious,
+    paddingBottom: ComponentTokens.card.padding.spacious,
+  },
+  practiceInfoTitle: {
+    ...ComponentTextStyles.subheading,
+    textAlign: 'center',
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  practiceInfoDescription: {
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  practiceActionsContainer: {
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.sm,
+  },
+  practiceActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.md,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+  },
+  practiceActionButtonDanger: {
+    borderColor: DesignSystem.colors.error + '30',
+  },
+  practiceActionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: DesignSystem.borderRadius.md,
+    backgroundColor: DesignSystem.colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: DesignSystem.spacing.md,
+  },
+  practiceActionIconDanger: {
+    backgroundColor: DesignSystem.colors.error + '15',
+  },
+  practiceActionContent: {
+    flex: 1,
+  },
+  practiceActionTitle: {
+    ...ComponentTextStyles.body,
+    fontWeight: DesignSystem.typography.fontWeight.medium as any,
+    marginBottom: 2,
+  },
+  practiceActionTitleDanger: {
+    color: DesignSystem.colors.error,
+  },
+  practiceActionSubtitle: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textTertiary,
+  },
+  completionPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: DesignSystem.spacing.xl * 2,
+    paddingHorizontal: DesignSystem.spacing.xl,
+  },
+  completionPlaceholderTitle: {
+    ...ComponentTextStyles.subheading,
+    color: DesignSystem.colors.textSecondary,
+    marginTop: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  completionPlaceholderText: {
+    ...ComponentTextStyles.body,
+    color: DesignSystem.colors.textTertiary,
+    textAlign: 'center',
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
@@ -662,8 +879,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recordsSection: {
-    marginTop: DesignSystem.spacing.xl,
-    paddingHorizontal: DesignSystem.spacing.lg, // Proper section padding
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   sectionTitle: {
     ...ComponentTextStyles.subheading,
