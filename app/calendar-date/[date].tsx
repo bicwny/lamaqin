@@ -285,7 +285,9 @@ export default function CalendarDatePage() {
                     <Text style={styles.recordText}>
                       {record.practices.name}: {record.count} {record.practices.unit}
                     </Text>
-                    <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
+                    <View style={styles.circleButtonPrimary}>
+                      <Ionicons name="create-outline" size={22} color={DesignSystem.colors.primary} />
+                    </View>
                   </TouchableOpacity>
                 ))}
                 {dateRecords.meditation.map((record: any, index) => {
@@ -307,7 +309,9 @@ export default function CalendarDatePage() {
                       <Text style={styles.recordText}>
                         {practiceName} 第{record.session_number || 1}座: {record.duration_minutes} 分钟
                       </Text>
-                      <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
+                      <View style={styles.circleButtonPrimary}>
+                        <Ionicons name="create-outline" size={22} color={DesignSystem.colors.primary} />
+                      </View>
                     </TouchableOpacity>
                   );
                 })}
@@ -337,7 +341,9 @@ export default function CalendarDatePage() {
                         <Text style={styles.projectSubName}>{project.project_name}</Text>
                       )}
                     </View>
-                    <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
+                    <View style={styles.circleButtonAdd}>
+                      <Ionicons name="add" size={22} color={DesignSystem.colors.blueTara} />
+                    </View>
                   </TouchableOpacity>
                 ))
               )}
@@ -428,5 +434,25 @@ const styles = StyleSheet.create({
   emptyProjectsText: {
     fontSize: 16,
     color: DesignSystem.colors.textSecondary,
+  },
+  circleButtonPrimary: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.primary,
+    backgroundColor: DesignSystem.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circleButtonAdd: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.blueTara,
+    backgroundColor: DesignSystem.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
