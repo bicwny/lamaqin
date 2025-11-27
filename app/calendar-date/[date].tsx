@@ -220,7 +220,7 @@ export default function CalendarDatePage() {
     const practiceName = project.practices.name;
     const practiceId = project.practice_id;
 
-    if (practiceType === 'meditation') {
+    if (practiceType === 'time') {
       router.push({
         pathname: '/modals/meditation-record',
         params: {
@@ -346,8 +346,8 @@ export default function CalendarDatePage() {
               </Text>
               {(() => {
                 const availableProjects = userProjects.filter((project) => {
-                  // Time-based practices (meditation): always show, user can log multiple times
-                  if (project.practices.type === 'meditation') {
+                  // Time-based practices: always show, user can log multiple times
+                  if (project.practices.type === 'time') {
                     return true;
                   }
                   // Count-based practices: hide if already has a record for this date
