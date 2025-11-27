@@ -33,7 +33,7 @@ export const DesignSystem = {
     success: '#16a34a',          // green-600
     warning: '#f59e0b',          // yellow-500
     error: '#dc2626',            // red-600
-    info: '#3b82f6',             // blue-500
+    info: '#ef4444',             // red-500 (changed from blue)
     
     // Utility colors
     cardShadow: '#000000',       // black
@@ -52,8 +52,8 @@ export const DesignSystem = {
     orangeTaraLight: '#fdba74',  // orange-300
     yellowTara: '#eab308',       // yellow-500
     yellowTaraLight: '#fcd34d',  // yellow-300
-    blueTara: '#3b82f6',         // blue-500
-    blueTaraLight: '#93c5fd',    // blue-300
+    blueTara: '#ef4444',         // red-500 (changed from blue for UI consistency)
+    blueTaraLight: '#fca5a5',    // red-300 (changed from blue for UI consistency)
     greenTara: '#16a34a',        // green-600
     blackTara: '#111827',        // gray-900
     blackTaraLight: '#6b7280',   // gray-500

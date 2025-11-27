@@ -260,7 +260,7 @@ export default function CalendarDatePage() {
           headerBackTitle: '回向',
           headerRight: () => (
             <TouchableOpacity onPress={handleShare} style={{ marginRight: 16 }}>
-              <Ionicons name="share-social" size={24} color={DesignSystem.colors.blueTara} />
+              <Ionicons name="share-social" size={24} color={DesignSystem.colors.textSecondary} />
             </TouchableOpacity>
           ),
         }} 
@@ -268,7 +268,7 @@ export default function CalendarDatePage() {
       <ScrollView style={styles.container}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={DesignSystem.colors.blueTara} />
+            <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
             <Text style={styles.loadingText}>加载中...</Text>
           </View>
         ) : (
@@ -385,7 +385,7 @@ export default function CalendarDatePage() {
                         <Text style={styles.projectSubName}>{project.project_name}</Text>
                       )}
                     </View>
-                    <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
+                    <Ionicons name="add" size={24} color={DesignSystem.colors.textSecondary} />
                   </TouchableOpacity>
                 ));
               })()}
