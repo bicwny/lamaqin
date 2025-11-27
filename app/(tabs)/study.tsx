@@ -472,44 +472,30 @@ export default function StudyScreen() {
                             style={styles.courseCard}
                             onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
                           >
-                            <View style={styles.courseHeader}>
-                              <Text style={styles.courseName}>{userCourse.course.name}</Text>
-                              <Text style={styles.courseInfo}>
-                                {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课
-                              </Text>
-                            </View>
-
-                            <View style={styles.progressContainer}>
-                              <View style={styles.progressTextRow}>
-                                <Text style={styles.progressText}>
-                                  完成进度：{progressPercentage.toFixed(1)}%
+                            <View style={styles.courseCardContent}>
+                              <View style={styles.courseCardInfo}>
+                                <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                                <Text style={styles.courseInfo}>
+                                  {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
                                 </Text>
-                                <Text style={styles.currentLessonText}>
+                                <Text style={styles.statusText}>
                                   {totalLessonsStudied === 0 ? '尚未开始' : `上次完成：第${currentLesson}课`}
                                 </Text>
                               </View>
-
-                              <View style={styles.progressBarContainer}>
-                                <View style={styles.progressBarBg}>
-                                  <View 
-                                    style={[
-                                      styles.progressBarFill, 
-                                      { width: `${Math.min(progressPercentage, 100)}%` }
-                                    ]} 
-                                  />
-                                </View>
-                              </View>
+                              <TouchableOpacity 
+                                style={styles.playButton}
+                                onPress={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/course-detail/${userCourse.course_id}`);
+                                }}
+                              >
+                                <Ionicons 
+                                  name="play-circle-outline" 
+                                  size={36} 
+                                  color={DesignSystem.colors.primary} 
+                                />
+                              </TouchableOpacity>
                             </View>
-
-                            <TouchableOpacity 
-                              style={styles.continueButton}
-                              onPress={(e) => {
-                                e.stopPropagation();
-                                router.push(`/course-detail/${userCourse.course_id}`);
-                              }}
-                            >
-                              <Text style={styles.continueButtonText}>继续学习</Text>
-                            </TouchableOpacity>
                           </TouchableOpacity>
                         );
                       })}
@@ -536,44 +522,30 @@ export default function StudyScreen() {
                           style={styles.courseCard}
                           onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
                         >
-                          <View style={styles.courseHeader}>
-                            <Text style={styles.courseName}>{userCourse.course.name}</Text>
-                            <Text style={styles.courseInfo}>
-                              {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课
-                            </Text>
-                          </View>
-
-                          <View style={styles.progressContainer}>
-                            <View style={styles.progressTextRow}>
-                              <Text style={styles.progressText}>
-                                完成进度：{progressPercentage.toFixed(1)}%
+                          <View style={styles.courseCardContent}>
+                            <View style={styles.courseCardInfo}>
+                              <Text style={styles.courseName}>{userCourse.course.name}</Text>
+                              <Text style={styles.courseInfo}>
+                                {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
                               </Text>
-                              <Text style={styles.currentLessonText}>
+                              <Text style={styles.statusText}>
                                 {totalLessonsStudied === 0 ? '尚未开始' : `上次完成：第${currentLesson}课`}
                               </Text>
                             </View>
-
-                            <View style={styles.progressBarContainer}>
-                              <View style={styles.progressBarBg}>
-                                <View 
-                                  style={[
-                                    styles.progressBarFill, 
-                                    { width: `${Math.min(progressPercentage, 100)}%` }
-                                  ]} 
-                                />
-                              </View>
-                            </View>
+                            <TouchableOpacity 
+                              style={styles.playButton}
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                router.push(`/course-detail/${userCourse.course_id}`);
+                              }}
+                            >
+                              <Ionicons 
+                                name="play-circle-outline" 
+                                size={36} 
+                                color={DesignSystem.colors.primary} 
+                              />
+                            </TouchableOpacity>
                           </View>
-
-                          <TouchableOpacity 
-                            style={styles.continueButton}
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              router.push(`/course-detail/${userCourse.course_id}`);
-                            }}
-                          >
-                            <Text style={styles.continueButtonText}>继续学习</Text>
-                          </TouchableOpacity>
                         </TouchableOpacity>
                       );
                     })}
@@ -751,9 +723,21 @@ const styles = StyleSheet.create({
   },
   courseCard: {
     ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
+    padding: ComponentTokens.card.padding.comfortable,
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
+  },
+  courseCardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  courseCardInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  playButton: {
+    padding: 4,
   },
   manageCourseCard: {
     ...ComponentTokens.card.variants.outlined,
