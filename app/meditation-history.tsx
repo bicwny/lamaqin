@@ -15,6 +15,8 @@ import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { meditationService } from '@/lib/database';
 import { Colors } from '@/constants/Colors';
+import { DesignSystem } from '@/constants/DesignSystem';
+import { ComponentTokens } from '@/utils/componentTokens';
 import PageTemplate from '@/components/PageTemplate';
 
 export default function MeditationHistoryScreen() {
@@ -537,17 +539,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   recordCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   recordHeader: {
     flexDirection: 'row',
@@ -732,17 +726,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   topicCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.04)',
+    ...ComponentTokens.card.variants.outlined,
+    padding: ComponentTokens.card.padding.comfortable,
+    marginBottom: ComponentTokens.card.margin.comfortable,
   },
   topicHeader: {
     flexDirection: 'row',
