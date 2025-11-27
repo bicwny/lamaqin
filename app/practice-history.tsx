@@ -255,18 +255,22 @@ export default function PracticeHistoryScreen() {
     setDeletingRecords(prev => new Set(prev).add(record.id));
 
     try {
+      // Determine which table to delete from based on practice type
+      const isTimeBased = projectInfo?.practices?.type === 'time';
+      const tableName = isTimeBased ? 'meditation_records' : 'daily_records';
+
       // Delete the record
       const { error: deleteError } = await supabase
-        .from('daily_records')
+        .from(tableName)
         .delete()
         .eq('id', record.id)
         .eq('user_id', user.id);
 
       if (deleteError) throw deleteError;
 
-      // Update project's current count
-      if (projectInfo) {
-        const newCurrentCount = Math.max(0, projectInfo.current_count - record.count);
+      // Update project's current count only for count-based practices
+      if (projectInfo && !isTimeBased) {
+        const newCurrentCount = Math.max(0, projectInfo.current_count - (record as any).count);
         const { error: updateError } = await supabase
           .from('user_practice_projects')
           .update({ 
