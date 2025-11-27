@@ -802,6 +802,26 @@ export const studyService = {
   async updateCourseStatus(userId: string, courseId: string, status: 'active' | 'paused' | 'completed') {
     console.log(`🔄 updateCourseStatus called: userId=${userId}, courseId=${courseId}, status=${status}`);
     
+    // Check current auth session
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log('🔐 Current session user:', sessionData?.session?.user?.id);
+    console.log('🔐 Session user matches userId:', sessionData?.session?.user?.id === userId);
+    
+    // First verify the record exists
+    const { data: existingRecord, error: fetchError } = await supabase
+      .from('user_courses')
+      .select('id, user_id, course_id, status')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .single();
+    
+    if (fetchError) {
+      console.error('❌ Error fetching existing record:', fetchError);
+    } else {
+      console.log('📋 Existing record before update:', existingRecord);
+    }
+    
+    // Now perform the update
     const { data, error } = await supabase
       .from('user_courses')
       .update({ 
@@ -815,10 +835,22 @@ export const studyService = {
 
     if (error) {
       console.error('❌ updateCourseStatus error:', error);
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
       throw error;
     }
     
     console.log('✅ updateCourseStatus success:', data);
+    
+    // Verify the update persisted
+    const { data: verifyRecord } = await supabase
+      .from('user_courses')
+      .select('id, user_id, course_id, status')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .single();
+    
+    console.log('🔍 Record after update:', verifyRecord);
+    
     return data;
   },
 
