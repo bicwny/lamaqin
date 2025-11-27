@@ -123,6 +123,38 @@ export default function PracticeScreen() {
         }
       }
 
+      // For time-based practices, fetch actual session counts from meditation_records
+      const timePractices = practiceProjects?.filter(p => p.practices?.type === 'time') || [];
+      if (timePractices.length > 0) {
+        const practiceIds = timePractices.map(p => p.practice_id);
+        
+        // Get actual counts from meditation_records
+        const { data: meditationCounts, error: countError } = await supabase
+          .from('meditation_records')
+          .select('practice_id')
+          .eq('user_id', user.id)
+          .in('practice_id', practiceIds);
+        
+        if (!countError && meditationCounts) {
+          // Count records per practice_id
+          const countMap: { [key: string]: number } = {};
+          meditationCounts.forEach(record => {
+            countMap[record.practice_id] = (countMap[record.practice_id] || 0) + 1;
+          });
+          
+          // Update current_count for time-based practices with actual counts
+          practiceProjects?.forEach(project => {
+            if (project.practices?.type === 'time') {
+              const actualCount = countMap[project.practice_id] || 0;
+              if (project.current_count !== actualCount) {
+                console.log(`📊 Correcting count for ${project.practices.name}: ${project.current_count} -> ${actualCount}`);
+                project.current_count = actualCount;
+              }
+            }
+          });
+        }
+      }
+
       setProjects(practiceProjects || []);
     } catch (error) {
       console.error("Error loading practice data:", error);
