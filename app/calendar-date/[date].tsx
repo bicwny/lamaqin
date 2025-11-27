@@ -158,6 +158,8 @@ export default function CalendarDatePage() {
         record_date: record.record_date,
         practice_project_id: record.practice_project_id,
         count: record.count,
+        target_count: record.user_practice_projects.target_count,
+        target_period: record.user_practice_projects.target_period,
         practices: {
           name: record.user_practice_projects.practices.name,
           unit: record.user_practice_projects.practices.unit,
@@ -281,16 +283,18 @@ export default function CalendarDatePage() {
             {(dateRecords.daily.length > 0 || dateRecords.meditation.length > 0) && (
               <View style={styles.section}>
                 <Text style={styles.sectionLabel}>当日记录</Text>
-                {dateRecords.daily.map((record, index) => (
+                {dateRecords.daily.map((record: any, index) => (
                   <TouchableOpacity 
                     key={`daily-${index}`} 
                     style={styles.recordItem}
                     onPress={() => handleEditRecord(record.id, record.practice_project_id, record.practices.name, record.practices.type)}
                   >
-                    <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
-                    <Text style={styles.recordText}>
-                      {record.practices.name}: {record.count} {record.practices.unit}
-                    </Text>
+                    <View style={styles.recordContent}>
+                      <Text style={styles.recordPracticeName}>{record.practices.name}</Text>
+                      <Text style={styles.recordGoal}>
+                        {record.count}{record.target_count ? `/${record.target_count}` : ''}{record.practices.unit}
+                      </Text>
+                    </View>
                     <View style={styles.circleButtonPrimary}>
                       <Ionicons name="create-outline" size={22} color={DesignSystem.colors.primary} />
                     </View>
