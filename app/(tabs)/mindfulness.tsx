@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   thangkaImage: {
     width: '100%',
-    height: 300,
+    height: 450,
     marginBottom: DesignSystem.spacing.xl,
   },
   prayerHeader: {
