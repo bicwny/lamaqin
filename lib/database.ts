@@ -1065,6 +1065,32 @@ export const studyService = {
     return summary;
   },
 
+  async getLessonStudyRecords(userId: string, courseId: string, lessonId: string) {
+    const { data, error } = await supabase
+      .from('study_records')
+      .select('id, study_type, study_count_for_lesson, study_date, status, created_at')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .eq('lesson_id', lessonId)
+      .order('study_date', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async deleteStudyRecord(recordId: string, userId: string, courseId: string) {
+    const { error } = await supabase
+      .from('study_records')
+      .delete()
+      .eq('id', recordId)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    await this.calculateProgress(userId, courseId);
+    return true;
+  },
+
   // 🚀 OPTIMIZATION: Batch load all lessons' summaries for a course in one query
   async getBulkLessonsSummary(userId: string, courseId: string): Promise<Record<string, any>> {
     const { data, error } = await supabase
