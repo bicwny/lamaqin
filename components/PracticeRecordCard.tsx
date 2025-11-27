@@ -93,16 +93,17 @@ export default function PracticeRecordCard({
       {isDeleting && (
         <View style={styles.deletingOverlay}>
           <ActivityIndicator
-            color={DesignSystem.colors.error} // Using standard error color for destructive actions
+            color={DesignSystem.colors.error}
             size="small"
           />
           <Text style={styles.deletingText}>删除中...</Text>
         </View>
       )}
 
-      <View style={[styles.header, isDeleting && styles.disabledContent]}>
-        <View style={styles.headerLeft}>
+      <View style={[styles.mainRow, isDeleting && styles.disabledContent]}>
+        <View style={styles.leftContent}>
           <Text style={styles.recordDate}>{formatDateTime(record.record_date, record.created_at)}</Text>
+          {renderRecordContent()}
         </View>
         {showActions && (
           <View style={styles.actions}>
@@ -132,18 +133,13 @@ export default function PracticeRecordCard({
         )}
       </View>
 
-      <View style={[styles.content, isDeleting && styles.disabledContent]}>
-        {renderRecordContent()}
-
-        {record.notes && (
-          <View style={styles.notesContainer}>
-
-            <Text style={styles.notesText} numberOfLines={showActions ? 3 : 2}>
-              {record.notes}
-            </Text>
-          </View>
-        )}
-      </View>
+      {record.notes && (
+        <View style={[styles.notesContainer, isDeleting && styles.disabledContent]}>
+          <Text style={styles.notesText} numberOfLines={showActions ? 3 : 2}>
+            {record.notes}
+          </Text>
+        </View>
+      )}
     </>
   );
 
@@ -194,24 +190,20 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.error, // Standard error color for destructive actions
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
-  header: {
+  mainRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  headerLeft: {
-    flexDirection: "row",
     alignItems: "center",
+    gap: DesignSystem.spacing.md,
+  },
+  leftContent: {
+    flex: 1,
     gap: DesignSystem.spacing.xs,
   },
   recordDate: {
     ...ComponentTextStyles.label,
     fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textSecondary,
-  },
-  content: {
-    // marginBottom: DesignSystem.spacing.md,
   },
   recordCount: {
     fontSize: DesignSystem.typography.fontSize.lg,
