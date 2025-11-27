@@ -101,6 +101,8 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       });
 
       // Mark today with red outline circle (not solid)
+      // If today has practice records, also add a dot indicator
+      const isTodayWithRecords = allDates.has(todayStr);
       marked[todayStr] = {
         customStyles: {
           container: {
@@ -113,6 +115,10 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
             fontWeight: '600',
           },
         },
+        ...(isTodayWithRecords && {
+          marked: true,
+          dotColor: DesignSystem.colors.redTara,
+        }),
       };
 
       setMarkedDates(marked);
