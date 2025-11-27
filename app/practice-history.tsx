@@ -106,11 +106,16 @@ export default function PracticeHistoryScreen() {
         }
       }
 
-      // Load daily records
+      // Load records based on practice type
+      const isTimeBased = project.practices?.type === 'time';
+      const tableName = isTimeBased ? 'meditation_records' : 'daily_records';
+      const queryColumn = isTimeBased ? 'practice_id' : 'practice_project_id';
+      const practiceRefId = isTimeBased ? project.practice_id : projectId;
+
       const { data: recordsData, error: recordsError } = await supabase
-        .from('daily_records')
+        .from(tableName)
         .select('*')
-        .eq('practice_project_id', projectId)
+        .eq(queryColumn, practiceRefId)
         .eq('user_id', user.id)
         .order('record_date', { ascending: false })
         .order('created_at', { ascending: false });
