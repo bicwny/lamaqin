@@ -134,13 +134,18 @@ export default function PracticeHistoryScreen() {
   };
 
   const handleEditRecord = (record: DailyRecord) => {
+    const isTimeBased = projectInfo?.practices?.type === 'time';
     router.push({
-      pathname: '/modals/custom-record',
+      pathname: isTimeBased ? '/modals/meditation-record' : '/modals/custom-record',
       params: {
         projectId,
         practiceName,
         practiceType: projectInfo?.practices?.type || 'count',
-        editRecordId: record.id
+        editRecordId: record.id,
+        ...(isTimeBased && { 
+          practiceId: projectInfo?.practice_id,
+          practiceProjectId: projectId 
+        })
       }
     });
   };
@@ -172,12 +177,17 @@ export default function PracticeHistoryScreen() {
   };
 
   const handleAddRecord = () => {
+    const isTimeBased = projectInfo?.practices?.type === 'time';
     router.push({
-      pathname: '/modals/custom-record',
+      pathname: isTimeBased ? '/modals/meditation-record' : '/modals/custom-record',
       params: {
         projectId,
         practiceName,
-        practiceType: projectInfo?.practices?.type || 'count'
+        practiceType: projectInfo?.practices?.type || 'count',
+        ...(isTimeBased && { 
+          practiceId: projectInfo?.practice_id,
+          practiceProjectId: projectId 
+        })
       }
     });
   };
