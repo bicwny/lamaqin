@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
@@ -87,47 +87,17 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         marked[date] = {
           marked: true,
           dotColor: DesignSystem.colors.redTara,
+          isToday: date === todayStr,
         };
       });
 
-      // Mark today using timezone-aware date with red outline
-      if (marked[todayStr]) {
+      // Mark today even if no records
+      if (!marked[todayStr]) {
         marked[todayStr] = {
-          ...marked[todayStr],
-          selected: true,
-          selectedColor: 'transparent',
-          selectedTextColor: DesignSystem.colors.redTara,
-          selectedDayBackgroundColor: 'transparent',
-          customStyles: {
-            container: {
-              borderWidth: 2,
-              borderColor: DesignSystem.colors.redTara,
-              borderRadius: 50,
-            },
-            text: {
-              color: DesignSystem.colors.redTara,
-              fontWeight: 'bold',
-            },
-          },
+          isToday: true,
         };
       } else {
-        marked[todayStr] = {
-          selected: true,
-          selectedColor: 'transparent',
-          selectedTextColor: DesignSystem.colors.redTara,
-          selectedDayBackgroundColor: 'transparent',
-          customStyles: {
-            container: {
-              borderWidth: 2,
-              borderColor: DesignSystem.colors.redTara,
-              borderRadius: 50,
-            },
-            text: {
-              color: DesignSystem.colors.redTara,
-              fontWeight: 'bold',
-            },
-          },
-        };
+        marked[todayStr].isToday = true;
       }
 
       setMarkedDates(marked);
@@ -180,6 +150,34 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
           setCurrentMonth(month.dateString);
           loadMarkedDates(month.dateString, userTimezone);
         }}
+        dayComponent={({ date, state, marking }) => {
+          const customMarking = marking as any;
+          const isToday = customMarking?.isToday;
+          const hasDot = customMarking?.marked;
+          const isDisabled = state === 'disabled';
+          
+          return (
+            <TouchableOpacity
+              onPress={() => date && handleDayPress({ dateString: date.dateString, day: date.day, month: date.month, year: date.year, timestamp: date.timestamp })}
+              disabled={isDisabled}
+              style={[
+                styles.dayContainer,
+                isToday && styles.todayContainer,
+              ]}
+            >
+              <Text style={[
+                styles.dayText,
+                isToday && styles.todayText,
+                isDisabled && styles.disabledText,
+              ]}>
+                {date?.day}
+              </Text>
+              {hasDot && (
+                <View style={[styles.dot, { backgroundColor: marking?.dotColor || DesignSystem.colors.redTara }]} />
+              )}
+            </TouchableOpacity>
+          );
+        }}
         theme={{
           backgroundColor: '#ffffff',
           calendarBackground: '#ffffff',
@@ -226,5 +224,36 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
     color: DesignSystem.colors.textSecondary,
+  },
+  dayContainer: {
+    width: 32,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  todayContainer: {
+    borderWidth: 2,
+    borderColor: DesignSystem.colors.redTara,
+    borderRadius: 16,
+    width: 32,
+    height: 32,
+  },
+  dayText: {
+    fontSize: 14,
+    color: DesignSystem.colors.textPrimary,
+    textAlign: 'center',
+  },
+  todayText: {
+    color: DesignSystem.colors.redTara,
+    fontWeight: 'bold',
+  },
+  disabledText: {
+    color: DesignSystem.colors.textTertiary,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    marginTop: 2,
   },
 });
