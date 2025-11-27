@@ -100,40 +100,20 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         };
       });
 
-      // Mark today with red outline (not solid) - different from practice record dots
-      const isToday = allDates.has(todayStr);
-      if (isToday) {
-        // Today has practice records: show red background with red border
-        marked[todayStr] = {
-          customStyles: {
-            container: {
-              backgroundColor: DesignSystem.colors.redTara,
-              borderWidth: 2,
-              borderColor: DesignSystem.colors.redTaraDark,
-              borderRadius: 16,
-            },
-            text: {
-              color: '#ffffff',
-              fontWeight: '700',
-            },
+      // Mark today with red outline circle (not solid)
+      marked[todayStr] = {
+        customStyles: {
+          container: {
+            borderWidth: 2,
+            borderColor: DesignSystem.colors.redTara,
+            borderRadius: 16,
           },
-        };
-      } else {
-        // Today without practice records: just red outline
-        marked[todayStr] = {
-          customStyles: {
-            container: {
-              borderWidth: 2,
-              borderColor: DesignSystem.colors.redTara,
-              borderRadius: 16,
-            },
-            text: {
-              color: DesignSystem.colors.redTara,
-              fontWeight: '600',
-            },
+          text: {
+            color: DesignSystem.colors.textPrimary,
+            fontWeight: '600',
           },
-        };
-      }
+        },
+      };
 
       setMarkedDates(marked);
     } catch (error) {
