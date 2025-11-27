@@ -90,17 +90,43 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         };
       });
 
-      // Mark today using timezone-aware date
+      // Mark today using timezone-aware date with red outline
       if (marked[todayStr]) {
         marked[todayStr] = {
           ...marked[todayStr],
           selected: true,
-          selectedColor: DesignSystem.colors.blueTara,
+          selectedColor: 'transparent',
+          selectedTextColor: DesignSystem.colors.redTara,
+          selectedDayBackgroundColor: 'transparent',
+          customStyles: {
+            container: {
+              borderWidth: 2,
+              borderColor: DesignSystem.colors.redTara,
+              borderRadius: 50,
+            },
+            text: {
+              color: DesignSystem.colors.redTara,
+              fontWeight: 'bold',
+            },
+          },
         };
       } else {
         marked[todayStr] = {
           selected: true,
-          selectedColor: DesignSystem.colors.blueTara,
+          selectedColor: 'transparent',
+          selectedTextColor: DesignSystem.colors.redTara,
+          selectedDayBackgroundColor: 'transparent',
+          customStyles: {
+            container: {
+              borderWidth: 2,
+              borderColor: DesignSystem.colors.redTara,
+              borderRadius: 50,
+            },
+            text: {
+              color: DesignSystem.colors.redTara,
+              fontWeight: 'bold',
+            },
+          },
         };
       }
 
