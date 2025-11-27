@@ -225,6 +225,42 @@ export default function EditProfileScreen() {
     }
   };
 
+  const toggleEnrollmentStatus = async (classId: string) => {
+    if (!user) return;
+    
+    const currentStatus = enrollmentStatuses[classId];
+    const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+    const className = availableClasses.find(c => c.id === classId)?.class_name || '班级';
+    
+    try {
+      await classCurriculumService.updateEnrollmentStatus(user.id, classId, newStatus);
+      
+      // Update local state
+      setEnrollmentStatuses(prev => ({
+        ...prev,
+        [classId]: newStatus
+      }));
+      
+      // Update selectedClassIds to reflect the change
+      if (newStatus === 'paused') {
+        setSelectedClassIds(prev => prev.filter(id => id !== classId));
+      } else {
+        setSelectedClassIds(prev => [...prev, classId]);
+      }
+      
+      toastService.success({
+        title: newStatus === 'paused' ? '已暂停' : '已恢复',
+        message: `${className} ${newStatus === 'paused' ? '学习已暂停' : '学习已恢复'}`
+      });
+    } catch (error: any) {
+      console.error('Error toggling enrollment status:', error);
+      toastService.error({
+        title: '操作失败',
+        message: '更新班级状态时发生错误'
+      });
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!user) {
       toastService.error('用户信息未找到');
@@ -470,43 +506,68 @@ export default function EditProfileScreen() {
                       const enrollmentStatus = enrollmentStatuses[classItem.id];
                       const hasOptionalPractices = optionalPracticeGroups.has(classItem.id);
                       
-                      const statusLabel = enrollmentStatus === 'completed' ? '圆满' : '已加入';
+                      const statusLabel = enrollmentStatus === 'completed' ? '圆满' 
+                        : enrollmentStatus === 'paused' ? '已暂停' 
+                        : '学习中';
+                      const isPaused = enrollmentStatus === 'paused';
                       
                       return (
                         <View key={classItem.id}>
-                          <TouchableOpacity
-                            style={[
-                              styles.classCheckbox,
-                              isSelected && styles.classCheckboxSelected
-                            ]}
-                            onPress={() => toggleClassSelection(classItem.id)}
-                            disabled={isEnrolled}
-                          >
-                            {!isEnrolled && (
-                              <View style={[
-                                styles.checkbox,
-                                isSelected && styles.checkboxSelected
-                              ]}>
-                                {isSelected && (
-                                  <ThemedText style={styles.checkmark}>✓</ThemedText>
+                          <View style={[
+                            styles.classCheckbox,
+                            isSelected && styles.classCheckboxSelected,
+                            isPaused && styles.classCheckboxPaused
+                          ]}>
+                            <TouchableOpacity
+                              style={styles.classMainArea}
+                              onPress={() => toggleClassSelection(classItem.id)}
+                              disabled={isEnrolled}
+                            >
+                              {!isEnrolled && (
+                                <View style={[
+                                  styles.checkbox,
+                                  isSelected && styles.checkboxSelected
+                                ]}>
+                                  {isSelected && (
+                                    <ThemedText style={styles.checkmark}>✓</ThemedText>
+                                  )}
+                                </View>
+                              )}
+                              <View style={styles.classInfo}>
+                                <ThemedText style={[
+                                  styles.className,
+                                  isSelected && styles.classNameSelected,
+                                  isPaused && styles.classNamePaused
+                                ]}>
+                                  {classItem.class_name}
+                                  {isEnrolled && ` (${statusLabel})`}
+                                </ThemedText>
+                                {classItem.description && (
+                                  <ThemedText style={styles.classDescription}>
+                                    {classItem.description}
+                                  </ThemedText>
                                 )}
                               </View>
-                            )}
-                            <View style={styles.classInfo}>
-                              <ThemedText style={[
-                                styles.className,
-                                isSelected && styles.classNameSelected
-                              ]}>
-                                {classItem.class_name}
-                                {isEnrolled && ` (${statusLabel})`}
-                              </ThemedText>
-                              {classItem.description && (
-                                <ThemedText style={styles.classDescription}>
-                                  {classItem.description}
+                            </TouchableOpacity>
+                            
+                            {/* Pause/Resume button for enrolled classes */}
+                            {isEnrolled && enrollmentStatus !== 'completed' && (
+                              <TouchableOpacity
+                                style={[
+                                  styles.statusToggleButton,
+                                  isPaused ? styles.resumeButton : styles.pauseButton
+                                ]}
+                                onPress={() => toggleEnrollmentStatus(classItem.id)}
+                              >
+                                <ThemedText style={[
+                                  styles.statusToggleText,
+                                  isPaused && styles.resumeButtonText
+                                ]}>
+                                  {isPaused ? '恢复' : '暂停'}
                                 </ThemedText>
-                              )}
-                            </View>
-                          </TouchableOpacity>
+                              </TouchableOpacity>
+                            )}
+                          </View>
 
                           {/* Combined Year & Practice Selection - for both new and enrolled classes */}
                           {(isSelected && !isEnrolled) || isEnrolled ? (
@@ -713,6 +774,43 @@ const styles = StyleSheet.create({
   classCheckboxSelected: {
     borderColor: Colors.primary,
     backgroundColor: '#F0F4FF',
+  },
+  classCheckboxPaused: {
+    borderColor: '#9CA3AF',
+    backgroundColor: '#F3F4F6',
+    opacity: 0.8,
+  },
+  classMainArea: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  classNamePaused: {
+    color: '#6B7280',
+  },
+  statusToggleButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  pauseButton: {
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  resumeButton: {
+    backgroundColor: '#D1FAE5',
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  statusToggleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#B45309',
+  },
+  resumeButtonText: {
+    color: '#059669',
   },
   checkbox: {
     width: 24,
