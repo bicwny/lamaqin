@@ -85,6 +85,14 @@ The `practice-detail/[practiceId].tsx` page has been deprecated and replaced wit
 - Complete practice record history with edit/delete capabilities
 - The old practice-detail page now auto-redirects to practice-history for backward compatibility
 
+### Practice History Tab System (2025-11-27)
+The `practice-history.tsx` page now features a three-tab navigation system with Buddhist-themed naming:
+- **日志 (Journal)**: Displays all practice records with an "添加记录" button at the top. Shows the chronological list of practice entries with edit/delete options for each record.
+- **功课 (Practice)**: Shows project details including progress summary, stats grid (start date, status, end date, type, days practiced, days remaining), and action buttons for editing settings or deleting user-created projects.
+- **圆满 (Completion)**: Placeholder for future report/statistics functionality (TBD).
+
+The tab bar uses a pill-style design with icons, smooth state switching, and follows the app's design system colors. Default tab is "日志" (Journal).
+
 # External Dependencies
 
 -   **Supabase**: Backend-as-a-service for authentication, database, and real-time features.
