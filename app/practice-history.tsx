@@ -94,7 +94,6 @@ export default function PracticeHistoryScreen() {
         .single();
 
       if (projectError) throw projectError;
-      setProjectInfo(project);
 
       // Load preset project name if needed
       if (project.preset_project_id) {
@@ -125,6 +124,16 @@ export default function PracticeHistoryScreen() {
 
       if (recordsError) throw recordsError;
 
+      // For time-based practices, recalculate current_count from actual records
+      if (isTimeBased && recordsData) {
+        const actualCount = recordsData.length;
+        if (project.current_count !== actualCount) {
+          console.log(`📊 Correcting count for ${project.practices.name}: ${project.current_count} -> ${actualCount}`);
+          project.current_count = actualCount;
+        }
+      }
+
+      setProjectInfo(project);
       setRecords(recordsData || []);
       console.log('📋 Loaded records:', recordsData?.length || 0);
     } catch (error) {
