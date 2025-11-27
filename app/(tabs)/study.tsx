@@ -744,9 +744,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   className: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: DesignSystem.colors.yellowTara,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
     letterSpacing: -0.3,
   },
   courseCard: {
