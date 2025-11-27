@@ -573,7 +573,10 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.spacious,
+    paddingTop: ComponentTokens.card.padding.spacious,
+    paddingLeft: ComponentTokens.card.padding.spacious,
+    paddingRight: ComponentTokens.card.padding.spacious,
+    paddingBottom: ComponentTokens.card.padding.spacious,
   },
   summaryTitle: {
     ...ComponentTextStyles.subheading,
