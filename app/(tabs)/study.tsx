@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, FlatList, Linking, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService, classCurriculumService } from '@/lib/database';
@@ -12,6 +12,7 @@ import PageTemplate from '@/components/PageTemplate';
 import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 import { CourseSkeleton } from '@/components/SkeletonLoader';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Component to display lesson progress with real-time counts
 const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
@@ -106,6 +107,16 @@ export default function StudyScreen() {
   useEffect(() => {
     loadStudyData();
   }, [user]);
+
+  // Refresh data when screen comes into focus (e.g., returning from course-management)
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        console.log('📚 Study screen focused - refreshing course data');
+        loadStudyData();
+      }
+    }, [user])
+  );
 
   // Handle navigation from index page
   useEffect(() => {
