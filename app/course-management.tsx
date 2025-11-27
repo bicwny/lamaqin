@@ -9,6 +9,7 @@ import PageTemplate from '@/components/PageTemplate';
 import { router } from 'expo-router';
 import { toastService } from '@/lib/toast';
 import { CourseSkeleton } from '@/components/SkeletonLoader';
+import ToggleSwitch from '@/components/ToggleSwitch';
 
 interface Course {
   id: string;
@@ -24,6 +25,7 @@ export default function CourseManagementScreen() {
   const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningCourse, setJoiningCourse] = useState<string | null>(null);
+  const [togglingCourse, setTogglingCourse] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -113,6 +115,21 @@ export default function CourseManagementScreen() {
     }
   };
 
+  const toggleCourseStatus = async (courseId: string, currentlyActive: boolean) => {
+    if (togglingCourse) return;
+    
+    setTogglingCourse(courseId);
+    try {
+      if (currentlyActive) {
+        await pauseCourse(courseId);
+      } else {
+        await resumeCourse(courseId);
+      }
+    } finally {
+      setTogglingCourse(null);
+    }
+  };
+
   const joinCourse = async (courseId: string) => {
     if (!user) return;
 
@@ -193,59 +210,43 @@ export default function CourseManagementScreen() {
 
             {userCourses.map(userCourse => {
               const progressPercentage = userCourse.progress_percentage || 0;
+              const isActive = userCourse.status === 'active';
+              const isCompleted = userCourse.status === 'completed';
 
               return (
-                <View key={userCourse.id} style={styles.manageCourseCard}>
-                  <View style={styles.courseHeader}>
-                    <Text style={styles.courseName}>
-                      {userCourse.course.name}
-                    </Text>
-                    <Text style={styles.courseDetails}>
-                      {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
-                    </Text>
-                    <Text style={styles.statusText}>
-                      状态：{getStatusText(userCourse.status)}
-                    </Text>
+                <TouchableOpacity 
+                  key={userCourse.id} 
+                  style={styles.manageCourseCard}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    if (isActive) {
+                      router.push(`/course-detail/${userCourse.course_id}`);
+                    }
+                  }}
+                >
+                  <View style={styles.courseCardContent}>
+                    <View style={styles.courseInfo}>
+                      <Text style={styles.courseName}>
+                        {userCourse.course.name}
+                      </Text>
+                      <Text style={styles.courseDetails}>
+                        {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
+                      </Text>
+                      <Text style={styles.statusText}>
+                        状态：{getStatusText(userCourse.status)}
+                      </Text>
+                    </View>
+                    {!isCompleted && (
+                      <View style={styles.toggleContainer}>
+                        <ToggleSwitch
+                          value={isActive}
+                          onValueChange={() => toggleCourseStatus(userCourse.course_id, isActive)}
+                          disabled={togglingCourse === userCourse.course_id}
+                        />
+                      </View>
+                    )}
                   </View>
-
-                  <View style={styles.buttonRow}>
-                    {userCourse.status === 'active' ? (
-                      <>
-                        <TouchableOpacity 
-                          style={styles.primaryButton}
-                          activeOpacity={0.7}
-                          onPress={() => {
-                            console.log('🔵 继续学习 button pressed');
-                            router.push(`/course-detail/${userCourse.course_id}`);
-                          }}
-                        >
-                          <Text style={styles.buttonText}>继续学习</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                          style={styles.secondaryButton}
-                          activeOpacity={0.7}
-                          onPress={() => {
-                            console.log('🔴 暂停 button pressed for course:', userCourse.course_id);
-                            pauseCourse(userCourse.course_id);
-                          }}
-                        >
-                          <Text style={styles.secondaryButtonText}>暂停</Text>
-                        </TouchableOpacity>
-                      </>
-                    ) : userCourse.status === 'paused' ? (
-                      <TouchableOpacity 
-                        style={styles.primaryButton}
-                        activeOpacity={0.7}
-                        onPress={() => {
-                          console.log('🟢 恢复学习 button pressed for course:', userCourse.course_id);
-                          resumeCourse(userCourse.course_id);
-                        }}
-                      >
-                        <Text style={styles.buttonText}>恢复学习</Text>
-                      </TouchableOpacity>
-                    ) : null}
-                  </View>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
@@ -317,6 +318,19 @@ const styles = StyleSheet.create({
     marginHorizontal: ComponentTokens.card.margin.spacious,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
+  courseCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  courseInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  toggleContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   availableCourseCard: {
     ...ComponentTokens.card.variants.outlined,
     padding: ComponentTokens.card.padding.comfortable,
@@ -325,6 +339,11 @@ const styles = StyleSheet.create({
   },
   courseHeader: {
     marginBottom: 12,
+  },
+  courseHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
   },
   courseName: {
     fontSize: 18,
