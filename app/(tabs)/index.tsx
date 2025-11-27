@@ -49,9 +49,6 @@ export default function HomeScreen() {
   const [dailyPractices, setDailyPractices] = useState<DailyPractice[]>([]);
   const [weeklyPractices, setWeeklyPractices] = useState<WeeklyPractice[]>([]);
 
-  // Track when user is returning from recording to avoid unnecessary refresh
-  const [lastRecordTime, setLastRecordTime] = useState<number>(0);
-
   // Add timezone support for daily reset
   const { timezoneInfo, handleDailyResetCheck } = useTimezone();
 
@@ -74,14 +71,10 @@ export default function HomeScreen() {
           });
         }
 
-        const now = Date.now();
-        // Only refresh if it's been more than 2 seconds since last record
-        // This prevents refresh when user just recorded something and came back
-        if (now - lastRecordTime > 2000) {
-          loadDashboardData();
-        }
+        // Always reload data when screen gains focus to show latest records
+        loadDashboardData();
       }
-    }, [user?.id, lastRecordTime, timezoneInfo])
+    }, [user?.id, timezoneInfo])
   );
 
   const loadDashboardData = async () => {
@@ -345,9 +338,6 @@ export default function HomeScreen() {
   // Handle add record button (plus)
   const handleAddRecord = (e: any, practice: any) => {
     e.stopPropagation(); // Prevent card tap
-
-    // Track when user is going to record
-    setLastRecordTime(Date.now());
 
     if (practice.type === 'time' || practice.weekSessions !== undefined) {
       // For meditation practices (both daily and weekly), navigate to meditation record modal
