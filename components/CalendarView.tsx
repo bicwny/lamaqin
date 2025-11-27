@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { router } from 'expo-router';
 import { toastService } from '@/lib/toast';
+import { getUserTimezone, getCurrentDateInTimezone } from '@/lib/timezone';
 
 interface CalendarViewProps {
   userId: string;
@@ -15,18 +16,29 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
   const [currentMonth, setCurrentMonth] = useState<string>('');
   const [markedDates, setMarkedDates] = useState<any>({});
   const [loading, setLoading] = useState(true);
+  const [userTimezone, setUserTimezone] = useState<string>('');
 
   useEffect(() => {
-    loadMarkedDates();
+    initializeTimezone();
   }, [userId]);
 
+  const initializeTimezone = async () => {
+    const timezoneInfo = await getUserTimezone();
+    setUserTimezone(timezoneInfo.timezone);
+    loadMarkedDates(undefined, timezoneInfo.timezone);
+  };
 
-  const loadMarkedDates = async (specificDate?: string) => {
+  const loadMarkedDates = async (specificDate?: string, timezone?: string) => {
     try {
       setLoading(true);
       
-      // Get date range - either for a specific month or a broader range
-      const today = new Date();
+      // Use passed timezone or get from state
+      const tz = timezone || userTimezone;
+      
+      // Get today's date in user's timezone
+      const todayStr = tz ? getCurrentDateInTimezone(tz) : new Date().toISOString().split('T')[0];
+      const today = new Date(todayStr);
+      
       let startDate: string;
       let endDate: string;
       
@@ -35,14 +47,14 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         const baseDate = new Date(specificDate);
         const firstDay = new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, 1);
         const lastDay = new Date(baseDate.getFullYear(), baseDate.getMonth() + 2, 0);
-        startDate = firstDay.toISOString().split('T')[0];
-        endDate = lastDay.toISOString().split('T')[0];
+        startDate = `${firstDay.getFullYear()}-${String(firstDay.getMonth() + 1).padStart(2, '0')}-01`;
+        endDate = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
       } else {
         // Load 6 months range (3 months before and after today)
         const firstDay = new Date(today.getFullYear(), today.getMonth() - 3, 1);
         const lastDay = new Date(today.getFullYear(), today.getMonth() + 4, 0);
-        startDate = firstDay.toISOString().split('T')[0];
-        endDate = lastDay.toISOString().split('T')[0];
+        startDate = `${firstDay.getFullYear()}-${String(firstDay.getMonth() + 1).padStart(2, '0')}-01`;
+        endDate = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`;
       }
 
       // Load daily records
@@ -78,8 +90,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         };
       });
 
-      // Mark today
-      const todayStr = today.toISOString().split('T')[0];
+      // Mark today using timezone-aware date
       if (marked[todayStr]) {
         marked[todayStr] = {
           ...marked[todayStr],
@@ -127,8 +138,8 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     );
   }
 
-  const today = new Date();
-  const maxDate = today.toISOString().split('T')[0];
+  // Get max date using timezone-aware calculation
+  const maxDate = userTimezone ? getCurrentDateInTimezone(userTimezone) : new Date().toISOString().split('T')[0];
 
   return (
     <View style={styles.container}>
@@ -141,7 +152,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         onMonthChange={(month) => {
           console.log('📅 Month changed to:', month.dateString);
           setCurrentMonth(month.dateString);
-          loadMarkedDates(month.dateString);
+          loadMarkedDates(month.dateString, userTimezone);
         }}
         theme={{
           backgroundColor: '#ffffff',
