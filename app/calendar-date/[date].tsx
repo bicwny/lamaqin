@@ -320,12 +320,36 @@ export default function CalendarDatePage() {
                   ? '选择项目添加记录' 
                   : '添加更多记录'}
               </Text>
-              {userProjects.length === 0 ? (
-                <View style={styles.emptyProjectsContainer}>
-                  <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
-                </View>
-              ) : (
-                userProjects.map((project) => (
+              {(() => {
+                const availableProjects = userProjects.filter((project) => {
+                  // Time-based practices (meditation): always show, user can log multiple times
+                  if (project.practices.type === 'meditation') {
+                    return true;
+                  }
+                  // Count-based practices: hide if already has a record for this date
+                  const hasExistingRecord = dateRecords.daily.some(
+                    (record) => record.practice_project_id === project.id
+                  );
+                  return !hasExistingRecord;
+                });
+
+                if (userProjects.length === 0) {
+                  return (
+                    <View style={styles.emptyProjectsContainer}>
+                      <Text style={styles.emptyProjectsText}>还没有修行项目</Text>
+                    </View>
+                  );
+                }
+
+                if (availableProjects.length === 0) {
+                  return (
+                    <View style={styles.emptyProjectsContainer}>
+                      <Text style={styles.emptyProjectsText}>今日所有项目已记录完成</Text>
+                    </View>
+                  );
+                }
+
+                return availableProjects.map((project) => (
                   <TouchableOpacity
                     key={project.id}
                     style={styles.projectItem}
@@ -339,8 +363,8 @@ export default function CalendarDatePage() {
                     </View>
                     <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
                   </TouchableOpacity>
-                ))
-              )}
+                ));
+              })()}
             </View>
           </>
         )}
