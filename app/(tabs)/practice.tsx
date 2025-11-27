@@ -7,19 +7,16 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  ScrollView,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import PageTemplate from "@/components/PageTemplate";
-import ProgressBar from "@/components/ProgressBar";
 import { DesignSystem } from "@/constants/DesignSystem";
 import {
   ComponentTokens,
   ComponentTextStyles,
-  componentHelpers,
 } from "@/utils/componentTokens";
 import { presetProjectNameService } from "@/lib/database";
 import { toastService } from "@/lib/toast";
@@ -242,79 +239,62 @@ export default function PracticeScreen() {
 
   const renderPracticeItem = ({ item }: { item: PracticeProject }) => {
     const progress = calculateProgress(item);
-    const presetName = item.preset_project_id
-      ? presetProjectNames[item.preset_project_id]
-      : null;
-    const displayName = item.project_name || presetName || "预设项目";
+    const unit = item.practices.type === 'time' ? '座' : item.practices.unit;
 
     return (
       <View key={item.id} style={styles.practiceItem}>
-        {/* Section 1: Practice Header & Completion Badge */}
-        <View style={styles.practiceHeader}>
-          <View style={styles.practiceInfo}>
-            {/* Program name first, then practice name (matching practice-detail) */}
-            {(item.project_name || item.preset_project_id) && (
-              <Text style={styles.programName}>
-                {item.project_name ||
-                  presetProjectNames[item.preset_project_id] ||
-                  "预设项目"}
-              </Text>
-            )}
+        {/* Row layout: Left content + Right action buttons */}
+        <View style={styles.cardRow}>
+          {/* Left side: Title, progress, percentage */}
+          <View style={styles.cardContent}>
+            {/* Practice name - large title */}
             <Text style={styles.practiceName}>{item.practices.name}</Text>
-          </View>
-          {/* Completion badge (24px icon matching practice-detail) */}
-          {progress.isCompleted && (
-            <Ionicons
-              name="checkmark-circle"
-              size={24}
-              color={DesignSystem.colors.greenTara}
-            />
-          )}
-        </View>
-
-
-        {/* Section 2: Progress Info */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressInfo}>
+            
+            {/* Progress line */}
             <Text style={styles.progressText}>
               {progress.target 
-                ? `${(progress.current ?? 0).toLocaleString()}/${progress.target.toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
-                : `已完成 ${(progress.current ?? 0).toLocaleString()} ${item.practices.type === 'time' ? '座' : item.practices.unit}`
+                ? `${(progress.current ?? 0).toLocaleString()}/${progress.target.toLocaleString()}${unit}`
+                : `${(progress.current ?? 0).toLocaleString()}${unit}`
               }
             </Text>
-          </View>
-          {progress.target && (
-            <View style={styles.progressBarContainer}>
-              <ProgressBar
-                progress={progress.percentage}
-                size="thick"
-                containerStyle={{ flex: 1 }}
-                fillColor={progress.isCompleted ? DesignSystem.colors.greenTara : DesignSystem.colors.redTara}
-              />
-              <Text style={styles.progressPercentage}>
+            
+            {/* Percentage - only show when there's a target */}
+            {progress.target && (
+              <Text style={[
+                styles.percentageText,
+                progress.isCompleted && styles.percentageCompleted
+              ]}>
                 {Math.round(progress.percentage)}%
               </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Divider */}
-        {/* <View style={styles.divider} />*/}
-
-        {/* Section 3: Action Buttons */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => handleViewDetails(item.id, item.practices.name)}
-          >
-            <Text style={styles.secondaryButtonText}>详情</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.primaryButton, { backgroundColor: DesignSystem.colors.redTara }]} // Red Tara for practice recording energy
-            onPress={() => handleCustomRecord(item.id, item.practices.name)}
-          >
-            <Text style={styles.primaryButtonText}>记录</Text>
-          </TouchableOpacity>
+            )}
+          </View>
+          
+          {/* Right side: Two circular action buttons */}
+          <View style={styles.actionButtons}>
+            {/* History button */}
+            <TouchableOpacity
+              style={styles.circleButton}
+              onPress={() => handleViewDetails(item.id, item.practices.name)}
+            >
+              <Ionicons
+                name="document-text-outline"
+                size={22}
+                color={DesignSystem.colors.textSecondary}
+              />
+            </TouchableOpacity>
+            
+            {/* Add record button */}
+            <TouchableOpacity
+              style={[styles.circleButton, styles.circleButtonPrimary]}
+              onPress={() => handleCustomRecord(item.id, item.practices.name)}
+            >
+              <Ionicons
+                name="add"
+                size={24}
+                color={DesignSystem.colors.redTara}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -455,82 +435,51 @@ const styles = StyleSheet.create({
     padding: ComponentTokens.card.padding.comfortable,
     marginBottom: ComponentTokens.card.margin.spacious,
   },
-  practiceHeader: {
+  cardRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    // marginBottom: DesignSystem.spacing.md,
+    alignItems: "center",
   },
-  practiceInfo: {
+  cardContent: {
     flex: 1,
+    paddingRight: DesignSystem.spacing.md,
   },
   practiceName: {
-    ...ComponentTextStyles.subheading,
-    // marginBottom: DesignSystem.spacing.sm,
-  },
-  programName: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  completedBadge: {
-    fontSize: DesignSystem.typography.fontSize.lg,
-  },
-  progressContainer: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  progressInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: DesignSystem.spacing.sm,
+    fontSize: DesignSystem.typography.fontSize.xl,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
+    color: DesignSystem.colors.textPrimary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   progressText: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.textPrimary,
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.textSecondary,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  percentageText: {
+    fontSize: DesignSystem.typography.fontSize.base,
+    color: DesignSystem.colors.redTara,
     fontWeight: DesignSystem.typography.fontWeight.medium,
   },
-  progressPercentage: {
-    ...ComponentTextStyles.body,
-    color: DesignSystem.colors.redTara,
-    fontWeight: DesignSystem.typography.fontWeight.semibold,
-    minWidth: 50,
-    textAlign: "right",
+  percentageCompleted: {
+    color: DesignSystem.colors.greenTara,
   },
-
-  actionsContainer: {
-    flexDirection: "row",
-    gap: DesignSystem.spacing.md,
-  },
-  secondaryButton: {
-    ...ComponentTokens.button.variants.secondary,
-    ...ComponentTokens.button.sizes.small,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryButton: {
-    ...ComponentTokens.button.variants.primary,
-    ...ComponentTokens.button.sizes.small,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  secondaryButtonText: {
-    color: DesignSystem.colors.redTara,
-  },
-  primaryButtonText: {
-    color: DesignSystem.colors.textInverse,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: DesignSystem.colors.divider,
-    marginVertical: DesignSystem.spacing.sm,
-  },
-  progressBarContainer: {
+  actionButtons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: DesignSystem.spacing.md,
+    gap: DesignSystem.spacing.sm,
+  },
+  circleButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+    backgroundColor: DesignSystem.colors.surface,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  circleButtonPrimary: {
+    borderColor: DesignSystem.colors.redTara,
   },
   calendarSection: {
     paddingHorizontal: DesignSystem.spacing.lg,
