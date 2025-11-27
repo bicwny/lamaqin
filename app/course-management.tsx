@@ -193,23 +193,50 @@ export default function CourseManagementScreen() {
 
             {userCourses.map(userCourse => {
               const progressPercentage = userCourse.progress_percentage || 0;
+              const isActive = userCourse.status === 'active';
+              const isPaused = userCourse.status === 'paused';
+              const isCompleted = userCourse.status === 'completed';
 
               return (
                 <View key={userCourse.id} style={styles.manageCourseCard}>
-                  <View style={styles.courseHeader}>
-                    <Text style={styles.courseName}>
-                      {userCourse.course.name}
-                    </Text>
-                    <Text style={styles.courseDetails}>
-                      {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
-                    </Text>
-                    <Text style={styles.statusText}>
-                      状态：{getStatusText(userCourse.status)}
-                    </Text>
+                  <View style={styles.cardTopRow}>
+                    <View style={styles.courseInfo}>
+                      <Text style={styles.courseName}>
+                        {userCourse.course.name}
+                      </Text>
+                      <Text style={styles.teacherName}>
+                        {userCourse.course.teacher}
+                      </Text>
+                    </View>
+                    <View style={[
+                      styles.statusBadge,
+                      isActive && styles.statusBadgeActive,
+                      isPaused && styles.statusBadgePaused,
+                      isCompleted && styles.statusBadgeCompleted,
+                    ]}>
+                      <Text style={[
+                        styles.statusBadgeText,
+                        isActive && styles.statusTextActive,
+                        isPaused && styles.statusTextPaused,
+                        isCompleted && styles.statusTextCompleted,
+                      ]}>
+                        {getStatusText(userCourse.status)}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.progressSection}>
+                    <View style={styles.progressInfo}>
+                      <Text style={styles.lessonCount}>共{userCourse.course.total_lessons}课</Text>
+                      <Text style={styles.progressPercent}>{progressPercentage.toFixed(1)}%</Text>
+                    </View>
+                    <View style={styles.progressBarContainer}>
+                      <View style={[styles.progressBarFill, { width: `${Math.min(progressPercentage, 100)}%` }]} />
+                    </View>
                   </View>
 
                   <View style={styles.buttonRow}>
-                    {userCourse.status === 'active' ? (
+                    {isActive ? (
                       <>
                         <TouchableOpacity 
                           style={styles.primaryButton}
@@ -232,7 +259,7 @@ export default function CourseManagementScreen() {
                           <Text style={styles.secondaryButtonText}>暂停</Text>
                         </TouchableOpacity>
                       </>
-                    ) : userCourse.status === 'paused' ? (
+                    ) : isPaused ? (
                       <TouchableOpacity 
                         style={styles.primaryButton}
                         activeOpacity={0.7}
@@ -259,15 +286,19 @@ export default function CourseManagementScreen() {
 
             {availableCourses.map(course => (
               <View key={course.id} style={styles.availableCourseCard}>
-                <View style={styles.courseHeader}>
-                  <Text style={styles.courseName}>{course.name}</Text>
-                  <Text style={styles.courseDetails}>
-                    {course.teacher} • {course.total_lessons}课
-                  </Text>
-                  {course.description && (
-                    <Text style={styles.courseDescription}>{course.description}</Text>
-                  )}
+                <View style={styles.availableCardTopRow}>
+                  <View style={styles.courseInfo}>
+                    <Text style={styles.courseName}>{course.name}</Text>
+                    <Text style={styles.teacherName}>{course.teacher}</Text>
+                  </View>
+                  <View style={styles.lessonBadge}>
+                    <Text style={styles.lessonBadgeText}>{course.total_lessons}课</Text>
+                  </View>
                 </View>
+
+                {course.description && (
+                  <Text style={styles.courseDescription}>{course.description}</Text>
+                )}
 
                 <TouchableOpacity
                   style={[
@@ -312,19 +343,28 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   manageCourseCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
-  },
-  availableCourseCard: {
-    ...ComponentTokens.card.variants.outlined,
-    padding: ComponentTokens.card.padding.comfortable,
-    marginHorizontal: ComponentTokens.card.margin.spacious,
-    marginBottom: ComponentTokens.card.margin.spacious,
-  },
-  courseHeader: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
     marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  courseInfo: {
+    flex: 1,
+    marginRight: 12,
   },
   courseName: {
     fontSize: 18,
@@ -333,22 +373,106 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     letterSpacing: -0.3,
   },
-  courseDetails: {
+  teacherName: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
+    fontWeight: '500',
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: '#f3f4f6',
+  },
+  statusBadgeActive: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+  },
+  statusBadgePaused: {
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+  },
+  statusBadgeCompleted: {
+    backgroundColor: 'rgba(22, 163, 74, 0.1)',
+  },
+  statusBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  statusTextActive: {
+    color: DesignSystem.colors.primary,
+  },
+  statusTextPaused: {
+    color: '#f59e0b',
+  },
+  statusTextCompleted: {
+    color: '#16a34a',
+  },
+  progressSection: {
+    marginBottom: 16,
+  },
+  progressInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  lessonCount: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontWeight: '500',
+  },
+  progressPercent: {
+    fontSize: 13,
+    color: DesignSystem.colors.primary,
+    fontWeight: '600',
+  },
+  progressBarContainer: {
+    height: 6,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: DesignSystem.colors.primary,
+    borderRadius: 3,
+  },
+  availableCourseCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
+  },
+  availableCardTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  lessonBadge: {
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  lessonBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
   },
   courseDescription: {
     fontSize: 13,
     color: '#888',
-    fontStyle: 'italic',
-    marginTop: 4,
-  },
-  statusText: {
-    fontSize: 13,
-    color: DesignSystem.colors.primary,
-    fontWeight: '600',
-    marginTop: 4,
+    lineHeight: 20,
+    marginBottom: 16,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -393,10 +517,9 @@ const styles = StyleSheet.create({
   },
   joinButton: {
     backgroundColor: DesignSystem.colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 10,
-    alignSelf: 'flex-end',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
