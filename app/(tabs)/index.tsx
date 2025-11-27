@@ -590,7 +590,7 @@ export default function HomeScreen() {
                         >
                           <Ionicons 
                             name="checkmark-circle-outline" 
-                            size={24} 
+                            size={28} 
                             color="#6B7280" 
                           />
                         </TouchableOpacity>
@@ -601,8 +601,8 @@ export default function HomeScreen() {
                         style={styles.actionButton}
                       >
                         <Ionicons 
-                          name="add-circle-outline" 
-                          size={24} 
+                          name={practice.type === 'count' ? "create-outline" : "add-circle-outline"} 
+                          size={28} 
                           color={DesignSystem.colors.primary} 
                         />
                       </TouchableOpacity>
@@ -632,14 +632,14 @@ export default function HomeScreen() {
                       </Text>
                     </View>
 
-                    {/* Action Button for Weekly Practices */}
+                    {/* Action Button for Weekly Practices (time-based, keep + icon) */}
                     <View style={styles.practiceActions}>
                       <TouchableOpacity
                         onPress={(e) => handleAddRecord(e, practice)}
                       >
                         <Ionicons 
                           name="add-circle-outline" 
-                          size={24} 
+                          size={28} 
                           color={DesignSystem.colors.primary} 
                         />
                       </TouchableOpacity>
