@@ -24,6 +24,7 @@ import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
 import TopicSelectionModal from '@/components/TopicSelectionModal';
+import { getUserTimezone, getCurrentDateInTimezone, TimezoneInfo } from '@/lib/timezone';
 
 export default function MeditationRecordScreen() {
   const { user } = useAuth();
@@ -48,7 +49,7 @@ export default function MeditationRecordScreen() {
   const [duration, setDuration] = useState('');
   const [sessionNumber, setSessionNumber] = useState('1');
   const [reflection, setReflection] = useState('');
-  const [recordDate, setRecordDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
+  const [recordDate, setRecordDate] = useState(selectedDate || '');
   const [loading, setLoading] = useState(false);
   const [loadingTopics, setLoadingTopics] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -63,10 +64,21 @@ export default function MeditationRecordScreen() {
     title: string;
     description?: string;
   } | null>(null);
+  const [timezoneInfo, setTimezoneInfo] = useState<TimezoneInfo | null>(null);
 
   const isEditing = !!editRecordId;
 
   useEffect(() => {
+    const initTimezone = async () => {
+      const tz = await getUserTimezone();
+      setTimezoneInfo(tz);
+      if (!selectedDate && !recordDate) {
+        const localDate = getCurrentDateInTimezone(tz.timezone);
+        console.log('📅 Setting default meditation date from timezone:', localDate, tz.timezone);
+        setRecordDate(localDate);
+      }
+    };
+    initTimezone();
     loadMeditationTopics();
     if (isEditing) {
       loadExistingRecord();
