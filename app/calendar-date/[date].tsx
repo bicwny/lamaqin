@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: ComponentTokens.card.padding.spacious,
+    padding: ComponentTokens.card.padding.comfortable,
     marginBottom: ComponentTokens.card.margin.comfortable,
   },
   recordCardContent: {
