@@ -383,11 +383,10 @@ export default function PracticeHistoryScreen() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'journal':
-        const isTimeBased = projectInfo?.practices?.type === 'time';
-        const unit = isTimeBased ? '分钟' : (projectInfo?.practices?.unit || '次');
+        const practiceUnit = projectInfo?.practices?.unit || '次';
         const progressText = progress.target
-          ? `${progress.current.toLocaleString()}/${progress.target.toLocaleString()}${unit} · ${Math.round(progress.percentage)}%`
-          : `已完成 ${progress.current.toLocaleString()}${unit}`;
+          ? `${progress.current.toLocaleString()}/${progress.target.toLocaleString()}${practiceUnit} · ${Math.round(progress.percentage)}%`
+          : `已完成 ${progress.current.toLocaleString()}${practiceUnit}`;
         
         return (
           <View style={styles.tabContent}>
