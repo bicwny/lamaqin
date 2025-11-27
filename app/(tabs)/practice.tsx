@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  ScrollView,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import PageTemplate from "@/components/PageTemplate";
+import CalendarView from "@/components/CalendarView";
 import { DesignSystem } from "@/constants/DesignSystem";
 import {
   ComponentTokens,
@@ -21,11 +23,13 @@ import {
 import { presetProjectNameService } from "@/lib/database";
 import { toastService } from "@/lib/toast";
 
+type TabType = 'practices' | 'calendar';
+
 interface PracticeProject {
   id: string;
   user_id: string;
   practice_id: string;
-  total_target?: number;  // 可选：持续修行时为null
+  total_target?: number;
   current_count: number;
   daily_target?: number;
   weekly_target?: number;
@@ -54,6 +58,7 @@ interface MeditationRecord {
 
 export default function PracticeScreen() {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabType>('practices');
   const [projects, setProjects] = useState<PracticeProject[]>([]);
   const [presetProjectNames, setPresetProjectNames] = useState<{
     [key: string]: string;
@@ -104,7 +109,6 @@ export default function PracticeScreen() {
         practiceProjects?.length || 0,
       );
 
-      // Load preset project names for projects that use presets
       const presetIds =
         practiceProjects
           ?.filter((p) => p.preset_project_id)
@@ -123,12 +127,10 @@ export default function PracticeScreen() {
         }
       }
 
-      // For time-based practices, fetch actual session counts from meditation_records
       const timePractices = practiceProjects?.filter(p => p.practices?.type === 'time') || [];
       if (timePractices.length > 0) {
         const practiceIds = timePractices.map(p => p.practice_id);
         
-        // Get actual counts from meditation_records
         const { data: meditationCounts, error: countError } = await supabase
           .from('meditation_records')
           .select('practice_id')
@@ -136,13 +138,11 @@ export default function PracticeScreen() {
           .in('practice_id', practiceIds);
         
         if (!countError && meditationCounts) {
-          // Count records per practice_id
           const countMap: { [key: string]: number } = {};
           meditationCounts.forEach(record => {
             countMap[record.practice_id] = (countMap[record.practice_id] || 0) + 1;
           });
           
-          // Update current_count for time-based practices with actual counts
           practiceProjects?.forEach(project => {
             if (project.practices?.type === 'time') {
               const actualCount = countMap[project.practice_id] || 0;
@@ -174,7 +174,6 @@ export default function PracticeScreen() {
   };
 
   const calculateProgress = (project: PracticeProject) => {
-    // 如果没有总目标，表示持续修行，只显示当前进度
     if (!project.total_target) {
       return {
         current: project.current_count,
@@ -196,7 +195,6 @@ export default function PracticeScreen() {
         isCompleted: project.current_count >= project.total_target,
       };
     } else {
-      // For time-based practices, calculate based on sessions
       return {
         current: project.current_count,
         target: project.total_target,
@@ -230,7 +228,6 @@ export default function PracticeScreen() {
     }
 
     if (project.practices.type === "time") {
-      // For time-based practices, open meditation record modal directly
       router.push({
         pathname: "/modals/meditation-record",
         params: {
@@ -240,7 +237,6 @@ export default function PracticeScreen() {
         },
       });
     } else {
-      // For count-based practices, show simple input
       router.push({
         pathname: "/modals/custom-record",
         params: {
@@ -259,7 +255,6 @@ export default function PracticeScreen() {
       return;
     }
 
-    // Navigate to practice-history page (deprecated practice-detail)
     router.push({
       pathname: "/practice-history",
       params: {
@@ -275,14 +270,10 @@ export default function PracticeScreen() {
 
     return (
       <View key={item.id} style={styles.practiceItem}>
-        {/* Row layout: Left content + Right action buttons */}
         <View style={styles.cardRow}>
-          {/* Left side: Title, progress, percentage */}
           <View style={styles.cardContent}>
-            {/* Practice name - large title */}
             <Text style={styles.practiceName}>{item.practices.name}</Text>
             
-            {/* Progress line */}
             <Text style={styles.progressText}>
               {progress.target 
                 ? `${(progress.current ?? 0).toLocaleString()}/${progress.target.toLocaleString()}${unit}`
@@ -290,7 +281,6 @@ export default function PracticeScreen() {
               }
             </Text>
             
-            {/* Percentage - only show when there's a target */}
             {progress.target && (
               <Text style={[
                 styles.percentageText,
@@ -301,9 +291,7 @@ export default function PracticeScreen() {
             )}
           </View>
           
-          {/* Right side: Two circular action buttons */}
           <View style={styles.actionButtons}>
-            {/* History button */}
             <TouchableOpacity
               style={styles.circleButton}
               onPress={() => handleViewDetails(item.id, item.practices.name)}
@@ -315,7 +303,6 @@ export default function PracticeScreen() {
               />
             </TouchableOpacity>
             
-            {/* Add record button */}
             <TouchableOpacity
               style={[styles.circleButton, styles.circleButtonPrimary]}
               onPress={() => handleCustomRecord(item.id, item.practices.name)}
@@ -330,6 +317,72 @@ export default function PracticeScreen() {
         </View>
       </View>
     );
+  };
+
+  const tabs: { key: TabType; label: string; icon: string }[] = [
+    { key: 'practices', label: '功课', icon: 'flower-outline' },
+    { key: 'calendar', label: '日历', icon: 'calendar-outline' },
+  ];
+
+  const renderTabContent = () => {
+    if (activeTab === 'practices') {
+      if (projects.length === 0) {
+        return (
+          <View style={styles.emptyState}>
+            <View style={styles.iconContainer}>
+              <Ionicons name="flower-outline" size={80} color="#9CA3AF" />
+            </View>
+
+            <Text style={styles.emptyTitle}>开始你的修行之旅</Text>
+            <Text style={styles.emptyDescription}>
+              添加你的第一个修行项目，开始记录你的精神成长历程
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.browseButton, { backgroundColor: DesignSystem.colors.redTara }]}
+              onPress={handleAddPractice}
+            >
+              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.browseButtonText}>添加修行项目</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+
+      return (
+        <FlatList
+          data={projects}
+          renderItem={renderPracticeItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      );
+    }
+
+    if (activeTab === 'calendar') {
+      return (
+        <ScrollView 
+          style={styles.calendarScrollView}
+          contentContainerStyle={styles.calendarScrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {user && (
+            <View style={styles.calendarContainer}>
+              <CalendarView userId={user.id} />
+            </View>
+          )}
+        </ScrollView>
+      );
+    }
+
+    return null;
   };
 
   if (loading) {
@@ -352,41 +405,6 @@ export default function PracticeScreen() {
     );
   }
 
-  if (projects.length === 0) {
-    return (
-      <PageTemplate
-        title="修行"
-        subtitle="如人饮水，冷暖自知"
-        rightAction={{
-          text: "添加",
-          onPress: handleAddPractice,
-        }}
-        scrollable={false}
-        backgroundColor={DesignSystem.colors.background}
-      >
-        <View style={styles.emptyState}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="flower-outline" size={80} color="#9CA3AF" />
-          </View>
-
-          <Text style={styles.emptyTitle}>开始你的修行之旅</Text>
-          <Text style={styles.emptyDescription}>
-            添加你的第一个修行项目，开始记录你的精神成长历程
-          </Text>
-
-          <TouchableOpacity
-            style={[styles.browseButton, { backgroundColor: DesignSystem.colors.redTara }]}
-            onPress={handleAddPractice}
-          >
-            <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
-            <Text style={styles.browseButtonText}>添加修行项目</Text>
-          </TouchableOpacity>
-        </View>
-      </PageTemplate>
-    );
-  }
-
-
   return (
     <PageTemplate
       title="修行"
@@ -399,16 +417,36 @@ export default function PracticeScreen() {
       backgroundColor={DesignSystem.colors.background}
       padding={0}
     >
-      <FlatList
-        data={projects}
-        renderItem={renderPracticeItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
+      {/* Tab Bar */}
+      <View style={styles.tabBar}>
+        {tabs.map((tab) => (
+          <TouchableOpacity
+            key={tab.key}
+            style={[
+              styles.tabItem,
+              activeTab === tab.key && styles.tabItemActive
+            ]}
+            onPress={() => setActiveTab(tab.key)}
+          >
+            <Ionicons 
+              name={tab.icon as any} 
+              size={20} 
+              color={activeTab === tab.key ? DesignSystem.colors.primary : DesignSystem.colors.textTertiary} 
+            />
+            <Text style={[
+              styles.tabLabel,
+              activeTab === tab.key && styles.tabLabelActive
+            ]}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Tab Content */}
+      <View style={styles.tabContent}>
+        {renderTabContent()}
+      </View>
     </PageTemplate>
   );
 }
@@ -424,6 +462,43 @@ const styles = StyleSheet.create({
     ...ComponentTextStyles.body,
     color: DesignSystem.colors.textSecondary,
     marginTop: DesignSystem.spacing.md,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.xs,
+  },
+  tabItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+  },
+  tabItemActive: {
+    backgroundColor: DesignSystem.colors.background,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  tabLabel: {
+    ...ComponentTextStyles.label,
+    color: DesignSystem.colors.textTertiary,
+  },
+  tabLabelActive: {
+    color: DesignSystem.colors.primary,
+    fontWeight: DesignSystem.typography.fontWeight.semibold as any,
+  },
+  tabContent: {
+    flex: 1,
   },
   emptyState: {
     flex: 1,
@@ -513,13 +588,15 @@ const styles = StyleSheet.create({
   circleButtonPrimary: {
     borderColor: DesignSystem.colors.redTara,
   },
-  calendarSection: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.md,
+  calendarScrollView: {
+    flex: 1,
   },
-  sectionTitle: {
-    ...ComponentTextStyles.subheading,
-    marginBottom: DesignSystem.spacing.sm,
-    color: DesignSystem.colors.textPrimary,
+  calendarScrollContent: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xl,
+  },
+  calendarContainer: {
+    flex: 1,
   },
 });
