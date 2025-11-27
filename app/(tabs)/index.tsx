@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   practiceName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: Colors.text,
     marginBottom: 4,

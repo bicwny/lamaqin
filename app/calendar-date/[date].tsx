@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   recordCardTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '600',
     color: DesignSystem.colors.textPrimary,
     marginBottom: 4,
