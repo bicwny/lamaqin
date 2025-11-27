@@ -11,8 +11,6 @@ interface DailyRecord {
   record_date: string;
   practice_project_id: string;
   count: number;
-  target_count?: number;
-  target_period?: string;
   practices: {
     name: string;
     unit: string;
@@ -26,8 +24,6 @@ interface MeditationRecord {
   practice_id: string;
   duration_minutes: number;
   session_number?: number;
-  target_count?: number;
-  target_period?: string;
   practices?: {
     name: string;
   };
@@ -122,8 +118,6 @@ export default function CalendarDatePage() {
           practice_project_id,
           count,
           user_practice_projects!inner (
-            target_count,
-            target_period,
             practices (
               name,
               unit,
@@ -144,10 +138,6 @@ export default function CalendarDatePage() {
           practice_id,
           duration_minutes,
           session_number,
-          user_practice_projects!inner (
-            target_count,
-            target_period
-          ),
           practices!inner (
             name
           )
@@ -162,8 +152,6 @@ export default function CalendarDatePage() {
         record_date: record.record_date,
         practice_project_id: record.practice_project_id,
         count: record.count,
-        target_count: record.user_practice_projects.target_count,
-        target_period: record.user_practice_projects.target_period,
         practices: {
           name: record.user_practice_projects.practices.name,
           unit: record.user_practice_projects.practices.unit,
@@ -287,21 +275,17 @@ export default function CalendarDatePage() {
             {(dateRecords.daily.length > 0 || dateRecords.meditation.length > 0) && (
               <View style={styles.section}>
                 <Text style={styles.sectionLabel}>当日记录</Text>
-                {dateRecords.daily.map((record: any, index) => (
+                {dateRecords.daily.map((record, index) => (
                   <TouchableOpacity 
                     key={`daily-${index}`} 
                     style={styles.recordItem}
                     onPress={() => handleEditRecord(record.id, record.practice_project_id, record.practices.name, record.practices.type)}
                   >
-                    <View style={styles.recordContent}>
-                      <Text style={styles.recordPracticeName}>{record.practices.name}</Text>
-                      <Text style={styles.recordGoal}>
-                        {record.count}{record.target_count ? `/${record.target_count}` : ''}{record.practices.unit}
-                      </Text>
-                    </View>
-                    <View style={styles.circleButtonPrimary}>
-                      <Ionicons name="create-outline" size={22} color={DesignSystem.colors.primary} />
-                    </View>
+                    <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.greenTara} />
+                    <Text style={styles.recordText}>
+                      {record.practices.name}: {record.count} {record.practices.unit}
+                    </Text>
+                    <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
                   </TouchableOpacity>
                 ))}
                 {dateRecords.meditation.map((record: any, index) => {
@@ -323,9 +307,7 @@ export default function CalendarDatePage() {
                       <Text style={styles.recordText}>
                         {practiceName} 第{record.session_number || 1}座: {record.duration_minutes} 分钟
                       </Text>
-                      <View style={styles.circleButtonPrimary}>
-                        <Ionicons name="create-outline" size={22} color={DesignSystem.colors.primary} />
-                      </View>
+                      <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textTertiary} />
                     </TouchableOpacity>
                   );
                 })}
@@ -355,9 +337,7 @@ export default function CalendarDatePage() {
                         <Text style={styles.projectSubName}>{project.project_name}</Text>
                       )}
                     </View>
-                    <View style={styles.circleButtonAdd}>
-                      <Ionicons name="add" size={22} color={DesignSystem.colors.blueTara} />
-                    </View>
+                    <Ionicons name="add-circle" size={24} color={DesignSystem.colors.blueTara} />
                   </TouchableOpacity>
                 ))
               )}
@@ -448,25 +428,5 @@ const styles = StyleSheet.create({
   emptyProjectsText: {
     fontSize: 16,
     color: DesignSystem.colors.textSecondary,
-  },
-  circleButtonPrimary: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.primary,
-    backgroundColor: DesignSystem.colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  circleButtonAdd: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.blueTara,
-    backgroundColor: DesignSystem.colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
