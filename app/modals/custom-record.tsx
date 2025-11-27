@@ -23,6 +23,7 @@ import { DesignSystem, createStyles } from '@/constants/DesignSystem';
 import { ComponentTokens, ComponentTextStyles } from '@/utils/componentTokens';
 import { Typography } from '@/utils/typography';
 import { toastService } from '@/lib/toast';
+import { getUserTimezone, getCurrentDateInTimezone, TimezoneInfo } from '@/lib/timezone';
 
 export default function CustomRecordScreen() {
   const { user } = useAuth();
@@ -44,25 +45,41 @@ export default function CustomRecordScreen() {
 
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
-  const [recordDate, setRecordDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
+  const [recordDate, setRecordDate] = useState(selectedDate || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingRecord, setLoadingRecord] = useState(false);
+  const [timezoneInfo, setTimezoneInfo] = useState<TimezoneInfo | null>(null);
   const isEditing = !!editRecordId;
+
+  // Initialize timezone and default date
+  useEffect(() => {
+    const initTimezone = async () => {
+      const tz = await getUserTimezone();
+      setTimezoneInfo(tz);
+      // Set default date using user's timezone if not already set
+      if (!selectedDate && !recordDate) {
+        const localDate = getCurrentDateInTimezone(tz.timezone);
+        console.log('📅 Setting default date from timezone:', localDate, tz.timezone);
+        setRecordDate(localDate);
+      }
+    };
+    initTimezone();
+  }, []);
 
   // Load existing record data when editing
   useEffect(() => {
     if (isEditing && editRecordId && user) {
       loadExistingRecord();
-    } else if (!isEditing && user) {
+    } else if (!isEditing && user && recordDate) {
       // Load existing total for the selected date when creating a new record
       loadExistingTotalForDate(recordDate);
     }
-  }, [isEditing, editRecordId, user]);
+  }, [isEditing, editRecordId, user, recordDate]);
 
   // Load existing total when date changes (only when not editing)
   useEffect(() => {
-    if (!isEditing && user) {
+    if (!isEditing && user && recordDate) {
       loadExistingTotalForDate(recordDate);
     }
   }, [recordDate, user]);
