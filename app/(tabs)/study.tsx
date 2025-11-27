@@ -457,7 +457,7 @@ export default function StudyScreen() {
                   return (
                     <View key={enrollment.class_id} style={styles.section}>
                       <View style={styles.classHeader}>
-                        <Text style={styles.className}>【{enrollment.class_curriculum.class_name}】</Text>
+                        <Text style={styles.className}>{enrollment.class_curriculum.class_name}</Text>
                       </View>
 
                       {classData.courses.map(userCourse => {
@@ -521,7 +521,7 @@ export default function StudyScreen() {
                 {groupedCourses['_orphan'] && (
                   <View key="_orphan" style={styles.section}>
                     <View style={styles.classHeader}>
-                      <Text style={styles.className}>【{groupedCourses['_orphan'].class.class_curriculum.class_name}】</Text>
+                      <Text style={styles.className}>{groupedCourses['_orphan'].class.class_curriculum.class_name}</Text>
                     </View>
 
                     {groupedCourses['_orphan'].courses.map(userCourse => {
