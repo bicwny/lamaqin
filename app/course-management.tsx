@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Platform } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { studyService, UserCourse } from '@/lib/database';
 import { DesignSystem } from '@/constants/DesignSystem';
@@ -60,10 +60,17 @@ export default function CourseManagementScreen() {
   };
 
   const pauseCourse = async (courseId: string) => {
-    if (!user) return;
+    console.log('🔴 pauseCourse called with courseId:', courseId);
+    if (!user) {
+      console.log('🔴 pauseCourse: No user found, returning early');
+      return;
+    }
+    console.log('🔴 pauseCourse: User ID:', user.id);
 
     try {
+      console.log('🔴 pauseCourse: Calling studyService.updateCourseStatus...');
       await studyService.updateCourseStatus(user.id, courseId, 'paused');
+      console.log('🔴 pauseCourse: updateCourseStatus completed successfully');
       setUserCourses(prev => 
         prev.map(uc => 
           uc.course_id === courseId ? { ...uc, status: 'paused' } : uc
@@ -74,7 +81,7 @@ export default function CourseManagementScreen() {
         message: '可在课程管理中恢复学习'
       });
     } catch (error) {
-      console.error('Error pausing course:', error);
+      console.error('🔴 pauseCourse ERROR:', error);
       toastService.error({ 
         title: '暂停失败', 
         message: '请稍后重试' 
@@ -83,6 +90,7 @@ export default function CourseManagementScreen() {
   };
 
   const resumeCourse = async (courseId: string) => {
+    console.log('🟢 resumeCourse called with courseId:', courseId);
     if (!user) return;
 
     try {
@@ -205,13 +213,21 @@ export default function CourseManagementScreen() {
                       <>
                         <TouchableOpacity 
                           style={styles.primaryButton}
-                          onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
+                          activeOpacity={0.7}
+                          onPress={() => {
+                            console.log('🔵 继续学习 button pressed');
+                            router.push(`/course-detail/${userCourse.course_id}`);
+                          }}
                         >
                           <Text style={styles.buttonText}>继续学习</Text>
                         </TouchableOpacity>
                         <TouchableOpacity 
                           style={styles.secondaryButton}
-                          onPress={() => pauseCourse(userCourse.course_id)}
+                          activeOpacity={0.7}
+                          onPress={() => {
+                            console.log('🔴 暂停 button pressed for course:', userCourse.course_id);
+                            pauseCourse(userCourse.course_id);
+                          }}
                         >
                           <Text style={styles.secondaryButtonText}>暂停</Text>
                         </TouchableOpacity>
@@ -219,7 +235,11 @@ export default function CourseManagementScreen() {
                     ) : userCourse.status === 'paused' ? (
                       <TouchableOpacity 
                         style={styles.primaryButton}
-                        onPress={() => resumeCourse(userCourse.course_id)}
+                        activeOpacity={0.7}
+                        onPress={() => {
+                          console.log('🟢 恢复学习 button pressed for course:', userCourse.course_id);
+                          resumeCourse(userCourse.course_id);
+                        }}
                       >
                         <Text style={styles.buttonText}>恢复学习</Text>
                       </TouchableOpacity>
@@ -346,6 +366,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    cursor: 'pointer' as any,
   },
   secondaryButton: {
     flex: 1,
@@ -356,6 +377,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
+    cursor: 'pointer' as any,
   },
   buttonText: {
     color: '#fff',
