@@ -254,7 +254,7 @@ export default function PracticeScreen() {
             <Text style={styles.progressText}>
               {progress.target 
                 ? `${(progress.current ?? 0).toLocaleString()}/${progress.target.toLocaleString()}${unit}`
-                : `${(progress.current ?? 0).toLocaleString()}${unit}`
+                : `圆满${(progress.current ?? 0).toLocaleString()}${unit}`
               }
             </Text>
             
