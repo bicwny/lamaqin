@@ -637,17 +637,6 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.textSecondary,
     textAlign: 'center',
   },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: DesignSystem.spacing.sm,
-    marginBottom: DesignSystem.spacing.md,
-  },
-  dateTimeText: {
-    ...ComponentTextStyles.label,
-    color: DesignSystem.colors.textSecondary,
-  },
   recordsSection: {
     marginTop: DesignSystem.spacing.xl,
     paddingHorizontal: DesignSystem.spacing.lg, // Proper section padding
