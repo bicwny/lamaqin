@@ -412,7 +412,7 @@ export default function PracticeHistoryScreen() {
                       <PracticeRecordCard
                         key={record.id}
                         record={record}
-                        practiceType="count"
+                        practiceType={projectInfo?.practices?.type === 'time' ? 'time' : 'count'}
                         practiceUnit={projectInfo?.practices?.unit || '次'}
                         isDeleting={isDeleting}
                         showActions={true}
