@@ -75,6 +75,7 @@ function RootLayoutNav() {
         <Stack.Screen name="practice-history" options={{ headerShown: false }} />
         <Stack.Screen name="meditation-history" options={{ headerShown: false }} />
         <Stack.Screen name="lesson-viewer" options={{ headerShown: false }} />
+        <Stack.Screen name="course-management" options={{ headerShown: false }} />
       <Stack.Screen 
         name="modals/custom-record" 
         options={{ presentation: 'modal', headerShown: false }} 
