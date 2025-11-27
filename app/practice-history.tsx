@@ -329,7 +329,7 @@ export default function PracticeHistoryScreen() {
   };
 
   const getDisplayProjectName = (projectInfo: any) => {
-    return projectInfo.project_name || presetProjectName || '预设项目';
+    return projectInfo.project_name || presetProjectName || practiceName;
   };
 
   if (loading) {
