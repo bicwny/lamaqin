@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { DesignSystem } from "@/constants/DesignSystem";
 import { ComponentTokens, ComponentTextStyles } from "@/utils/componentTokens";
 
@@ -124,32 +125,26 @@ export default function PracticeRecordCard({
       {showActions && (
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.editButton, isDeleting && styles.disabledButton]}
+            style={[styles.iconButton, styles.editIconButton, isDeleting && styles.disabledButton]}
             onPress={onEdit}
             disabled={isDeleting}
           >
-            <Text
-              style={[
-                styles.editButtonText,
-                isDeleting && styles.disabledButtonText,
-              ]}
-            >
-              编辑
-            </Text>
+            <Ionicons
+              name="create-outline"
+              size={18}
+              color={DesignSystem.colors.textSecondary}
+            />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.editButton, isDeleting && styles.disabledButton]}
+            style={[styles.iconButton, styles.deleteIconButton, isDeleting && styles.disabledButton]}
             onPress={onDelete}
             disabled={isDeleting}
           >
-            <Text
-              style={[
-                styles.editButtonText,
-                isDeleting && styles.disabledButtonText,
-              ]}
-            >
-              删除
-            </Text>
+            <Ionicons
+              name="trash-outline"
+              size={18}
+              color={DesignSystem.colors.error}
+            />
           </TouchableOpacity>
         </View>
       )}
@@ -252,25 +247,21 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.md,
     marginTop: DesignSystem.spacing.sm,
   },
-  editButton: {
-    ...ComponentTokens.button.variants.secondary,
-    ...ComponentTokens.button.sizes.small,
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: DesignSystem.spacing.md,
+    borderWidth: 1.5,
   },
-  editButtonText: {
-    ...ComponentTextStyles.button.secondary,
+  editIconButton: {
+    borderColor: DesignSystem.colors.textTertiary,
+    backgroundColor: DesignSystem.colors.backgroundSecondary,
   },
-  deleteButton: {
-    ...ComponentTokens.button.variants.destructive,
-    ...ComponentTokens.button.sizes.small,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: DesignSystem.spacing.lg,
-  },
-  deleteButtonText: {
-    ...ComponentTextStyles.button.primary,
+  deleteIconButton: {
+    borderColor: DesignSystem.colors.error,
+    backgroundColor: "rgba(211, 47, 47, 0.08)",
   },
   disabledContent: {
     opacity: 0.5,
