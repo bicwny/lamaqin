@@ -800,6 +800,8 @@ export const studyService = {
   },
 
   async updateCourseStatus(userId: string, courseId: string, status: 'active' | 'paused' | 'completed') {
+    console.log(`🔄 updateCourseStatus called: userId=${userId}, courseId=${courseId}, status=${status}`);
+    
     const { data, error } = await supabase
       .from('user_courses')
       .update({ 
@@ -811,7 +813,12 @@ export const studyService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ updateCourseStatus error:', error);
+      throw error;
+    }
+    
+    console.log('✅ updateCourseStatus success:', data);
     return data;
   },
 

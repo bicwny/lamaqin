@@ -400,8 +400,10 @@ export default function StudyScreen() {
   const pauseCourse = async (courseId: string) => {
     if (!user) return;
 
+    console.log('🔄 pauseCourse called for:', courseId);
     try {
-      await studyService.updateCourseStatus(user.id, courseId, 'paused');
+      const result = await studyService.updateCourseStatus(user.id, courseId, 'paused');
+      console.log('✅ pauseCourse result:', result);
       setUserCourses(prev => 
         prev.map(uc => 
           uc.course_id === courseId ? { ...uc, status: 'paused' } : uc
@@ -412,7 +414,7 @@ export default function StudyScreen() {
         message: '可在课程管理中恢复学习'
       });
     } catch (error) {
-      console.error('Error pausing course:', error);
+      console.error('❌ Error pausing course:', error);
       toastService.error({ 
         title: '暂停失败', 
         message: '请稍后重试' 
