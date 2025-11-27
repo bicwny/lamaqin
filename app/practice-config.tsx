@@ -977,6 +977,11 @@ export default function PracticeConfigScreen() {
       padding={0}
     >
       <View style={styles.contentWrapper}>
+        {practiceType === "count"
+          ? renderCountBasedConfig()
+          : renderTimeBasedConfig()}
+        {renderTimePlanning()}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>项目名称 (可选)</Text>
           <View style={styles.inputContainer}>
@@ -1016,10 +1021,6 @@ export default function PracticeConfigScreen() {
           </View>
         </View>
 
-        {practiceType === "count"
-          ? renderCountBasedConfig()
-          : renderTimeBasedConfig()}
-        {renderTimePlanning()}
         {renderSmartSummary()}
       </View>
 
