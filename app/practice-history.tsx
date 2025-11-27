@@ -573,6 +573,8 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     ...ComponentTokens.card.variants.outlined,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.lg,
     paddingTop: ComponentTokens.card.padding.spacious,
     paddingLeft: ComponentTokens.card.padding.spacious,
     paddingRight: ComponentTokens.card.padding.spacious,
