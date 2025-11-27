@@ -586,11 +586,12 @@ export default function HomeScreen() {
                     <View style={styles.practiceActions}>
                       {practice.current < practice.target && (
                         <TouchableOpacity
+                          style={styles.circleButtonSecondary}
                           onPress={(e) => handleQuickComplete(e, practice)}
                         >
                           <Ionicons 
-                            name="checkmark-circle-outline" 
-                            size={28} 
+                            name="checkmark" 
+                            size={22} 
                             color="#6B7280" 
                           />
                         </TouchableOpacity>
@@ -598,11 +599,11 @@ export default function HomeScreen() {
 
                       <TouchableOpacity
                         onPress={(e) => handleAddRecord(e, practice)}
-                        style={styles.actionButton}
+                        style={styles.circleButtonPrimary}
                       >
                         <Ionicons 
-                          name={practice.type === 'count' ? "create-outline" : "add-circle-outline"} 
-                          size={28} 
+                          name={practice.type === 'count' ? "create-outline" : "add"} 
+                          size={22} 
                           color={DesignSystem.colors.primary} 
                         />
                       </TouchableOpacity>
@@ -635,11 +636,12 @@ export default function HomeScreen() {
                     {/* Action Button for Weekly Practices (time-based, keep + icon) */}
                     <View style={styles.practiceActions}>
                       <TouchableOpacity
+                        style={styles.circleButtonPrimary}
                         onPress={(e) => handleAddRecord(e, practice)}
                       >
                         <Ionicons 
-                          name="add-circle-outline" 
-                          size={28} 
+                          name="add" 
+                          size={22} 
                           color={DesignSystem.colors.primary} 
                         />
                       </TouchableOpacity>
@@ -744,6 +746,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginLeft: 12,
+  },
+  circleButtonPrimary: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.primary,
+    backgroundColor: DesignSystem.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circleButtonSecondary: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.border,
+    backgroundColor: DesignSystem.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   actionButton: {
     marginLeft: 4,

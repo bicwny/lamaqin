@@ -483,15 +483,15 @@ export default function StudyScreen() {
                                 </Text>
                               </View>
                               <TouchableOpacity 
-                                style={styles.playButton}
+                                style={styles.circleButton}
                                 onPress={(e) => {
                                   e.stopPropagation();
                                   router.push(`/course-detail/${userCourse.course_id}`);
                                 }}
                               >
                                 <Ionicons 
-                                  name="play-circle-outline" 
-                                  size={36} 
+                                  name="play" 
+                                  size={22} 
                                   color={DesignSystem.colors.primary} 
                                 />
                               </TouchableOpacity>
@@ -533,15 +533,15 @@ export default function StudyScreen() {
                               </Text>
                             </View>
                             <TouchableOpacity 
-                              style={styles.playButton}
+                              style={styles.circleButton}
                               onPress={(e) => {
                                 e.stopPropagation();
                                 router.push(`/course-detail/${userCourse.course_id}`);
                               }}
                             >
                               <Ionicons 
-                                name="play-circle-outline" 
-                                size={36} 
+                                name="play" 
+                                size={22} 
                                 color={DesignSystem.colors.primary} 
                               />
                             </TouchableOpacity>
@@ -738,6 +738,16 @@ const styles = StyleSheet.create({
   },
   playButton: {
     padding: 4,
+  },
+  circleButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.primary,
+    backgroundColor: DesignSystem.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   manageCourseCard: {
     ...ComponentTokens.card.variants.outlined,
