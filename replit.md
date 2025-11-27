@@ -93,6 +93,13 @@ The `practice-history.tsx` page now features a three-tab navigation system with 
 
 The tab bar uses a pill-style design with icons, smooth state switching, and follows the app's design system colors. Default tab is "日志" (Journal).
 
+### 修行 Tab Reorganization (2025-11-27)
+The 修行 (Practice) tab now features a two-tab navigation system:
+- **功课 (Practices)**: Displays all user practice projects with progress tracking, showing the complete list of enrolled practices with action buttons for viewing history and adding records.
+- **日历 (Calendar)**: Shows the practice calendar (CalendarView component) that was previously in the 回向 tab, allowing users to view their practice history by date.
+
+The 回向 (Stats/Dedication) tab has been simplified to only display the dedication prayers (回向文), removing the calendar which is now in the 修行 tab. This reorganization makes the 修行 tab the central hub for all practice-related activities.
+
 # External Dependencies
 
 -   **Supabase**: Backend-as-a-service for authentication, database, and real-time features.
