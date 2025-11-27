@@ -116,6 +116,10 @@ export default function CourseDetailScreen() {
   const [optionalStatusFields, setOptionalStatusFields] = useState<Set<'共修' | '讲考'>>(new Set());
   const [bulkLessonsSummary, setBulkLessonsSummary] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingLesson, setEditingLesson] = useState<CourseLesson | null>(null);
+  const [lessonRecords, setLessonRecords] = useState<any[]>([]);
+  const [loadingRecords, setLoadingRecords] = useState(false);
 
   useEffect(() => {
     if (user && courseId) {
@@ -237,6 +241,64 @@ export default function CourseDetailScreen() {
     setStatusPickerVisible(false);
   };
 
+  const openEditModal = async (lesson: CourseLesson) => {
+    if (!user || !courseId) return;
+    
+    setEditingLesson(lesson);
+    setEditModalVisible(true);
+    setLoadingRecords(true);
+    
+    try {
+      const records = await studyService.getLessonStudyRecords(user.id, courseId, lesson.id);
+      setLessonRecords(records);
+    } catch (error) {
+      console.error('Error loading lesson records:', error);
+      toastService.error({
+        title: '加载失败',
+        message: '无法加载学习记录'
+      });
+    } finally {
+      setLoadingRecords(false);
+    }
+  };
+
+  const handleDeleteRecord = async (recordId: string) => {
+    if (!user || !courseId) return;
+    
+    try {
+      await studyService.deleteStudyRecord(recordId, user.id, courseId);
+      
+      setLessonRecords(prev => prev.filter(r => r.id !== recordId));
+      
+      toastService.success({
+        title: '删除成功',
+        message: '学习记录已删除'
+      });
+      
+      setRefreshTrigger(prev => prev + 1);
+      loadCourseData();
+    } catch (error) {
+      console.error('Error deleting record:', error);
+      toastService.error({
+        title: '删除失败',
+        message: '无法删除记录，请稍后重试'
+      });
+    }
+  };
+
+  const closeEditModal = () => {
+    setEditModalVisible(false);
+    setEditingLesson(null);
+    setLessonRecords([]);
+  };
+
+  const formatStudyType = (type: string, status?: string) => {
+    if (status) {
+      return `${type}: ${status}`;
+    }
+    return type;
+  };
+
   const filteredLessons = useMemo(() => {
     if (!searchQuery.trim()) {
       return lessons;
@@ -330,15 +392,23 @@ export default function CourseDetailScreen() {
                 <Text style={styles.lessonTitle}>
                   {lesson.title}
                 </Text>
-                <LessonProgressDisplay 
-                  userId={user.id} 
-                  courseId={courseId} 
-                  lessonId={lesson.id} 
-                  refreshTrigger={refreshTrigger}
-                  showOnlyIcon={true}
-                  optionalStatusFields={optionalStatusFields}
-                  bulkData={bulkLessonsSummary[lesson.id]}
-                />
+                <View style={styles.lessonTitleIcons}>
+                  <LessonProgressDisplay 
+                    userId={user.id} 
+                    courseId={courseId} 
+                    lessonId={lesson.id} 
+                    refreshTrigger={refreshTrigger}
+                    showOnlyIcon={true}
+                    optionalStatusFields={optionalStatusFields}
+                    bulkData={bulkLessonsSummary[lesson.id]}
+                  />
+                  <TouchableOpacity 
+                    style={styles.editButton}
+                    onPress={() => openEditModal(lesson)}
+                  >
+                    <Ionicons name="create-outline" size={18} color={DesignSystem.colors.textSecondary} />
+                  </TouchableOpacity>
+                </View>
               </View>
               <LessonProgressDisplay 
                 userId={user.id}
@@ -498,6 +568,59 @@ export default function CourseDetailScreen() {
                 onPress={() => setStatusPickerVisible(false)}
               >
                 <Text style={styles.cancelButtonText}>取消</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
+        {/* Edit Records Modal */}
+        <Modal
+          visible={editModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={closeEditModal}
+        >
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={closeEditModal}
+          >
+            <View style={[styles.modalContent, styles.editModalContent]} onStartShouldSetResponder={() => true}>
+              <Text style={styles.modalTitle}>
+                {editingLesson?.title}
+              </Text>
+              <Text style={styles.editModalSubtitle}>学习记录</Text>
+              
+              {loadingRecords ? (
+                <Text style={styles.editModalLoading}>加载中...</Text>
+              ) : lessonRecords.length === 0 ? (
+                <Text style={styles.editModalEmpty}>暂无学习记录</Text>
+              ) : (
+                <ScrollView style={styles.recordsList} showsVerticalScrollIndicator={false}>
+                  {lessonRecords.map((record) => (
+                    <View key={record.id} style={styles.recordItem}>
+                      <View style={styles.recordInfo}>
+                        <Text style={styles.recordType}>
+                          {formatStudyType(record.study_type, record.status)}
+                        </Text>
+                        <Text style={styles.recordDate}>{record.study_date}</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => handleDeleteRecord(record.id)}
+                      >
+                        <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+              
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={closeEditModal}
+              >
+                <Text style={styles.cancelButtonText}>关闭</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -717,5 +840,68 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 15,
     fontWeight: '500',
+  },
+  lessonTitleIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  editModalContent: {
+    maxHeight: '70%',
+    width: '85%',
+    maxWidth: 350,
+  },
+  editModalSubtitle: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    marginTop: -12,
+    marginBottom: 16,
+  },
+  editModalLoading: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
+  editModalEmpty: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
+  recordsList: {
+    maxHeight: 300,
+    marginBottom: 16,
+  },
+  recordItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  recordInfo: {
+    flex: 1,
+  },
+  recordType: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 2,
+  },
+  recordDate: {
+    fontSize: 12,
+    color: DesignSystem.colors.textSecondary,
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
 });
