@@ -144,6 +144,10 @@ export default function CalendarDatePage() {
           practice_id,
           duration_minutes,
           session_number,
+          user_practice_projects!inner (
+            target_count,
+            target_period
+          ),
           practices!inner (
             name
           )
