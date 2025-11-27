@@ -54,8 +54,18 @@ export default function CustomRecordScreen() {
   useEffect(() => {
     if (isEditing && editRecordId && user) {
       loadExistingRecord();
+    } else if (!isEditing && user) {
+      // Load existing total for the selected date when creating a new record
+      loadExistingTotalForDate(recordDate);
     }
   }, [isEditing, editRecordId, user]);
+
+  // Load existing total when date changes (only when not editing)
+  useEffect(() => {
+    if (!isEditing && user) {
+      loadExistingTotalForDate(recordDate);
+    }
+  }, [recordDate, user]);
 
   const loadExistingRecord = async () => {
     if (!user || !editRecordId) return;
@@ -81,6 +91,37 @@ export default function CustomRecordScreen() {
       toastService.error({ title: '❌ 加载失败', message: '记录加载失败，请重试' });
     } finally {
       setLoadingRecord(false);
+    }
+  };
+
+  const loadExistingTotalForDate = async (date: string) => {
+    if (!user || !projectId) return;
+
+    try {
+      // Get all records for this date to calculate the existing total
+      const { data: existingRecords, error } = await supabase
+        .from('daily_records')
+        .select('count')
+        .eq('user_id', user.id)
+        .eq('practice_project_id', projectId)
+        .eq('record_date', date);
+
+      if (error) {
+        console.error('❌ Error loading existing total:', error);
+        return;
+      }
+
+      // Calculate the sum of existing records for this date
+      const existingTotal = (existingRecords || []).reduce((sum, r) => sum + r.count, 0);
+      
+      // Pre-fill with the existing total
+      if (existingTotal > 0) {
+        setCount(existingTotal.toString());
+      } else {
+        setCount('');
+      }
+    } catch (error) {
+      console.error('❌ Error in loadExistingTotalForDate:', error);
     }
   };
 
