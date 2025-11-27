@@ -43,22 +43,18 @@ export default function PracticeRecordCard({
   showActions = false,
   hasTopics = false,
 }: PracticeRecordCardProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("zh-CN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      weekday: "short",
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("zh-CN", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const formatDateTime = (dateString: string, timeString: string) => {
+    const dateObj = new Date(dateString);
+    const timeObj = new Date(timeString);
+    
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth() + 1;
+    const day = dateObj.getDate();
+    const weekday = dateObj.toLocaleDateString("zh-CN", { weekday: "short" });
+    const hour = String(timeObj.getHours()).padStart(2, "0");
+    const minute = String(timeObj.getMinutes()).padStart(2, "0");
+    
+    return `${year}年${month}月${day}日 · ${weekday} · ${hour}:${minute}`;
   };
 
   const renderRecordContent = () => {
@@ -106,8 +102,7 @@ export default function PracticeRecordCard({
 
       <View style={[styles.header, isDeleting && styles.disabledContent]}>
         <View style={styles.headerLeft}>
-          <Text style={styles.recordDate}>{formatDate(record.record_date)}</Text>
-          <Text style={styles.recordTime}>· {formatTime(record.created_at)}</Text>
+          <Text style={styles.recordDate}>{formatDateTime(record.record_date, record.created_at)}</Text>
         </View>
         {showActions && (
           <View style={styles.actions}>
@@ -203,7 +198,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.xs,
   },
   headerLeft: {
     flexDirection: "row",
@@ -211,11 +206,6 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xs,
   },
   recordDate: {
-    ...ComponentTextStyles.label,
-    fontWeight: DesignSystem.typography.fontWeight.normal,
-    color: DesignSystem.colors.textSecondary,
-  },
-  recordTime: {
     ...ComponentTextStyles.label,
     fontWeight: DesignSystem.typography.fontWeight.normal,
     color: DesignSystem.colors.textSecondary,
