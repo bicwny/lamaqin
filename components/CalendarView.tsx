@@ -83,24 +83,55 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       meditationRecords?.forEach(record => allDates.add(record.record_date));
 
       const marked: any = {};
+      
+      // Mark dates with practice records (red dot indicator)
       allDates.forEach(date => {
         marked[date] = {
-          marked: true,
-          dotColor: DesignSystem.colors.redTara,
+          customStyles: {
+            container: {
+              backgroundColor: DesignSystem.colors.redTara,
+              borderRadius: 16,
+            },
+            text: {
+              color: '#ffffff',
+              fontWeight: '500',
+            },
+          },
         };
       });
 
-      // Mark today using timezone-aware date
-      if (marked[todayStr]) {
+      // Mark today with red outline (not solid) - different from practice record dots
+      const isToday = allDates.has(todayStr);
+      if (isToday) {
+        // Today has practice records: show red background with red border
         marked[todayStr] = {
-          ...marked[todayStr],
-          selected: true,
-          selectedColor: DesignSystem.colors.blueTara,
+          customStyles: {
+            container: {
+              backgroundColor: DesignSystem.colors.redTara,
+              borderWidth: 2,
+              borderColor: DesignSystem.colors.redTaraDark,
+              borderRadius: 16,
+            },
+            text: {
+              color: '#ffffff',
+              fontWeight: '700',
+            },
+          },
         };
       } else {
+        // Today without practice records: just red outline
         marked[todayStr] = {
-          selected: true,
-          selectedColor: DesignSystem.colors.blueTara,
+          customStyles: {
+            container: {
+              borderWidth: 2,
+              borderColor: DesignSystem.colors.redTara,
+              borderRadius: 16,
+            },
+            text: {
+              color: DesignSystem.colors.redTara,
+              fontWeight: '600',
+            },
+          },
         };
       }
 
@@ -132,7 +163,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={DesignSystem.colors.blueTara} />
+        <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
         <Text style={styles.loadingText}>加载日历...</Text>
       </View>
     );
@@ -147,6 +178,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         current={currentMonth || undefined}
         maxDate={maxDate}
         markedDates={markedDates}
+        markingType={'custom'}
         onDayPress={handleDayPress}
         enableSwipeMonths={true}
         onMonthChange={(month) => {
@@ -158,14 +190,9 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
           backgroundColor: '#ffffff',
           calendarBackground: '#ffffff',
           textSectionTitleColor: DesignSystem.colors.textPrimary,
-          selectedDayBackgroundColor: DesignSystem.colors.blueTara,
-          selectedDayTextColor: '#ffffff',
-          todayTextColor: DesignSystem.colors.redTara,
           dayTextColor: DesignSystem.colors.textPrimary,
           textDisabledColor: DesignSystem.colors.textTertiary,
-          dotColor: DesignSystem.colors.redTara,
-          selectedDotColor: '#ffffff',
-          arrowColor: DesignSystem.colors.blueTara,
+          arrowColor: DesignSystem.colors.redTara,
           monthTextColor: DesignSystem.colors.textPrimary,
           textDayFontFamily: 'System',
           textMonthFontFamily: 'System',
