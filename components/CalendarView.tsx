@@ -83,43 +83,26 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       meditationRecords?.forEach(record => allDates.add(record.record_date));
 
       const marked: any = {};
-      
-      // Mark dates with practice records (red dot indicator)
       allDates.forEach(date => {
         marked[date] = {
-          customStyles: {
-            container: {
-              backgroundColor: DesignSystem.colors.redTara,
-              borderRadius: 16,
-            },
-            text: {
-              color: '#ffffff',
-              fontWeight: '500',
-            },
-          },
+          marked: true,
+          dotColor: DesignSystem.colors.redTara,
         };
       });
 
-      // Mark today with red outline circle (not solid)
-      // If today has practice records, also add a dot indicator
-      const isTodayWithRecords = allDates.has(todayStr);
-      marked[todayStr] = {
-        customStyles: {
-          container: {
-            borderWidth: 2,
-            borderColor: DesignSystem.colors.redTara,
-            borderRadius: 16,
-          },
-          text: {
-            color: DesignSystem.colors.textPrimary,
-            fontWeight: '600',
-          },
-        },
-        ...(isTodayWithRecords && {
-          marked: true,
-          dotColor: DesignSystem.colors.redTara,
-        }),
-      };
+      // Mark today using timezone-aware date
+      if (marked[todayStr]) {
+        marked[todayStr] = {
+          ...marked[todayStr],
+          selected: true,
+          selectedColor: DesignSystem.colors.blueTara,
+        };
+      } else {
+        marked[todayStr] = {
+          selected: true,
+          selectedColor: DesignSystem.colors.blueTara,
+        };
+      }
 
       setMarkedDates(marked);
     } catch (error) {
@@ -149,7 +132,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={DesignSystem.colors.primary} />
+        <ActivityIndicator size="large" color={DesignSystem.colors.blueTara} />
         <Text style={styles.loadingText}>加载日历...</Text>
       </View>
     );
@@ -164,7 +147,6 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         current={currentMonth || undefined}
         maxDate={maxDate}
         markedDates={markedDates}
-        markingType={'custom'}
         onDayPress={handleDayPress}
         enableSwipeMonths={true}
         onMonthChange={(month) => {
@@ -176,9 +158,14 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
           backgroundColor: '#ffffff',
           calendarBackground: '#ffffff',
           textSectionTitleColor: DesignSystem.colors.textPrimary,
+          selectedDayBackgroundColor: DesignSystem.colors.blueTara,
+          selectedDayTextColor: '#ffffff',
+          todayTextColor: DesignSystem.colors.redTara,
           dayTextColor: DesignSystem.colors.textPrimary,
           textDisabledColor: DesignSystem.colors.textTertiary,
-          arrowColor: DesignSystem.colors.redTara,
+          dotColor: DesignSystem.colors.redTara,
+          selectedDotColor: '#ffffff',
+          arrowColor: DesignSystem.colors.blueTara,
           monthTextColor: DesignSystem.colors.textPrimary,
           textDayFontFamily: 'System',
           textMonthFontFamily: 'System',
