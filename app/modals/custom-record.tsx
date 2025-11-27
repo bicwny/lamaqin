@@ -95,7 +95,11 @@ export default function CustomRecordScreen() {
   };
 
   const loadExistingTotalForDate = async (date: string) => {
-    if (!user || !projectId) return;
+    console.log('🔍 loadExistingTotalForDate called:', { date, projectId, userId: user?.id });
+    if (!user || !projectId) {
+      console.log('⚠️ loadExistingTotalForDate - missing user or projectId:', { user: !!user, projectId });
+      return;
+    }
 
     try {
       // Get all records for this date to calculate the existing total
@@ -106,6 +110,8 @@ export default function CustomRecordScreen() {
         .eq('practice_project_id', projectId)
         .eq('record_date', date);
 
+      console.log('📊 Existing records for date:', { date, records: existingRecords, error });
+
       if (error) {
         console.error('❌ Error loading existing total:', error);
         return;
@@ -113,6 +119,7 @@ export default function CustomRecordScreen() {
 
       // Calculate the sum of existing records for this date
       const existingTotal = (existingRecords || []).reduce((sum, r) => sum + r.count, 0);
+      console.log('📈 Calculated existing total:', existingTotal);
       
       // Pre-fill with the existing total
       if (existingTotal > 0) {
