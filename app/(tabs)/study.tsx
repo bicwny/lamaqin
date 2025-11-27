@@ -135,7 +135,11 @@ export default function StudyScreen() {
       let enrolledClassesData: any[] = [];
       try {
         enrolledClassesData = await classCurriculumService.getUserEnrolledClasses(user.id);
-        console.log('📚 Enrolled classes:', enrolledClassesData.map(c => c.class_curriculum.class_name));
+        console.log('📚 Enrolled classes:', enrolledClassesData.map(c => ({
+          name: c.class_curriculum.class_name,
+          status: c.status,
+          class_id: c.class_id
+        })));
         
         // Sort enrolled classes by display_order
         enrolledClassesData.sort((a, b) => 
@@ -588,9 +592,15 @@ export default function StudyScreen() {
         <ScrollView style={styles.scrollView}>
           {(() => {
             const groupedCourses = groupCoursesByClass();
+            console.log('🔍 Filtering classes for display:', enrolledClasses.map(e => ({
+              name: e.class_curriculum?.class_name,
+              status: e.status,
+              hasGroupedCourses: !!groupedCourses[e.class_id]
+            })));
             const classesToShow = enrolledClasses.filter(enrollment => 
               enrollment.status === 'active' && groupedCourses[enrollment.class_id]
             );
+            console.log('📋 Classes to show after filter:', classesToShow.map(c => c.class_curriculum?.class_name));
             
             return (
               <>
