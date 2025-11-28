@@ -592,7 +592,7 @@ export default function HomeScreen() {
                           <Ionicons 
                             name="checkmark" 
                             size={22} 
-                            color="#EF4444" 
+                            color={DesignSystem.colors.primary} 
                           />
                         </TouchableOpacity>
                       )}
@@ -604,7 +604,7 @@ export default function HomeScreen() {
                         <Ionicons 
                           name={practice.type === 'count' ? "create-outline" : "add"} 
                           size={22} 
-                          color={DesignSystem.colors.primary} 
+                          color="#6B7280" 
                         />
                       </TouchableOpacity>
                     </View>
