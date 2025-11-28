@@ -55,6 +55,14 @@ All class enrollments now track the user's entry year (cohort) to identify which
 - Validation requiring entry year selection before enrollment
 - Migration: `docs/ADD_ENTRY_YEAR_MIGRATION.sql` adds the nullable `entry_year` TEXT column
 
+### No Dharma Name Option (2025-11-28)
+Both profile setup (`profile-setup.tsx`) and edit profile (`edit-profile.tsx`) screens include a "未得法名" (No Dharma Name) checkbox below the 法名 input field. This allows users who haven't received a dharma name yet to complete their profile:
+- When checked, the 法名 input field is disabled and cleared
+- Validation skips dharma name requirement when checkbox is checked
+- Saves `null` (not empty string) to database when checked, making state distinguishable
+- On profile load, checkbox is automatically checked if `dharma_name` is null or empty
+- Full round-trip persistence: check → save → reload → checkbox remains checked
+
 ### Course Display Ordering
 The `class_required_courses` table includes a `display_order` field allowing each class to define its own custom sequence for courses. This enables flexible learning paths where the same course can appear in different positions across classes (e.g., "大学演讲" might be first in one class but third in another). Courses are automatically displayed in ascending order based on this field, with any courses lacking a display_order value appearing last.
 
