@@ -564,6 +564,9 @@ export default function StudyScreen() {
           <View style={styles.courseSummary}>
             <Text style={styles.courseSummaryText}>
               {userCourses.length}门课程已加入
+              {userCourses.filter(uc => uc.status === 'completed').length > 0 && 
+                `，${userCourses.filter(uc => uc.status === 'completed').length}门课程已圆满`
+              }
               {userCourses.filter(uc => uc.status === 'paused').length > 0 && 
                 `，${userCourses.filter(uc => uc.status === 'paused').length}门课程已暂停`
               }
