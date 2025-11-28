@@ -70,65 +70,85 @@ export default function SharePracticeModal() {
       const day = date.getDate();
       setDateTitle(`${month}/${day}修行总结`);
 
-      // Get all active practice projects
-      const { data: projects, error: projectsError } = await supabase
-        .from('user_practice_projects')
-        .select(`
-          *,
-          practices(*)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .order('created_at', { ascending: true });
-
-      if (projectsError) throw projectsError;
-
       const practiceList: PracticeSummary[] = [];
 
-      // Collect count-based practices
-      for (const project of projects || []) {
-        if (project.practices.type === 'count') {
-          const { data: todayRecords, error: recordsError } = await supabase
-            .from('daily_records')
-            .select('count')
-            .eq('user_id', user.id)
-            .eq('practice_project_id', project.id)
-            .eq('record_date', targetDate);
+      // Query daily_records directly - this includes records from all projects (active or not)
+      const { data: dailyRecords, error: dailyError } = await supabase
+        .from('daily_records')
+        .select(`
+          count,
+          user_practice_projects!inner (
+            practices (
+              name,
+              unit,
+              type
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('record_date', targetDate);
 
-          if (recordsError) throw recordsError;
+      if (dailyError) throw dailyError;
 
-          const todayCount = todayRecords?.reduce((sum, record) => sum + record.count, 0) || 0;
-          
-          if (todayCount > 0) {
-            practiceList.push({
-              name: project.practices.name,
-              count: todayCount,
-              unit: project.practices.unit
-            });
+      // Aggregate count-based practices by name
+      const countPractices: { [name: string]: { count: number; unit: string } } = {};
+      for (const record of dailyRecords || []) {
+        const practice = (record.user_practice_projects as any)?.practices;
+        if (practice && practice.type === 'count') {
+          const name = practice.name;
+          if (!countPractices[name]) {
+            countPractices[name] = { count: 0, unit: practice.unit };
           }
+          countPractices[name].count += record.count;
         }
       }
 
-      // Collect time-based practices
-      for (const project of projects || []) {
-        if (project.practices.type === 'time') {
-          const { data: todayRecords, error: recordsError } = await supabase
-            .from('meditation_records')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('practice_id', project.practice_id)
-            .eq('record_date', targetDate);
+      // Add count practices to the list
+      for (const [name, data] of Object.entries(countPractices)) {
+        if (data.count > 0) {
+          practiceList.push({
+            name,
+            count: data.count,
+            unit: data.unit
+          });
+        }
+      }
 
-          if (recordsError) throw recordsError;
+      // Query meditation_records directly - this includes records from all projects (active or not)
+      const { data: meditationRecords, error: meditationError } = await supabase
+        .from('meditation_records')
+        .select(`
+          id,
+          practices (
+            name,
+            type
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('record_date', targetDate);
 
-          const todaySessions = todayRecords?.length || 0;
+      if (meditationError) throw meditationError;
 
-          if (todaySessions > 0) {
-            practiceList.push({
-              name: project.practices.name,
-              sessions: todaySessions
-            });
+      // Aggregate time-based practices by name
+      const timePractices: { [name: string]: number } = {};
+      for (const record of meditationRecords || []) {
+        const practice = record.practices as any;
+        if (practice && practice.type === 'time') {
+          const name = practice.name;
+          if (!timePractices[name]) {
+            timePractices[name] = 0;
           }
+          timePractices[name] += 1;
+        }
+      }
+
+      // Add time practices to the list
+      for (const [name, sessions] of Object.entries(timePractices)) {
+        if (sessions > 0) {
+          practiceList.push({
+            name,
+            sessions
+          });
         }
       }
 
