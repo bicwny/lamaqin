@@ -77,6 +77,16 @@ When the same course is required by multiple classes, students only need to enro
 - Progress on shared courses counts toward all classes requiring it
 - Example: If both "加行" and "预科：入行" require "大学演讲", the student is enrolled only when joining the first class, and the second class enrollment skips it
 
+### Class Pause/Resume System (2025-11-28)
+When a user pauses a class enrollment from the edit-profile page, all mandatory practice projects for that class are automatically paused as well. This ensures:
+- **Pause behavior**: When a class is paused, associated practice projects have their status changed from 'active' to 'paused'
+- **Shared practice protection**: Before pausing, the system checks if any practice is still required by other active classes. If so, those practices remain active to preserve the user's obligations to other classes
+- **Resume behavior**: When a class is resumed, all paused practice projects for that class are changed back to 'active'
+- **UI filtering**: Paused practices are hidden from the home screen (daily/weekly practices) and practice list, so users only see their active practices
+- **Data preservation**: All practice progress is preserved during pause - counts, records, and history remain intact
+- **Implementation**: The `updateEnrollmentStatus` function in `classCurriculumService` automatically calls `pausePracticeProjectsForClass` or `resumePracticeProjectsForClass` based on the new status
+- **Migration**: `docs/ADD_PAUSED_STATUS_MIGRATION.sql` updates the status check constraint to include 'paused' as a valid status
+
 ### Practice Deletion System
 The `user_practice_projects` table includes a `source_type` field ('class_required' | 'user_created') that tracks the origin of each practice project. This enables safe deletion control:
 - **Class-required practices**: Created automatically during class enrollment, marked as `source_type='class_required'`, and cannot be deleted by users

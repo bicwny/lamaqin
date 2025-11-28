@@ -1672,6 +1672,14 @@ export const classCurriculumService = {
       .eq('class_id', classId);
 
     if (error) throw error;
+    
+    if (status === 'paused') {
+      await this.pausePracticeProjectsForClass(userId, classId);
+      console.log(`⏸️ Class ${classId} paused with practice projects`);
+    } else if (status === 'active') {
+      await this.resumePracticeProjectsForClass(userId, classId);
+      console.log(`▶️ Class ${classId} resumed with practice projects`);
+    }
   },
 
   async getUserClassProgress(userId: string, classId: string): Promise<UserClassProgress | null> {
@@ -1928,5 +1936,89 @@ export const classCurriculumService = {
       if (error) throw error;
       console.log(`✅ Created ${projectsToCreate.length} practice projects`);
     }
+  },
+
+  async pausePracticeProjectsForClass(userId: string, classId: string): Promise<number> {
+    const requiredPractices = await this.getClassRequiredPractices(classId);
+    
+    if (requiredPractices.length === 0) {
+      console.log(`⚠️ No required practices found for class ${classId}`);
+      return 0;
+    }
+    
+    const practiceIdsFromThisClass = requiredPractices.map(rp => rp.practice_id);
+    
+    const { data: otherActiveClasses, error: classesError } = await supabase
+      .from('user_enrolled_classes')
+      .select('class_id')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .neq('class_id', classId);
+    
+    if (classesError) {
+      console.error('Error fetching other active classes:', classesError);
+      throw classesError;
+    }
+    
+    const practicesStillRequired = new Set<string>();
+    
+    for (const enrollment of otherActiveClasses || []) {
+      const otherClassPractices = await this.getClassRequiredPractices(enrollment.class_id);
+      otherClassPractices.forEach(p => practicesStillRequired.add(p.practice_id));
+    }
+    
+    const practicesToPause = practiceIdsFromThisClass.filter(
+      pid => !practicesStillRequired.has(pid)
+    );
+    
+    if (practicesToPause.length === 0) {
+      console.log(`ℹ️ All practices from class ${classId} are still required by other active classes`);
+      return 0;
+    }
+    
+    const { data, error } = await supabase
+      .from('user_practice_projects')
+      .update({ status: 'paused' })
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .in('practice_id', practicesToPause)
+      .select();
+    
+    if (error) {
+      console.error('Error pausing practice projects:', error);
+      throw error;
+    }
+    
+    const pausedCount = data?.length || 0;
+    console.log(`⏸️ Paused ${pausedCount} practice projects for class ${classId} (${practiceIdsFromThisClass.length - practicesToPause.length} shared practices kept active)`);
+    return pausedCount;
+  },
+
+  async resumePracticeProjectsForClass(userId: string, classId: string): Promise<number> {
+    const requiredPractices = await this.getClassRequiredPractices(classId);
+    
+    if (requiredPractices.length === 0) {
+      console.log(`⚠️ No required practices found for class ${classId}`);
+      return 0;
+    }
+    
+    const practiceIds = requiredPractices.map(rp => rp.practice_id);
+    
+    const { data, error } = await supabase
+      .from('user_practice_projects')
+      .update({ status: 'active' })
+      .eq('user_id', userId)
+      .eq('status', 'paused')
+      .in('practice_id', practiceIds)
+      .select();
+    
+    if (error) {
+      console.error('Error resuming practice projects:', error);
+      throw error;
+    }
+    
+    const resumedCount = data?.length || 0;
+    console.log(`▶️ Resumed ${resumedCount} practice projects for class ${classId}`);
+    return resumedCount;
   }
 };

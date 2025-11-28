@@ -99,6 +99,7 @@ export default function PracticeScreen() {
         `,
         )
         .eq("user_id", user.id)
+        .in("status", ["active", "not_started", "completed"])
         .order("created_at", { ascending: false });
 
       if (error) throw error;
