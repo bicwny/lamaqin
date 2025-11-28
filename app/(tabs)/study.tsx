@@ -327,17 +327,22 @@ export default function StudyScreen() {
   };
 
   // Group courses by class with proper ordering
+  // Deduplicates shared courses - each course only shows under the first ACTIVE class that requires it
   const groupCoursesByClass = () => {
     const grouped: Record<string, { class: any; courses: (UserCourse & { display_order?: number })[] }> = {};
-    const coursesInClasses = new Set<string>();
+    const coursesAlreadyDisplayed = new Set<string>(); // Track courses already shown in previous active classes
     
-    // First, group courses by class
-    enrolledClasses.forEach(enrollment => {
+    // Only process ACTIVE classes for deduplication (sorted by display_order)
+    const activeEnrolledClasses = enrolledClasses.filter(enrollment => enrollment.status === 'active');
+    
+    activeEnrolledClasses.forEach(enrollment => {
       const classCourses = enrollment.required_courses || [];
       
       // Get user's enrolled courses for this class (only active courses)
+      // Skip courses that have already been displayed in a previous active class
       const coursesForClass = userCourses
         .filter(uc => uc.status === 'active') // Only show active courses
+        .filter(uc => !coursesAlreadyDisplayed.has(uc.course_id)) // Skip already displayed courses
         .map(userCourse => {
           // Find the display_order for this course in this class
           const courseLink = classCourses.find((rc: any) => rc.course_id === userCourse.course_id);
@@ -349,12 +354,12 @@ export default function StudyScreen() {
         .filter(uc => {
           // Check if this course belongs to this class
           const belongsToClass = classCourses.some((rc: any) => rc.course_id === uc.course_id);
-          if (belongsToClass) {
-            coursesInClasses.add(uc.course_id);
-          }
           return belongsToClass;
         })
         .sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+      
+      // Mark these courses as displayed so they won't appear in subsequent classes
+      coursesForClass.forEach(uc => coursesAlreadyDisplayed.add(uc.course_id));
       
       if (coursesForClass.length > 0) {
         grouped[enrollment.class_id] = {
@@ -364,9 +369,9 @@ export default function StudyScreen() {
       }
     });
     
-    // Add a special group for courses not in any class (active only)
+    // Add a special group for courses not in any active class (active courses only)
     const orphanCourses = userCourses
-      .filter(uc => uc.status === 'active' && !coursesInClasses.has(uc.course_id))
+      .filter(uc => uc.status === 'active' && !coursesAlreadyDisplayed.has(uc.course_id))
       .map(uc => ({ ...uc, display_order: 999 }));
     
     if (orphanCourses.length > 0) {
