@@ -38,6 +38,7 @@ const ENTRY_YEAR_OPTIONS = generateEntryYearOptions();
 export default function EditProfileScreen() {
   const { user } = useAuth();
   const [dharmaName, setDharmaName] = useState('');
+  const [noDharmaName, setNoDharmaName] = useState(false);
   const [layName, setLayName] = useState('');
   const [currentClass, setCurrentClass] = useState('');
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
@@ -83,7 +84,9 @@ export default function EditProfileScreen() {
       ]);
 
       if (userData) {
+        const hasDharmaName = userData.dharma_name && userData.dharma_name.trim() !== '';
         setDharmaName(userData.dharma_name || '');
+        setNoDharmaName(!hasDharmaName);
         setLayName(userData.lay_name || '');
         setLocation(userData.location || '');
         setCurrentClass(userData.class_name || '');
@@ -267,7 +270,7 @@ export default function EditProfileScreen() {
       return;
     }
 
-    if (!dharmaName.trim()) {
+    if (!noDharmaName && !dharmaName.trim()) {
       toastService.error({ title: '验证失败', message: '请输入法名' });
       return;
     }
@@ -325,7 +328,7 @@ export default function EditProfileScreen() {
       const { error: dbError } = await supabase
         .from('users')
         .update({
-          dharma_name: dharmaName.trim(),
+          dharma_name: noDharmaName ? null : dharmaName.trim(),
           lay_name: layName.trim(),
           class_name: classNames || currentClass.trim() || null,
           location: location.trim() || null,
@@ -404,7 +407,7 @@ export default function EditProfileScreen() {
       // Also update auth metadata for consistency
       const { error: authError } = await supabase.auth.updateUser({
         data: {
-          dharma_name: dharmaName.trim(),
+          dharma_name: noDharmaName ? null : dharmaName.trim(),
           lay_name: layName.trim(),
           class_name: classNames || currentClass.trim() || null,
           location: location.trim() || null,
@@ -472,13 +475,28 @@ export default function EditProfileScreen() {
             <View style={styles.inputGroup}>
               <ThemedText style={styles.label}>法名 *</ThemedText>
               <TextInput
-                style={styles.input}
+                style={[styles.input, noDharmaName && styles.inputDisabled]}
                 value={dharmaName}
                 onChangeText={setDharmaName}
                 placeholder="请输入您的法名"
                 placeholderTextColor={Colors.textSecondary}
                 autoCapitalize="none"
+                editable={!noDharmaName}
               />
+              <TouchableOpacity
+                style={styles.checkboxRow}
+                onPress={() => {
+                  setNoDharmaName(!noDharmaName);
+                  if (!noDharmaName) {
+                    setDharmaName('');
+                  }
+                }}
+              >
+                <View style={[styles.smallCheckbox, noDharmaName && styles.smallCheckboxSelected]}>
+                  {noDharmaName && <ThemedText style={styles.smallCheckmark}>✓</ThemedText>}
+                </View>
+                <ThemedText style={styles.checkboxLabel}>未得法名</ThemedText>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.inputGroup}>
@@ -969,5 +987,37 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
+  },
+  inputDisabled: {
+    backgroundColor: '#F3F4F6',
+    color: '#9CA3AF',
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  smallCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  smallCheckboxSelected: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  smallCheckmark: {
+    color: Colors.surface,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: Colors.textSecondary,
   },
 });
