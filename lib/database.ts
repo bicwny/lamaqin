@@ -1675,10 +1675,12 @@ export const classCurriculumService = {
     
     if (status === 'paused') {
       await this.pausePracticeProjectsForClass(userId, classId);
-      console.log(`⏸️ Class ${classId} paused with practice projects`);
+      await this.pauseCoursesForClass(userId, classId);
+      console.log(`⏸️ Class ${classId} paused with practice projects and courses`);
     } else if (status === 'active') {
       await this.resumePracticeProjectsForClass(userId, classId);
-      console.log(`▶️ Class ${classId} resumed with practice projects`);
+      await this.resumeCoursesForClass(userId, classId);
+      console.log(`▶️ Class ${classId} resumed with practice projects and courses`);
     }
   },
 
@@ -2019,6 +2021,90 @@ export const classCurriculumService = {
     
     const resumedCount = data?.length || 0;
     console.log(`▶️ Resumed ${resumedCount} practice projects for class ${classId}`);
+    return resumedCount;
+  },
+
+  async pauseCoursesForClass(userId: string, classId: string): Promise<number> {
+    const requiredCourses = await this.getClassRequiredCourses(classId);
+    
+    if (requiredCourses.length === 0) {
+      console.log(`⚠️ No required courses found for class ${classId}`);
+      return 0;
+    }
+    
+    const courseIdsFromThisClass = requiredCourses.map(rc => rc.course_id);
+    
+    const { data: otherActiveClasses, error: classesError } = await supabase
+      .from('user_enrolled_classes')
+      .select('class_id')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .neq('class_id', classId);
+    
+    if (classesError) {
+      console.error('Error fetching other active classes:', classesError);
+      throw classesError;
+    }
+    
+    const coursesStillRequired = new Set<string>();
+    
+    for (const enrollment of otherActiveClasses || []) {
+      const otherClassCourses = await this.getClassRequiredCourses(enrollment.class_id);
+      otherClassCourses.forEach(c => coursesStillRequired.add(c.course_id));
+    }
+    
+    const coursesToPause = courseIdsFromThisClass.filter(
+      cid => !coursesStillRequired.has(cid)
+    );
+    
+    if (coursesToPause.length === 0) {
+      console.log(`ℹ️ All courses from class ${classId} are still required by other active classes`);
+      return 0;
+    }
+    
+    const { data, error } = await supabase
+      .from('user_courses')
+      .update({ status: 'paused' })
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .in('course_id', coursesToPause)
+      .select();
+    
+    if (error) {
+      console.error('Error pausing courses:', error);
+      throw error;
+    }
+    
+    const pausedCount = data?.length || 0;
+    console.log(`⏸️ Paused ${pausedCount} courses for class ${classId} (${courseIdsFromThisClass.length - coursesToPause.length} shared courses kept active)`);
+    return pausedCount;
+  },
+
+  async resumeCoursesForClass(userId: string, classId: string): Promise<number> {
+    const requiredCourses = await this.getClassRequiredCourses(classId);
+    
+    if (requiredCourses.length === 0) {
+      console.log(`⚠️ No required courses found for class ${classId}`);
+      return 0;
+    }
+    
+    const courseIds = requiredCourses.map(rc => rc.course_id);
+    
+    const { data, error } = await supabase
+      .from('user_courses')
+      .update({ status: 'active' })
+      .eq('user_id', userId)
+      .eq('status', 'paused')
+      .in('course_id', courseIds)
+      .select();
+    
+    if (error) {
+      console.error('Error resuming courses:', error);
+      throw error;
+    }
+    
+    const resumedCount = data?.length || 0;
+    console.log(`▶️ Resumed ${resumedCount} courses for class ${classId}`);
     return resumedCount;
   }
 };
