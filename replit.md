@@ -27,7 +27,7 @@ The application uses Expo Router for file-based routing and a tab-based navigati
 -   **"No Dharma Name" Option**: Profile setup and edit screens allow users without a dharma name to proceed by checking a "未得法名" (No Dharma Name) checkbox, disabling and clearing the dharma name input.
 -   **Course Display Ordering**: `class_required_courses` table includes a `display_order` field for custom course sequencing within each class.
 -   **Shared Course Handling**: The system prevents duplicate course enrollments across multiple classes; progress on shared courses counts for all requiring classes.
--   **Class Pause/Resume System**: Pausing a class automatically pauses its mandatory practice projects, protecting practices required by other active classes. Resuming a class reactivates its paused projects. Paused practices are hidden from the home screen.
+-   **Class Pause/Resume System**: Pausing a class automatically pauses its mandatory practice projects AND courses, protecting shared resources (practices/courses required by other active classes stay active). Resuming a class reactivates its paused projects and courses. Paused practices are hidden from the home screen, and paused courses don't appear in the study tab.
 -   **Practice Deletion System**: Practice projects have a `source_type` ('class_required' | 'user_created'). Only user-created practices can be deleted by users.
 -   **Practice Detail Deprecation**: The `practice-detail/[practiceId].tsx` page is deprecated and redirects to `practice-history.tsx`.
 
