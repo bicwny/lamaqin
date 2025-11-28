@@ -715,7 +715,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.3,
-    marginBottom: 6,
   },
   lessonProgressContainer: {
     flexDirection: 'row',
@@ -734,6 +733,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginBottom: 6,
   },
   recordButtonsContainer: {
     gap: 8,
