@@ -586,20 +586,20 @@ export default function HomeScreen() {
                     <View style={styles.practiceActions}>
                       {practice.current < practice.target && (
                         <TouchableOpacity
-                          style={styles.circleButtonSecondary}
+                          style={styles.circleButtonPrimary}
                           onPress={(e) => handleQuickComplete(e, practice)}
                         >
                           <Ionicons 
                             name="checkmark" 
                             size={22} 
-                            color="#6B7280" 
+                            color="#EF4444" 
                           />
                         </TouchableOpacity>
                       )}
 
                       <TouchableOpacity
                         onPress={(e) => handleAddRecord(e, practice)}
-                        style={styles.circleButtonPrimary}
+                        style={styles.circleButtonSecondary}
                       >
                         <Ionicons 
                           name={practice.type === 'count' ? "create-outline" : "add"} 
