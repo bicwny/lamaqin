@@ -54,7 +54,7 @@ WHERE name IN (
 -- 阿弥陀佛名号（汉）- 每日5000遍，总目标6350000遍
 INSERT INTO class_required_practices (
   id, class_id, practice_id, choice_group, is_optional, 
-  target_count, daily_target, practice_category, display_order
+  total_target, daily_target, practice_category
 )
 VALUES (
   gen_random_uuid(),
@@ -64,15 +64,14 @@ VALUES (
   TRUE,
   6350000,
   5000,
-  'count',
-  1
+  'count'
 )
 ON CONFLICT DO NOTHING;
 
 -- 阿弥陀佛圣号（藏）- 每日900遍，总目标1143000遍
 INSERT INTO class_required_practices (
   id, class_id, practice_id, choice_group, is_optional, 
-  target_count, daily_target, practice_category, display_order
+  total_target, daily_target, practice_category
 )
 VALUES (
   gen_random_uuid(),
@@ -82,15 +81,14 @@ VALUES (
   TRUE,
   1143000,
   900,
-  'count',
-  2
+  'count'
 )
 ON CONFLICT DO NOTHING;
 
 -- 阿弥陀佛（汉）- 每日7500遍，总目标9525000遍
 INSERT INTO class_required_practices (
   id, class_id, practice_id, choice_group, is_optional, 
-  target_count, daily_target, practice_category, display_order
+  total_target, daily_target, practice_category
 )
 VALUES (
   gen_random_uuid(),
@@ -100,8 +98,7 @@ VALUES (
   TRUE,
   9525000,
   7500,
-  'count',
-  3
+  'count'
 )
 ON CONFLICT DO NOTHING;
 */
@@ -118,14 +115,13 @@ SELECT
   crp.choice_group,
   crp.is_optional,
   crp.daily_target,
-  crp.target_count as total_target,
+  crp.total_target,
   crp.practice_category
 FROM class_required_practices crp
 JOIN class_curricula cc ON crp.class_id = cc.id
 JOIN practices p ON crp.practice_id = p.id
 WHERE cc.class_name = '预科：净土'
-  AND crp.is_optional = TRUE
-ORDER BY crp.display_order;
+  AND crp.is_optional = TRUE;
 
 -- ========================================
 -- 使用说明 (Instructions)
