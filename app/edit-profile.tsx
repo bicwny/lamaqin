@@ -537,7 +537,8 @@ export default function EditProfileScreen() {
                             <View style={[
                               styles.enrolledClassCard,
                               isActive && styles.enrolledClassCardActive,
-                              isPaused && styles.enrolledClassCardPaused
+                              isPaused && styles.enrolledClassCardPaused,
+                              showExpanded && styles.cardExpanded
                             ]}>
                               <View style={styles.enrolledClassHeader}>
                                 <View style={styles.classInfo}>
@@ -558,8 +559,8 @@ export default function EditProfileScreen() {
                                   <Switch
                                     value={isActive}
                                     onValueChange={() => toggleEnrollmentStatus(classItem.id)}
-                                    trackColor={{ false: '#E5E7EB', true: Colors.primary }}
-                                    thumbColor={isActive ? '#FFFFFF' : '#FFFFFF'}
+                                    trackColor={{ false: '#E5E7EB', true: '#EF8354' }}
+                                    thumbColor={'#FFFFFF'}
                                     ios_backgroundColor="#E5E7EB"
                                   />
                                 )}
@@ -573,7 +574,8 @@ export default function EditProfileScreen() {
                             <TouchableOpacity
                               style={[
                                 styles.classCheckbox,
-                                isSelected && styles.classCheckboxSelected
+                                isSelected && styles.classCheckboxSelected,
+                                showExpanded && styles.cardExpanded
                               ]}
                               onPress={() => toggleClassSelection(classItem.id)}
                             >
@@ -796,31 +798,36 @@ const styles = StyleSheet.create({
   },
   classCheckbox: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: 16,
     backgroundColor: Colors.surface,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: Colors.border,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   classCheckboxSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: '#F0F4FF',
+    borderColor: '#C75050',
+    backgroundColor: '#FDF2F2',
   },
   enrolledClassCard: {
     padding: 16,
     backgroundColor: Colors.surface,
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: Colors.border,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   enrolledClassCardActive: {
-    borderColor: Colors.primary,
-    backgroundColor: '#F0F4FF',
+    borderColor: '#E5E7EB',
+    backgroundColor: Colors.surface,
   },
   enrolledClassCardPaused: {
     borderColor: '#E5E7EB',
     backgroundColor: '#F9FAFB',
+  },
+  cardExpanded: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottomWidth: 0,
   },
   enrolledClassHeader: {
     flexDirection: 'row',
@@ -840,22 +847,22 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 2,
-    borderColor: Colors.border,
+    borderColor: '#D1D5DB',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   checkboxSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: '#C75050',
+    borderColor: '#C75050',
   },
   checkmark: {
-    color: Colors.surface,
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: 'bold',
   },
   classInfo: {
@@ -867,7 +874,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   classNameSelected: {
-    color: Colors.primary,
+    color: '#C75050',
   },
   classDescription: {
     fontSize: 13,
@@ -893,14 +900,17 @@ const styles = StyleSheet.create({
   classDescriptionDisabled: {
     color: Colors.borderDark,
   },
-  // Practice choice styles
   combinedSelectionSection: {
-    marginTop: 8,
-    padding: 16,
-    backgroundColor: '#F5F7FA',
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
+    marginTop: 0,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: Colors.surface,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: '#E5E7EB',
   },
   yearFieldContainer: {
     marginBottom: 16,
@@ -934,38 +944,36 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   practiceGroupContainer: {
-    marginTop: 12,
+    marginTop: 0,
   },
   practiceGroupLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.textSecondary,
-    marginBottom: 8,
+    display: 'none',
   },
   practiceOption: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
+    alignItems: 'flex-start',
+    padding: 14,
     backgroundColor: Colors.surface,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: 8,
+    borderColor: '#E5E7EB',
+    marginBottom: 10,
   },
   practiceOptionSelected: {
-    borderColor: '#FF9800',
-    backgroundColor: '#FFF3E0',
+    borderColor: '#C75050',
+    backgroundColor: '#FDF2F2',
   },
   practiceOptionTextContainer: {
     flex: 1,
+    paddingTop: 1,
   },
   practiceOptionText: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
     color: Colors.text,
   },
   practiceOptionTextSelected: {
-    color: '#FF9800',
+    color: '#C75050',
   },
   practiceOptionDescription: {
     fontSize: 12,
