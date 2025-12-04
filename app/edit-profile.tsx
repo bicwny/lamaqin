@@ -8,8 +8,7 @@ import {
   Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
-  Switch
+  Platform
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
@@ -22,6 +21,7 @@ import PageTemplate from '@/components/PageTemplate';
 import { ThemedText } from '@/components/ThemedText';
 import { toastService } from '@/lib/toast';
 import { classCurriculumService } from '@/lib/database';
+import ToggleSwitch from '@/components/ToggleSwitch';
 import type { ClassCurriculum } from '@/types/database';
 
 // Generate entry year options from 1984 to current year
