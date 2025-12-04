@@ -556,12 +556,9 @@ export default function EditProfileScreen() {
                                   )}
                                 </View>
                                 {!isCompleted && (
-                                  <Switch
+                                  <ToggleSwitch
                                     value={isActive}
                                     onValueChange={() => toggleEnrollmentStatus(classItem.id)}
-                                    trackColor={{ false: '#E5E7EB', true: '#EF8354' }}
-                                    thumbColor={'#FFFFFF'}
-                                    ios_backgroundColor="#E5E7EB"
                                   />
                                 )}
                                 {isCompleted && (
