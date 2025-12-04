@@ -502,7 +502,7 @@ export default function ProfileSetupScreen() {
                           {hasOptionalPractices && (
                             <View style={styles.practiceFieldContainer}>
                               <Text style={styles.fieldLabel}>
-                                🧘 观修选择 *（至少选择一项）
+                                🧘 修行选择 *（至少选择一项）
                               </Text>
                               {Array.from(groups.entries()).map(([groupName, practices]) => {
                                 const selectedForGroup = selectedPractices.get(classItem.id)?.get(groupName) || [];
