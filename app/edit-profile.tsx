@@ -8,7 +8,8 @@ import {
   Alert, 
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Switch
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
@@ -524,41 +525,72 @@ export default function EditProfileScreen() {
                       const enrollmentStatus = enrollmentStatuses[classItem.id];
                       const hasOptionalPractices = optionalPracticeGroups.has(classItem.id);
                       
-                      const statusLabel = enrollmentStatus === 'completed' ? '圆满' 
-                        : enrollmentStatus === 'paused' ? '已暂停' 
-                        : '学习中';
                       const isPaused = enrollmentStatus === 'paused';
+                      const isActive = isEnrolled && !isPaused && enrollmentStatus !== 'completed';
+                      const isCompleted = enrollmentStatus === 'completed';
+                      const showExpanded = isEnrolled ? isActive : isSelected;
                       
                       return (
                         <View key={classItem.id}>
-                          <View style={[
-                            styles.classCheckbox,
-                            isSelected && styles.classCheckboxSelected,
-                            isPaused && styles.classCheckboxPaused
-                          ]}>
-                            <TouchableOpacity
-                              style={styles.classMainArea}
-                              onPress={() => toggleClassSelection(classItem.id)}
-                              disabled={isEnrolled}
-                            >
-                              {!isEnrolled && (
-                                <View style={[
-                                  styles.checkbox,
-                                  isSelected && styles.checkboxSelected
-                                ]}>
-                                  {isSelected && (
-                                    <ThemedText style={styles.checkmark}>✓</ThemedText>
+                          {/* Enrolled classes: Toggle-based UI */}
+                          {isEnrolled ? (
+                            <View style={[
+                              styles.enrolledClassCard,
+                              isActive && styles.enrolledClassCardActive,
+                              isPaused && styles.enrolledClassCardPaused
+                            ]}>
+                              <View style={styles.enrolledClassHeader}>
+                                <View style={styles.classInfo}>
+                                  <ThemedText style={[
+                                    styles.className,
+                                    isActive && styles.classNameSelected,
+                                    isPaused && styles.classNamePaused
+                                  ]}>
+                                    {classItem.class_name}
+                                  </ThemedText>
+                                  {classItem.description && (
+                                    <ThemedText style={styles.classDescription}>
+                                      {classItem.description}
+                                    </ThemedText>
                                   )}
                                 </View>
-                              )}
+                                {!isCompleted && (
+                                  <Switch
+                                    value={isActive}
+                                    onValueChange={() => toggleEnrollmentStatus(classItem.id)}
+                                    trackColor={{ false: '#E5E7EB', true: Colors.primary }}
+                                    thumbColor={isActive ? '#FFFFFF' : '#FFFFFF'}
+                                    ios_backgroundColor="#E5E7EB"
+                                  />
+                                )}
+                                {isCompleted && (
+                                  <ThemedText style={styles.completedBadge}>圆满</ThemedText>
+                                )}
+                              </View>
+                            </View>
+                          ) : (
+                            /* Not enrolled classes: Checkbox-based UI */
+                            <TouchableOpacity
+                              style={[
+                                styles.classCheckbox,
+                                isSelected && styles.classCheckboxSelected
+                              ]}
+                              onPress={() => toggleClassSelection(classItem.id)}
+                            >
+                              <View style={[
+                                styles.checkbox,
+                                isSelected && styles.checkboxSelected
+                              ]}>
+                                {isSelected && (
+                                  <ThemedText style={styles.checkmark}>✓</ThemedText>
+                                )}
+                              </View>
                               <View style={styles.classInfo}>
                                 <ThemedText style={[
                                   styles.className,
-                                  isSelected && styles.classNameSelected,
-                                  isPaused && styles.classNamePaused
+                                  isSelected && styles.classNameSelected
                                 ]}>
                                   {classItem.class_name}
-                                  {isEnrolled && ` (${statusLabel})`}
                                 </ThemedText>
                                 {classItem.description && (
                                   <ThemedText style={styles.classDescription}>
@@ -567,28 +599,10 @@ export default function EditProfileScreen() {
                                 )}
                               </View>
                             </TouchableOpacity>
-                            
-                            {/* Pause/Resume button for enrolled classes */}
-                            {isEnrolled && enrollmentStatus !== 'completed' && (
-                              <TouchableOpacity
-                                style={[
-                                  styles.statusToggleButton,
-                                  isPaused ? styles.resumeButton : styles.pauseButton
-                                ]}
-                                onPress={() => toggleEnrollmentStatus(classItem.id)}
-                              >
-                                <ThemedText style={[
-                                  styles.statusToggleText,
-                                  isPaused && styles.resumeButtonText
-                                ]}>
-                                  {isPaused ? '恢复' : '暂停'}
-                                </ThemedText>
-                              </TouchableOpacity>
-                            )}
-                          </View>
+                          )}
 
-                          {/* Combined Year & Practice Selection - for both new and enrolled classes */}
-                          {(isSelected && !isEnrolled) || isEnrolled ? (
+                          {/* Combined Year & Practice Selection - shown when expanded */}
+                          {showExpanded ? (
                             <View style={styles.combinedSelectionSection}>
                               {/* Year Selection */}
                               <View style={styles.yearFieldContainer}>
@@ -793,42 +807,37 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: '#F0F4FF',
   },
-  classCheckboxPaused: {
-    borderColor: '#9CA3AF',
-    backgroundColor: '#F3F4F6',
-    opacity: 0.8,
+  enrolledClassCard: {
+    padding: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.border,
   },
-  classMainArea: {
-    flex: 1,
+  enrolledClassCardActive: {
+    borderColor: Colors.primary,
+    backgroundColor: '#F0F4FF',
+  },
+  enrolledClassCardPaused: {
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
+  },
+  enrolledClassHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  completedBadge: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#10B981',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   classNamePaused: {
     color: '#6B7280',
-  },
-  statusToggleButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-  pauseButton: {
-    backgroundColor: '#FEF3C7',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-  },
-  resumeButton: {
-    backgroundColor: '#D1FAE5',
-    borderWidth: 1,
-    borderColor: '#10B981',
-  },
-  statusToggleText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#B45309',
-  },
-  resumeButtonText: {
-    color: '#059669',
   },
   checkbox: {
     width: 24,
