@@ -13,7 +13,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { toastService } from '@/lib/toast';
 import { CourseSkeleton } from '@/components/SkeletonLoader';
 import { useFocusEffect } from '@react-navigation/native';
-import ToggleSwitch from '@/components/ToggleSwitch';
 
 // Component to display lesson progress with real-time counts
 const LessonProgressDisplay = ({ userId, courseId, lessonId, refreshTrigger }: {
@@ -104,7 +103,6 @@ export default function StudyScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [selectedCourse, setSelectedCourse] = useState<UserCourse | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [togglingCourse, setTogglingCourse] = useState<string | null>(null);
 
   useEffect(() => {
     loadStudyData();
@@ -328,42 +326,6 @@ export default function StudyScreen() {
     return progress.find(p => p.courseId === courseId);
   };
 
-  const toggleCourseStatus = async (courseId: string, currentlyActive: boolean) => {
-    if (!user || togglingCourse) return;
-    
-    setTogglingCourse(courseId);
-    try {
-      const newStatus = currentlyActive ? 'paused' : 'active';
-      await studyService.updateCourseStatus(user.id, courseId, newStatus);
-      
-      setUserCourses(prev => 
-        prev.map(uc => 
-          uc.course_id === courseId ? { ...uc, status: newStatus } : uc
-        )
-      );
-      
-      if (currentlyActive) {
-        toastService.info({
-          title: '课程已暂停',
-          message: '可随时恢复学习'
-        });
-      } else {
-        toastService.success({ 
-          title: '课程已恢复', 
-          message: '继续您的学习进度' 
-        });
-      }
-    } catch (error) {
-      console.error('Error toggling course status:', error);
-      toastService.error({ 
-        title: '操作失败', 
-        message: '请稍后重试' 
-      });
-    } finally {
-      setTogglingCourse(null);
-    }
-  };
-
   // Group courses by class with proper ordering
   // Deduplicates shared courses - each course only shows under the first ACTIVE class that requires it
   const groupCoursesByClass = () => {
@@ -508,19 +470,12 @@ export default function StudyScreen() {
                         const currentLesson = courseProgress?.currentLesson || 1;
                         const totalLessonsStudied = courseProgress?.totalLessonsStudied || 0;
                         const progressPercentage = userCourse.progress_percentage || 0;
-                        const isActive = userCourse.status === 'active';
-                        const isCompleted = userCourse.status === 'completed';
 
                         return (
                           <TouchableOpacity 
                             key={userCourse.id} 
                             style={styles.courseCard}
-                            onPress={() => {
-                              if (isActive) {
-                                router.push(`/course-detail/${userCourse.course_id}`);
-                              }
-                            }}
-                            disabled={!isActive}
+                            onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
                           >
                             <View style={styles.courseCardContent}>
                               <View style={styles.courseCardInfo}>
@@ -528,17 +483,23 @@ export default function StudyScreen() {
                                 <Text style={styles.courseInfo}>
                                   {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
                                 </Text>
-                                <Text style={[styles.statusText, isActive && styles.statusTextActive]}>
-                                  状态：{isActive ? '学习中' : isCompleted ? '已圆满' : '已暂停'}
+                                <Text style={styles.statusText}>
+                                  {totalLessonsStudied === 0 ? '尚未开始' : `上次完成：第${currentLesson}课`}
                                 </Text>
                               </View>
-                              {!isCompleted && (
-                                <ToggleSwitch
-                                  value={isActive}
-                                  onValueChange={() => toggleCourseStatus(userCourse.course_id, isActive)}
-                                  disabled={togglingCourse === userCourse.course_id}
+                              <TouchableOpacity 
+                                style={styles.circleButton}
+                                onPress={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/course-detail/${userCourse.course_id}`);
+                                }}
+                              >
+                                <Ionicons 
+                                  name="play" 
+                                  size={22} 
+                                  color={DesignSystem.colors.primary} 
                                 />
-                              )}
+                              </TouchableOpacity>
                             </View>
                           </TouchableOpacity>
                         );
@@ -559,19 +520,12 @@ export default function StudyScreen() {
                       const currentLesson = courseProgress?.currentLesson || 1;
                       const totalLessonsStudied = courseProgress?.totalLessonsStudied || 0;
                       const progressPercentage = userCourse.progress_percentage || 0;
-                      const isActive = userCourse.status === 'active';
-                      const isCompleted = userCourse.status === 'completed';
 
                       return (
                         <TouchableOpacity 
                           key={userCourse.id} 
                           style={styles.courseCard}
-                          onPress={() => {
-                            if (isActive) {
-                              router.push(`/course-detail/${userCourse.course_id}`);
-                            }
-                          }}
-                          disabled={!isActive}
+                          onPress={() => router.push(`/course-detail/${userCourse.course_id}`)}
                         >
                           <View style={styles.courseCardContent}>
                             <View style={styles.courseCardInfo}>
@@ -579,17 +533,23 @@ export default function StudyScreen() {
                               <Text style={styles.courseInfo}>
                                 {userCourse.course.teacher} • 共{userCourse.course.total_lessons}课 • {progressPercentage.toFixed(1)}%完成
                               </Text>
-                              <Text style={[styles.statusText, isActive && styles.statusTextActive]}>
-                                状态：{isActive ? '学习中' : isCompleted ? '已圆满' : '已暂停'}
+                              <Text style={styles.statusText}>
+                                {totalLessonsStudied === 0 ? '尚未开始' : `上次完成：第${currentLesson}课`}
                               </Text>
                             </View>
-                            {!isCompleted && (
-                              <ToggleSwitch
-                                value={isActive}
-                                onValueChange={() => toggleCourseStatus(userCourse.course_id, isActive)}
-                                disabled={togglingCourse === userCourse.course_id}
+                            <TouchableOpacity 
+                              style={styles.circleButton}
+                              onPress={(e) => {
+                                e.stopPropagation();
+                                router.push(`/course-detail/${userCourse.course_id}`);
+                              }}
+                            >
+                              <Ionicons 
+                                name="play" 
+                                size={22} 
+                                color={DesignSystem.colors.primary} 
                               />
-                            )}
+                            </TouchableOpacity>
                           </View>
                         </TouchableOpacity>
                       );
@@ -837,12 +797,9 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 13,
-    color: '#666',
+    color: DesignSystem.colors.primary,
     fontWeight: '600',
     marginTop: 4,
-  },
-  statusTextActive: {
-    color: '#EF8354',
   },
   progressContainer: {
     marginBottom: 16,

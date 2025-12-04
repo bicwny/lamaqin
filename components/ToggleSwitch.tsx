@@ -14,7 +14,7 @@ export default function ToggleSwitch({
   value,
   onValueChange,
   disabled = false,
-  activeColor = '#EF8354',
+  activeColor = DesignSystem.colors.primary,
   inactiveColor = '#E5E5EA',
 }: ToggleSwitchProps) {
   const handlePress = () => {
