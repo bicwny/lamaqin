@@ -25,7 +25,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="theme-color" content="#000000" />
         
         {/* Apple touch icon */}
-        <link rel="apple-touch-icon" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         
         <ScrollViewStyleReset />
       </head>
