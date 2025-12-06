@@ -147,7 +147,7 @@ export default function GongFo() {
         <View style={styles.altarContainer}>
           <Animated.View style={{ opacity: altarOpacity }}>
             <Image
-              source={require('@/assets/images/bg.jpg')}
+              source={require('../assets/images/bg.jpg')}
               style={styles.backgroundImage}
               resizeMode="contain"
             />
@@ -155,20 +155,20 @@ export default function GongFo() {
 
           <Animated.View style={[styles.glowOverlay, { opacity: bgGlowAnim }]}>
             <Image
-              source={require('@/assets/images/bg1.jpg')}
+              source={require('../assets/images/bg1.jpg')}
               style={styles.backgroundImage}
               resizeMode="contain"
             />
           </Animated.View>
 
-          {renderOfferingItem('light', OFFERING_POSITIONS.lightLeft, require('@/assets/images/gd.png'))}
-          {renderOfferingItem('light', OFFERING_POSITIONS.lightRight, require('@/assets/images/gd.png'))}
-          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerLeft, require('@/assets/images/gh.png'))}
-          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerRight, require('@/assets/images/gh.png'))}
-          {renderOfferingItem('mandala', OFFERING_POSITIONS.mandala, require('@/assets/images/mcl.png'))}
-          {renderOfferingItem('fruit', OFFERING_POSITIONS.fruit, require('@/assets/images/gg.png'))}
-          {renderOfferingItem('water', OFFERING_POSITIONS.water, require('@/assets/images/gs.png'))}
-          {renderOfferingItem('incense', OFFERING_POSITIONS.incense, require('@/assets/images/gx.png'))}
+          {renderOfferingItem('light', OFFERING_POSITIONS.lightLeft, require('../assets/images/gd.png'))}
+          {renderOfferingItem('light', OFFERING_POSITIONS.lightRight, require('../assets/images/gd.png'))}
+          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerLeft, require('../assets/images/gh.png'))}
+          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerRight, require('../assets/images/gh.png'))}
+          {renderOfferingItem('mandala', OFFERING_POSITIONS.mandala, require('../assets/images/mcl.png'))}
+          {renderOfferingItem('fruit', OFFERING_POSITIONS.fruit, require('../assets/images/gg.png'))}
+          {renderOfferingItem('water', OFFERING_POSITIONS.water, require('../assets/images/gs.png'))}
+          {renderOfferingItem('incense', OFFERING_POSITIONS.incense, require('../assets/images/gx.png'))}
         </View>
 
         <View style={styles.buttonsContainer}>
