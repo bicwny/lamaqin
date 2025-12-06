@@ -28,16 +28,16 @@ interface OfferingState {
 
 const OFFERING_POSITIONS = {
   // Top stair - lamps on left and right
-  lightLeft: { left: '2%', top: '52%', width: '13%' },
-  lightRight: { left: '85%', top: '52%', width: '13%', flip: true },
+  lightLeft: { left: '2%', top: '36%', width: '13%' },
+  lightRight: { left: '85%', top: '36%', width: '13%', flip: true },
   // Middle stair - fruit on left, mandala center, incense on right
-  fruit: { left: '15%', top: '68%', width: '16%' },
-  mandala: { left: '38%', top: '65%', width: '23%' },
-  incense: { left: '67%', top: '68%', width: '17%' },
+  fruit: { left: '15%', top: '55%', width: '16%' },
+  mandala: { left: '38%', top: '52%', width: '23%' },
+  incense: { left: '67%', top: '55%', width: '17%' },
   // Bottom stair - flowers on left/right, water bowls in center
-  flowerLeft: { left: '2%', top: '85%', width: '14%' },
-  flowerRight: { left: '84%', top: '85%', width: '14%', flip: true },
-  water: { left: '35%', top: '89%', width: '30%' },
+  flowerLeft: { left: '2%', top: '76%', width: '14%' },
+  flowerRight: { left: '84%', top: '76%', width: '14%', flip: true },
+  water: { left: '35%', top: '80%', width: '30%' },
 };
 
 const ICON_FILL = '#665d52';
