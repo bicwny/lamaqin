@@ -6,7 +6,8 @@ import {
   Dimensions, 
   Animated,
   Text,
-  Image as RNImage
+  Image as RNImage,
+  Platform
 } from 'react-native';
 import { Image } from 'expo-image';
 import Svg, { Path, G } from 'react-native-svg';
@@ -41,6 +42,8 @@ const ICON_FILL_HOVER = '#80524f';
 const BUTTON_BG = '#9c9a97';
 const BUTTON_BG_HOVER = '#bdbcba';
 
+const useNativeDriver = Platform.OS !== 'web';
+
 export default function GongFo() {
   const [offerings, setOfferings] = useState<OfferingState>({
     light: false,
@@ -71,7 +74,7 @@ export default function GongFo() {
       Animated.timing(bgGlowAnim, {
         toValue: 1,
         duration: 3000,
-        useNativeDriver: true,
+        useNativeDriver,
       }).start();
     }
   }, [allOfferingsComplete]);
@@ -85,14 +88,14 @@ export default function GongFo() {
       Animated.timing(altarOpacity, {
         toValue: 1,
         duration: 1000,
-        useNativeDriver: true,
+        useNativeDriver,
       }).start();
     }
 
     Animated.timing(fadeAnims[type], {
       toValue: 1,
       duration: 700,
-      useNativeDriver: true,
+      useNativeDriver,
     }).start();
   }, [offerings, fadeAnims, altarOpacity]);
 
