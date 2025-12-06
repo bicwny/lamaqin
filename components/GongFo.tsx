@@ -31,13 +31,13 @@ const OFFERING_POSITIONS = {
   lightLeft: { left: '2%', top: '-5%', width: '13%' },
   lightRight: { left: '85%', top: '-5%', width: '13%', flip: true },
   // Middle stair - fruit on left, mandala center, incense on right
-  fruit: { left: '30%', top: '20%', width: '16%' },
-  mandala: { left: '45%', top: '20%', width: '23%' },
-  incense: { left: '60%', top: '20%', width: '17%' },
+  fruit: { left: '20%', top: '50%', width: '16%' },
+  mandala: { left: '40%', top: '48%', width: '23%' },
+  incense: { left: '63%', top: '50%', width: '17%' },
   // Bottom stair - flowers on left/right, water bowls in center
-  flowerLeft: { left: '2%', top: '30%', width: '14%' },
-  flowerRight: { left: '84%', top: '30%', width: '14%', flip: true },
-  water: { left: '20%', top: '30%', width: '30%' },
+  flowerLeft: { left: '2%', top: '78%', width: '14%' },
+  flowerRight: { left: '84%', top: '78%', width: '14%', flip: true },
+  water: { left: '25%', top: '88%', width: '30%' },
 };
 
 const ICON_FILL = '#665d52';
