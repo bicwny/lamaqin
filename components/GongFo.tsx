@@ -143,31 +143,33 @@ export default function GongFo() {
 
   return (
     <View style={styles.container} onLayout={onLayout}>
-      <View style={styles.altarContainer}>
-        <Animated.View style={{ opacity: altarOpacity }}>
-          <Image
-            source={require('@/assets/images/bg.jpg')}
-            style={styles.backgroundImage}
-            resizeMode="contain"
-          />
-        </Animated.View>
+      <View style={styles.mainLayout}>
+        <View style={styles.altarContainer}>
+          <Animated.View style={{ opacity: altarOpacity }}>
+            <Image
+              source={require('@/assets/images/bg.jpg')}
+              style={styles.backgroundImage}
+              resizeMode="contain"
+            />
+          </Animated.View>
 
-        <Animated.View style={[styles.glowOverlay, { opacity: bgGlowAnim }]}>
-          <Image
-            source={require('@/assets/images/bg1.jpg')}
-            style={styles.backgroundImage}
-            resizeMode="contain"
-          />
-        </Animated.View>
+          <Animated.View style={[styles.glowOverlay, { opacity: bgGlowAnim }]}>
+            <Image
+              source={require('@/assets/images/bg1.jpg')}
+              style={styles.backgroundImage}
+              resizeMode="contain"
+            />
+          </Animated.View>
 
-        {renderOfferingItem('light', OFFERING_POSITIONS.lightLeft, require('@/assets/images/gd.png'))}
-        {renderOfferingItem('light', OFFERING_POSITIONS.lightRight, require('@/assets/images/gd.png'))}
-        {renderOfferingItem('flower', OFFERING_POSITIONS.flowerLeft, require('@/assets/images/gh.png'))}
-        {renderOfferingItem('flower', OFFERING_POSITIONS.flowerRight, require('@/assets/images/gh.png'))}
-        {renderOfferingItem('mandala', OFFERING_POSITIONS.mandala, require('@/assets/images/mcl.png'))}
-        {renderOfferingItem('fruit', OFFERING_POSITIONS.fruit, require('@/assets/images/gg.png'))}
-        {renderOfferingItem('water', OFFERING_POSITIONS.water, require('@/assets/images/gs.png'))}
-        {renderOfferingItem('incense', OFFERING_POSITIONS.incense, require('@/assets/images/gx.png'))}
+          {renderOfferingItem('light', OFFERING_POSITIONS.lightLeft, require('@/assets/images/gd.png'))}
+          {renderOfferingItem('light', OFFERING_POSITIONS.lightRight, require('@/assets/images/gd.png'))}
+          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerLeft, require('@/assets/images/gh.png'))}
+          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerRight, require('@/assets/images/gh.png'))}
+          {renderOfferingItem('mandala', OFFERING_POSITIONS.mandala, require('@/assets/images/mcl.png'))}
+          {renderOfferingItem('fruit', OFFERING_POSITIONS.fruit, require('@/assets/images/gg.png'))}
+          {renderOfferingItem('water', OFFERING_POSITIONS.water, require('@/assets/images/gs.png'))}
+          {renderOfferingItem('incense', OFFERING_POSITIONS.incense, require('@/assets/images/gx.png'))}
+        </View>
 
         <View style={styles.buttonsContainer}>
           <OfferingButton 
@@ -226,7 +228,7 @@ function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps)
   const iconColor = disabled ? '#81817e' : ICON_FILL;
   
   const renderIcon = () => {
-    const size = 44;
+    const size = 38;
     switch (type) {
       case 'light':
         return (
@@ -337,11 +339,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#E1DCD0',
     borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
+    padding: 8,
+  },
+  mainLayout: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   altarContainer: {
-    width: '100%',
+    flex: 1,
     aspectRatio: 1170 / 1197,
     position: 'relative',
+    borderRadius: DesignSystem.borderRadius.md,
+    overflow: 'hidden',
   },
   backgroundImage: {
     width: '100%',
@@ -363,14 +372,12 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   buttonsContainer: {
-    position: 'absolute',
-    right: 8,
-    top: 60,
-    gap: 8,
+    marginLeft: 8,
+    gap: 6,
   },
   offeringButton: {
-    width: 54,
-    height: 54,
+    width: 48,
+    height: 48,
     backgroundColor: BUTTON_BG,
     borderRadius: 10,
     justifyContent: 'center',
@@ -380,16 +387,16 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   resetButton: {
-    width: 54,
-    height: 54,
+    width: 48,
+    height: 48,
     backgroundColor: BUTTON_BG,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
   resetButtonText: {
-    fontSize: 28,
+    fontSize: 24,
     color: ICON_FILL,
   },
 });
