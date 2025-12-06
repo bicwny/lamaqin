@@ -106,6 +106,22 @@ INSERT INTO buddhist_days (gregorian_date, day_type, day_name, description, mult
 ('2025-12-29', 'special_day', '莲师荟供日', '作何善恶成十万倍', 100000, 1);
 
 -- =============================================
+-- 十斋日 (Ten Fasting Days) - 持斋日
+-- =============================================
+INSERT INTO buddhist_days (gregorian_date, day_type, day_name, description, multiplier, display_order) VALUES
+('2025-12-04', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-05', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-07', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-12', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-13', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-14', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-17', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-18', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-19', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-20', 'fasting_day', '十斋日', '持斋修福日', 1, 10),
+('2025-12-27', 'fasting_day', '十斋日', '持斋修福日', 1, 10);
+
+-- =============================================
 -- Verification queries (optional - run to check data)
 -- =============================================
 -- SELECT * FROM tibetan_calendar WHERE gregorian_date BETWEEN '2025-12-01' AND '2025-12-31' ORDER BY gregorian_date;
