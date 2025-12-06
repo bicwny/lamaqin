@@ -235,12 +235,6 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     }
   };
 
-  const formatDisplayDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    return `${month}月${day}日`;
-  };
-
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -339,10 +333,6 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
         <>
           <CalendarInfoCard dateString={selectedDate} />
           <View style={styles.previewSection}>
-          <View style={styles.previewHeader}>
-            <Text style={styles.previewTitle}>{formatDisplayDate(selectedDate)} 记录</Text>
-          </View>
-
           {loadingRecords ? (
             <View style={styles.previewLoading}>
               <ActivityIndicator size="small" color={DesignSystem.colors.blueTara} />
@@ -454,17 +444,6 @@ const styles = StyleSheet.create({
   },
   previewSection: {
     marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.border,
-  },
-  previewHeader: {
-    marginBottom: 12,
-  },
-  previewTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: DesignSystem.colors.textPrimary,
   },
   previewLoading: {
     paddingVertical: 20,
