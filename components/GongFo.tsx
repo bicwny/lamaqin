@@ -338,6 +338,8 @@ function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps)
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
     borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
     padding: 8,
