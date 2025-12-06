@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
-import { getLunarDate, LunarDateInfo } from '@/lib/lunarCalendar';
+import { getLunarDate } from '@/lib/lunarCalendar';
 
 interface CalendarInfoCardProps {
   dateString: string;
@@ -22,7 +22,7 @@ export default function CalendarInfoCard({ dateString }: CalendarInfoCardProps) 
               <Text style={styles.badgeText}>农</Text>
             </View>
             <Text style={styles.calendarText}>
-              {lunarInfo.lunarMonthName.replace('月', '')}{lunarInfo.lunarDayName.replace('初', '').replace('十', '十').replace('廿', '二十')}
+              {lunarInfo.lunarMonthName}{lunarInfo.lunarDayName}
             </Text>
           </View>
 

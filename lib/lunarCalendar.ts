@@ -1,4 +1,4 @@
-import { Solar, Lunar } from 'lunar-javascript';
+import { Solar } from 'lunar-javascript';
 
 export interface LunarDateInfo {
   lunarYear: number;
@@ -28,7 +28,7 @@ export function getLunarDate(dateString: string): LunarDateInfo {
   
   const lunarMonth = lunar.getMonth();
   const lunarDay = lunar.getDay();
-  const isLeapMonth = lunar.getMonth() < 0;
+  const isLeapMonth = typeof lunar.isLeap === 'function' ? lunar.isLeap() : false;
   
   const monthIndex = Math.abs(lunarMonth) - 1;
   const lunarMonthName = (isLeapMonth ? '闰' : '') + LUNAR_MONTHS[monthIndex] + '月';

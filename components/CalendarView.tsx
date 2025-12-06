@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 import { toastService } from '@/lib/toast';
 import { getUserTimezone, getCurrentDateInTimezone } from '@/lib/timezone';
 import { Ionicons } from '@expo/vector-icons';
+import CalendarInfoCard from '@/components/CalendarInfoCard';
 
 interface DailyRecord {
   id: string;
@@ -335,7 +336,9 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
       />
 
       {selectedDate && (
-        <View style={styles.previewSection}>
+        <>
+          <CalendarInfoCard dateString={selectedDate} />
+          <View style={styles.previewSection}>
           <View style={styles.previewHeader}>
             <Text style={styles.previewTitle}>{formatDisplayDate(selectedDate)} 记录</Text>
           </View>
@@ -380,6 +383,7 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
             <Ionicons name="chevron-forward" size={18} color="#ffffff" />
           </TouchableOpacity>
         </View>
+        </>
       )}
     </View>
   );
