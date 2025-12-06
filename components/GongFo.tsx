@@ -27,14 +27,17 @@ interface OfferingState {
 }
 
 const OFFERING_POSITIONS = {
-  lightLeft: { left: '1.8%', top: '42.3%', width: '13%' },
-  lightRight: { left: '84.4%', top: '42.3%', width: '13%', flip: true },
-  flowerLeft: { left: '1.2%', top: '67.1%', width: '14%' },
-  flowerRight: { left: '80.9%', top: '67.1%', width: '14%', flip: true },
-  mandala: { left: '38.7%', top: '60.5%', width: '22.7%' },
-  fruit: { left: '23.8%', top: '68.3%', width: '16%' },
-  water: { left: '21%', top: '89.4%', width: '9%' },
-  incense: { left: '63.2%', top: '70.6%', width: '17%' },
+  // Top stair - lamps on left and right
+  lightLeft: { left: '2%', top: '52%', width: '13%' },
+  lightRight: { left: '85%', top: '52%', width: '13%', flip: true },
+  // Middle stair - fruit on left, mandala center, incense on right
+  fruit: { left: '15%', top: '68%', width: '16%' },
+  mandala: { left: '38%', top: '65%', width: '23%' },
+  incense: { left: '67%', top: '68%', width: '17%' },
+  // Bottom stair - flowers on left/right, water bowls in center
+  flowerLeft: { left: '2%', top: '85%', width: '14%' },
+  flowerRight: { left: '84%', top: '85%', width: '14%', flip: true },
+  water: { left: '35%', top: '89%', width: '30%' },
 };
 
 const ICON_FILL = '#665d52';
