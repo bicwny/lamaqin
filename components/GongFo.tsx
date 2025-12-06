@@ -149,14 +149,14 @@ export default function GongFo() {
           <RNImage
             source={require('../assets/images/bg.jpg')}
             style={styles.backgroundImage}
-            resizeMode="contain"
+            resizeMode="cover"
           />
 
           <Animated.View style={[styles.glowOverlay, { opacity: bgGlowAnim }]}>
             <RNImage
               source={require('../assets/images/bg1.jpg')}
               style={styles.backgroundImage}
-              resizeMode="contain"
+              resizeMode="cover"
             />
           </Animated.View>
 
