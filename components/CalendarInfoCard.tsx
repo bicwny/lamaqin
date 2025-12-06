@@ -1,15 +1,51 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
 import { getLunarDate } from '@/lib/lunarCalendar';
+import { getCalendarDayInfo, CalendarDayInfo, formatTibetanMonth, formatTibetanDay } from '@/lib/calendarService';
 
 interface CalendarInfoCardProps {
   dateString: string;
 }
 
 export default function CalendarInfoCard({ dateString }: CalendarInfoCardProps) {
+  const [calendarInfo, setCalendarInfo] = useState<CalendarDayInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+
   const lunarInfo = getLunarDate(dateString);
   const dayNumber = parseInt(dateString.split('-')[2], 10);
+
+  useEffect(() => {
+    let mounted = true;
+    
+    async function fetchCalendarInfo() {
+      setLoading(true);
+      try {
+        const info = await getCalendarDayInfo(dateString);
+        if (mounted) {
+          setCalendarInfo(info);
+        }
+      } catch (error) {
+        console.error('Error fetching calendar info:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchCalendarInfo();
+
+    return () => {
+      mounted = false;
+    };
+  }, [dateString]);
+
+  const tibetanText = calendarInfo?.tibetan
+    ? `${calendarInfo.tibetan.tibetan_month_name || formatTibetanMonth(calendarInfo.tibetan.tibetan_month, calendarInfo.tibetan.is_leap_month)}${calendarInfo.tibetan.tibetan_day_name || formatTibetanDay(calendarInfo.tibetan.tibetan_day)}`
+    : null;
+
+  const buddhistDays = calendarInfo?.buddhistDays || [];
 
   return (
     <View style={styles.container}>
@@ -26,15 +62,72 @@ export default function CalendarInfoCard({ dateString }: CalendarInfoCardProps) 
             </Text>
           </View>
 
+          {loading ? (
+            <View style={styles.calendarRow}>
+              <ActivityIndicator size="small" color={DesignSystem.colors.textSecondary} />
+            </View>
+          ) : tibetanText ? (
+            <View style={styles.calendarRow}>
+              <View style={[styles.badge, styles.tibetanBadge]}>
+                <Text style={styles.badgeText}>藏</Text>
+              </View>
+              <Text style={styles.calendarText}>{tibetanText}</Text>
+            </View>
+          ) : null}
+
           {lunarInfo.solarTerm && (
-            <View style={styles.solarTermContainer}>
-              <Text style={styles.solarTermText}>{lunarInfo.solarTerm}</Text>
+            <View style={styles.tagsRow}>
+              <View style={[styles.tag, styles.solarTermTag]}>
+                <Text style={styles.solarTermTagText}>{lunarInfo.solarTerm}</Text>
+              </View>
+            </View>
+          )}
+
+          {buddhistDays.length > 0 && (
+            <View style={styles.tagsRow}>
+              {buddhistDays.map((day) => (
+                <View key={day.id} style={[styles.tag, getTagStyle(day.day_type)]}>
+                  <Text style={[styles.tagText, getTagTextStyle(day.day_type)]}>{day.day_name}</Text>
+                </View>
+              ))}
             </View>
           )}
         </View>
       </View>
+
+      {buddhistDays.length > 0 && buddhistDays[0].description && (
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.descriptionText}>{buddhistDays[0].description}</Text>
+        </View>
+      )}
     </View>
   );
+}
+
+function getTagStyle(dayType: string) {
+  switch (dayType) {
+    case 'special_day':
+      return styles.specialDayTag;
+    case 'fasting_day':
+      return styles.fastingDayTag;
+    case 'auspicious':
+      return styles.auspiciousTag;
+    default:
+      return styles.defaultTag;
+  }
+}
+
+function getTagTextStyle(dayType: string) {
+  switch (dayType) {
+    case 'special_day':
+      return styles.specialDayTagText;
+    case 'fasting_day':
+      return styles.fastingDayTagText;
+    case 'auspicious':
+      return styles.auspiciousTagText;
+    default:
+      return styles.defaultTagText;
+  }
 }
 
 const styles = StyleSheet.create({
@@ -81,6 +174,9 @@ const styles = StyleSheet.create({
   lunarBadge: {
     backgroundColor: '#6b7280',
   },
+  tibetanBadge: {
+    backgroundColor: '#8B5CF6',
+  },
   badgeText: {
     color: '#ffffff',
     fontSize: 12,
@@ -91,16 +187,62 @@ const styles = StyleSheet.create({
     color: '#8B7355',
     fontWeight: '500',
   },
-  solarTermContainer: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 12,
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  tag: {
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 4,
   },
-  solarTermText: {
-    fontSize: 16,
+  tagText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  solarTermTag: {
+    backgroundColor: '#fef3c7',
+  },
+  solarTermTagText: {
+    fontSize: 14,
     color: '#d97706',
     fontWeight: '600',
+  },
+  specialDayTag: {
+    backgroundColor: '#fce7f3',
+  },
+  specialDayTagText: {
+    color: '#be185d',
+  },
+  fastingDayTag: {
+    backgroundColor: '#e0e7ff',
+  },
+  fastingDayTagText: {
+    color: '#4338ca',
+  },
+  auspiciousTag: {
+    backgroundColor: '#dcfce7',
+  },
+  auspiciousTagText: {
+    color: '#15803d',
+  },
+  defaultTag: {
+    backgroundColor: '#f3f4f6',
+  },
+  defaultTagText: {
+    color: '#4b5563',
+  },
+  descriptionContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#f3f4f6',
+  },
+  descriptionText: {
+    fontSize: 14,
+    color: DesignSystem.colors.textSecondary,
+    lineHeight: 20,
   },
 });
