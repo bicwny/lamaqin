@@ -34,8 +34,8 @@ export default function TabLayout() {
             shadowOpacity: DesignSystem.opacity[10],
             shadowRadius: DesignSystem.spacing.sm,
             paddingTop: DesignSystem.spacing.sm,
-            paddingBottom: Math.max(insets.bottom, DesignSystem.spacing.sm),
-            height: 60 + Math.max(insets.bottom, DesignSystem.spacing.sm),
+            paddingBottom: Math.max(insets.bottom, DesignSystem.spacing.sm) + 10,
+            height: 60 + Math.max(insets.bottom, DesignSystem.spacing.sm) + 10,
           },
           default: {
             backgroundColor: DesignSystem.colors.backgroundSecondary,
