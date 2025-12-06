@@ -75,16 +75,13 @@ export default function CalendarInfoCard({ dateString }: CalendarInfoCardProps) 
             </View>
           ) : null}
 
-          {lunarInfo.solarTerm && (
+          {(lunarInfo.solarTerm || buddhistDays.length > 0) && (
             <View style={styles.tagsRow}>
-              <View style={[styles.tag, styles.solarTermTag]}>
-                <Text style={styles.solarTermTagText}>{lunarInfo.solarTerm}</Text>
-              </View>
-            </View>
-          )}
-
-          {buddhistDays.length > 0 && (
-            <View style={styles.tagsRow}>
+              {lunarInfo.solarTerm && (
+                <View style={[styles.tag, styles.solarTermTag]}>
+                  <Text style={styles.solarTermTagText}>{lunarInfo.solarTerm}</Text>
+                </View>
+              )}
               {buddhistDays.map((day) => (
                 <View key={day.id} style={[styles.tag, getTagStyle(day.day_type)]}>
                   <Text style={[styles.tagText, getTagTextStyle(day.day_type)]}>{day.day_name}</Text>
