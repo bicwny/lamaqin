@@ -508,15 +508,6 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary,
     borderWidth: 1.5,
     borderColor: DesignSystem.colors.primary,
-    ...(Platform.OS === "web"
-      ? { boxShadow: `0 0 12px 4px ${YELLOW_GLOW}` }
-      : {
-          shadowColor: YELLOW_GLOW,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.8,
-          shadowRadius: 8,
-          elevation: 8,
-        }),
   },
   resetButton: {
     width: 48,
