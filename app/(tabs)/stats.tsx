@@ -2,11 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { DesignSystem } from '@/constants/DesignSystem';
 import PageTemplate from '@/components/PageTemplate';
+import GongFo from '@/components/GongFo';
 
 export default function StatsScreen() {
   return (
     <PageTemplate title="回向" subtitle="诸佛菩萨如何回向 我亦如是回向" scrollable={false} padding={0}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.gongfoContainer}>
+          <GongFo />
+        </View>
+        
         <View style={styles.dedicationContainer}>
           <Text style={styles.dedicationText}>
             所南德义檀嘉热巴涅    此福已得一切智{'\n'}
@@ -35,9 +40,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingVertical: DesignSystem.spacing.xl,
-    justifyContent: 'center',
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.lg,
+  },
+  gongfoContainer: {
+    marginBottom: DesignSystem.spacing.xl,
   },
   dedicationContainer: {
     paddingHorizontal: DesignSystem.spacing.lg,
