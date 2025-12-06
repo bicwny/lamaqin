@@ -35,7 +35,7 @@ const OFFERING_POSITIONS = {
   mandala: { left: '40%', top: '48%', width: '13%' },
   incense: { left: '63%', top: '50%', width: '13%' },
   // Bottom stair - flowers on left/right, water bowls in center
-  flowerLeft: { left: '2%', top: '20%', width: '13%' },
+  flowerLeft: { left: '2%', top: '23%', width: '13%' },
   flowerRight: { left: '84%', top: '78%', width: '13%', flip: true },
   water: { left: '25%', top: '88%', width: '13%' },
 };
