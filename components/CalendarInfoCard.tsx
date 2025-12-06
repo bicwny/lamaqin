@@ -13,7 +13,9 @@ export default function CalendarInfoCard({ dateString }: CalendarInfoCardProps) 
   const [loading, setLoading] = useState(true);
 
   const lunarInfo = getLunarDate(dateString);
-  const dayNumber = parseInt(dateString.split('-')[2], 10);
+  
+  const dateParts = dateString.split('-');
+  const formattedDate = `${dateParts[0]}年${parseInt(dateParts[1], 10)}月${parseInt(dateParts[2], 10)}`;
 
   useEffect(() => {
     let mounted = true;
@@ -49,53 +51,47 @@ export default function CalendarInfoCard({ dateString }: CalendarInfoCardProps) 
 
   return (
     <View style={styles.container}>
-      <View style={styles.mainRow}>
-        <Text style={styles.dayNumber}>{dayNumber}</Text>
-        
-        <View style={styles.calendarInfo}>
-          <View style={styles.calendarRow}>
-            <View style={[styles.badge, styles.lunarBadge]}>
-              <Text style={styles.badgeText}>农</Text>
-            </View>
-            <Text style={styles.calendarText}>
-              {lunarInfo.lunarMonthName}{lunarInfo.lunarDayName}
-            </Text>
+      <Text style={styles.dateHeader}>{formattedDate}</Text>
+      
+      <View style={styles.calendarRow}>
+        <View style={styles.calendarItem}>
+          <View style={[styles.badge, styles.lunarBadge]}>
+            <Text style={styles.badgeText}>农</Text>
           </View>
-
-          {loading ? (
-            <View style={styles.calendarRow}>
-              <ActivityIndicator size="small" color={DesignSystem.colors.textSecondary} />
-            </View>
-          ) : tibetanText ? (
-            <View style={styles.calendarRow}>
-              <View style={[styles.badge, styles.tibetanBadge]}>
-                <Text style={styles.badgeText}>藏</Text>
-              </View>
-              <Text style={styles.calendarText}>{tibetanText}</Text>
-            </View>
-          ) : null}
-
-          {(lunarInfo.solarTerm || buddhistDays.length > 0) && (
-            <View style={styles.tagsRow}>
-              {lunarInfo.solarTerm && (
-                <View style={[styles.tag, styles.solarTermTag]}>
-                  <Text style={styles.solarTermTagText}>{lunarInfo.solarTerm}</Text>
-                </View>
-              )}
-              {buddhistDays.map((day) => (
-                <View key={day.id} style={[styles.tag, getTagStyle(day.day_type)]}>
-                  <Text style={[styles.tagText, getTagTextStyle(day.day_type)]}>{day.day_name}</Text>
-                </View>
-              ))}
-            </View>
-          )}
+          <Text style={styles.calendarText}>
+            {lunarInfo.lunarMonthName}{lunarInfo.lunarDayName}
+          </Text>
         </View>
+
+        {loading ? (
+          <ActivityIndicator size="small" color={DesignSystem.colors.textSecondary} />
+        ) : tibetanText ? (
+          <View style={styles.calendarItem}>
+            <View style={[styles.badge, styles.tibetanBadge]}>
+              <Text style={styles.badgeText}>藏</Text>
+            </View>
+            <Text style={styles.calendarText}>{tibetanText}</Text>
+          </View>
+        ) : null}
       </View>
 
-      {buddhistDays.length > 0 && buddhistDays[0].description && (
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.descriptionText}>{buddhistDays[0].description}</Text>
+      {(lunarInfo.solarTerm || buddhistDays.length > 0) && (
+        <View style={styles.tagsRow}>
+          {lunarInfo.solarTerm && (
+            <View style={[styles.tag, styles.solarTermTag]}>
+              <Text style={styles.solarTermTagText}>{lunarInfo.solarTerm}</Text>
+            </View>
+          )}
+          {buddhistDays.map((day) => (
+            <View key={day.id} style={[styles.tag, getTagStyle(day.day_type)]}>
+              <Text style={[styles.tagText, getTagTextStyle(day.day_type)]}>{day.day_name}</Text>
+            </View>
+          ))}
         </View>
+      )}
+
+      {buddhistDays.length > 0 && buddhistDays[0].description && (
+        <Text style={styles.descriptionText}>{buddhistDays[0].description}</Text>
       )}
     </View>
   );
@@ -139,26 +135,21 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  mainRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  dayNumber: {
-    fontSize: 56,
-    fontWeight: '300',
+  dateHeader: {
+    fontSize: 22,
+    fontWeight: '600',
     color: DesignSystem.colors.textPrimary,
-    lineHeight: 60,
-    marginRight: 16,
-    minWidth: 70,
-  },
-  calendarInfo: {
-    flex: 1,
-    paddingTop: 8,
+    marginBottom: 8,
   },
   calendarRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    gap: 24,
+  },
+  calendarItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   badge: {
     width: 24,
@@ -180,7 +171,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   calendarText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#8B7355',
     fontWeight: '500',
   },
@@ -188,7 +179,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 4,
+    marginBottom: 8,
   },
   tag: {
     paddingHorizontal: 10,
@@ -230,12 +221,6 @@ const styles = StyleSheet.create({
   },
   defaultTagText: {
     color: '#4b5563',
-  },
-  descriptionContainer: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
   },
   descriptionText: {
     fontSize: 14,
