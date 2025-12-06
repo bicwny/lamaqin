@@ -1,21 +1,27 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { 
-  View, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Dimensions, 
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
   Animated,
   Text,
   Image as RNImage,
-  Platform
-} from 'react-native';
-import { Image } from 'expo-image';
-import Svg, { Path, G } from 'react-native-svg';
-import { DesignSystem } from '@/constants/DesignSystem';
+  Platform,
+} from "react-native";
+import { Image } from "expo-image";
+import Svg, { Path, G } from "react-native-svg";
+import { DesignSystem } from "@/constants/DesignSystem";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
-type OfferingType = 'light' | 'water' | 'flower' | 'fruit' | 'incense' | 'mandala';
+type OfferingType =
+  | "light"
+  | "water"
+  | "flower"
+  | "fruit"
+  | "incense"
+  | "mandala";
 
 interface OfferingState {
   light: boolean;
@@ -28,24 +34,24 @@ interface OfferingState {
 
 const OFFERING_POSITIONS = {
   // Top stair - lamps on left and right
-  lightLeft: { left: '2%', top: '-6%', width: '13%' },
-  lightRight: { left: '85%', top: '-6%', width: '13%', flip: true },
+  lightLeft: { left: "2%", top: "-9%", width: "13%" },
+  lightRight: { left: "85%", top: "-9%", width: "13%", flip: true },
   // Middle stair - fruit on left, mandala center, incense on right
-  fruit: { left: '20%', top: '50%', width: '13%' },
-  mandala: { left: '40%', top: '48%', width: '13%' },
-  incense: { left: '63%', top: '50%', width: '13%' },
+  fruit: { left: "20%", top: "36%", width: "13%" },
+  mandala: { left: "40%", top: "18%", width: "20%" },
+  incense: { left: "63%", top: "43%", width: "13%" },
   // Bottom stair - flowers on left/right, water bowls in center
-  flowerLeft: { left: '2%', top: '12%', width: '13%' },
-  flowerRight: { left: '85%', top: '12%', width: '13%', flip: true },
-  water: { left: '25%', top: '88%', width: '13%' },
+  flowerLeft: { left: "2%", top: "18%", width: "13%" },
+  flowerRight: { left: "85%", top: "18%", width: "13%", flip: true },
+  water: { left: "25%", top: "73%", width: "50%" },
 };
 
-const ICON_FILL = '#665d52';
-const ICON_FILL_HOVER = '#80524f';
-const BUTTON_BG = '#9c9a97';
-const BUTTON_BG_HOVER = '#bdbcba';
+const ICON_FILL = "#665d52";
+const ICON_FILL_HOVER = "#80524f";
+const BUTTON_BG = "#9c9a97";
+const BUTTON_BG_HOVER = "#bdbcba";
 
-const useNativeDriver = Platform.OS !== 'web';
+const useNativeDriver = Platform.OS !== "web";
 
 export default function GongFo() {
   const [offerings, setOfferings] = useState<OfferingState>({
@@ -70,7 +76,7 @@ export default function GongFo() {
   const bgGlowAnim = useRef(new Animated.Value(0)).current;
   const altarOpacity = useRef(new Animated.Value(1)).current;
 
-  const allOfferingsComplete = Object.values(offerings).every(v => v);
+  const allOfferingsComplete = Object.values(offerings).every((v) => v);
 
   useEffect(() => {
     if (allOfferingsComplete) {
@@ -82,25 +88,28 @@ export default function GongFo() {
     }
   }, [allOfferingsComplete]);
 
-  const handleOffering = useCallback((type: OfferingType) => {
-    if (offerings[type]) return;
+  const handleOffering = useCallback(
+    (type: OfferingType) => {
+      if (offerings[type]) return;
 
-    setOfferings(prev => ({ ...prev, [type]: true }));
-    
-    if (type === 'light') {
-      Animated.timing(altarOpacity, {
+      setOfferings((prev) => ({ ...prev, [type]: true }));
+
+      if (type === "light") {
+        Animated.timing(altarOpacity, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver,
+        }).start();
+      }
+
+      Animated.timing(fadeAnims[type], {
         toValue: 1,
-        duration: 1000,
+        duration: 700,
         useNativeDriver,
       }).start();
-    }
-
-    Animated.timing(fadeAnims[type], {
-      toValue: 1,
-      duration: 700,
-      useNativeDriver,
-    }).start();
-  }, [offerings, fadeAnims, altarOpacity]);
+    },
+    [offerings, fadeAnims, altarOpacity],
+  );
 
   const handleReset = useCallback(() => {
     setOfferings({
@@ -112,7 +121,7 @@ export default function GongFo() {
       mandala: false,
     });
 
-    Object.values(fadeAnims).forEach(anim => {
+    Object.values(fadeAnims).forEach((anim) => {
       anim.setValue(0);
     });
     bgGlowAnim.setValue(0);
@@ -127,9 +136,9 @@ export default function GongFo() {
   const renderOfferingItem = (
     type: OfferingType,
     position: typeof OFFERING_POSITIONS.lightLeft,
-    imageSrc: any
+    imageSrc: any,
   ) => {
-    const flip = 'flip' in position && position.flip;
+    const flip = "flip" in position && position.flip;
     return (
       <Animated.View
         style={[
@@ -143,7 +152,11 @@ export default function GongFo() {
           },
         ]}
       >
-        <RNImage source={imageSrc} style={styles.offeringImage} resizeMode="contain" />
+        <RNImage
+          source={imageSrc}
+          style={styles.offeringImage}
+          resizeMode="contain"
+        />
       </Animated.View>
     );
   };
@@ -153,64 +166,96 @@ export default function GongFo() {
       <View style={styles.mainLayout}>
         <View style={styles.altarContainer}>
           <RNImage
-            source={require('../assets/images/bg.jpg')}
+            source={require("../assets/images/bg.jpg")}
             style={styles.backgroundImage}
             resizeMode="cover"
           />
 
           <Animated.View style={[styles.glowOverlay, { opacity: bgGlowAnim }]}>
             <RNImage
-              source={require('../assets/images/bg1.jpg')}
+              source={require("../assets/images/bg1.jpg")}
               style={styles.backgroundImage}
               resizeMode="cover"
             />
           </Animated.View>
 
-          {renderOfferingItem('light', OFFERING_POSITIONS.lightLeft, require('../assets/images/gd.png'))}
-          {renderOfferingItem('light', OFFERING_POSITIONS.lightRight, require('../assets/images/gd.png'))}
-          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerLeft, require('../assets/images/gh.png'))}
-          {renderOfferingItem('flower', OFFERING_POSITIONS.flowerRight, require('../assets/images/gh.png'))}
-          {renderOfferingItem('mandala', OFFERING_POSITIONS.mandala, require('../assets/images/mcl.png'))}
-          {renderOfferingItem('fruit', OFFERING_POSITIONS.fruit, require('../assets/images/gg.png'))}
-          {renderOfferingItem('water', OFFERING_POSITIONS.water, require('../assets/images/gs.png'))}
-          {renderOfferingItem('incense', OFFERING_POSITIONS.incense, require('../assets/images/gx.png'))}
+          {renderOfferingItem(
+            "light",
+            OFFERING_POSITIONS.lightLeft,
+            require("../assets/images/gd.png"),
+          )}
+          {renderOfferingItem(
+            "light",
+            OFFERING_POSITIONS.lightRight,
+            require("../assets/images/gd.png"),
+          )}
+          {renderOfferingItem(
+            "flower",
+            OFFERING_POSITIONS.flowerLeft,
+            require("../assets/images/gh.png"),
+          )}
+          {renderOfferingItem(
+            "flower",
+            OFFERING_POSITIONS.flowerRight,
+            require("../assets/images/gh.png"),
+          )}
+          {renderOfferingItem(
+            "mandala",
+            OFFERING_POSITIONS.mandala,
+            require("../assets/images/mcl.png"),
+          )}
+          {renderOfferingItem(
+            "fruit",
+            OFFERING_POSITIONS.fruit,
+            require("../assets/images/gg.png"),
+          )}
+          {renderOfferingItem(
+            "water",
+            OFFERING_POSITIONS.water,
+            require("../assets/images/gs.png"),
+          )}
+          {renderOfferingItem(
+            "incense",
+            OFFERING_POSITIONS.incense,
+            require("../assets/images/gx.png"),
+          )}
         </View>
 
         <View style={styles.buttonsContainer}>
-          <OfferingButton 
-            type="light" 
-            title="供灯" 
-            onPress={() => handleOffering('light')} 
+          <OfferingButton
+            type="light"
+            title="供灯"
+            onPress={() => handleOffering("light")}
             disabled={offerings.light}
           />
-          <OfferingButton 
-            type="water" 
-            title="供水" 
-            onPress={() => handleOffering('water')} 
+          <OfferingButton
+            type="water"
+            title="供水"
+            onPress={() => handleOffering("water")}
             disabled={offerings.water}
           />
-          <OfferingButton 
-            type="flower" 
-            title="供花" 
-            onPress={() => handleOffering('flower')} 
+          <OfferingButton
+            type="flower"
+            title="供花"
+            onPress={() => handleOffering("flower")}
             disabled={offerings.flower}
           />
-          <OfferingButton 
-            type="fruit" 
-            title="供食子" 
-            onPress={() => handleOffering('fruit')} 
+          <OfferingButton
+            type="fruit"
+            title="供食子"
+            onPress={() => handleOffering("fruit")}
             disabled={offerings.fruit}
           />
-          <OfferingButton 
-            type="incense" 
-            title="供香" 
-            onPress={() => handleOffering('incense')} 
+          <OfferingButton
+            type="incense"
+            title="供香"
+            onPress={() => handleOffering("incense")}
             disabled={offerings.incense}
           />
-          <OfferingButton 
-            type="mandala" 
-            title="供曼达" 
-            onPress={() => handleOffering('mandala')} 
+          <OfferingButton
+            type="mandala"
+            title="供曼达"
+            onPress={() => handleOffering("mandala")}
             disabled={offerings.mandala}
           />
           <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
@@ -229,13 +274,18 @@ interface OfferingButtonProps {
   disabled: boolean;
 }
 
-function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps) {
-  const iconColor = disabled ? '#81817e' : ICON_FILL;
-  
+function OfferingButton({
+  type,
+  title,
+  onPress,
+  disabled,
+}: OfferingButtonProps) {
+  const iconColor = disabled ? "#81817e" : ICON_FILL;
+
   const renderIcon = () => {
     const size = 38;
     switch (type) {
-      case 'light':
+      case "light":
         return (
           <Svg width={size} height={size} viewBox="0 0 300 300">
             <G transform="translate(0, 511) scale(0.1, -0.1)">
@@ -254,7 +304,7 @@ function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps)
             </G>
           </Svg>
         );
-      case 'water':
+      case "water":
         return (
           <Svg width={size} height={size} viewBox="0 0 300 300">
             <G transform="translate(0, 511) scale(0.1, -0.1)">
@@ -269,23 +319,50 @@ function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps)
             </G>
           </Svg>
         );
-      case 'flower':
+      case "flower":
         return (
           <Svg width={size} height={size} viewBox="0 0 300 300">
             <G>
-              <Path fill={iconColor} d="M159,33.4c3-41.9-28.3-32.6-28.3-32.6s-21.2,5.3-15.6,28c7.8,19.1,37,53.8,37,53.8S156,75.4,159,33.4z" />
-              <Path fill={iconColor} d="M249.4,70.5c0,0-4.6-21.4-27.5-16.4c-19.3,7.2-54.9,35.3-54.9,35.3s7.1,4.1,48.9,8.4C257.8,102.1,249.4,70.5,249.4,70.5z" />
-              <Path fill={iconColor} d="M201.9,7.4c0,0-19.3-10.4-30.3,10.2c-7.1,19.4-8.9,64.6-8.9,64.6s7.7-2.8,38.2-31.7S201.9,7.4,201.9,7.4z" />
-              <Path fill={iconColor} d="M170.2,97.5c0,0,1.8,8,26.9,41.7c25.1,33.7,42.7,6.1,42.7,6.1s12.6-17.9-6.5-31.3C215,104.6,170.2,97.5,170.2,97.5z" />
-              <Path fill={iconColor} d="M198,159.4c-7.3-19.3-35.6-54.7-35.6-54.7s-3.2,9.1-8.2,49c-5.2,41.7,27.4,33.3,27.4,33.3S203.1,182.2,198,159.4z" />
-              <Path fill={iconColor} d="M70.5,46.1c0,0-11.3,18.7,8.6,30.8C98.2,85,143.3,89,143.3,89s-2.4-7.9-29.8-39.7C86.1,17.4,70.5,46.1,70.5,46.1z" />
-              <Path fill={iconColor} d="M61.6,124.6c0,0,6.9,20.8,29,13.5c18.5-9.1,50.9-40.8,50.9-40.8S134,93.9,92,94C49.9,94.1,61.6,124.6,61.6,124.6z" />
-              <Path fill={iconColor} d="M155.5,300h19.1c0,0-60.2-47.3-50.8-123.5c4.3-1.1,8-2.7,12.2-8.4c9.9-18.1,15.2-65.6,15.2-65.6s-10,5.9-39.3,29.3c-35.5,28.4-7.4,42.6-7.4,42.6s6.8,3.4,15.9,2.7C114.4,201.7,107.6,263.5,155.5,300z" />
-              <Path fill={iconColor} d="M50.9,233.8C47.2,246,54.6,264,54.6,264c21.2,45.6,70.6,26,70.6,26C102.4,242.8,53.7,224.7,50.9,233.8z" />
+              <Path
+                fill={iconColor}
+                d="M159,33.4c3-41.9-28.3-32.6-28.3-32.6s-21.2,5.3-15.6,28c7.8,19.1,37,53.8,37,53.8S156,75.4,159,33.4z"
+              />
+              <Path
+                fill={iconColor}
+                d="M249.4,70.5c0,0-4.6-21.4-27.5-16.4c-19.3,7.2-54.9,35.3-54.9,35.3s7.1,4.1,48.9,8.4C257.8,102.1,249.4,70.5,249.4,70.5z"
+              />
+              <Path
+                fill={iconColor}
+                d="M201.9,7.4c0,0-19.3-10.4-30.3,10.2c-7.1,19.4-8.9,64.6-8.9,64.6s7.7-2.8,38.2-31.7S201.9,7.4,201.9,7.4z"
+              />
+              <Path
+                fill={iconColor}
+                d="M170.2,97.5c0,0,1.8,8,26.9,41.7c25.1,33.7,42.7,6.1,42.7,6.1s12.6-17.9-6.5-31.3C215,104.6,170.2,97.5,170.2,97.5z"
+              />
+              <Path
+                fill={iconColor}
+                d="M198,159.4c-7.3-19.3-35.6-54.7-35.6-54.7s-3.2,9.1-8.2,49c-5.2,41.7,27.4,33.3,27.4,33.3S203.1,182.2,198,159.4z"
+              />
+              <Path
+                fill={iconColor}
+                d="M70.5,46.1c0,0-11.3,18.7,8.6,30.8C98.2,85,143.3,89,143.3,89s-2.4-7.9-29.8-39.7C86.1,17.4,70.5,46.1,70.5,46.1z"
+              />
+              <Path
+                fill={iconColor}
+                d="M61.6,124.6c0,0,6.9,20.8,29,13.5c18.5-9.1,50.9-40.8,50.9-40.8S134,93.9,92,94C49.9,94.1,61.6,124.6,61.6,124.6z"
+              />
+              <Path
+                fill={iconColor}
+                d="M155.5,300h19.1c0,0-60.2-47.3-50.8-123.5c4.3-1.1,8-2.7,12.2-8.4c9.9-18.1,15.2-65.6,15.2-65.6s-10,5.9-39.3,29.3c-35.5,28.4-7.4,42.6-7.4,42.6s6.8,3.4,15.9,2.7C114.4,201.7,107.6,263.5,155.5,300z"
+              />
+              <Path
+                fill={iconColor}
+                d="M50.9,233.8C47.2,246,54.6,264,54.6,264c21.2,45.6,70.6,26,70.6,26C102.4,242.8,53.7,224.7,50.9,233.8z"
+              />
             </G>
           </Svg>
         );
-      case 'fruit':
+      case "fruit":
         return (
           <Svg width={size} height={size} viewBox="0 0 300 300">
             <G transform="translate(0, 511) scale(0.1, -0.1)">
@@ -300,26 +377,39 @@ function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps)
             </G>
           </Svg>
         );
-      case 'incense':
+      case "incense":
         return (
           <Svg width={size} height={size} viewBox="0 0 300 300">
             <G>
               <Path fill={iconColor} d="M145,5 L155,5 L155,180 L145,180 Z" />
-              <Path fill={iconColor} d="M140,180 L160,180 L165,200 L135,200 Z" />
-              <Path fill={iconColor} d="M130,200 L170,200 L175,220 L125,220 Z" />
-              <Path fill={iconColor} d="M120,220 L180,220 Q190,260 150,290 Q110,260 120,220 Z" />
-              <Path fill={iconColor} opacity="0.6" d="M147,0 Q140,-20 150,-30 Q160,-20 153,0 Q160,15 150,25 Q140,15 147,0" />
+              <Path
+                fill={iconColor}
+                d="M140,180 L160,180 L165,200 L135,200 Z"
+              />
+              <Path
+                fill={iconColor}
+                d="M130,200 L170,200 L175,220 L125,220 Z"
+              />
+              <Path
+                fill={iconColor}
+                d="M120,220 L180,220 Q190,260 150,290 Q110,260 120,220 Z"
+              />
+              <Path
+                fill={iconColor}
+                opacity="0.6"
+                d="M147,0 Q140,-20 150,-30 Q160,-20 153,0 Q160,15 150,25 Q140,15 147,0"
+              />
             </G>
           </Svg>
         );
-      case 'mandala':
+      case "mandala":
         return (
           <Svg width={size} height={size} viewBox="0 0 300 300">
             <G>
-              <Path fill={iconColor} d="M150,20 L180,100 L260,100 L195,150 L220,230 L150,185 L80,230 L105,150 L40,100 L120,100 Z" />
-              <Path fill={iconColor} d="M150,70 L165,115 L210,115 L175,145 L190,190 L150,165 L110,190 L125,145 L90,115 L135,115 Z" opacity="0.7" />
-              <Path fill={iconColor} d="M150,250 L160,250 L160,290 L140,290 L140,250 Z" />
-              <Path fill={iconColor} d="M120,285 L180,285 L185,295 L115,295 Z" />
+              <Path
+                fill={iconColor}
+                d="M149.7,0c-1.8,0-6.4,6.8-7,7.6s3.2,6.2,2.6,6.6c-25,17.1-39.2,55.2-10.1,59c0.4,1,0.9,3,0,3.6c-2.3,0.7-2.1,4.8-2.2,5.7c-1.1,0.2-1.7,1-1.4,1.6c0.8,1.6,8.6,3.4,8.4,5.6c-0.5,6-8.2,7.7-9.6,8.5s3.5,5.7,3.5,5.7s-22.9-0.7-25.2-0.5c-2.3,0.2-6.5,0.4-6.5,2.6c0.1,2.5,4.3,1,5,2.1c-1.4,1.9-2.2,7.1-2.2,7.8s-3.8,4.2,0,8.3c0.8,0.8,0.4,3-0.7,3.1c-3,0.3-17.8,0.7-19.4,1.6c-1.6,0.8-3,3.4-0.7,4.2c3,1,2.6,2.8,1.4,4.2c-0.8,0.9,0.1,2.6,0,3.1c-0.1,0.5,1.1,3.1,0.7,4.2c-0.4,1-1.1,4.5,0.7,7.3c0.8,1.2-6.6,0-13.6,3.1c-2.6,1.1-3.3,4.4-1.4,5.2s4.2,1.3,3.6,2.6c-0.6,1.3-1.3,2.1-2.2,2.6c-0.8,0.5-1.3,4.5-0.7,5.2s2,1.3,1.4,3.6c-0.3,1.1-0.7,4.5,1.4,6.2c0.7,0.5-0.3,2.3-1.4,2.6s0.6,3.7-0.7,4.2c-2.6,0.8-13,2.4-13.6,6.7c-0.2,1.2,1.4,3.6,2.2,4.2c1.3,1,3,1.3,1.4,4.6c-0.5,1.3,0.1,3.4,0,4.6c-0.3,3.9,2.1,11.3,0.7,12.9c-2,2.4-8,4.4-5.7,11.9c0.5,1.7,4.7,7,10.8,8.8c3.6,1.1,4.6,2,5,5.2c0.2,1.1,4.7,4.5,10.1,6.7c1.1,0.5,2.9,0.7,3.6,1.6c3,3.8,4.8,8.8,21.5,12.5c1.7,0.4,14.6,8.1,13.7,8.9c-2,1.9-13.7-0.5-14.5,7.6c-1.1,11.3,21.9,17.1,41.9,17c30.7-0.2,41.6-7.3,40.6-17c-0.6-5.8-6.9-2.9-13.2-5.7c-0.7-1.1,9.8-8,12.3-8.5c2.4-0.5,15.4-4.2,21.6-11.1c0.8-0.8-0.4-2.2,0.7-3.1s10.9-3.2,14.3-8.8c0.7-1.1-0.7-2.9,0-3.6c0.8-0.9,11.3-1.4,15.1-10.9c0.5-1.4,0-7.3-2.9-8.8c-0.9-0.5-2.4-0.2-2.2-3.6c0.1-1,2.2-12.8,1.4-17.1c-0.3-1.7-2.2-2.8-1.4-3.6c0.8-0.8,4.7-1.3,4.3-5.7c-0.2-2.7-8.2-4.9-10.1-5.7c-0.5-0.2-68.8,8.3-85,8.6c-14.5,0.2-57.4-3.7-72.4-7.6c9.3,1,61.5,6.1,72,5.7c10.2-0.4,75.3-5.7,85.7-6.6c1.1-0.1-4.7-1.1-4.8-1.1c-1.1-0.5-1.3-3.1-2.2-3.6c-0.8-0.5-2.7-0.2-2.9-1c-0.3-1.4,0.8-18.2,0.7-19.2c-0.1-1-1.1-2.7,0.7-3.1c1.6-0.4,2.9-0.9,2.9-3.1c0-1.2,1.4-3.4-17.2-4.6c-0.6-0.1-37.3,7.7-62.8,7.6c-18-0.1-46.4-4.8-59.3-6.6c2.8,0.1,41.7,3.6,59,3.8c32.9,0.2,60.5-4.6,61.4-4.7c1.1-0.1-3.3-0.5-3.3-0.5c-0.4-1-0.8-3.4,0-4.2s1.3-4.5,0.7-5.7c-0.1-0.3-1.3-0.3-1.4-1.6c-0.1-1.3-0.7-5.4-0.7-8.3c2.6-0.6,3.4-0.6,4.3-2.6c-2.9-0.6-11.1,0-12.7,0.2s-33.6,4-46.4,3.8c-11.6-0.2-34.7-2.8-43.4-4.7c9.4,0.2,35.6,3.2,43.4,2.8c6.5-0.2,36.6-1.4,46.4-1.9c-0.4-1.3-1-1.6-0.8-1.9c-0.1-1.7-0.5-5.1-0.8-9.2c-0.2-3.4-3.8-8.3-2.9-10.9c2.6,0,4.8-0.4,5-2.1c0.3-3-20-0.3-31-0.5c-0.2-2.1,4.5-1.4,4.4-3.8c-0.2-2.9-2.4,0.8-7.9-10.4c0.9-4.2,5.3-3.1,6.1-5.7c0.4-1.3,0.2-1.7,0-4.7c-0.1-1.1-3-0.7-3.1-3c0-0.9-0.8-3.3,0.7-3.6c35.3-7,4.6-50-10.7-58.5c0.7-1.9,2.5-4.3,2.6-5.7C155.9,7.2,151.4,0,149.7,0z"
+              />
             </G>
           </Svg>
         );
@@ -340,52 +430,52 @@ function OfferingButton({ type, title, onPress, disabled }: OfferingButtonProps)
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
-    alignSelf: 'center',
+    alignSelf: "center",
     borderRadius: DesignSystem.borderRadius.lg,
-    overflow: 'hidden',
+    overflow: "hidden",
     padding: 8,
   },
   mainLayout: {
-    flexDirection: 'column',
-    alignItems: 'center',
+    flexDirection: "column",
+    alignItems: "center",
   },
   altarContainer: {
-    width: '100%',
+    width: "100%",
     aspectRatio: 1170 / 1197,
-    position: 'relative',
+    position: "relative",
     borderRadius: DesignSystem.borderRadius.md,
-    overflow: 'hidden',
-    backgroundColor: '#f0e6d6',
+    overflow: "hidden",
+    backgroundColor: "#f0e6d6",
   },
   backgroundWrapper: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   backgroundImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   glowOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
   offeringItem: {
-    position: 'absolute',
+    position: "absolute",
   },
   offeringImage: {
-    width: '100%',
+    width: "100%",
     height: undefined,
     aspectRatio: 1,
   },
   buttonsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
     marginTop: 12,
     gap: 8,
   },
@@ -394,8 +484,8 @@ const styles = StyleSheet.create({
     height: 48,
     backgroundColor: BUTTON_BG,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   offeringButtonDisabled: {
     opacity: 0.5,
@@ -405,8 +495,8 @@ const styles = StyleSheet.create({
     height: 48,
     backgroundColor: BUTTON_BG,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   resetButtonText: {
     fontSize: 24,
