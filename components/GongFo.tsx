@@ -282,7 +282,7 @@ function OfferingButton({
   const iconColor = isActivated ? "#ffffff" : PRIMARY_RED;
 
   const renderIcon = () => {
-    const size = 38;
+    const size = 32;
     switch (type) {
       case "light":
         return (
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   offeringButton: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     backgroundColor: "#ffffff",
-    borderRadius: 10,
+    borderRadius: 24,
     borderWidth: 1.5,
     borderColor: DesignSystem.colors.primary,
     justifyContent: "center",
