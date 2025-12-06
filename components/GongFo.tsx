@@ -340,11 +340,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   mainLayout: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   altarContainer: {
-    flex: 1,
+    width: '100%',
     aspectRatio: 1170 / 1197,
     position: 'relative',
     borderRadius: DesignSystem.borderRadius.md,
@@ -375,8 +375,11 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   buttonsContainer: {
-    marginLeft: 8,
-    gap: 6,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: 12,
+    gap: 8,
   },
   offeringButton: {
     width: 48,
@@ -396,7 +399,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 4,
   },
   resetButtonText: {
     fontSize: 24,
