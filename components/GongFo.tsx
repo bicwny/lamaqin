@@ -61,7 +61,7 @@ export default function GongFo() {
   }).current;
 
   const bgGlowAnim = useRef(new Animated.Value(0)).current;
-  const altarOpacity = useRef(new Animated.Value(0.75)).current;
+  const altarOpacity = useRef(new Animated.Value(1)).current;
 
   const allOfferingsComplete = Object.values(offerings).every(v => v);
 
@@ -109,7 +109,7 @@ export default function GongFo() {
       anim.setValue(0);
     });
     bgGlowAnim.setValue(0);
-    altarOpacity.setValue(0.75);
+    altarOpacity.setValue(1);
   }, [fadeAnims, bgGlowAnim, altarOpacity]);
 
   const onLayout = (event: any) => {
