@@ -244,8 +244,11 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     );
   }
 
-  // Get max date using timezone-aware calculation
-  const maxDate = userTimezone ? getCurrentDateInTimezone(userTimezone) : new Date().toISOString().split('T')[0];
+  // Get today's date using timezone-aware calculation
+  const todayDate = userTimezone ? getCurrentDateInTimezone(userTimezone) : new Date().toISOString().split('T')[0];
+
+  // Check if selected date is in the future
+  const isFutureDate = selectedDate ? selectedDate > todayDate : false;
 
   const updatedMarkedDates = { ...markedDates };
   if (selectedDate) {
@@ -262,7 +265,6 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
     <View style={styles.container}>
       <Calendar
         current={currentMonth || undefined}
-        maxDate={maxDate}
         markedDates={updatedMarkedDates}
         onDayPress={handleDayPress}
         enableSwipeMonths={true}
@@ -366,12 +368,14 @@ export default function CalendarView({ userId, onDateSelect }: CalendarViewProps
             </View>
           )}
 
-          <TouchableOpacity style={styles.ctaButton} onPress={handleViewFullDetails}>
-            <Text style={styles.ctaButtonText}>
-              {hasRecords ? '查看详情 / 添加记录' : '添加记录'}
-            </Text>
-            <Ionicons name="chevron-forward" size={18} color="#ffffff" />
-          </TouchableOpacity>
+          {!isFutureDate && (
+            <TouchableOpacity style={styles.ctaButton} onPress={handleViewFullDetails}>
+              <Text style={styles.ctaButtonText}>
+                {hasRecords ? '查看详情 / 添加记录' : '添加记录'}
+              </Text>
+              <Ionicons name="chevron-forward" size={18} color="#ffffff" />
+            </TouchableOpacity>
+          )}
         </View>
         </>
       )}
