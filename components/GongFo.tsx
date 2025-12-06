@@ -46,10 +46,8 @@ const OFFERING_POSITIONS = {
   water: { left: "25%", top: "73%", width: "50%" },
 };
 
-const ICON_FILL = "#665d52";
-const ICON_FILL_HOVER = "#80524f";
-const BUTTON_BG = "#9c9a97";
-const BUTTON_BG_HOVER = "#bdbcba";
+const PRIMARY_RED = DesignSystem.colors.primary;
+const YELLOW_GLOW = "#eab308";
 
 const useNativeDriver = Platform.OS !== "web";
 
@@ -280,7 +278,8 @@ function OfferingButton({
   onPress,
   disabled,
 }: OfferingButtonProps) {
-  const iconColor = disabled ? "#81817e" : ICON_FILL;
+  const isActivated = disabled;
+  const iconColor = isActivated ? "#ffffff" : PRIMARY_RED;
 
   const renderIcon = () => {
     const size = 38;
@@ -429,7 +428,10 @@ function OfferingButton({
 
   return (
     <TouchableOpacity
-      style={[styles.offeringButton, disabled && styles.offeringButtonDisabled]}
+      style={[
+        styles.offeringButton,
+        isActivated ? styles.offeringButtonActivated : styles.offeringButtonDefault,
+      ]}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
@@ -493,24 +495,41 @@ const styles = StyleSheet.create({
   offeringButton: {
     width: 48,
     height: 48,
-    backgroundColor: BUTTON_BG,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
-  offeringButtonDisabled: {
-    opacity: 0.5,
+  offeringButtonDefault: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1.5,
+    borderColor: DesignSystem.colors.primary,
+  },
+  offeringButtonActivated: {
+    backgroundColor: DesignSystem.colors.primary,
+    borderWidth: 1.5,
+    borderColor: DesignSystem.colors.primary,
+    ...(Platform.OS === "web"
+      ? { boxShadow: `0 0 12px 4px ${YELLOW_GLOW}` }
+      : {
+          shadowColor: YELLOW_GLOW,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.8,
+          shadowRadius: 8,
+          elevation: 8,
+        }),
   },
   resetButton: {
     width: 48,
     height: 48,
-    backgroundColor: BUTTON_BG,
+    backgroundColor: "#ffffff",
     borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: DesignSystem.colors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
   resetButtonText: {
     fontSize: 24,
-    color: ICON_FILL,
+    color: DesignSystem.colors.primary,
   },
 });
