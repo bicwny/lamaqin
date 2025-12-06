@@ -28,8 +28,8 @@ interface OfferingState {
 
 const OFFERING_POSITIONS = {
   // Top stair - lamps on left and right
-  lightLeft: { left: '3%', top: '0%', width: '13%' },
-  lightRight: { left: '84%', top: '0%', width: '13%', flip: true },
+  lightLeft: { left: '3%', top: '45%', width: '13%' },
+  lightRight: { left: '84%', top: '45%', width: '13%', flip: true },
   // Middle stair - fruit on left, mandala center, incense on right
   fruit: { left: '15%', top: '55%', width: '16%' },
   mandala: { left: '38%', top: '52%', width: '23%' },
