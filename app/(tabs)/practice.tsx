@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -22,6 +22,7 @@ import {
 } from "@/utils/componentTokens";
 import { presetProjectNameService } from "@/lib/database";
 import { toastService } from "@/lib/toast";
+import { clearCalendarCache } from "@/lib/calendarCache";
 
 type TabType = 'practices' | 'calendar';
 
@@ -65,6 +66,15 @@ export default function PracticeScreen() {
   }>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [calendarKey, setCalendarKey] = useState(0);
+
+  const handleTabChange = async (tabKey: TabType) => {
+    if (tabKey === 'calendar') {
+      await clearCalendarCache();
+      setCalendarKey(prev => prev + 1);
+    }
+    setActiveTab(tabKey);
+  };
 
   useEffect(() => {
     if (user) {
@@ -376,7 +386,7 @@ export default function PracticeScreen() {
         >
           {user && (
             <View style={styles.calendarContainer}>
-              <CalendarView userId={user.id} />
+              <CalendarView key={calendarKey} userId={user.id} />
             </View>
           )}
         </ScrollView>
@@ -427,7 +437,7 @@ export default function PracticeScreen() {
               styles.tabItem,
               activeTab === tab.key && styles.tabItemActive
             ]}
-            onPress={() => setActiveTab(tab.key)}
+            onPress={() => handleTabChange(tab.key)}
           >
             <Ionicons 
               name={tab.icon as any} 
