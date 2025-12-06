@@ -1,13 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   View, 
-  Image, 
   TouchableOpacity, 
   StyleSheet, 
   Dimensions, 
   Animated,
-  Text 
+  Text,
+  Image as RNImage
 } from 'react-native';
+import { Image } from 'expo-image';
 import Svg, { Path, G } from 'react-native-svg';
 import { DesignSystem } from '@/constants/DesignSystem';
 
@@ -136,7 +137,7 @@ export default function GongFo() {
           },
         ]}
       >
-        <Image source={imageSrc} style={styles.offeringImage} resizeMode="contain" />
+        <RNImage source={imageSrc} style={styles.offeringImage} resizeMode="contain" />
       </Animated.View>
     );
   };
@@ -145,16 +146,14 @@ export default function GongFo() {
     <View style={styles.container} onLayout={onLayout}>
       <View style={styles.mainLayout}>
         <View style={styles.altarContainer}>
-          <Animated.View style={{ opacity: altarOpacity }}>
-            <Image
-              source={require('../assets/images/bg.jpg')}
-              style={styles.backgroundImage}
-              resizeMode="contain"
-            />
-          </Animated.View>
+          <RNImage
+            source={require('../assets/images/bg.jpg')}
+            style={styles.backgroundImage}
+            resizeMode="contain"
+          />
 
           <Animated.View style={[styles.glowOverlay, { opacity: bgGlowAnim }]}>
-            <Image
+            <RNImage
               source={require('../assets/images/bg1.jpg')}
               style={styles.backgroundImage}
               resizeMode="contain"
@@ -350,6 +349,11 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderRadius: DesignSystem.borderRadius.md,
     overflow: 'hidden',
+    backgroundColor: '#f0e6d6',
+  },
+  backgroundWrapper: {
+    width: '100%',
+    height: '100%',
   },
   backgroundImage: {
     width: '100%',
