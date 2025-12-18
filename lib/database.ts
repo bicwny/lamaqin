@@ -231,10 +231,20 @@ export const dailyRecordService = {
 
       if (error) throw error;
 
-      // Update practice project progress
-      await practiceService.updatePracticeProject(record.practice_project_id, {
-        current_count: data.count // This should be cumulative - need to handle properly
-      });
+      // Update practice project progress - fetch current count and add to it
+      const { data: project, error: projectError } = await supabase
+        .from('user_practice_projects')
+        .select('current_count')
+        .eq('id', record.practice_project_id)
+        .single();
+
+      if (projectError) throw projectError;
+
+      if (project) {
+        await practiceService.updatePracticeProject(record.practice_project_id, {
+          current_count: (project.current_count || 0) + data.count
+        });
+      }
 
       return data;
     } else {
