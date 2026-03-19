@@ -83,3 +83,7 @@ expertMode = true
 deploymentTarget = "autoscale"
 run = ["npm", "run", "serve"]
 build = ["npm", "run", "build:web"]
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 120000
