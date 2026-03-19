@@ -1,24 +1,27 @@
 {
   "expo": {
     "name": "三殊胜",
-    "slug": "expo-on-replit",
+    "slug": "san-shu-sheng",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "myapp",
+    "scheme": "sanshusheng",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bicwny.sanshusheng",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserNotificationsUsageDescription": "三殊胜 uses notifications to remind you of your daily practice sessions and to notify you of important practice milestones."
       }
     },
     "android": {
+      "package": "com.bicwny.sanshusheng",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#7C3AED"
       },
       "edgeToEdgeEnabled": true
     },
@@ -58,6 +61,15 @@
           "image": "./assets/splash.png",
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#7C3AED",
+          "defaultChannel": "default",
+          "sounds": []
         }
       ],
       "expo-web-browser",

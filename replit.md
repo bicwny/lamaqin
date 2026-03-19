@@ -45,6 +45,13 @@ The app is configured with `"newArchEnabled": false` for Expo Go compatibility. 
 
 ## App Branding Assets
 Custom app icon (`assets/icon.png`) and splash screen (`assets/splash.png`) are configured in `app.json` for iOS, Android, and web.
+Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) with a purple background (`#7C3AED`) matching the design system.
+
+## EAS Build & Submit Configuration
+- `eas.json` has `preview` and `production` build profiles wired with `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from EAS Secrets.
+- Preview Android builds produce an APK; production Android builds produce an AAB (App Bundle).
+- `submit.production` block has placeholder fields for iOS (Apple ID, ASC App ID, Team ID) and Android (Google Play service account JSON path) — these must be filled in before submitting.
+- EAS Secrets (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) must be pushed via `eas secret:create` after authenticating with `eas login`.
 
 # External Dependencies
 
