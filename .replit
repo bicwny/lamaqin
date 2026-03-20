@@ -8,10 +8,6 @@ channel = "stable-24_05"
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 5001
-externalPort = 8099
-
 [workflows]
 runButton = "Project"
 
@@ -73,7 +69,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx expo start --web --port 5000 --tunnel"
+args = "npx expo start --web --port 5000"
 waitForPort = 5000
 
 [agent]
