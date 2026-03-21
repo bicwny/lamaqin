@@ -9,8 +9,6 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:web": "expo export -p web --output-dir dist-web && node scripts/add-pwa-meta-tags.js",
-    "serve": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
-    "serve-dist": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
     "serve-web": "npx serve dist-web -l tcp://0.0.0.0:5000 --single",
     "deploy": "npm run build:web && npm run serve-web",
     "test": "jest --watchAll",
@@ -40,7 +38,7 @@
     "@supabase/supabase-js": "^2.50.2",
     "expo": "~54.0.33",
     "expo-blur": "~15.0.8",
-    "expo-build-properties": "^55.0.10",
+    "expo-build-properties": "~1.0.10",
     "expo-clipboard": "~8.0.8",
     "expo-constants": "~18.0.9",
     "expo-font": "~14.0.8",
@@ -87,7 +85,8 @@
     "typescript": "~5.9.2"
   },
   "overrides": {
-    "react-native-reanimated": "~3.15.5"
+    "react-native-reanimated": "~3.15.5",
+    "react-native-safe-area-context": "~5.6.0"
   },
   "expo": {
     "install": {

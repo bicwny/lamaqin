@@ -41,7 +41,7 @@ Supabase PostgreSQL is the primary external database. Local storage for sessions
 Supabase Auth handles a complete email/password authentication system, including user registration with email verification, password reset, persistent sessions, and secure token refreshing.
 
 ## React Native Architecture Configuration
-The app is configured with `"newArchEnabled": false` for Expo Go compatibility. It can be set to `"newArchEnabled": true` for production to leverage React Native's New Architecture.
+The app is configured with `"newArchEnabled": true` to leverage React Native's New Architecture for production builds.
 
 ## App Branding Assets
 Custom app icon (`assets/icon.png`) and splash screen (`assets/splash.png`) are configured in `app.json` for iOS, Android, and web.
@@ -50,8 +50,12 @@ Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) w
 ## EAS Build & Submit Configuration
 - `eas.json` has `preview` and `production` build profiles wired with `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from EAS Secrets.
 - Preview Android builds produce an APK; production Android builds produce an AAB (App Bundle).
-- `submit.production` block has placeholder fields for iOS (Apple ID, ASC App ID, Team ID) and Android (Google Play service account JSON path) — these must be filled in before submitting.
+- `submit.production` block has placeholder fields for iOS (Apple ID, ASC App ID, Team ID) and Android (Google Play service account JSON path) — see `SUBMIT_GUIDE.md` for detailed instructions on filling these in.
 - EAS Secrets (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) must be pushed via `eas secret:create` after authenticating with `eas login`.
+- `expo-build-properties` is pinned to `~1.0.10` (compatible with Expo SDK 54). Do not upgrade without also upgrading the Expo SDK.
+- `react-native-safe-area-context` has an override in `package.json` to deduplicate the version pulled by `react-native-calendars`.
+- iOS deployment target is 15.1 with static frameworks; Android targets SDK 35.
+- Version auto-increment is enabled for production builds via `appVersionSource: "remote"` and `autoIncrement: true`.
 
 # External Dependencies
 

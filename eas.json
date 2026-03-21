@@ -43,12 +43,12 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "YOUR_APPLE_ID_EMAIL",
-        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "YOUR_APPLE_TEAM_ID"
+        "appleId": "REPLACE_WITH_YOUR_APPLE_ID_EMAIL",
+        "ascAppId": "REPLACE_WITH_YOUR_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_YOUR_APPLE_TEAM_ID"
       },
       "android": {
-        "serviceAccountKeyPath": "./path/to/google-play-service-account.json",
+        "serviceAccountKeyPath": "REPLACE_WITH_PATH_TO_GOOGLE_PLAY_SERVICE_ACCOUNT_JSON",
         "track": "production"
       }
     }
