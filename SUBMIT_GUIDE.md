@@ -13,10 +13,23 @@ This guide explains how to fill in the `eas.json` submit section and publish you
 | `appleId` | `fob.design@gmail.com` | Apple ID used to sign in to App Store Connect |
 | `ascAppId` | `6764305709` | App Store Connect → 三殊胜 → General → App Information → Apple ID |
 | `appleTeamId` | `XCS8NXLU3K` | Apple Developer Portal → Membership Details → Team ID |
+| `ascApiKeyPath` | `./.secrets/AuthKey_<KEY_ID>.p8` | Local path to the ASC API private key (see "ASC API key" below) |
+| `ascApiKeyId` | `L4TD2FVUPX` | App Store Connect → Users & Access → Integrations → App Store Connect API → Key ID |
+| `ascApiKeyIssuerId` | UUID | Same screen → Issuer ID (shown above the keys table) |
 
 ### Prerequisites (already satisfied)
 - Active [Apple Developer Program](https://developer.apple.com/programs/) membership under team `XCS8NXLU3K`.
 - App record exists in App Store Connect for bundle id `com.bicwny.sanshusheng` (ascAppId `6764305709`).
+
+### ASC API key (required for non-interactive `eas submit`)
+EAS needs the App Store Connect API key to authenticate the upload to TestFlight. The three `ascApiKey…` fields above tell `eas submit` to use a **local** key file instead of the EAS-server-managed key (the server flow can't run with `--non-interactive`). One-time setup:
+
+1. In App Store Connect → **Users & Access** → **Integrations** → **App Store Connect API**, create an API key with **App Manager** access (or higher). Note the **Key ID** and **Issuer ID** shown on that page.
+2. Download the `.p8` file Apple offers — Apple only lets you download it once. Save it as `./.secrets/AuthKey_<KEY_ID>.p8` (the directory and `*.p8` are gitignored). The filename's `<KEY_ID>` segment must match the value of `ascApiKeyId` in `eas.json`.
+3. If you only have the raw PEM body (e.g. it was pasted into a Replit Secret without the `-----BEGIN/END PRIVATE KEY-----` headers), wrap it back into a real PEM and validate it with `openssl pkcs8 -in ./.secrets/AuthKey_<KEY_ID>.p8 -nocrypt -topk8 -out /dev/null` before running submit.
+4. Update `eas.json` so `submit.production.ios.ascApiKeyId` and `ascApiKeyIssuerId` match the key you just created. (`ascApiKeyPath` already points at `./.secrets/AuthKey_<KEY_ID>.p8`.)
+
+If you ever need to rotate the key (e.g. the IDs were committed to a public repo, or someone leaked the `.p8`), revoke it on that same App Store Connect page, repeat steps 1–4, and the next `eas submit` will pick up the new key automatically.
 
 ### App Store listing content (required before review)
 The App Store Connect listing for 三殊胜 needs categories, age rating,
@@ -28,8 +41,18 @@ ready-to-host privacy policy ships with the web build at
 
 ### Submit command
 ```bash
-eas submit --platform ios --profile production
+# Production build, then submit the latest finished build to TestFlight
+eas build --platform ios --profile production --non-interactive
+eas submit --platform ios --profile production --non-interactive
 ```
+
+You can also pass an explicit build id with `--id <build-uuid>` to submit
+an older finished build instead of the latest one.
+
+### Verified end-to-end (2026-04-28)
+- Production build `a1012e1e-4679-471c-bf1b-c2bce91df570` (app build version 6) → FINISHED on EAS.
+- Submission `36ff9811-e372-4a6f-b4eb-cffb287a6737` → FINISHED on EAS.
+- Apple-side build id `6e7ae47d-4f80-42e4-81bb-7a7a8c0ee473` reached `processingState=VALID` and `internalBuildState=READY_FOR_BETA_TESTING` on App Store Connect — it is installable from TestFlight by anyone added as an Internal Tester. External testing additionally requires submitting for Beta App Review and configuring an External Testers group in App Store Connect.
 
 ---
 

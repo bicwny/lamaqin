@@ -47,7 +47,10 @@
       "ios": {
         "appleId": "fob.design@gmail.com",
         "ascAppId": "6764305709",
-        "appleTeamId": "XCS8NXLU3K"
+        "appleTeamId": "XCS8NXLU3K",
+        "ascApiKeyPath": "./.secrets/AuthKey_L4TD2FVUPX.p8",
+        "ascApiKeyId": "L4TD2FVUPX",
+        "ascApiKeyIssuerId": "d62f4fac-87bb-4047-ae55-6765cacbf9ff"
       },
       "android": {
         "serviceAccountKeyPath": "./google-play-service-account.json",
