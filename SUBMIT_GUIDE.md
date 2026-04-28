@@ -74,3 +74,19 @@ Make sure the EAS environment variables `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUB
 ## Version management
 
 Version auto-increment is enabled (`autoIncrement: true` in the production build profile). EAS will automatically bump the build number for each new build. The app version (`1.0.0`) is set in `app.json` and should be manually updated for major/minor releases.
+
+---
+
+## Why we build React Native from source on iOS
+
+`app.json` sets `"buildReactNativeFromSource": true` in the iOS section of the `expo-build-properties` plugin, and `eas.json` sets `RCT_USE_PREBUILT_RNCORE: "0"` in both the `preview` and `production` build profiles. **Do not remove these without verifying iOS still builds.**
+
+Expo SDK 54 ships React Native's native dependencies as prebuilt binaries (`ReactNativeDependencies` and `React-Core-prebuilt`). Those prebuilt folly headers `#include <folly/coro/Coroutine.h>`, but the matching `folly-coro` header is not packaged in the iOS Pods. As soon as a native module pulls in `folly/dynamic.h`, every iOS target fails with:
+
+```
+folly/Expected.h:1587:10: fatal error: 'folly/coro/Coroutine.h' file not found
+```
+
+The flag forces CocoaPods to build folly (and the rest of React Native's native deps) from source instead of consuming the broken prebuilts. This roughly doubles iOS build time on EAS, which is acceptable given the alternative is no `.ipa` at all. Re-evaluate once we upgrade past Expo SDK 54 / React Native 0.81 — if upstream packages a fixed set of prebuilt binaries, the flag can be removed.
+
+Do **not** replace this with a Podfile post-install hook or hand-patched folly headers; those break on `pod install` regeneration.
