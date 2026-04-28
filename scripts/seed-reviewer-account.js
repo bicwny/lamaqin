@@ -18,7 +18,7 @@
  *   REVIEWER_EMAIL                 Default: appstore-review@bicwny.com
  *   REVIEWER_PASSWORD              Default: random 24-char string printed at end
  *   REVIEWER_DHARMA_NAME           Default: 审核测试
- *   REVIEWER_CLASS_NAME            Default: 加行  (covers count + session/time practices)
+ *   REVIEWER_CLASS_NAME            Default: 预科：加行  (covers count + session/time practices)
  *   REVIEWER_ENTRY_YEAR            Default: current year
  *   SEED_DAYS                      Default: 14   (days of practice history to seed)
  *
@@ -46,7 +46,7 @@ const REVIEWER_PASSWORD =
   process.env.REVIEWER_PASSWORD ||
   crypto.randomBytes(18).toString('base64').replace(/[+/=]/g, '').slice(0, 24);
 const REVIEWER_DHARMA_NAME = process.env.REVIEWER_DHARMA_NAME || '审核测试';
-const REVIEWER_CLASS_NAME = process.env.REVIEWER_CLASS_NAME || '加行';
+const REVIEWER_CLASS_NAME = process.env.REVIEWER_CLASS_NAME || '预科：加行';
 const REVIEWER_ENTRY_YEAR =
   process.env.REVIEWER_ENTRY_YEAR || String(new Date().getFullYear());
 const SEED_DAYS = Math.max(1, parseInt(process.env.SEED_DAYS || '14', 10));
@@ -58,6 +58,13 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
 function todayMinus(days) {
   const d = new Date();
   d.setDate(d.getDate() - days);
+  return d.toISOString().split('T')[0];
+}
+
+function weekStartDate(isoDate) {
+  // Returns the Sunday on/before the given YYYY-MM-DD date.
+  const d = new Date(`${isoDate}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay());
   return d.toISOString().split('T')[0];
 }
 
@@ -289,6 +296,9 @@ async function seedPracticeHistory(userId, projects) {
           user_id: userId,
           practice_id: meta.practice_id,
           record_date: date,
+          session_number: 1,
+          session_attempt: 1,
+          week_start_date: weekStartDate(date),
           duration_minutes: minutes,
           method: '前行实修',
           reflection: d === 0 ? '今日观修清明，安住明觉。' : null,
