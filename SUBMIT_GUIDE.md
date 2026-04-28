@@ -77,24 +77,33 @@ Version auto-increment is enabled (`autoIncrement: true` in the production build
 
 ---
 
-## Why we build React Native from source on iOS
+## iOS folly/coro build error — RESOLVED (verified 2026-04-28)
 
-`app.json` sets `"buildReactNativeFromSource": true` in the iOS section of the `expo-build-properties` plugin, and `eas.json` sets `RCT_USE_PREBUILT_RNCORE: "0"` in both the `preview` and `production` build profiles. **Do not remove these without verifying iOS still builds.**
+> **✅ Status: FIXED.** Both iOS `.ipa` and Android `.apk` preview builds now succeed end-to-end on EAS. iOS build `816c6dba-7ae5-4f88-85b9-d8d052247cba` produced `https://expo.dev/artifacts/eas/gYWFqKGKtHDtn4wrraTPPh.ipa`. Android build `f06c3e39-8fd6-4168-bc53-1d137486417d` produced `https://expo.dev/artifacts/eas/vFVTZPeA4J3Jw4a3JpRXbD.apk`.
 
-Expo SDK 54 ships React Native's native dependencies as prebuilt binaries (`ReactNativeDependencies` and `React-Core-prebuilt`). Those prebuilt folly headers `#include <folly/coro/Coroutine.h>`, but the matching `folly-coro` header is not packaged in the iOS Pods. As soon as a native module pulls in `folly/dynamic.h`, every iOS target fails with:
+### What the fix is
 
-```
-folly/Expected.h:1587:10: fatal error: 'folly/coro/Coroutine.h' file not found
-```
+Two pieces work together:
 
-The flag forces CocoaPods to build folly (and the rest of React Native's native deps) from source instead of consuming the broken prebuilts. This roughly doubles iOS build time on EAS, which is acceptable given the alternative is no `.ipa` at all. Re-evaluate once we upgrade past Expo SDK 54 / React Native 0.81 — if upstream packages a fixed set of prebuilt binaries, the flag can be removed.
+**1. Build RN folly from source AND disable folly coroutines via a config plugin.**
+- `app.json` (`expo-build-properties` plugin, ios): `"buildReactNativeFromSource": true`, `"deploymentTarget": "15.1"`, `"useFrameworks": "static"`.
+- `eas.json` `preview.env` and `production.env`: `"RCT_USE_PREBUILT_RNCORE": "0"`.
+- `plugins/withFollyCoroFix.js` (registered in `app.json` plugins array): a `withDangerousMod` plugin that injects a Ruby block at the end of the Podfile `post_install` that adds `FOLLY_CFG_NO_COROUTINES=1` to `GCC_PREPROCESSOR_DEFINITIONS` for every Pod target. This is the knob folly's own `Portability.h` checks **before** auto-detecting C++20 coroutines, so it correctly turns off the `#include <folly/coro/Coroutine.h>` branch in `folly/Expected.h:1587`. (`FOLLY_HAS_COROUTINES=0` alone does NOT work — folly's `Portability.h:635` unconditionally redefines it.)
 
-Do **not** replace this with a Podfile post-install hook or hand-patched folly headers; those break on `pod install` regeneration.
+**2. Upgrade `react-native-reanimated` to v4 for RN 0.81 compatibility.**
+- `package.json`: `react-native-reanimated@~4.1.0` (was `~3.15.5`), added `react-native-worklets@0.5.1` peer dep.
+- Removed `expo.install.exclude` for reanimated and bumped the `overrides` entry.
+- `babel.config.js`: re-added `'react-native-worklets/plugin'` (Reanimated v4 requires it).
+- This also resolves the Android `:react-native-reanimated:configureCMakeRelWithDebInfo` prefab failure that was blocking the `.apk`.
 
-### Checklist when upgrading Expo SDK
+### Why earlier attempts failed
 
-Before removing these flags after an SDK upgrade:
-1. Check the [Expo SDK changelog](https://expo.dev/changelog) — confirm the new SDK ships fixed prebuilt binaries for React Native deps.
-2. Remove `"buildReactNativeFromSource": true` from `app.json` (ios section) and `"RCT_USE_PREBUILT_RNCORE": "0"` from both env blocks in `eas.json`.
-3. Trigger a preview iOS build and confirm the Xcode log contains **no** `folly/coro/Coroutine.h file not found` error.
-4. If the error reappears, re-add both flags.
+- `RCT_USE_PREBUILT_RNCORE=0` + `buildReactNativeFromSource: true` correctly switched the build to source folly, but the source folly has the same `<folly/coro/Coroutine.h>` include that doesn't ship with the Pod.
+- A first plugin attempt set `FOLLY_HAS_COROUTINES=0` directly. The compile log showed the define landed (`<command line>:4: #define FOLLY_HAS_COROUTINES 0`), but `RCT-Folly/folly/Portability.h:635` then unconditionally redefined it back to `1` — so the include was still pulled.
+- The correct knob is `FOLLY_CFG_NO_COROUTINES=1`, which folly checks **before** the auto-detect block.
+
+### What to do if the issue ever returns
+
+1. Verify the plugin actually injected by inspecting the EAS Xcode log for `-DFOLLY_CFG_NO_COROUTINES\=1` in the compiler invocations (should appear hundreds of times across Pod targets).
+2. Verify the source-build path is in effect (`Installing RCT-Folly (2024.11.18.00)` in the `INSTALL_PODS` phase). If you see `ReactNativeDependencies` being downloaded as a prebuilt artifact instead, `RCT_USE_PREBUILT_RNCORE=0` was not honored.
+3. If folly upstream changes the gating macro again, look for the most recent `#define FOLLY_HAS_COROUTINES` in `node_modules/react-native/third-party-podspecs/RCT-Folly.podspec.json`-referenced source and adjust `plugins/withFollyCoroFix.js` accordingly.

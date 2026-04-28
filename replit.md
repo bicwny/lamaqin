@@ -61,6 +61,10 @@ Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) w
 - `expo-build-properties` is pinned to `~1.0.10` (compatible with Expo SDK 54). Do not upgrade without also upgrading the Expo SDK.
 - `react-native-safe-area-context` has an override in `package.json` to deduplicate the version pulled by `react-native-calendars`.
 - iOS deployment target is 15.1 with static frameworks; Android targets SDK 35.
+- **EAS build status (verified 2026-04-28): iOS `.ipa` and Android `.apk` builds both succeed.** Latest preview builds: iOS `816c6dba-7ae5-4f88-85b9-d8d052247cba` → `https://expo.dev/artifacts/eas/gYWFqKGKtHDtn4wrraTPPh.ipa`; Android `f06c3e39-8fd6-4168-bc53-1d137486417d` → `https://expo.dev/artifacts/eas/vFVTZPeA4J3Jw4a3JpRXbD.apk`. The fix has two parts:
+  1. **iOS folly/coro fix:** `app.json` has `buildReactNativeFromSource: true`, both `eas.json` profiles set `RCT_USE_PREBUILT_RNCORE: "0"`, and the local config plugin `plugins/withFollyCoroFix.js` (registered in `app.json` plugins array) injects `FOLLY_CFG_NO_COROUTINES=1` into every Pod target's `GCC_PREPROCESSOR_DEFINITIONS` via a `withDangerousMod` Podfile `post_install` block. The CFG variant is required because `RCT-Folly/folly/Portability.h:635` unconditionally redefines `FOLLY_HAS_COROUTINES`, so only the pre-detect knob (`FOLLY_CFG_NO_COROUTINES`) sticks.
+  2. **react-native-reanimated v4 upgrade for RN 0.81:** `react-native-reanimated@~4.1.0` (was `~3.15.5`) + `react-native-worklets@0.5.1` (new peer dep). Removed `expo.install.exclude` and bumped `overrides`. `babel.config.js` now includes `'react-native-worklets/plugin'`. This unblocks both the iOS `ReanimatedMountHook.h` `override` C++ error and the Android `:react-native-reanimated:configureCMakeRelWithDebInfo` prefab error simultaneously.
+  See `SUBMIT_GUIDE.md` → "iOS folly/coro build error — RESOLVED" for full diagnostic detail and what to check if regression occurs.
 - Version auto-increment is enabled for production builds via `appVersionSource: "remote"` and `autoIncrement: true`.
 
 # External Dependencies

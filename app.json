@@ -88,7 +88,8 @@
             "targetSdkVersion": 35
           }
         }
-      ]
+      ],
+      "./plugins/withFollyCoroFix"
     ],
     "extra": {
       "router": {},

@@ -4,7 +4,7 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      // react-native-reanimated/plugin removed for Expo SDK 54 compatibility
+      'react-native-worklets/plugin',
     ],
   };
 };
