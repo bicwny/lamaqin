@@ -53,6 +53,11 @@ The single dev workflow `三殊胜 Development` runs `EXPO_PACKAGER_PROXY_URL=ht
 Custom app icon (`assets/icon.png`) and splash screen (`assets/splash.png`) are configured in `app.json` for iOS, Android, and web.
 Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) with a purple background (`#7C3AED`) matching the design system.
 
+## App Store Submission Materials
+- `docs/APP_STORE_SUBMISSION.md` is the copy-paste source of truth for every App Store Connect field (categories, age rating, App Privacy questionnaire, description, keywords, screenshot specs, reviewer demo account notes, final checklist).
+- `public/privacy-policy.html` is the publicly hostable bilingual (zh-Hans + English) privacy policy. It ships automatically inside the Expo web build (`public/` is copied verbatim), so once the web build is deployed anywhere it becomes reachable at `/privacy-policy.html` — that URL is what gets pasted into App Store Connect → App Privacy.
+- The privacy policy reflects the actual data the app collects: Supabase email auth, optional dharma name, and practice records linked to the user. No analytics/ads SDKs, no IDFA, no location/camera/contacts/health.
+
 ## EAS Build & Submit Configuration
 - `eas.json` has `preview` and `production` build profiles wired with `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from EAS Secrets.
 - Preview Android builds produce an APK; production Android builds produce an AAB (App Bundle).

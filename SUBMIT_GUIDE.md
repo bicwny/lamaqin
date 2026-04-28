@@ -18,6 +18,14 @@ This guide explains how to fill in the `eas.json` submit section and publish you
 - Active [Apple Developer Program](https://developer.apple.com/programs/) membership under team `XCS8NXLU3K`.
 - App record exists in App Store Connect for bundle id `com.bicwny.sanshusheng` (ascAppId `6764305709`).
 
+### App Store listing content (required before review)
+The App Store Connect listing for 三殊胜 needs categories, age rating,
+privacy policy URL, description, keywords, screenshots, etc. before Apple
+will accept a build for review. All of that copy is pre-written in
+[`docs/APP_STORE_SUBMISSION.md`](./docs/APP_STORE_SUBMISSION.md), and a
+ready-to-host privacy policy ships with the web build at
+[`public/privacy-policy.html`](./public/privacy-policy.html).
+
 ### Submit command
 ```bash
 eas submit --platform ios --profile production
