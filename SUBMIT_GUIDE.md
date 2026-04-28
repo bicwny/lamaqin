@@ -90,3 +90,11 @@ folly/Expected.h:1587:10: fatal error: 'folly/coro/Coroutine.h' file not found
 The flag forces CocoaPods to build folly (and the rest of React Native's native deps) from source instead of consuming the broken prebuilts. This roughly doubles iOS build time on EAS, which is acceptable given the alternative is no `.ipa` at all. Re-evaluate once we upgrade past Expo SDK 54 / React Native 0.81 — if upstream packages a fixed set of prebuilt binaries, the flag can be removed.
 
 Do **not** replace this with a Podfile post-install hook or hand-patched folly headers; those break on `pod install` regeneration.
+
+### Checklist when upgrading Expo SDK
+
+Before removing these flags after an SDK upgrade:
+1. Check the [Expo SDK changelog](https://expo.dev/changelog) — confirm the new SDK ships fixed prebuilt binaries for React Native deps.
+2. Remove `"buildReactNativeFromSource": true` from `app.json` (ios section) and `"RCT_USE_PREBUILT_RNCORE": "0"` from both env blocks in `eas.json`.
+3. Trigger a preview iOS build and confirm the Xcode log contains **no** `folly/coro/Coroutine.h file not found` error.
+4. If the error reappears, re-add both flags.

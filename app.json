@@ -79,9 +79,9 @@
         "expo-build-properties",
         {
           "ios": {
+            "buildReactNativeFromSource": true,
             "deploymentTarget": "15.1",
-            "useFrameworks": "static",
-            "buildReactNativeFromSource": true
+            "useFrameworks": "static"
           },
           "android": {
             "compileSdkVersion": 35,
