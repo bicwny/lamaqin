@@ -239,18 +239,80 @@ empty — that's expected; you can fill in everything else above first.
 
 ### 4.11 Sign-In Information for Reviewers
 
-Apple's reviewer needs working credentials to log in. Create a dedicated
-demo account in your Supabase project (e.g.
-`appstore-review@bicwny.com` / a strong password you write down) with one
-class enrolled and a couple of practice records pre-seeded so the reviewer
-can see real content.
+Apple's reviewer needs working credentials to log in. The app uses
+**email-OTP authentication only** (no passwords). Use the seeder script in
+this repo to create a fully populated reviewer account, then forward the OTP
+to Apple's reviewer when they request it during review.
+
+#### How to populate the reviewer account
+
+```bash
+# 1. Get the service-role key from Supabase Dashboard → Settings → API
+# 2. Make sure EXPO_PUBLIC_SUPABASE_URL is set in your shell env (it already
+#    is in this repo's .env / Replit Secrets — print it with `echo` to confirm).
+# 3. Run the seeder (idempotent — safe to re-run):
+EXPO_PUBLIC_SUPABASE_URL=<https://...supabase.co> \
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key> \
+  node scripts/seed-reviewer-account.js
+```
+
+By default the script:
+
+- creates / refreshes the auth user `appstore-review@bicwny.com`
+- sets a random strong password (printed at the end — save it)
+- sets dharma name `审核测试`
+- enrolls in the **加行** class (covers count-based + time-based practices)
+- joins the class's required course (`前行广释`)
+- creates all class-required practice projects
+- seeds **14 days** of `daily_records` and `meditation_records` with realistic
+  variance, and a few `study_records` on the first course
+- recomputes `current_count` so 当日 / 功课 / 日历 / 圆满 screens all show
+  populated data
+
+You can override `REVIEWER_EMAIL`, `REVIEWER_PASSWORD`, `REVIEWER_CLASS_NAME`,
+`REVIEWER_DHARMA_NAME`, `REVIEWER_ENTRY_YEAR`, or `SEED_DAYS` via env vars.
+
+#### What to paste into App Store Connect → App Review Information
 
 | Field | Value |
 |---|---|
 | Demo account required | **Yes** |
 | User Name | `appstore-review@bicwny.com` |
-| Password | *(set in Supabase, paste here)* |
-| Notes for reviewer | "请使用上述账号登录，应用为佛弟子日常修行记录工具，所有功能可在登录后体验。This app is a daily practice tracker for Buddhist practitioners; all features are accessible after sign-in with the credentials above. No payments, no third-party login required." |
+| Password | *(the random password printed by the seeder — paste here)* |
+| Notes for reviewer | *(see bilingual block below)* |
+
+**Reviewer notes (paste into the "Notes" field):**
+
+```
+This app uses email one-time-code (OTP) sign-in — no password is required.
+To sign in:
+  1. Open the app, choose “Sign in”, and enter
+     appstore-review@bicwny.com.
+  2. Tap “Send code”. Then email contact@bicwny.com (or reply in App Store
+     Connect Resolution Center) and we will forward the 6-digit code within
+     a few minutes during review hours (UTC 00:00–14:00).
+  3. Enter the code in the app to complete sign-in.
+
+The account is pre-populated with a class enrollment (加行 / Preliminary
+Practices), a required course, and ~2 weeks of practice history so every
+major tab (当日 Today, 修行 Practice, 修学 Study, 个人 Profile) shows real
+content. No payments, no third-party login, no external content access.
+
+本应用使用邮箱一次性验证码登录（无需密码）：
+  1. 打开应用，选择“登录”，输入 appstore-review@bicwny.com。
+  2. 点“发送验证码”后，请邮件至 contact@bicwny.com 或在 App Store
+     Connect 解决方案中心留言，我们会在审核时段（UTC 00:00–14:00）
+     几分钟内转发 6 位验证码。
+  3. 在应用中输入验证码即可完成登录。
+
+该账号已预置班级报名（加行）、必修课程及约两周的功课记录，
+可完整体验“当日 / 修行 / 修学 / 个人”等所有主要功能。
+应用无内购、无第三方登录、无外部内容访问。
+```
+
+> Replace `contact@bicwny.com` with whichever inbox the developer monitors
+> during review. The Supabase password set on the account is kept only as a
+> future-proof credential — the current app never asks for it.
 
 ### 4.12 Export Compliance
 
@@ -273,7 +335,7 @@ Tick each item before clicking **Add for Review**:
 - [ ] "What's New in This Version" filled in.
 - [ ] Build attached (after the production build is uploaded).
 - [ ] Copyright filled in.
-- [ ] Reviewer demo account created in Supabase and credentials pasted in App Review Information.
+- [ ] Reviewer demo account seeded via `node scripts/seed-reviewer-account.js` and credentials + OTP-forwarding notes pasted in App Review Information (see §4.11).
 - [ ] **Add for Review** clicked → status changes to **Waiting for Review**.
 
 When that last bullet is checked, this task is done.
