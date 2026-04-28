@@ -68,9 +68,9 @@ waitForPort = 5000
 expertMode = true
 
 [deployment]
-deploymentTarget = "autoscale"
-run = ["npm", "run", "serve"]
+deploymentTarget = "static"
 build = ["npm", "run", "build:web"]
+publicDir = "dist-web"
 
 [postMerge]
 path = "scripts/post-merge.sh"
