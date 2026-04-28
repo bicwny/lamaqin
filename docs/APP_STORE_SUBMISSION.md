@@ -346,6 +346,86 @@ content. No payments, no third-party login, no external content access.
 > during review. The Supabase password set on the account is kept only as a
 > future-proof credential — the current app never asks for it.
 
+#### Reviewer-inbox monitoring (REQUIRED before "Add for Review")
+
+The reviewer notes above promise Apple's reviewer that someone will forward
+the 6-digit OTP "within a few minutes during review hours". If that inbox
+isn't actually being watched, the reviewer can't sign in and the build will
+be rejected with a 2.1 (Performance) or 5.1.1 (Data Collection) failure.
+Before submitting, the inbox owner must complete every item below.
+
+1. **Confirm the inbox is real and reaches a human.**
+   - Send a test email to `contact@bicwny.com` from an outside address (e.g.
+     a personal Gmail). It must hit a real human's inbox — not bounce, not
+     sit in a shared mailbox nobody opens, not get auto-filtered to spam.
+   - If the address that should be used is *not* `contact@bicwny.com`,
+     update **every** occurrence of `contact@bicwny.com` in §4.11 above
+     (both the English and 中文 paragraphs of the reviewer notes block)
+     before pasting them into App Store Connect. Search the file for
+     `contact@bicwny.com` to make sure none are missed.
+   - Also confirm the same address is the one set as **App Review →
+     Contact Information → Email** in App Store Connect, so Apple has a
+     consistent way to reach you if Resolution Center is preferred.
+
+2. **Commit to a monitoring cadence.**
+   - Apple's review queue can pick up the build at any hour. The reviewer
+     notes promise availability during **UTC 00:00–14:00** (= roughly
+     08:00–22:00 Beijing). The owner of the inbox must check it at least
+     every 2–3 hours during that window for the entire time the build is
+     **Waiting for Review** or **In Review** (typically 24–48h, sometimes
+     longer).
+   - Recommended: turn on push notifications for new mail on the phone of
+     whoever owns the inbox, so a reviewer's email triggers an alert
+     instead of relying on manual polling.
+   - If a single person can't cover the window, arrange a backup
+     forwarder before submitting (e.g. add a second human as a
+     `Cc:`/forwarding rule).
+
+3. **Set up an auto-responder so the reviewer gets immediate
+   acknowledgement.** This is technically optional but strongly
+   recommended — without it the reviewer has no way to tell their
+   request was received and may close the ticket as unresponsive.
+   In Gmail / Google Workspace: **Settings → See all settings → General →
+   Vacation responder** (or **Filters and Blocked Addresses → Create a
+   filter** with subject contains `appstore-review@bicwny.com` →
+   *Send template*). In Outlook: **Settings → Mail → Automatic replies**.
+   Paste the bilingual template below verbatim:
+
+   ```
+   Subject: Re: appstore-review@bicwny.com login code request
+
+   Hi App Review team,
+
+   Thanks for reaching out — your message has been received. We are
+   fetching the 6-digit sign-in code for appstore-review@bicwny.com from
+   our Supabase logs and will reply with it within a few minutes (review
+   hours: UTC 00:00–14:00). If you don't see a follow-up within 30
+   minutes, please resend or use the App Store Connect Resolution Center
+   and we'll respond immediately.
+
+   你好，审核团队：
+   邮件已收到，我们正在从 Supabase 后台获取
+   appstore-review@bicwny.com 的 6 位登录验证码，几分钟内会回复您
+   （审核时段：UTC 00:00–14:00 / 北京时间 08:00–22:00）。如 30 分钟
+   内未收到回复，请重新发送或在 App Store Connect 解决方案中心留言，
+   我们会立即处理。
+
+   — 三殊胜 team
+   ```
+
+4. **Know how to fetch the OTP fast.** When the reviewer's email arrives:
+   - Open the app on any device, choose **Sign in**, enter
+     `appstore-review@bicwny.com`, tap **Send code** to trigger Supabase
+     to email a fresh 6-digit code to the reviewer account's mailbox, *or*
+   - Open Supabase Dashboard → **Authentication → Logs** → filter by
+     `appstore-review@bicwny.com` to read the most recent OTP that
+     Supabase generated when the reviewer themselves tapped **Send code**
+     in the app.
+
+   Codes expire after a few minutes — reply to the reviewer with the code
+   immediately and tell them which method (app-triggered vs. their own
+   tap) the code came from so they know to use it before it expires.
+
 ### 4.12 Export Compliance
 
 Already handled by `app.json` → `ios.infoPlist.ITSAppUsesNonExemptEncryption: false`.
@@ -368,6 +448,7 @@ Tick each item before clicking **Add for Review**:
 - [ ] Build attached (after the production build is uploaded).
 - [ ] Copyright filled in.
 - [ ] Reviewer demo account seeded via `node scripts/seed-reviewer-account.js` and credentials + OTP-forwarding notes pasted in App Review Information (see §4.11).
+- [ ] OTP-forwarding inbox (the address in §4.11's reviewer notes — `contact@bicwny.com` by default) confirmed reachable, owned by a real human, monitored every 2–3h during UTC 00:00–14:00, and (recommended) auto-responder configured per §4.11 "Reviewer-inbox monitoring".
 - [ ] **Add for Review** clicked → status changes to **Waiting for Review**.
 
 When that last bullet is checked, this task is done.
