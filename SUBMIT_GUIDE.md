@@ -6,17 +6,17 @@ This guide explains how to fill in the `eas.json` submit section and publish you
 
 ## iOS (Apple App Store)
 
-In `eas.json` → `submit.production.ios`, replace the placeholder values:
+`eas.json` → `submit.production.ios` is fully configured:
 
-| Field | Where to find it |
-|-------|-----------------|
-| `appleId` | Your Apple ID email (the one you use to sign in to App Store Connect) |
-| `ascAppId` | Go to [App Store Connect](https://appstoreconnect.apple.com) → Your App → General → App Information → Apple ID (a numeric ID like `1234567890`) |
-| `appleTeamId` | Go to [Apple Developer Portal](https://developer.apple.com/account) → Membership Details → Team ID (a 10-character string like `ABCDE12345`) |
+| Field | Current value | Where it came from |
+|-------|---------------|-----------------|
+| `appleId` | `fob.design@gmail.com` | Apple ID used to sign in to App Store Connect |
+| `ascAppId` | `6764305709` | App Store Connect → 三殊胜 → General → App Information → Apple ID |
+| `appleTeamId` | `XCS8NXLU3K` | Apple Developer Portal → Membership Details → Team ID |
 
-### Prerequisites
-- An active [Apple Developer Program](https://developer.apple.com/programs/) membership ($99/year)
-- An app record created in App Store Connect with a matching bundle identifier: `com.bicwny.sanshusheng`
+### Prerequisites (already satisfied)
+- Active [Apple Developer Program](https://developer.apple.com/programs/) membership under team `XCS8NXLU3K`.
+- App record exists in App Store Connect for bundle id `com.bicwny.sanshusheng` (ascAppId `6764305709`).
 
 ### Submit command
 ```bash
