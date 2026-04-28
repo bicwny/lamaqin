@@ -17,16 +17,48 @@ automatically with any web build of the app.
 App Store Connect requires a **publicly reachable URL** for the privacy
 policy. The HTML file at `public/privacy-policy.html` is shipped as part of
 the Expo web build (`expo export -p web` puts everything in `public/` into
-the web output). Pick one of these to host it:
+the web output).
+
+### Replit Static Deployment (configured)
+
+`.replit` is already configured for a Replit Static Deployment of the web
+build:
+
+```toml
+[deployment]
+deploymentTarget = "static"
+build = ["npm", "run", "build:web"]
+publicDir = "dist-web"
+```
+
+`npm run build:web` runs `expo export -p web --output-dir dist-web` and then
+`scripts/add-pwa-meta-tags.js`, producing `dist-web/privacy-policy.html`
+alongside the rest of the web build.
+
+To publish:
+
+1. Open the **Publishing** tool in the Replit workspace (main repl, after
+   this task is merged).
+2. Click **Publish** — Replit will run the configured `build` step and serve
+   `dist-web/` as a static site.
+3. After publishing, the policy will be reachable at
+   `https://<your-deploy>.replit.app/privacy-policy.html`. (Replit's static
+   server may serve it as `/privacy-policy` without the `.html`; both forms
+   resolve to the same page.)
+4. Open the URL in a private browser window to confirm it returns HTTP 200
+   with the bilingual 三殊胜 隐私政策 / Privacy Policy content.
+
+### Other hosting options
 
 | Option | URL pattern | Effort |
 |---|---|---|
-| Replit deploy of this repo's web build | `https://<your-deploy>.replit.app/privacy-policy.html` | Lowest — already part of the build |
+| Replit deploy of this repo's web build | `https://<your-deploy>.replit.app/privacy-policy.html` | Lowest — already configured |
 | GitHub Pages | `https://<user>.github.io/<repo>/privacy-policy.html` | Low |
 | Any static host (Netlify / Vercel / Cloudflare Pages) | `https://<host>/privacy-policy.html` | Low |
 
 Whichever you pick, **paste that URL into App Store Connect → App Privacy →
-Privacy Policy URL**.
+Privacy Policy URL** (and also into the **Support URL** field if no separate
+support page exists yet).
 
 ---
 
