@@ -46,6 +46,9 @@ The app is configured with `"newArchEnabled": true` to leverage React Native's N
 ## Dev Server (Metro) Watcher
 Watchman is installed via Nix (`pkgs.watchman` in `replit.nix`) and Metro auto-detects it, so the dev server uses the Watchman-backed watcher instead of Metro's `FallbackWatcher`. Project-wide watcher exclusions live in `.watchmanconfig` (`ignore_dirs`: `.git`, `.local`, `.expo`, `.cache`, `.upm`, `dist`, `dist-web`, `android`, `ios`). The `.local` exclusion prevents agent-tooling churn from triggering ENOENT crashes; `metro.config.js` keeps a matching `blockList` for resolver-level safety.
 
+## Dev Server Host Configuration
+The single dev workflow `三殊胜 Development` runs `EXPO_PACKAGER_PROXY_URL=https://$REPLIT_DEV_DOMAIN REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN npx expo start --port 5000` on port 5000. These env vars are required so Metro advertises the public Replit dev domain (e.g. `exp://<repl>.<region>.replit.dev`) instead of the container's internal IP — without them, the "Simulate on iOS" iframe and Expo Go can't reach the bundler and Expo shows a 502 "Hmm... We couldn't reach this app" page. The same workflow serves both the web preview (root URL) and native bundles for the iOS/Android simulators.
+
 ## App Branding Assets
 Custom app icon (`assets/icon.png`) and splash screen (`assets/splash.png`) are configured in `app.json` for iOS, Android, and web.
 Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) with a purple background (`#7C3AED`) matching the design system.
