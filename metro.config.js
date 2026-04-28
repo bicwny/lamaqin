@@ -4,7 +4,9 @@ const { withNativeWind } = require('nativewind/metro');
 const config = getDefaultConfig(__dirname);
 
 // Use regular expression for blockList without exclusionList
-config.resolver.blockList = /__replco.*/;
+// Exclude __replco internals and the .local directory (used by agent tooling
+// for transient files that would otherwise crash Metro's watcher with ENOENT)
+config.resolver.blockList = /(__replco.*|[\\/]\.local[\\/].*)/;
 
 // Sanitize resolver arrays to prevent undefined entries that crash production bundler
 config.resolver.sourceExts = Array.from(new Set(
