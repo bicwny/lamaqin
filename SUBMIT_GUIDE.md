@@ -35,30 +35,64 @@ eas submit --platform ios --profile production
 
 ## Android (Google Play Store)
 
-In `eas.json` → `submit.production.android`, replace the placeholder values:
+`eas.json` → `submit.production.android` is wired up to read the service
+account key from `./google-play-service-account.json` (project root). That
+filename is already in `.gitignore`, so once you drop the real key in place it
+will not be committed.
 
-| Field | Where to find it |
-|-------|-----------------|
-| `serviceAccountKeyPath` | Path to your Google Play service account JSON key file (relative to project root) |
-| `track` | The release track: `production`, `beta`, `alpha`, or `internal` (default: `production`) |
+| Field | Current value | What it means |
+|-------|---------------|---------------|
+| `serviceAccountKeyPath` | `./google-play-service-account.json` | Where EAS reads the JSON key from. Just place the file at this path. |
+| `track` | `production` | Release track: `production`, `beta`, `alpha`, or `internal`. |
 
-### How to create a Google Play service account key
-1. Go to [Google Play Console](https://play.google.com/console) → Setup → API access
-2. Link your Google Cloud project (or create one)
-3. Create a new service account with "Service Account User" role
-4. In Google Cloud Console, create a JSON key for that service account
-5. Download the JSON key file and place it in your project (e.g., `./google-play-service-account.json`)
-6. Back in Google Play Console, grant the service account "Release manager" permissions
-7. Update `serviceAccountKeyPath` in `eas.json` to point to your key file
+### What you need to do once (manual, ~15 min)
 
-### Prerequisites
-- A [Google Play Developer account](https://play.google.com/console) ($25 one-time fee)
-- An app created in Google Play Console with matching package name: `com.bicwny.sanshusheng`
+These steps require a real Google account and a $25 payment, so they cannot be
+automated from this repo.
 
-### Submit command
+1. **Create a Google Play Developer account** at
+   <https://play.google.com/console> ($25 one-time fee). Skip if you already
+   have one.
+2. **Create an app entry** in Play Console with package name
+   `com.bicwny.sanshusheng` (must match `app.json` `android.package`).
+3. **Link a Google Cloud project**: Play Console → Setup → API access → "Link
+   project". Create a new GCP project if you don't have one.
+4. **Create a service account** in that GCP project (IAM & Admin → Service
+   Accounts → Create). Give it the role **Service Account User**. No need to
+   grant it any GCP project permissions beyond that.
+5. **Create a JSON key** for the service account (Service Account → Keys →
+   Add Key → Create new key → JSON). A `.json` file will download.
+6. **Grant Play Console access**: back in Play Console → Setup → API access,
+   find the service account in the list and click "Grant access". Give it
+   **Release manager** (or **Admin (all permissions)**) for this app.
+7. **Drop the JSON key into the project** at exactly this path:
+
+   ```
+   ./google-play-service-account.json
+   ```
+
+   (`.gitignore` already excludes `google-play-service-account*.json`, so the
+   secret stays out of git. Do **not** rename it unless you also update
+   `eas.json`.)
+
+### Verify it works
+
 ```bash
+# 1. Confirm the file is there and gitignored
+ls -l google-play-service-account.json
+git check-ignore -v google-play-service-account.json   # should print the rule
+
+# 2. Build a production .aab
+eas build --platform android --profile production
+
+# 3. Submit it
 eas submit --platform android --profile production
 ```
+
+The first `eas submit` after setup will also ask you to upload an initial
+manual release through the Play Console UI (Google requires a human to publish
+the very first version of an app). Subsequent submissions will be fully
+automated.
 
 ---
 

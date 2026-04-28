@@ -63,7 +63,8 @@ Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) w
 ## EAS Build & Submit Configuration
 - `eas.json` has `preview` and `production` build profiles wired with `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from EAS Secrets.
 - Preview Android builds produce an APK; production Android builds produce an AAB (App Bundle).
-- `submit.production` block has placeholder fields for iOS (Apple ID, ASC App ID, Team ID) and Android (Google Play service account JSON path) — see `SUBMIT_GUIDE.md` for detailed instructions on filling these in.
+- `submit.production.ios` is fully populated (Apple ID `fob.design@gmail.com`, ASC App ID `6764305709`, Team ID `XCS8NXLU3K`).
+- `submit.production.android.serviceAccountKeyPath` points to `./google-play-service-account.json` (project root). The file itself is **not** in the repo — the user must create the Google Play Developer account, generate the service account JSON key from the linked GCP project, grant it Release manager access in Play Console, and drop the file at that exact path. `.gitignore` already excludes `google-play-service-account*.json`. See `SUBMIT_GUIDE.md` → "Android (Google Play Store)" for the step-by-step.
 - EAS Secrets (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) must be pushed via `eas secret:create` after authenticating with `eas login`.
 - `expo-build-properties` is pinned to `~1.0.10` (compatible with Expo SDK 54). Do not upgrade without also upgrading the Expo SDK.
 - `react-native-safe-area-context` has an override in `package.json` to deduplicate the version pulled by `react-native-calendars`.

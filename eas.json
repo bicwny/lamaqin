@@ -50,7 +50,7 @@
         "appleTeamId": "XCS8NXLU3K"
       },
       "android": {
-        "serviceAccountKeyPath": "REPLACE_WITH_PATH_TO_GOOGLE_PLAY_SERVICE_ACCOUNT_JSON",
+        "serviceAccountKeyPath": "./google-play-service-account.json",
         "track": "production"
       }
     }
