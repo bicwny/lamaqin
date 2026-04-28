@@ -41,3 +41,4 @@ google-play-service-account*.json
 *.tsbuildinfo
 
 app-example
+.secrets/
