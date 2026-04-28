@@ -1,0 +1,13 @@
+{
+  "ignore_dirs": [
+    ".git",
+    ".local",
+    ".expo",
+    ".cache",
+    ".upm",
+    "dist",
+    "dist-web",
+    "android",
+    "ios"
+  ]
+}

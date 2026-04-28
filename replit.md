@@ -43,6 +43,9 @@ Supabase Auth handles a complete email/password authentication system, including
 ## React Native Architecture Configuration
 The app is configured with `"newArchEnabled": true` to leverage React Native's New Architecture for production builds.
 
+## Dev Server (Metro) Watcher
+Watchman is installed via Nix (`pkgs.watchman` in `replit.nix`) and Metro auto-detects it, so the dev server uses the Watchman-backed watcher instead of Metro's `FallbackWatcher`. Project-wide watcher exclusions live in `.watchmanconfig` (`ignore_dirs`: `.git`, `.local`, `.expo`, `.cache`, `.upm`, `dist`, `dist-web`, `android`, `ios`). The `.local` exclusion prevents agent-tooling churn from triggering ENOENT crashes; `metro.config.js` keeps a matching `blockList` for resolver-level safety.
+
 ## App Branding Assets
 Custom app icon (`assets/icon.png`) and splash screen (`assets/splash.png`) are configured in `app.json` for iOS, Android, and web.
 Android adaptive icon uses a dedicated foreground (`assets/adaptive-icon.png`) with a purple background (`#7C3AED`) matching the design system.
